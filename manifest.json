@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "repo": "koten-ai/zeus_chat_request",
+  "profile": "v2_min",
+  "description": "Minified Zeus V2 chat_request catalogs for clients, demos, and Dev Helper MCP",
+  "source_engine": {
+    "generated_from": "koten-ai/Zeus",
+    "path_in_engine": "ai/V2/variants/min/",
+    "regenerate": "go run . ai-snapshot --mode=all --api-version=v2 --min"
+  },
+  "usage": {
+    "stamp": "Always verify/stamp with your Zeus instance before production; do not invent contract hashes",
+    "client_sync": "Copy or sync into ZEUS_CLIENT_CONFIG_DIR/chat_requests/ after stamp, or use sync_chat_requests from live Zeus"
+  },
+  "catalogs": [
+    {
+      "file": "v2/min/chat_request_analytics_v2_min.json",
+      "mode": "analytics",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:387d0860afba87d25c6bc6ea07230e21"
+      },
+      "sha256": "4ba306db5928c108d202439a1cfd18a286b0d7e710d1ff2c56bc1755b887478c",
+      "bytes": 14684
+    },
+    {
+      "file": "v2/min/chat_request_auto_v2_min.json",
+      "mode": "auto",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:f0f92e4d3146031ac5878ded8ee97a6a"
+      },
+      "sha256": "ac9d0b01ace5b8d15987230944ed9021c32cf24877bc681cfbcac75b3e959c8a",
+      "bytes": 12784
+    },
+    {
+      "file": "v2/min/chat_request_code_v2_min.json",
+      "mode": "code",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:256479075c414a0ab13f525ce8472288"
+      },
+      "sha256": "ea9c27b6269740b67ffddf99c25bc87748cc00ca4bdd540cb21e781cb1ecb88b",
+      "bytes": 14679
+    },
+    {
+      "file": "v2/min/chat_request_custom_v2_min.json",
+      "mode": "custom",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:c2182701c7915356e0ac3ba9647cc730"
+      },
+      "sha256": "ee3c60cdfb450be325ba3eb9bb9250de8d88c086d884cfb5932049e4efd6a429",
+      "bytes": 14681
+    },
+    {
+      "file": "v2/min/chat_request_fraud_v2_min.json",
+      "mode": "fraud",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:01b976457b771696c5cb58e887f66131"
+      },
+      "sha256": "effc22ffe3ca8629835880559358c47a0b8ba4b67509e6ef9e3e5f8f1184cc1f",
+      "bytes": 14680
+    },
+    {
+      "file": "v2/min/chat_request_open_v2_min.json",
+      "mode": "open",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:ca332a8d4ff0324385e1cb5732bd06ac"
+      },
+      "sha256": "8dd4b7fc9ed4c8b6281392636b90a023fccf46e0938a48ae9ba5026db9c13101",
+      "bytes": 14679
+    },
+    {
+      "file": "v2/min/chat_request_private_v2_min.json",
+      "mode": "private",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:6485e923882f0af24a0ee8d1dbc9fab9"
+      },
+      "sha256": "a1735da8eeac9aa9a8161ef57a5e812312b699df9e80a34fda83fe0b750ff2a8",
+      "bytes": 14682
+    },
+    {
+      "file": "v2/min/chat_request_regulated_v2_min.json",
+      "mode": "regulated",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:16c4adb82a4c7c6984230226982274d5"
+      },
+      "sha256": "d0996fde446d3cf88c1c322485c3972dffc1270b0d4f27fbc283e5ca3fbc661c",
+      "bytes": 14684
+    },
+    {
+      "file": "v2/min/chat_request_research_v2_min.json",
+      "mode": "research",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:4781ec0687db39e7aaf502997b8ae1ba"
+      },
+      "sha256": "49532f60a8ab50f128ddbfa9866a318b35545077ad06f30cc2c0f204aaa7b83c",
+      "bytes": 14683
+    },
+    {
+      "file": "v2/min/chat_request_tenant_v2_min.json",
+      "mode": "tenant",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:a7d8d53512214c18f79ed949c4e32ab4"
+      },
+      "sha256": "8807d51965b683b1d37400d4f6df10ee602ef2b6f5d9fd10fa11ba5338008790",
+      "bytes": 14681
+    }
+  ]
+}

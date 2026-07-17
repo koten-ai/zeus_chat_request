@@ -1,0 +1,470 @@
+{
+  "_format": "zeus.chat_request.v2",
+  "_hash": "md5:f0f92e4d3146031ac5878ded8ee97a6a",
+  "_hash_policy": {
+    "excluded": [
+      "guidance",
+      "contract",
+      "metadata",
+      "_.*"
+    ],
+    "pointers": [
+      "/instructions/system_prompt",
+      "/instructions/verb_usage_guide",
+      "/instructions/verb_order",
+      "/instructions/response_expectations",
+      "/masq",
+      "/verbs",
+      "/messages/*/content"
+    ],
+    "version": 1
+  },
+  "_note": "V2 standardized 5TH contract shape (_format: zeus.chat_request.v2). guidance.query_decomposition carries business intent+entity. Emit both decomposition + query_decomposition on terminating returns. (MIN profile: trimmed for size)",
+  "_version": 1,
+  "contract": {
+    "builder": "ai-snapshot",
+    "hash": "md5:f0f92e4d3146031ac5878ded8ee97a6a"
+  },
+  "messages": [
+    {
+      "content": "Act, don't narrate. ONE decisive pipeline call (correct syntax first time). EVERYTHING inside ONE pipeline steps[] (search/find + traverse + project/get inside steps, using @as.ids). NEVER top-level project/get/find or repeat the same pipeline call. Verbs: cheap=find/get/project/enrich/order/set/describe | mod=pipeline/traverse | exp=search/analyze.\nRules: scope boundary. cheapest first. find→project(@as.ids). After search, project(@as.ids, fields to display e.g. name,style). max 8 steps. no repeat search or same pipeline. Reuse prior @results, do not re-query.\nPLAIN 'as' (e.g. as:items). ids:@prev.ids (NEVER bare @as for ids, never @as.node or @as.xxx).\nCORRECT: steps:[{as:beers,verb:search,entity_type:Beer,query_text:\"21A IPA\",strategy:fts,limit:5},{as:brew,verb:traverse,from:\"@beers.ids\",shape:\"hop\",walk_path:{edge:\"brewed_by\",direction:\"out\"}},{as:loc,verb:traverse,from:\"@brew.ids\",shape:\"hop\",walk_path:{edge:\"located_in\",direction:\"out\"}},{as:citystate,verb:project,ids:\"@loc.ids\",fields:[\"city\",\"state\"]}] . Use @as.ids for all chaining (never .node).\nFor counts: traverse walk_path aggregate:{group_by:\"x\",count:\"*\",as:\"c\"} (project only raw fields).\nTerminating on pipeline (preferred for 1 call / no extra round): write summary + query_decomposition *before* seeing results (tradeoff for speed). Base query_decomposition on the plan: {intent: the user goal, entity: main type, attribute: [what you are extracting]}. summary = the actual facts you expect. Server executes then returns your fields + data. Do NOT just describe steps.\nScope is a hard boundary.\nHard cap: **8 steps**.\n(MIN PROFILE: trimmed for speed; core invariants kept.)\nUse @as.ids. Lead multi-step with pipeline.\nLite schema injected at runtime.",
+      "role": "system"
+    }
+  ],
+  "verbs": [
+    {
+      "function": {
+        "description": "[cheap] describe",
+        "name": "describe",
+        "parameters": {
+          "properties": {},
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] exact by id",
+        "name": "get",
+        "parameters": {
+          "properties": {
+            "ids": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "include": {
+              "items": {
+                "enum": [
+                  "body",
+                  "edges",
+                  "edges_in",
+                  "edges_out"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "ids"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] predicate lookup + count/topK",
+        "name": "find",
+        "parameters": {
+          "properties": {
+            "entity_type": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer"
+            },
+            "return": {
+              "enum": [
+                "rows",
+                "ids",
+                "count",
+                "selectivity"
+              ],
+              "type": "string"
+            },
+            "where": {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          },
+          "required": [
+            "entity_type"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[mod] graph walk",
+        "name": "traverse",
+        "parameters": {
+          "properties": {
+            "from": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "return": {
+              "type": "string"
+            },
+            "shape": {
+              "enum": [
+                "hop",
+                "bfs",
+                "path",
+                "subgraph",
+                "walk_path"
+              ],
+              "type": "string"
+            },
+            "walk_path": {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          },
+          "required": [
+            "shape"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[exp] recall (fts/hybrid/vector). For fts: pass query_text (the search string) + entity_type. See examples for correct shape.",
+        "name": "search",
+        "parameters": {
+          "examples": [
+            {
+              "entity_type": "Beer",
+              "limit": 20,
+              "query_text": "lager",
+              "strategy": "fts",
+              "timeout_ms": 2000
+            },
+            {
+              "entity_type": "Beer",
+              "limit": 20,
+              "query_text": "lager",
+              "strategy": "hybrid",
+              "timeout_ms": 2000,
+              "where": {
+                "style": "American-Style Lager"
+              }
+            },
+            {
+              "entity_type": "Beer",
+              "limit": 30,
+              "query_text": "complex long-tail explore",
+              "strategy": "fts",
+              "timeout_ms": 5000
+            },
+            {
+              "limit": 10,
+              "seed_node_id": "n_abc123",
+              "strategy": "spatial"
+            }
+          ],
+          "properties": {
+            "entity_type": {
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer"
+            },
+            "query_text": {
+              "type": "string"
+            },
+            "strategy": {
+              "enum": [
+                "vector",
+                "semantic",
+                "fts",
+                "hybrid",
+                "spatial"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "entity_type",
+            "strategy"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[exp] analytics job",
+        "name": "analyze",
+        "parameters": {
+          "properties": {
+            "job": {
+              "enum": [
+                "communities",
+                "duplicates",
+                "super_nodes",
+                "bridges",
+                "outliers",
+                "node_importance",
+                "spatial_disagreements",
+                "topics"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "job"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "planner pass-through",
+        "name": "explain",
+        "parameters": {
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] set ops on ids",
+        "name": "set",
+        "parameters": {
+          "properties": {
+            "inputs": {
+              "items": {
+                "type": "array"
+              },
+              "maxItems": 8,
+              "minItems": 2,
+              "type": "array"
+            },
+            "op": {
+              "enum": [
+                "union",
+                "intersect",
+                "difference",
+                "xor"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "inputs"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] sort ids",
+        "name": "order",
+        "parameters": {
+          "properties": {
+            "by": {
+              "type": "string"
+            },
+            "ids": {
+              "items": {},
+              "type": "array"
+            }
+          },
+          "required": [
+            "ids",
+            "by"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] decorate ids",
+        "name": "enrich",
+        "parameters": {
+          "properties": {
+            "ids": {
+              "items": {},
+              "type": "array"
+            },
+            "with": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "ids",
+            "with"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] shape rows",
+        "name": "project",
+        "parameters": {
+          "properties": {
+            "fields": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ids": {
+              "items": {},
+              "type": "array"
+            }
+          },
+          "required": [
+            "ids",
+            "fields"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[mod] multi-step (preferred)",
+        "name": "pipeline",
+        "parameters": {
+          "properties": {
+            "confidence": {
+              "enum": [
+                "high",
+                "med",
+                "low"
+              ],
+              "type": "string"
+            },
+            "decomposition": {
+              "type": "object"
+            },
+            "entity_refs": {
+              "items": {},
+              "type": "array"
+            },
+            "node_refs": {
+              "items": {},
+              "type": "array"
+            },
+            "provenance": {
+              "items": {},
+              "type": "array"
+            },
+            "query_decomposition": {
+              "type": "object"
+            },
+            "return": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "steps": {
+              "items": {
+                "additionalProperties": true,
+                "properties": {
+                  "as": {
+                    "description": "unique step name (@as.ids)",
+                    "type": "string"
+                  },
+                  "verb": {
+                    "description": "verb name",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "verb",
+                  "as"
+                ],
+                "type": "object"
+              },
+              "maxItems": 8,
+              "type": "array"
+            },
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "steps"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "[cheap] terminal answer",
+        "name": "return",
+        "parameters": {
+          "properties": {
+            "confidence": {
+              "enum": [
+                "high",
+                "med",
+                "low"
+              ],
+              "type": "string"
+            },
+            "decomposition": {
+              "type": "object"
+            },
+            "query_decomposition": {
+              "type": "object"
+            },
+            "summary": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "summary",
+            "query_decomposition"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}
+

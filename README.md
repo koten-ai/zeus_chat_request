@@ -15,6 +15,10 @@ These are the **min** profile snapshots (`*_v2_min.json`) — currently the best
 | **Layout** | [`v2/min/`](v2/min/) |
 | **Index** | [`manifest.json`](manifest.json) |
 
+## Learn the format
+
+**[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.
+
 ## Why this repo exists
 
 Historically catalogs lived only inside the Zeus engine tree (`Zeus/ai/V2/…`). Clients and helpers should **not** need a full Zeus source checkout to obtain mode templates.

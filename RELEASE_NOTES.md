@@ -76,7 +76,7 @@ zeus_chat_request/
 | --- | --- |
 | Docs story | [KD-8](https://kotenai.atlassian.net/browse/KD-8) |
 | Helper catalog tools | [ZDH-14](https://kotenai.atlassian.net/browse/ZDH-14) |
-| Platform docs | [koten_docs · contracts](https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/contracts-and-catalog.md) |
+| Platform docs | [docs.koten.ai](https://docs.koten.ai/) · [contracts](https://docs.koten.ai/zeus-client/contracts-and-catalog) |
 | Generator | [koten-ai/Zeus](https://github.com/koten-ai/Zeus) `go run . ai-snapshot --mode=all --api-version=v2 --min` |
 
 ### Upgrade / refresh procedure

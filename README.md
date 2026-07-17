@@ -75,7 +75,7 @@ async with ZeusClient():
     await sync_chat_requests(cfg)  # pulls stamped catalogs from live Zeus
 ```
 
-Docs: [Using Zeus Client](https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/using-zeus-client.md) · [Contracts & catalog](https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/contracts-and-catalog.md)
+**Published docs:** [docs.koten.ai](https://docs.koten.ai/) · [Using Zeus Client](https://docs.koten.ai/zeus-client/using-zeus-client) · [Contracts & catalog](https://docs.koten.ai/zeus-client/contracts-and-catalog)
 
 ## Use with Developer Helper MCP
 
@@ -86,7 +86,7 @@ Helper tools should:
 3. Read `manifest.json` for mode list + file paths.
 4. Never tell the coding agent to hand-edit hashes.
 
-See koten_docs: [dev-helper-mcp.md](https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/dev-helper-mcp.md) · `agent-index.yaml`.
+See [docs.koten.ai](https://docs.koten.ai/) · [Dev Helper MCP](https://docs.koten.ai/zeus-client/dev-helper-mcp) · machine index in source repo `agent-index.yaml`.
 
 ## Refresh from a Zeus checkout
 
@@ -106,7 +106,7 @@ git add v2/min manifest.json && git commit -m "chore: refresh v2_min catalogs fr
 | --- | --- |
 | [Zeus](https://github.com/koten-ai/Zeus) | Engine; generates catalogs |
 | [zeus_client_python](https://github.com/koten-ai/zeus_client_python) | Client library |
-| [koten_docs](https://github.com/koten-ai/koten_docs) | Public docs (1.0.0) |
+| [**docs.koten.ai**](https://docs.koten.ai/) | **Published platform docs** (GitBook; source: [koten_docs](https://github.com/koten-ai/koten_docs)) |
 | ZDH board | Developer Helper MCP |
 
 ## License

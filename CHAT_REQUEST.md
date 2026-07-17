@@ -1,5 +1,8 @@
 # Understanding `chat_request*.json`
 
+**Platform docs (published):** [https://docs.koten.ai/](https://docs.koten.ai/)  
+*(site may still be a placeholder while GitBook is wired)*
+
 This document explains what a **chat_request** file is, what each part does, what a **contract** is, when you may change things, and where refinement actually happens (**Zeus Hub → Workbench**).
 
 Files in this repo (`v2/min/chat_request_*_v2_min.json`) are **baseline templates** — starting points for modes (analytics, code, tenant, …), not final production catalogs for your data.
@@ -187,7 +190,7 @@ Typical production loop:
 - Skip sync and ship unstamped baseline hashes  
 - Override stamp by editing local JSON hash fields  
 
-See: [Using Zeus Client](https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/using-zeus-client.md) · [Contracts & catalog](https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/contracts-and-catalog.md)
+See: [Using Zeus Client](https://docs.koten.ai/zeus-client/using-zeus-client) · [Contracts & catalog](https://docs.koten.ai/zeus-client/contracts-and-catalog)
 
 ---
 
@@ -253,6 +256,7 @@ Pick a mode that matches the **kind of help**, then refine in Workbench for **yo
 | Modes + files | [README.md](README.md) |
 | Version history | [RELEASE_NOTES.md](RELEASE_NOTES.md) |
 | Manifest | [manifest.json](manifest.json) |
-| Zeus Client usage | https://github.com/koten-ai/koten_docs/blob/zeus-v1.0.0/zeus-client/using-zeus-client.md |
+| Platform docs | https://docs.koten.ai/ |
+| Zeus Client usage | https://docs.koten.ai/zeus-client/using-zeus-client |
 | Helper MCP | https://github.com/koten-ai/zeus_dev_helper_mcp |
 | Engine generator | Zeus: `go run . ai-snapshot --mode=all --api-version=v2 --min` |

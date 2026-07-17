@@ -108,3 +108,7 @@ git add v2/min manifest.json && git commit -m "chore: refresh v2_min catalogs fr
 ## License
 
 Same product family as Zeus / Koten unless otherwise noted.
+
+## Release notes
+
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for version history and refresh procedure.

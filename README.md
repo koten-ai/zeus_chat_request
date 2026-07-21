@@ -15,6 +15,20 @@ These are the **min** profile snapshots (`*_v2_min.json`) — currently the best
 | **Layout** | [`v2/min/`](v2/min/) |
 | **Index** | [`manifest.json`](manifest.json) |
 
+## Catalog structure map (Hub-style)
+
+**[index.html](index.html)** — visual AI Catalog layout for published `v2/min` files:
+
+- **Don’t edit (Rules)** vs **Editable (guidance)** vs **On the wire**
+- What min is **missing** vs full engine profile
+- Evidence-loop terminate contract checklist
+- **JSON only** view + org plan
+
+```bash
+python3 -m http.server 8766 --bind 127.0.0.1
+# open http://127.0.0.1:8766/index.html
+```
+
 ## Learn the format
 
 **[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.

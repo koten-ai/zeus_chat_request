@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zeus chat_request catalog map</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    .box-ro { border-left: 4px solid #f87171; }
+    .box-ed { border-left: 4px solid #34d399; }
+    .box-wire { border-left: 4px solid #60a5fa; }
+    .box-miss { border-left: 4px solid #fbbf24; opacity: 0.95; }
+    .box-meta { border-left: 4px solid #a78bfa; }
+    pre.json {
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 70vh;
+      overflow: auto;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .tree-key { color: #93c5fd; }
+    .tree-str { color: #86efac; }
+    .tree-num { color: #fcd34d; }
+    .tree-bool { color: #f9a8d4; }
+    .tree-null { color: #9ca3af; }
+    .section-card { min-height: 7.5rem; }
+    #toast { position: fixed; bottom: 1rem; right: 1rem; z-index: 50; }
+  </style>
+</head>
+<body class="bg-base-300 text-base-content min-h-screen">
+  <div class="navbar bg-base-100 border-b border-base-content/10 sticky top-0 z-40 px-4">
+    <div class="flex-1 gap-3">
+      <span class="font-bold text-lg">chat_request map</span>
+      <span class="badge badge-ghost badge-sm">koten-ai/zeus_chat_request</span>
+      <span class="text-xs opacity-60 hidden sm:inline">Hub-style AI Catalog layout · Rules vs Editable vs Wire</span>
+    </div>
+    <div class="flex-none gap-2 items-center">
+      <label class="form-control w-40">
+        <select id="mode-select" class="select select-bordered select-sm"></select>
+      </label>
+      <div class="join">
+        <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes">Boxes</button>
+        <button type="button" class="btn btn-sm join-item btn-ghost" data-view="json">JSON only</button>
+        <button type="button" class="btn btn-sm join-item btn-ghost" data-view="org">Org plan</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto p-4 space-y-4">
+    <!-- Legend -->
+    <div class="alert bg-base-100 shadow-sm text-sm">
+      <div class="flex flex-wrap gap-3 items-center w-full">
+        <span class="font-semibold">Legend</span>
+        <span class="badge badge-error badge-outline">Don't edit (Rules / hashed)</span>
+        <span class="badge badge-success badge-outline">Editable (guidance / advisory)</span>
+        <span class="badge badge-info badge-outline">On the wire → model</span>
+        <span class="badge badge-warning badge-outline">Missing on this profile</span>
+        <span class="badge badge-secondary badge-outline">Meta / stamp</span>
+        <span class="ml-auto text-xs opacity-70" id="manifest-line">Loading manifest…</span>
+      </div>
+    </div>
+
+    <div id="status" class="text-sm opacity-70"></div>
+
+    <!-- BOXES VIEW -->
+    <section id="view-boxes" class="space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-3" id="summary-row"></div>
+      <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-2">Envelope sections</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="section-grid"></div>
+      <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">What the model actually receives</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wire-grid"></div>
+      <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">Evidence-loop terminate contract</h2>
+      <div id="evidence-panel" class="card bg-base-100 shadow section-card"></div>
+    </section>
+
+    <!-- JSON VIEW -->
+    <section id="view-json" class="hidden">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-3">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <h2 class="card-title text-base" id="json-title">JSON</h2>
+            <button type="button" class="btn btn-xs" id="btn-copy-json">Copy</button>
+          </div>
+          <pre class="json bg-base-200 p-3 rounded-lg" id="json-pre"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORG PLAN VIEW -->
+    <section id="view-org" class="hidden space-y-3">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body prose prose-sm max-w-none prose-invert">
+          <h2 class="mt-0">Target structure (engine Zeus + this repo)</h2>
+          <pre class="bg-base-200 p-3 rounded text-xs overflow-x-auto">koten-ai/Zeus  (generate + embed)
+├── ai/
+│   ├── README.md                 # index of AI surfaces
+│   ├── CHANGELOG.md              # cross-cutting history
+│   ├── chat_request/             # ★ maintenance & distribution kit
+│   │   ├── README.md
+│   │   ├── DISTRIBUTION.md
+│   │   ├── ORGANIZE_PLAN.md
+│   │   ├── scripts/              # check / publish / pull
+│   │   └── dist/                 # pulled pins (gitignored)
+│   ├── V2/
+│   │   ├── prompt/core/*.md      # ★ edit system prompt fragments here
+│   │   ├── chat_request_*_v2.json          # generated FULL (embed)
+│   │   └── variants/min/*_v2_min.json       # generated MIN → publish
+│   ├── V1/                       # legacy generated (embed)
+│   └── workbench_prompt_helper/  # separate product (Prompt Helper)
+│
+koten-ai/zeus_chat_request  (publish for clients)
+├── index.html                    # ★ this map (Hub-style AI Catalog)
+├── CHAT_REQUEST.md
+├── manifest.json
+├── v2/min/*.json                 # published min baselines
+└── scripts/                      # refresh_manifest, sync-from-zeus</pre>
+          <h3>Don't hand-edit JSON</h3>
+          <ul>
+            <li><strong>Edit:</strong> Zeus <code>ai/V2/prompt/core/*.md</code> + <code>chat_request_gen.go</code></li>
+            <li><strong>Generate:</strong> <code>make ai-snapshot-min</code></li>
+            <li><strong>Publish:</strong> <code>make chat-request-publish</code> → this repo</li>
+            <li><strong>Clients:</strong> pull pin → stamp on live Zeus</li>
+          </ul>
+          <h3>Boxes map to envelope</h3>
+          <ul>
+            <li><span class="text-error font-semibold">Don't edit / Rules</span> — <code>messages</code>, <code>verbs</code>, <code>masq</code>, hashed pointers</li>
+            <li><span class="text-success font-semibold">Editable / guidance</span> — <code>optimal_paths</code>, facet schemas (full only; stripped on min)</li>
+            <li><span class="text-info font-semibold">Wire</span> — only <code>messages</code> + tools reach the LLM</li>
+          </ul>
+          <h3>Suggested cleanup (engine ai/*)</h3>
+          <ul>
+            <li>Keep <code>by_use_case/</code> demos but link from <code>ai/chat_request/</code>; avoid dual V1 copies long-term</li>
+            <li>Move orphan essays (<code>more_balance_to_chat.md</code>, <code>PROMPT_SANDBOX.md</code>) → <code>ai/chat_request/notes/</code> or design_docs</li>
+            <li>Single entry: <code>ai/README.md</code> → chat_request hub + PROMPT_BUILDER</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast toast-end hidden">
+    <div class="alert alert-success text-sm py-2"><span id="toast-msg">OK</span></div>
+  </div>
+
+  <script>
+/**
+ * Structure map for zeus.chat_request.v2
+ * edit: 'rules' | 'guidance' | 'meta' | 'wire'
+ * minTypical: whether v2_min usually has this key
+ */
+const STRUCTURE = [
+  {
+    key: "_format",
+    title: "_format / _version",
+    edit: "meta",
+    minTypical: true,
+    summary: "Envelope identity. Must be zeus.chat_request.v2.",
+    path: "_format",
+  },
+  {
+    key: "_hash_policy",
+    title: "_hash_policy",
+    edit: "rules",
+    minTypical: true,
+    summary: "Which JSON pointers are Rules (hashed) vs excluded (guidance, contract, metadata).",
+    path: "_hash_policy",
+  },
+  {
+    key: "contract",
+    title: "contract",
+    edit: "meta",
+    minTypical: true,
+    summary: "Stamp block: id, hash, builder. Server is sole authority for hash after verify.",
+    path: "contract",
+  },
+  {
+    key: "messages",
+    title: "messages (system prompt)",
+    edit: "rules",
+    wire: true,
+    minTypical: true,
+    summary: "What the model reads. Evidence-loop terminate rules MUST live here (min deletes guidance).",
+    path: "messages",
+  },
+  {
+    key: "verbs",
+    title: "verbs (tools)",
+    edit: "rules",
+    wire: true,
+    minTypical: true,
+    summary: "Function schemas. return.required must include query_decomposition.",
+    path: "verbs",
+  },
+  {
+    key: "masq",
+    title: "masq (cost tiers)",
+    edit: "rules",
+    minTypical: false,
+    summary: "Cost model for verb priority. Present on full; often stripped on min.",
+    path: "masq",
+  },
+  {
+    key: "instructions",
+    title: "instructions",
+    edit: "rules",
+    minTypical: false,
+    summary: "response_expectations, verb_order. system_prompt is usually a marker only.",
+    path: "instructions",
+  },
+  {
+    key: "guidance",
+    title: "guidance (advisory)",
+    edit: "guidance",
+    minTypical: false,
+    summary: "optimal_paths, query_decomposition schema, data_decomposition. Hash-excluded. Min deletes this.",
+    path: "guidance",
+  },
+  {
+    key: "metadata",
+    title: "metadata",
+    edit: "meta",
+    minTypical: false,
+    summary: "mode, generated flags. Not hashed.",
+    path: "metadata",
+  },
+  {
+    key: "_note",
+    title: "_note",
+    edit: "meta",
+    minTypical: true,
+    summary: "Human-readable regen note (MIN profile, evidence-loop reminder).",
+    path: "_note",
+  },
+];
+
+const EVIDENCE_FIELDS = [
+  { name: "summary", required: true },
+  { name: "query_decomposition", required: true, note: "intent facets — hot-path / evidence loop" },
+  { name: "decomposition", required: true, note: "MINI-SCHEMA data extraction" },
+  { name: "confidence", required: true, note: "string high|med|low only" },
+  { name: "node_refs", required: false },
+  { name: "entity_refs", required: false },
+  { name: "provenance", required: false },
+];
+
+let state = {
+  view: "boxes",
+  manifest: null,
+  mode: null,
+  catalog: null,
+  catalogs: {},
+};
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = msg;
+  el.classList.remove("hidden");
+  setTimeout(() => el.classList.add("hidden"), 1800);
+}
+
+function getAt(obj, path) {
+  if (!path) return obj;
+  return path.split(".").reduce((a, k) => (a == null ? a : a[k]), obj);
+}
+
+function hasKey(doc, key) {
+  return doc && Object.prototype.hasOwnProperty.call(doc, key) && doc[key] != null;
+}
+
+function boxClass(edit, missing) {
+  if (missing) return "box-miss";
+  if (edit === "rules") return "box-ro";
+  if (edit === "guidance") return "box-ed";
+  if (edit === "wire") return "box-wire";
+  return "box-meta";
+}
+
+function editBadge(edit, missing) {
+  if (missing) return '<span class="badge badge-warning badge-sm">Missing</span>';
+  if (edit === "rules") return '<span class="badge badge-error badge-outline badge-sm">Don\'t edit · Rules</span>';
+  if (edit === "guidance") return '<span class="badge badge-success badge-outline badge-sm">Editable · guidance</span>';
+  if (edit === "wire") return '<span class="badge badge-info badge-outline badge-sm">On the wire</span>';
+  return '<span class="badge badge-secondary badge-outline badge-sm">Meta</span>';
+}
+
+function previewValue(v) {
+  if (v == null) return "null";
+  if (typeof v === "string") return v.length > 120 ? v.slice(0, 120) + "…" : v;
+  if (typeof v === "number" || typeof v === "boolean") return String(v);
+  if (Array.isArray(v)) return `array[${v.length}]`;
+  if (typeof v === "object") return `object{${Object.keys(v).length} keys}`;
+  return String(v);
+}
+
+function findReturnVerb(doc) {
+  const verbs = doc.verbs || [];
+  for (const v of verbs) {
+    const fn = v.function || v;
+    if (fn.name === "return") return fn;
+  }
+  return null;
+}
+
+function systemContent(doc) {
+  const msgs = doc.messages || [];
+  const m = msgs.find((x) => x.role === "system");
+  return (m && m.content) || "";
+}
+
+function renderSummary(doc, mode, manifestEntry) {
+  const row = document.getElementById("summary-row");
+  const ret = findReturnVerb(doc);
+  const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
+  const sys = systemContent(doc);
+  const hasEvidence = /evidence loop|query_decomposition/i.test(sys);
+  const cards = [
+    {
+      t: "Mode / profile",
+      b: `${mode} · ${manifestEntry?.format || doc._format || "?"} · profile v2_min`,
+      c: "box-meta",
+    },
+    {
+      t: "Contract stamp",
+      b: (doc.contract && (doc.contract.hash || doc.contract.id)) || doc._hash || "—",
+      c: "box-meta",
+    },
+    {
+      t: "Evidence-loop ready?",
+      b: hasEvidence && req.has("query_decomposition")
+        ? "YES — system + return.required"
+        : "GAPS — see panel below",
+      c: hasEvidence && req.has("query_decomposition") ? "box-ed" : "box-miss",
+    },
+  ];
+  row.innerHTML = cards
+    .map(
+      (c) => `
+    <div class="card bg-base-100 shadow section-card ${c.c}">
+      <div class="card-body p-4">
+        <div class="text-xs uppercase opacity-60">${c.t}</div>
+        <div class="font-mono text-sm break-all">${escapeHtml(c.b)}</div>
+      </div>
+    </div>`
+    )
+    .join("");
+}
+
+function renderSections(doc) {
+  const grid = document.getElementById("section-grid");
+  grid.innerHTML = STRUCTURE.map((s) => {
+    const present = hasKey(doc, s.key);
+    const missing = !present;
+    const val = present ? getAt(doc, s.path) : null;
+    const sizeHint = present
+      ? typeof val === "string"
+        ? `${val.length} chars`
+        : Array.isArray(val)
+          ? `${val.length} items`
+          : typeof val === "object"
+            ? `${Object.keys(val).length} keys`
+            : typeof val
+      : "—";
+    const expectedNote =
+      !present && s.minTypical === false
+        ? "Expected missing on min (full profile only)"
+        : !present && s.minTypical
+          ? "Unexpected missing on min"
+          : present && s.minTypical === false
+            ? "Present (bonus vs typical min)"
+            : "";
+
+    return `
+      <div class="card bg-base-100 shadow section-card ${boxClass(s.edit, missing)}">
+        <div class="card-body p-4 gap-2">
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="font-semibold text-sm">${escapeHtml(s.title)}</h3>
+            ${editBadge(s.edit, missing)}
+          </div>
+          <p class="text-xs opacity-80">${escapeHtml(s.summary)}</p>
+          <div class="text-[11px] font-mono opacity-70">size: ${escapeHtml(sizeHint)}</div>
+          ${
+            expectedNote
+              ? `<div class="text-[11px] ${missing ? "text-warning" : "text-success"}">${escapeHtml(expectedNote)}</div>`
+              : ""
+          }
+          ${
+            present
+              ? `<details class="text-xs"><summary class="cursor-pointer opacity-70">preview</summary>
+                 <pre class="bg-base-200 p-2 rounded mt-1 max-h-32 overflow-auto">${escapeHtml(
+                   typeof val === "string" ? val.slice(0, 800) : JSON.stringify(val, null, 2).slice(0, 800)
+                 )}</pre></details>`
+              : ""
+          }
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function renderWire(doc) {
+  const grid = document.getElementById("wire-grid");
+  const sys = systemContent(doc);
+  const verbs = doc.verbs || [];
+  grid.innerHTML = `
+    <div class="card bg-base-100 shadow box-wire">
+      <div class="card-body p-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold text-sm">messages[0] system</h3>
+          <span class="badge badge-info badge-outline badge-sm">On the wire</span>
+        </div>
+        <p class="text-xs opacity-70">${sys.length} chars · this is the only prose the model sees</p>
+        <pre class="bg-base-200 p-2 rounded text-[11px] max-h-48 overflow-auto">${escapeHtml(sys.slice(0, 2500))}${
+    sys.length > 2500 ? "\n…" : ""
+  }</pre>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow box-wire">
+      <div class="card-body p-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold text-sm">verbs → tools</h3>
+          <span class="badge badge-info badge-outline badge-sm">${verbs.length} tools</span>
+        </div>
+        <ul class="text-xs space-y-1 max-h-48 overflow-auto">
+          ${verbs
+            .map((v) => {
+              const fn = v.function || v;
+              const req = (fn.parameters && fn.parameters.required) || [];
+              return `<li><code class="text-info">${escapeHtml(fn.name || "?")}</code>
+                <span class="opacity-60">${escapeHtml((fn.description || "").slice(0, 60))}</span>
+                ${req.length ? `<span class="badge badge-ghost badge-xs">req: ${escapeHtml(req.join(", "))}</span>` : ""}
+              </li>`;
+            })
+            .join("")}
+        </ul>
+      </div>
+    </div>`;
+}
+
+function renderEvidence(doc) {
+  const panel = document.getElementById("evidence-panel");
+  const ret = findReturnVerb(doc);
+  const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
+  const props = (ret && ret.parameters && ret.parameters.properties) || {};
+  const sys = systemContent(doc);
+  const sysOk = /evidence loop|query_decomposition/i.test(sys);
+
+  const rows = EVIDENCE_FIELDS.map((f) => {
+    const inReq = req.has(f.name);
+    const inProps = Object.prototype.hasOwnProperty.call(props, f.name);
+    const ok = f.required ? inReq && inProps : inProps || !f.required;
+    return `<tr class="${ok ? "" : "bg-warning/10"}">
+      <td class="font-mono text-xs">${escapeHtml(f.name)}</td>
+      <td>${f.required ? "required" : "optional"}</td>
+      <td>${inReq ? "✅" : "—"}</td>
+      <td>${inProps ? "✅" : "—"}</td>
+      <td class="text-xs opacity-70">${escapeHtml(f.note || "")}</td>
+    </tr>`;
+  }).join("");
+
+  panel.innerHTML = `
+    <div class="card-body p-4 ${sysOk && req.has("query_decomposition") ? "box-ed" : "box-miss"}">
+      <div class="flex flex-wrap gap-2 items-center justify-between">
+        <h3 class="font-semibold">Terminate envelope (return verb)</h3>
+        <div class="flex gap-2">
+          <span class="badge ${sysOk ? "badge-success" : "badge-warning"} badge-sm">system prompt ${
+            sysOk ? "OK" : "weak"
+          }</span>
+          <span class="badge ${req.has("query_decomposition") ? "badge-success" : "badge-error"} badge-sm">query_decomposition required ${
+            req.has("query_decomposition") ? "OK" : "MISSING"
+          }</span>
+        </div>
+      </div>
+      <p class="text-xs opacity-80">Hot-path / evidence-loop analytics need intent facets on every terminating turn.
+      Min profiles strip <code>guidance</code> — contract must appear in system text + return.required.</p>
+      <div class="overflow-x-auto">
+        <table class="table table-xs">
+          <thead><tr><th>field</th><th>role</th><th>in required[]</th><th>in properties</th><th>note</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <details class="text-xs mt-2">
+        <summary class="cursor-pointer">return.function.description</summary>
+        <pre class="bg-base-200 p-2 rounded mt-1">${escapeHtml((ret && ret.description) || "—")}</pre>
+      </details>
+    </div>`;
+}
+
+function renderJson(doc, mode) {
+  document.getElementById("json-title").textContent = `v2/min/chat_request_${mode}_v2_min.json`;
+  document.getElementById("json-pre").textContent = JSON.stringify(doc, null, 2);
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function setView(view) {
+  state.view = view;
+  document.getElementById("view-boxes").classList.toggle("hidden", view !== "boxes");
+  document.getElementById("view-json").classList.toggle("hidden", view !== "json");
+  document.getElementById("view-org").classList.toggle("hidden", view !== "org");
+  document.querySelectorAll("[data-view]").forEach((btn) => {
+    btn.classList.toggle("btn-primary", btn.getAttribute("data-view") === view);
+    btn.classList.toggle("btn-ghost", btn.getAttribute("data-view") !== view);
+  });
+}
+
+async function loadManifest() {
+  const res = await fetch("manifest.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("manifest.json " + res.status);
+  return res.json();
+}
+
+async function loadCatalog(mode) {
+  if (state.catalogs[mode]) return state.catalogs[mode];
+  const path = `v2/min/chat_request_${mode}_v2_min.json`;
+  const res = await fetch(path, { cache: "no-store" });
+  if (!res.ok) throw new Error(path + " " + res.status);
+  const doc = await res.json();
+  state.catalogs[mode] = doc;
+  return doc;
+}
+
+function fillModes(manifest) {
+  const sel = document.getElementById("mode-select");
+  const modes = (manifest.catalogs || []).map((c) => c.mode);
+  sel.innerHTML = modes.map((m) => `<option value="${m}">${m}</option>`).join("");
+  state.mode = modes[0] || "analytics";
+  sel.value = state.mode;
+}
+
+async function selectMode(mode) {
+  state.mode = mode;
+  document.getElementById("status").textContent = `Loading ${mode}…`;
+  try {
+    const doc = await loadCatalog(mode);
+    state.catalog = doc;
+    const entry = (state.manifest.catalogs || []).find((c) => c.mode === mode);
+    renderSummary(doc, mode, entry);
+    renderSections(doc);
+    renderWire(doc);
+    renderEvidence(doc);
+    renderJson(doc, mode);
+    document.getElementById("status").textContent = `Loaded ${mode} · ${
+      entry ? entry.bytes + " bytes · sha256 " + (entry.sha256 || "").slice(0, 12) + "…" : ""
+    }`;
+  } catch (e) {
+    document.getElementById("status").textContent = String(e);
+  }
+}
+
+document.querySelectorAll("[data-view]").forEach((btn) => {
+  btn.addEventListener("click", () => setView(btn.getAttribute("data-view")));
+});
+document.getElementById("mode-select").addEventListener("change", (e) => selectMode(e.target.value));
+document.getElementById("btn-copy-json").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(document.getElementById("json-pre").textContent);
+    toast("Copied JSON");
+  } catch {
+    toast("Copy failed");
+  }
+});
+
+(async function init() {
+  try {
+    const man = await loadManifest();
+    state.manifest = man;
+    document.getElementById("manifest-line").textContent =
+      `${man.repo || "zeus_chat_request"} · profile ${man.profile || "?"} · ${
+        (man.catalogs || []).length
+      } catalogs · schema ${man.schema_version || "?"}`;
+    fillModes(man);
+    await selectMode(state.mode);
+  } catch (e) {
+    document.getElementById("status").textContent =
+      "Failed to load manifest.json — serve this directory over HTTP (python3 -m http.server). " + e;
+    document.getElementById("manifest-line").textContent = "manifest load failed";
+  }
+})();
+  </script>
+</body>
+</html>

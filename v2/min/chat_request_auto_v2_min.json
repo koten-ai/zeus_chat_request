@@ -1,6 +1,6 @@
 {
   "_format": "zeus.chat_request.v2",
-  "_hash": "md5:f0f92e4d3146031ac5878ded8ee97a6a",
+  "_hash": "md5:72695c7a9a134cafa254f5c206ba9098",
   "_hash_policy": {
     "excluded": [
       "guidance",
@@ -19,15 +19,15 @@
     ],
     "version": 1
   },
-  "_note": "V2 standardized 5TH contract shape (_format: zeus.chat_request.v2). guidance.query_decomposition carries business intent+entity. Emit both decomposition + query_decomposition on terminating returns. (MIN profile: trimmed for size)",
+  "_note": "V2 standardized 5TH contract shape (_format: zeus.chat_request.v2). Terminating returns MUST emit query_decomposition (intent facets) + decomposition for the evidence loop / hot-path analytics (EVIDENCE_LOOP_AB_AND_HOTPATH_ANALYTICS). guidance.query_decomposition documents the facet schema (full profile). (MIN profile: trimmed for size; evidence-loop return contract kept in system prompt)",
   "_version": 1,
   "contract": {
     "builder": "ai-snapshot",
-    "hash": "md5:f0f92e4d3146031ac5878ded8ee97a6a"
+    "hash": "md5:72695c7a9a134cafa254f5c206ba9098"
   },
   "messages": [
     {
-      "content": "Act, don't narrate. ONE decisive pipeline call (correct syntax first time). EVERYTHING inside ONE pipeline steps[] (search/find + traverse + project/get inside steps, using @as.ids). NEVER top-level project/get/find or repeat the same pipeline call. Verbs: cheap=find/get/project/enrich/order/set/describe | mod=pipeline/traverse | exp=search/analyze.\nRules: scope boundary. cheapest first. find→project(@as.ids). After search, project(@as.ids, fields to display e.g. name,style). max 8 steps. no repeat search or same pipeline. Reuse prior @results, do not re-query.\nPLAIN 'as' (e.g. as:items). ids:@prev.ids (NEVER bare @as for ids, never @as.node or @as.xxx).\nCORRECT: steps:[{as:beers,verb:search,entity_type:Beer,query_text:\"21A IPA\",strategy:fts,limit:5},{as:brew,verb:traverse,from:\"@beers.ids\",shape:\"hop\",walk_path:{edge:\"brewed_by\",direction:\"out\"}},{as:loc,verb:traverse,from:\"@brew.ids\",shape:\"hop\",walk_path:{edge:\"located_in\",direction:\"out\"}},{as:citystate,verb:project,ids:\"@loc.ids\",fields:[\"city\",\"state\"]}] . Use @as.ids for all chaining (never .node).\nFor counts: traverse walk_path aggregate:{group_by:\"x\",count:\"*\",as:\"c\"} (project only raw fields).\nTerminating on pipeline (preferred for 1 call / no extra round): write summary + query_decomposition *before* seeing results (tradeoff for speed). Base query_decomposition on the plan: {intent: the user goal, entity: main type, attribute: [what you are extracting]}. summary = the actual facts you expect. Server executes then returns your fields + data. Do NOT just describe steps.\nScope is a hard boundary.\nHard cap: **8 steps**.\n(MIN PROFILE: trimmed for speed; core invariants kept.)\nUse @as.ids. Lead multi-step with pipeline.\nLite schema injected at runtime.",
+      "content": "Act, don't narrate. ONE decisive pipeline call (correct syntax first time). EVERYTHING inside ONE pipeline steps[] (search/find + traverse + project/get inside steps, using @as.ids). NEVER top-level project/get/find or repeat the same pipeline call. Verbs: cheap=find/get/project/enrich/order/set/describe | mod=pipeline/traverse | exp=search/analyze.\nRules: scope boundary. cheapest first. find→project(@as.ids). After search, project(@as.ids, fields to display e.g. name,style). max 8 steps. no repeat search or same pipeline. Reuse prior @results, do not re-query.\nPLAIN 'as' (e.g. as:items). ids:@prev.ids (NEVER bare @as for ids, never @as.node or @as.xxx).\nCORRECT: steps:[{as:beers,verb:search,entity_type:Beer,query_text:\"21A IPA\",strategy:fts,limit:5},{as:brew,verb:traverse,from:\"@beers.ids\",shape:\"hop\",walk_path:{edge:\"brewed_by\",direction:\"out\"}},{as:loc,verb:traverse,from:\"@brew.ids\",shape:\"hop\",walk_path:{edge:\"located_in\",direction:\"out\"}},{as:citystate,verb:project,ids:\"@loc.ids\",fields:[\"city\",\"state\"]}] . Use @as.ids for all chaining (never .node).\nFor counts: traverse walk_path aggregate:{group_by:\"x\",count:\"*\",as:\"c\"} (project only raw fields).\nTerminating on pipeline (preferred for 1 call / no extra round): write summary + query_decomposition *before* seeing results (tradeoff for speed). Base query_decomposition on the plan: {intent: the user goal, entity: main type}. summary = the actual facts you expect. Server executes then returns your fields + data. Do NOT just describe steps.\nScope is a hard boundary.\nHard cap: **8 steps**.\nconfidence (STRING only: high | med | low — never object).\n(MIN PROFILE: trimmed for speed; core invariants kept.)\nUse @as.ids. Lead multi-step with pipeline.\nLite schema injected at runtime.\n\n## Evidence loop / hot-path return contract (CRITICAL)\n\nEvery terminating turn is telemetry for hot-path analytics (success vs lost paths, intent clustering, A/B of chat_request artifacts).\n\nOn every terminating return / return_result / terminating pipeline you MUST emit:\n- summary (user-facing facts)\n- query_decomposition (REQUIRED object — business intent facets; never a top-level string/array)\n- decomposition (data extraction grounded in MINI-SCHEMA: targets/predicates/output)\n- confidence (string: high|med|low)\n- node_refs / entity_refs / provenance when available\n\nquery_decomposition core: intent + entity. Optional facets only when signaled: audience, geo, theme, occasion, price, parts[], other.\nExample: {\"intent\":\"Best\",\"entity\":\"Hotel\",\"audience\":\"family\",\"geo\":\"MX\",\"theme\":\"beach\",\"price\":\"\u003c $300\"}\nMulti-part turns: shared fields top-level; distinct sub-goals in parts[].\nOmitting query_decomposition on terminate is a contract miss — not optional polish.",
       "role": "system"
     }
   ],
@@ -434,7 +434,7 @@
     },
     {
       "function": {
-        "description": "[cheap] terminal answer",
+        "description": "[cheap] terminal answer — MUST emit summary + query_decomposition{intent,entity,...} + decomposition (hot-path / evidence loop)",
         "name": "return",
         "parameters": {
           "properties": {
@@ -458,7 +458,9 @@
           },
           "required": [
             "summary",
-            "query_decomposition"
+            "query_decomposition",
+            "decomposition",
+            "confidence"
           ],
           "type": "object"
         }

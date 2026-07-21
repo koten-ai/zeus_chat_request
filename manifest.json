@@ -21,10 +21,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:387d0860afba87d25c6bc6ea07230e21"
+        "hash": "md5:2f43827f8f294766422e58fbbb60ce59"
       },
-      "sha256": "4ba306db5928c108d202439a1cfd18a286b0d7e710d1ff2c56bc1755b887478c",
-      "bytes": 14684
+      "sha256": "6e98a909ac206bd9e8023431e1bbe4013cb58268cd6495b533e3057047125eb6",
+      "bytes": 16034
     },
     {
       "file": "v2/min/chat_request_auto_v2_min.json",
@@ -34,10 +34,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:f0f92e4d3146031ac5878ded8ee97a6a"
+        "hash": "md5:72695c7a9a134cafa254f5c206ba9098"
       },
-      "sha256": "ac9d0b01ace5b8d15987230944ed9021c32cf24877bc681cfbcac75b3e959c8a",
-      "bytes": 12784
+      "sha256": "095c03763bfce3d402e3373c9ab62e0dbcc9be13ee1154f78c63b00c19340dee",
+      "bytes": 14156
     },
     {
       "file": "v2/min/chat_request_code_v2_min.json",
@@ -47,10 +47,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:256479075c414a0ab13f525ce8472288"
+        "hash": "md5:f65e0bc89f7290d36cd5d677d29460fd"
       },
-      "sha256": "ea9c27b6269740b67ffddf99c25bc87748cc00ca4bdd540cb21e781cb1ecb88b",
-      "bytes": 14679
+      "sha256": "72e140f2361896da73f558f55b9cd2d7539b04c3df8648090ae4c5e5fa6e7db2",
+      "bytes": 16029
     },
     {
       "file": "v2/min/chat_request_custom_v2_min.json",
@@ -60,10 +60,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:c2182701c7915356e0ac3ba9647cc730"
+        "hash": "md5:85e9d4633cf6b5675dc1de0c9651c029"
       },
-      "sha256": "ee3c60cdfb450be325ba3eb9bb9250de8d88c086d884cfb5932049e4efd6a429",
-      "bytes": 14681
+      "sha256": "340ac0bef6b585d7fd134f36b46acff132bb73221c22ab6a0974077896bd9f2b",
+      "bytes": 16031
     },
     {
       "file": "v2/min/chat_request_fraud_v2_min.json",
@@ -73,10 +73,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:01b976457b771696c5cb58e887f66131"
+        "hash": "md5:49a25850338f8dbcae2133dcc16ec75d"
       },
-      "sha256": "effc22ffe3ca8629835880559358c47a0b8ba4b67509e6ef9e3e5f8f1184cc1f",
-      "bytes": 14680
+      "sha256": "61ce076346303a633273118fe215176e8e9fbb2a6ef47c22a11defdec34c9f65",
+      "bytes": 16030
     },
     {
       "file": "v2/min/chat_request_open_v2_min.json",
@@ -86,10 +86,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:ca332a8d4ff0324385e1cb5732bd06ac"
+        "hash": "md5:d7cf4b5a91a26a7f9293b6727a4c9fef"
       },
-      "sha256": "8dd4b7fc9ed4c8b6281392636b90a023fccf46e0938a48ae9ba5026db9c13101",
-      "bytes": 14679
+      "sha256": "1cc0330d213b94289ff5796a86ea0d9c37deb79226827c72729e172da55c4307",
+      "bytes": 16029
     },
     {
       "file": "v2/min/chat_request_private_v2_min.json",
@@ -99,10 +99,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:6485e923882f0af24a0ee8d1dbc9fab9"
+        "hash": "md5:e5323c7c5406045f70fa9cdbbb104fbe"
       },
-      "sha256": "a1735da8eeac9aa9a8161ef57a5e812312b699df9e80a34fda83fe0b750ff2a8",
-      "bytes": 14682
+      "sha256": "b6e662893c9ed29b327799efad85e4ccd208150f72fcea4f1a20888e66b95ba3",
+      "bytes": 16032
     },
     {
       "file": "v2/min/chat_request_regulated_v2_min.json",
@@ -112,10 +112,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:16c4adb82a4c7c6984230226982274d5"
+        "hash": "md5:1bf605ca5b6c90e06acab07ae5bd9c8d"
       },
-      "sha256": "d0996fde446d3cf88c1c322485c3972dffc1270b0d4f27fbc283e5ca3fbc661c",
-      "bytes": 14684
+      "sha256": "882356b9c414535c97ab6cdcf467da38ab01a94cb44a3ea0561072271066f5a6",
+      "bytes": 16034
     },
     {
       "file": "v2/min/chat_request_research_v2_min.json",
@@ -125,10 +125,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:4781ec0687db39e7aaf502997b8ae1ba"
+        "hash": "md5:7f6caa5594465af955283336bab2d506"
       },
-      "sha256": "49532f60a8ab50f128ddbfa9866a318b35545077ad06f30cc2c0f204aaa7b83c",
-      "bytes": 14683
+      "sha256": "d080f8ac4c3eb043f1d1dc5520a07cea31d35c9479038e0fc26c970b94eff26b",
+      "bytes": 16033
     },
     {
       "file": "v2/min/chat_request_tenant_v2_min.json",
@@ -138,10 +138,10 @@
       "verb_count": 13,
       "contract": {
         "builder": "ai-snapshot",
-        "hash": "md5:a7d8d53512214c18f79ed949c4e32ab4"
+        "hash": "md5:c374c222b0d107654287b59731c764f2"
       },
-      "sha256": "8807d51965b683b1d37400d4f6df10ee602ef2b6f5d9fd10fa11ba5338008790",
-      "bytes": 14681
+      "sha256": "da046f37a476a73d43173210acea8e9fbea50633d52e9ccecfb5d077f9cb9ba3",
+      "bytes": 16031
     }
   ]
 }

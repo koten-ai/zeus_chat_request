@@ -33,6 +33,22 @@
       height: 420px;
     }
     #treemap-wire { height: 360px; }
+    #content-panel pre.content {
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 52vh;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+    }
+    #content-panel .prose-sys {
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body class="bg-base-300 text-base-content min-h-screen">
@@ -88,11 +104,12 @@
             <div>
               <h2 class="card-title text-base">Payload size treemap</h2>
               <p class="text-xs opacity-70 max-w-3xl">
-                Area ∝ UTF-8 JSON bytes (compact). <span class="txt-ro font-semibold">Red</span> =
-                rules you should not casually edit.
-                <span class="txt-ed font-semibold">Green</span> = advisory / guidance you may tune.
-                <span class="txt-inj font-semibold">Blue</span> = runtime injections (not in this file —
-                shown as estimates so you see how they compete for context).
+                Area ∝ UTF-8 JSON bytes (compact). Labels show <b>bytes</b> and
+                <b>~tokens</b> (chars÷4 heuristic — good enough for budgeting; not a model tokenizer).
+                <span class="txt-ro font-semibold">Red</span> = don't casually edit.
+                <span class="txt-ed font-semibold">Green</span> = editable guidance.
+                <span class="txt-inj font-semibold">Blue</span> = runtime inject estimates.
+                <b>Click a tile</b> to open the content panel below.
               </p>
             </div>
             <div class="flex flex-col gap-1 text-xs items-end">
@@ -107,30 +124,53 @@
         </div>
       </div>
 
+      <!-- Click detail: readable content -->
+      <div id="content-panel" class="card bg-base-100 shadow border border-base-content/10">
+        <div class="card-body p-4 gap-3">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h3 class="font-semibold text-base" id="content-title">Click a treemap tile</h3>
+              <p class="text-xs opacity-70" id="content-sub">Content preview appears here (readable format).</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <span class="badge badge-ghost badge-sm font-mono" id="content-bytes">— B</span>
+              <span class="badge badge-ghost badge-sm font-mono" id="content-tokens">— ~tok</span>
+              <span class="badge badge-outline badge-sm" id="content-class">—</span>
+              <button type="button" class="btn btn-xs btn-ghost" id="btn-copy-content" disabled>Copy</button>
+            </div>
+          </div>
+          <div id="content-body" class="bg-base-200 rounded-lg min-h-[8rem] p-3 text-sm opacity-70">
+            Select a red / green / blue box above (or a row in the size table).
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <div class="card bg-base-100 shadow">
           <div class="card-body p-4">
             <h3 class="font-semibold text-sm mb-1">Wire-only (what the LLM request roughly is)</h3>
-            <p class="text-xs opacity-70 mb-2">Catalog system + verbs, plus optional inject estimates. Same colors.</p>
+            <p class="text-xs opacity-70 mb-2">Click tiles here too. Same colors + bytes/~tokens.</p>
             <div id="treemap-wire" class="rounded-lg bg-base-200"></div>
           </div>
         </div>
         <div class="card bg-base-100 shadow">
           <div class="card-body p-4">
-            <h3 class="font-semibold text-sm mb-2">Byte table (on-disk catalog)</h3>
+            <h3 class="font-semibold text-sm mb-2">Size table (click row to open content)</h3>
             <div class="overflow-x-auto max-h-80 overflow-y-auto">
-              <table class="table table-xs" id="size-table">
+              <table class="table table-xs table-pin-rows" id="size-table">
                 <thead>
                   <tr>
                     <th>path</th>
                     <th>class</th>
                     <th class="text-right">bytes</th>
+                    <th class="text-right">~tokens</th>
                     <th class="text-right">%</th>
                   </tr>
                 </thead>
                 <tbody></tbody>
               </table>
             </div>
+            <p class="text-[10px] opacity-50 mt-2">~tokens ≈ UTF-8 bytes ÷ 4 (OpenAI-style rough budget; JSON often denser).</p>
           </div>
         </div>
       </div>
@@ -246,6 +286,152 @@ function jsonBytes(v) {
   }
 }
 
+/** Rough token budget: UTF-8 bytes / 4 (common wire heuristic). */
+function approxTokens(bytes) {
+  if (!bytes || bytes < 1) return 0;
+  return Math.max(1, Math.ceil(bytes / 4));
+}
+
+function formatBytes(n) {
+  return Number(n || 0).toLocaleString() + " B";
+}
+
+function formatTokens(bytes) {
+  return "~" + approxTokens(bytes).toLocaleString() + " tok";
+}
+
+function sizeLabel(name, bytes) {
+  return `${name}\n${formatBytes(bytes)} · ${formatTokens(bytes)}`;
+}
+
+function prettyContent(value, path) {
+  if (value == null) {
+    return { kind: "empty", text: "(null / empty)" };
+  }
+  if (typeof value === "string") {
+    // System prompts: keep as readable prose blocks
+    if (path && (path.includes("messages") || path.includes("system"))) {
+      return { kind: "prose", text: value };
+    }
+    return { kind: "prose", text: value };
+  }
+  try {
+    return { kind: "json", text: JSON.stringify(value, null, 2) };
+  } catch {
+    return { kind: "prose", text: String(value) };
+  }
+}
+
+/** Resolve catalog content for a treemap/table path. */
+function resolvePathContent(doc, path) {
+  if (!doc || !path) return { value: null, note: "" };
+  if (path === "inject" || String(path).startsWith("inject:")) {
+    const name = String(path).replace(/^inject:/, "") || "runtime inject";
+    const est = INJECT_ESTIMATES.find((x) => x.name === name);
+    return {
+      value: est
+        ? `// Runtime inject (estimate — not stored in this catalog file)\n// ${est.note}\n// ~${est.bytes} bytes · ${formatTokens(est.bytes)}\n\n[Injected at assemble / chat time by Zeus]`
+        : "// Runtime injection estimates (SCOPE BRIEF, MINI-SCHEMA, business rules, user turns)",
+      note: "BLUE = not in baseline JSON; competes for context when Zeus assembles the live request.",
+      estimate: true,
+    };
+  }
+  if (path === "messages") return { value: doc.messages, note: "Full messages array (Rules)." };
+  if (path.startsWith("messages[")) {
+    const m = path.match(/^messages\[(\d+)\]/);
+    if (m) {
+      const msg = (doc.messages || [])[Number(m[1])];
+      if (msg && msg.role === "system") {
+        return { value: msg.content, note: "System prompt text the model reads (Rules — edit via generator fragments)." };
+      }
+      return { value: msg, note: "Message object." };
+    }
+  }
+  if (path === "verbs") return { value: doc.verbs, note: "All tool/function schemas (Rules)." };
+  if (path.startsWith("verbs.")) {
+    const name = path.slice("verbs.".length);
+    const verb = (doc.verbs || []).find((v) => {
+      const fn = v.function || v;
+      return fn.name === name;
+    });
+    return { value: verb || null, note: `Verb schema: ${name}` };
+  }
+  if (path === "guidance") return { value: doc.guidance, note: "Advisory guidance (Editable on full profile)." };
+  if (path.startsWith("guidance.")) {
+    const gk = path.slice("guidance.".length);
+    return { value: doc.guidance ? doc.guidance[gk] : null, note: `guidance.${gk} (Editable / hash-excluded).` };
+  }
+  if (Object.prototype.hasOwnProperty.call(doc, path)) {
+    return { value: doc[path], note: `Top-level key: ${path}` };
+  }
+  return { value: null, note: `No content resolver for path: ${path}` };
+}
+
+let lastContentText = "";
+
+function showContentPanel({ path, bytes, cls, value, note, estimate }) {
+  const title = document.getElementById("content-title");
+  const sub = document.getElementById("content-sub");
+  const body = document.getElementById("content-body");
+  const bEl = document.getElementById("content-bytes");
+  const tEl = document.getElementById("content-tokens");
+  const cEl = document.getElementById("content-class");
+  const copyBtn = document.getElementById("btn-copy-content");
+
+  title.textContent = path || "(selection)";
+  sub.textContent = note || "";
+  bEl.textContent = formatBytes(bytes);
+  tEl.textContent = formatTokens(bytes);
+  cEl.textContent = classLabel(cls || "meta");
+  cEl.className =
+    "badge badge-outline badge-sm " +
+    (cls === "rules"
+      ? "border-red-500 text-red-300"
+      : cls === "guidance"
+        ? "border-green-500 text-green-300"
+        : cls === "inject"
+          ? "border-blue-500 text-blue-300"
+          : "");
+
+  const pretty = prettyContent(value, path);
+  lastContentText = pretty.text || "";
+  copyBtn.disabled = !lastContentText;
+
+  if (pretty.kind === "json") {
+    body.innerHTML = `<pre class="content bg-base-300 ${cls === "rules" ? "txt-ro" : cls === "guidance" ? "txt-ed" : cls === "inject" ? "txt-inj" : ""}">${escapeHtml(
+      pretty.text
+    )}</pre>`;
+  } else {
+    body.innerHTML = `<div class="prose-sys content bg-base-300 p-3 rounded-lg ${cls === "rules" ? "txt-ro" : cls === "guidance" ? "txt-ed" : cls === "inject" ? "txt-inj" : ""}">${escapeHtml(
+      pretty.text
+    )}</div>`;
+  }
+
+  // scroll panel into view when selecting
+  document.getElementById("content-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function openPath(path, bytes, cls) {
+  const resolved = resolvePathContent(state.catalog, path);
+  const b =
+    bytes != null
+      ? bytes
+      : resolved.estimate
+        ? (INJECT_ESTIMATES.find((x) => path.includes(x.name)) || {}).bytes || 0
+        : jsonBytes(resolved.value);
+  showContentPanel({
+    path,
+    bytes: b,
+    cls: cls || classForKey(path.split(".")[0] || path),
+    value: resolved.value,
+    note: resolved.note,
+    estimate: resolved.estimate,
+  });
+  document.getElementById("status").textContent = `Selected: ${path} · ${formatBytes(b)} · ${formatTokens(b)} · ${classLabel(
+    cls || ""
+  )}`;
+}
+
 function hasKey(doc, key) {
   return doc && Object.prototype.hasOwnProperty.call(doc, key) && doc[key] != null;
 }
@@ -316,19 +502,20 @@ function buildSizeTree(doc, includeInject) {
     if (k === "messages") {
       const kids = (v || []).map((msg, i) => {
         const b = jsonBytes(msg);
+        const path = `messages[${i}]`;
         tableRows.push({ path: `messages[${i}].${msg.role || "msg"}`, cls: "rules", bytes: b });
         return {
-          name: `${msg.role || "msg"} (${b} B)`,
+          name: sizeLabel(msg.role || "msg", b),
           value: b,
-          path: `messages[${i}]`,
+          path,
           cls: "rules",
           itemStyle: { color: COLORS.rules, borderColor: "#7f1d1d", borderWidth: 2 },
-          label: { color: "#fecaca" },
+          label: { color: "#fecaca", formatter: "{b}" },
         };
       });
       const total = kids.reduce((s, c) => s + c.value, 0);
       children.push({
-        name: `messages (${total} B)`,
+        name: sizeLabel("messages", total),
         path: "messages",
         cls: "rules",
         children: kids,
@@ -341,11 +528,12 @@ function buildSizeTree(doc, includeInject) {
       const kids = (v || []).map((verb) => {
         const fn = verb.function || verb;
         const b = jsonBytes(verb);
-        tableRows.push({ path: `verbs.${fn.name || "?"}`, cls: "rules", bytes: b });
+        const path = `verbs.${fn.name || "?"}`;
+        tableRows.push({ path, cls: "rules", bytes: b });
         return {
-          name: `${fn.name || "?"} (${b} B)`,
+          name: sizeLabel(fn.name || "?", b),
           value: b,
-          path: `verbs.${fn.name}`,
+          path,
           cls: "rules",
           itemStyle: { color: COLORS.rules, borderColor: "#7f1d1d", borderWidth: 2 },
           label: { color: "#fecaca" },
@@ -353,7 +541,7 @@ function buildSizeTree(doc, includeInject) {
       });
       const total = kids.reduce((s, c) => s + c.value, 0);
       children.push({
-        name: `verbs (${total} B)`,
+        name: sizeLabel("verbs", total),
         path: "verbs",
         cls: "rules",
         children: kids,
@@ -365,11 +553,12 @@ function buildSizeTree(doc, includeInject) {
     if (k === "guidance" && v && typeof v === "object") {
       const kids = Object.keys(v).map((gk) => {
         const b = jsonBytes(v[gk]);
-        tableRows.push({ path: `guidance.${gk}`, cls: "guidance", bytes: b });
+        const path = `guidance.${gk}`;
+        tableRows.push({ path, cls: "guidance", bytes: b });
         return {
-          name: `${gk} (${b} B)`,
+          name: sizeLabel(gk, b),
           value: Math.max(b, 1),
-          path: `guidance.${gk}`,
+          path,
           cls: "guidance",
           itemStyle: { color: COLORS.guidance, borderColor: "#14532d", borderWidth: 2 },
           label: { color: "#bbf7d0" },
@@ -377,10 +566,10 @@ function buildSizeTree(doc, includeInject) {
       });
       const total = kids.reduce((s, c) => s + c.value, 0);
       children.push({
-        name: `guidance (${total} B)`,
+        name: sizeLabel("guidance", total),
         path: "guidance",
         cls: "guidance",
-        children: kids.length ? kids : [{ name: "(empty)", value: 1 }],
+        children: kids.length ? kids : [{ name: "(empty)", value: 1, path: "guidance" }],
         itemStyle: { color: COLORS.guidance, borderColor: "#166534", borderWidth: 2 },
         label: { color: "#bbf7d0" },
       });
@@ -391,7 +580,7 @@ function buildSizeTree(doc, includeInject) {
     tableRows.push({ path: k, cls, bytes: b });
     const color = COLORS[cls] || COLORS.meta;
     children.push({
-      name: `${k} (${b} B)`,
+      name: sizeLabel(k, b),
       value: Math.max(b, 1),
       path: k,
       cls,
@@ -410,7 +599,7 @@ function buildSizeTree(doc, includeInject) {
     const kids = INJECT_ESTIMATES.map((x) => {
       tableRows.push({ path: `[inject] ${x.name}`, cls: "inject", bytes: x.bytes });
       return {
-        name: `${x.name} (~${x.bytes} B)`,
+        name: sizeLabel(x.name, x.bytes),
         value: x.bytes,
         path: `inject:${x.name}`,
         cls: "inject",
@@ -422,7 +611,7 @@ function buildSizeTree(doc, includeInject) {
     });
     const total = kids.reduce((s, c) => s + c.value, 0);
     children.push({
-      name: `runtime inject (~${total} B est.)`,
+      name: sizeLabel("runtime inject (est.)", total),
       path: "inject",
       cls: "inject",
       children: kids,
@@ -442,8 +631,9 @@ function buildWireTree(doc, includeInject) {
     const fn = verb.function || verb;
     const b = jsonBytes(verb);
     return {
-      name: `${fn.name} (${b} B)`,
+      name: sizeLabel(fn.name, b),
       value: b,
+      path: `verbs.${fn.name}`,
       cls: "rules",
       itemStyle: { color: COLORS.rules, borderColor: "#7f1d1d", borderWidth: 2 },
       label: { color: "#fecaca" },
@@ -451,14 +641,16 @@ function buildWireTree(doc, includeInject) {
   });
   const children = [
     {
-      name: `system prompt (${sysB} B)`,
+      name: sizeLabel("system prompt", sysB),
       value: sysB,
+      path: "messages[0]",
       cls: "rules",
       itemStyle: { color: COLORS.rules, borderColor: "#991b1b", borderWidth: 2 },
       label: { color: "#fecaca" },
     },
     {
-      name: `tools/verbs (${verbKids.reduce((s, c) => s + c.value, 0)} B)`,
+      name: sizeLabel("tools/verbs", verbKids.reduce((s, c) => s + c.value, 0)),
+      path: "verbs",
       cls: "rules",
       children: verbKids,
       itemStyle: { color: COLORS.rules, borderColor: "#991b1b", borderWidth: 2 },
@@ -467,12 +659,19 @@ function buildWireTree(doc, includeInject) {
   ];
   if (includeInject) {
     children.push({
-      name: "runtime inject (est.)",
+      name: sizeLabel(
+        "runtime inject (est.)",
+        INJECT_ESTIMATES.reduce((s, x) => s + x.bytes, 0)
+      ),
+      path: "inject",
       cls: "inject",
       children: INJECT_ESTIMATES.map((x) => ({
-        name: `${x.name} (~${x.bytes} B)`,
+        name: sizeLabel(x.name, x.bytes),
         value: x.bytes,
+        path: `inject:${x.name}`,
         cls: "inject",
+        estimate: true,
+        note: x.note,
         itemStyle: { color: COLORS.inject, borderColor: "#1e3a8a", borderWidth: 2 },
         label: { color: "#bfdbfe" },
       })),
@@ -495,11 +694,13 @@ function treemapOption(data, title) {
     tooltip: {
       formatter(info) {
         const d = info.data || {};
-        const v = info.value;
+        const v = info.value || 0;
         const cls = d.cls || "";
         const note = d.note ? `<br/>${d.note}` : "";
         const est = d.estimate ? "<br/><i>estimate — not in file</i>" : "";
-        return `<b>${info.name}</b><br/>${v} bytes · ${classLabel(cls)}${note}${est}`;
+        return `<b>${(info.name || "").split("\n")[0]}</b><br/>${formatBytes(v)} · ${formatTokens(
+          v
+        )} · ${classLabel(cls)}<br/><span style="opacity:.8">click to open content</span>${note}${est}`;
       },
     },
     series: [
@@ -509,7 +710,8 @@ function treemapOption(data, title) {
         height: "90%",
         top: 28,
         roam: false,
-        nodeClick: "zoomToNode",
+        // Don't zoom on click — we use click to open the content panel
+        nodeClick: false,
         breadcrumb: {
           show: true,
           bottom: 4,
@@ -519,8 +721,9 @@ function treemapOption(data, title) {
           show: true,
           formatter: "{b}",
           fontSize: 11,
+          lineHeight: 14,
         },
-        upperLabel: { show: true, height: 22, color: "#f9fafb" },
+        upperLabel: { show: true, height: 28, color: "#f9fafb" },
         itemStyle: {
           borderColor: "#111827",
           borderWidth: 1,
@@ -533,7 +736,7 @@ function treemapOption(data, title) {
           },
           {
             itemStyle: { gapWidth: 2 },
-            emphasis: { itemStyle: { borderColor: "#f9fafb" } },
+            emphasis: { itemStyle: { borderColor: "#f9fafb", borderWidth: 2 } },
           },
           {
             colorSaturation: [0.35, 0.55],
@@ -555,42 +758,58 @@ function ensureCharts() {
   }
 }
 
+function bindChartClick(chart) {
+  chart.off("click");
+  chart.on("click", (params) => {
+    const d = params.data || {};
+    if (!d.path && params.name) return;
+    openPath(d.path, params.value, d.cls);
+  });
+}
+
 function renderSizeMaps(doc) {
   ensureCharts();
   const includeInject = document.getElementById("chk-inject").checked;
   const { children, tableRows } = buildSizeTree(doc, includeInject);
   const diskBytes = tableRows.filter((r) => r.cls !== "inject").reduce((s, r) => s + r.bytes, 0);
   const injBytes = tableRows.filter((r) => r.cls === "inject").reduce((s, r) => s + r.bytes, 0);
+  const viewTotal = includeInject ? diskBytes + injBytes : diskBytes;
   document.getElementById("size-totals").textContent = includeInject
-    ? `on-disk ${diskBytes.toLocaleString()} B · inject est. ${injBytes.toLocaleString()} B · total view ${(diskBytes + injBytes).toLocaleString()} B`
-    : `on-disk ${diskBytes.toLocaleString()} B`;
+    ? `on-disk ${formatBytes(diskBytes)} (${formatTokens(diskBytes)}) · inject est. ${formatBytes(injBytes)} (${formatTokens(
+        injBytes
+      )}) · view ${formatBytes(viewTotal)} (${formatTokens(viewTotal)})`
+    : `on-disk ${formatBytes(diskBytes)} (${formatTokens(diskBytes)})`;
 
   state.chartMain.setOption(treemapOption(children, "Full catalog JSON (area = bytes)"), true);
   state.chartWire.setOption(treemapOption(buildWireTree(doc, includeInject), "Wire-ish payload"), true);
+  bindChartClick(state.chartMain);
+  bindChartClick(state.chartWire);
 
   const tbody = document.querySelector("#size-table tbody");
   tbody.innerHTML = tableRows
     .map((r) => {
-      const pct = diskBytes ? ((100 * r.bytes) / (r.cls === "inject" ? diskBytes + injBytes : diskBytes)).toFixed(1) : "0";
+      const denom = r.cls === "inject" ? viewTotal : diskBytes;
+      const pct = denom ? ((100 * r.bytes) / denom).toFixed(1) : "0";
       const cls =
         r.cls === "rules" ? "txt-ro" : r.cls === "guidance" ? "txt-ed" : r.cls === "inject" ? "txt-inj" : "opacity-80";
-      return `<tr>
+      // table path for inject rows uses [inject] name — normalize for openPath
+      const openPathKey = r.path.startsWith("[inject] ")
+        ? "inject:" + r.path.slice("[inject] ".length)
+        : r.path.replace(/\.system$|\.msg$/, "").replace(/^(messages\[\d+\])\..+$/, "$1");
+      return `<tr class="hover cursor-pointer" data-path="${escapeHtml(openPathKey)}" data-bytes="${r.bytes}" data-cls="${r.cls}">
         <td class="font-mono text-[11px] ${cls}">${escapeHtml(r.path)}</td>
         <td class="${cls}">${escapeHtml(classLabel(r.cls))}</td>
         <td class="text-right font-mono">${r.bytes.toLocaleString()}</td>
+        <td class="text-right font-mono">${approxTokens(r.bytes).toLocaleString()}</td>
         <td class="text-right font-mono">${pct}%</td>
       </tr>`;
     })
     .join("");
 
-  // click → flash path in status
-  state.chartMain.off("click");
-  state.chartMain.on("click", (params) => {
-    if (params.data && params.data.path) {
-      document.getElementById("status").textContent = `Selected: ${params.data.path} · ${params.value} bytes · ${classLabel(
-        params.data.cls || ""
-      )}`;
-    }
+  tbody.querySelectorAll("tr[data-path]").forEach((tr) => {
+    tr.addEventListener("click", () => {
+      openPath(tr.getAttribute("data-path"), Number(tr.getAttribute("data-bytes")), tr.getAttribute("data-cls"));
+    });
   });
 }
 
@@ -832,6 +1051,14 @@ document.getElementById("btn-copy-json").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(document.getElementById("json-pre").textContent);
     toast("Copied JSON");
+  } catch {
+    toast("Copy failed");
+  }
+});
+document.getElementById("btn-copy-content").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(lastContentText || "");
+    toast("Copied content");
   } catch {
     toast("Copy failed");
   }

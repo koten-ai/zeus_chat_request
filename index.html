@@ -6,14 +6,18 @@
   <title>Zeus chat_request catalog map</title>
   <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <style>
     :root { color-scheme: dark; }
     body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
-    .box-ro { border-left: 4px solid #f87171; }
-    .box-ed { border-left: 4px solid #34d399; }
-    .box-wire { border-left: 4px solid #60a5fa; }
+    .box-ro { border-left: 4px solid #ef4444; }
+    .box-ed { border-left: 4px solid #22c55e; }
+    .box-wire { border-left: 4px solid #3b82f6; }
     .box-miss { border-left: 4px solid #fbbf24; opacity: 0.95; }
     .box-meta { border-left: 4px solid #a78bfa; }
+    .txt-ro { color: #fca5a5; }
+    .txt-ed { color: #86efac; }
+    .txt-inj { color: #93c5fd; }
     pre.json {
       white-space: pre-wrap;
       word-break: break-word;
@@ -22,13 +26,13 @@
       font-size: 11px;
       line-height: 1.35;
     }
-    .tree-key { color: #93c5fd; }
-    .tree-str { color: #86efac; }
-    .tree-num { color: #fcd34d; }
-    .tree-bool { color: #f9a8d4; }
-    .tree-null { color: #9ca3af; }
     .section-card { min-height: 7.5rem; }
     #toast { position: fixed; bottom: 1rem; right: 1rem; z-index: 50; }
+    #treemap-chart, #treemap-wire {
+      width: 100%;
+      height: 420px;
+    }
+    #treemap-wire { height: 360px; }
   </style>
 </head>
 <body class="bg-base-300 text-base-content min-h-screen">
@@ -36,14 +40,15 @@
     <div class="flex-1 gap-3">
       <span class="font-bold text-lg">chat_request map</span>
       <span class="badge badge-ghost badge-sm">koten-ai/zeus_chat_request</span>
-      <span class="text-xs opacity-60 hidden sm:inline">Hub-style AI Catalog layout · Rules vs Editable vs Wire</span>
+      <span class="text-xs opacity-60 hidden md:inline">Size map · Rules / Editable / Injected</span>
     </div>
-    <div class="flex-none gap-2 items-center">
-      <label class="form-control w-40">
+    <div class="flex-none gap-2 items-center flex-wrap justify-end">
+      <label class="form-control w-36">
         <select id="mode-select" class="select select-bordered select-sm"></select>
       </label>
       <div class="join">
         <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes">Boxes</button>
+        <button type="button" class="btn btn-sm join-item btn-ghost" data-view="size">Size map</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="json">JSON only</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="org">Org plan</button>
       </div>
@@ -51,16 +56,14 @@
   </div>
 
   <main class="max-w-7xl mx-auto p-4 space-y-4">
-    <!-- Legend -->
     <div class="alert bg-base-100 shadow-sm text-sm">
       <div class="flex flex-wrap gap-3 items-center w-full">
-        <span class="font-semibold">Legend</span>
-        <span class="badge badge-error badge-outline">Don't edit (Rules / hashed)</span>
-        <span class="badge badge-success badge-outline">Editable (guidance / advisory)</span>
-        <span class="badge badge-info badge-outline">On the wire → model</span>
-        <span class="badge badge-warning badge-outline">Missing on this profile</span>
-        <span class="badge badge-secondary badge-outline">Meta / stamp</span>
-        <span class="ml-auto text-xs opacity-70" id="manifest-line">Loading manifest…</span>
+        <span class="font-semibold">Color legend</span>
+        <span class="badge badge-error badge-outline border-red-500 text-red-300">RED — Don't change (Rules / hashed)</span>
+        <span class="badge badge-success badge-outline border-green-500 text-green-300">GREEN — You can change (guidance / advisory)</span>
+        <span class="badge badge-info badge-outline border-blue-500 text-blue-300">BLUE — Injected at runtime (brief / mini-schema / business rules / user turns)</span>
+        <span class="badge badge-warning badge-outline">Yellow — Missing on this profile</span>
+        <span class="ml-auto text-xs opacity-70" id="manifest-line">Loading…</span>
       </div>
     </div>
 
@@ -75,6 +78,62 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wire-grid"></div>
       <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">Evidence-loop terminate contract</h2>
       <div id="evidence-panel" class="card bg-base-100 shadow section-card"></div>
+    </section>
+
+    <!-- SIZE MAP VIEW (ECharts treemap) -->
+    <section id="view-size" class="hidden space-y-4">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4 gap-3">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h2 class="card-title text-base">Payload size treemap</h2>
+              <p class="text-xs opacity-70 max-w-3xl">
+                Area ∝ UTF-8 JSON bytes (compact). <span class="txt-ro font-semibold">Red</span> =
+                rules you should not casually edit.
+                <span class="txt-ed font-semibold">Green</span> = advisory / guidance you may tune.
+                <span class="txt-inj font-semibold">Blue</span> = runtime injections (not in this file —
+                shown as estimates so you see how they compete for context).
+              </p>
+            </div>
+            <div class="flex flex-col gap-1 text-xs items-end">
+              <label class="label cursor-pointer gap-2 py-0">
+                <span class="label-text text-xs">Include runtime inject estimates</span>
+                <input type="checkbox" id="chk-inject" class="toggle toggle-sm toggle-info" checked />
+              </label>
+              <span class="opacity-60" id="size-totals"></span>
+            </div>
+          </div>
+          <div id="treemap-chart" class="rounded-lg bg-base-200"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div class="card bg-base-100 shadow">
+          <div class="card-body p-4">
+            <h3 class="font-semibold text-sm mb-1">Wire-only (what the LLM request roughly is)</h3>
+            <p class="text-xs opacity-70 mb-2">Catalog system + verbs, plus optional inject estimates. Same colors.</p>
+            <div id="treemap-wire" class="rounded-lg bg-base-200"></div>
+          </div>
+        </div>
+        <div class="card bg-base-100 shadow">
+          <div class="card-body p-4">
+            <h3 class="font-semibold text-sm mb-2">Byte table (on-disk catalog)</h3>
+            <div class="overflow-x-auto max-h-80 overflow-y-auto">
+              <table class="table table-xs" id="size-table">
+                <thead>
+                  <tr>
+                    <th>path</th>
+                    <th>class</th>
+                    <th class="text-right">bytes</th>
+                    <th class="text-right">%</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- JSON VIEW -->
@@ -96,46 +155,20 @@
         <div class="card-body prose prose-sm max-w-none prose-invert">
           <h2 class="mt-0">Target structure (engine Zeus + this repo)</h2>
           <pre class="bg-base-200 p-3 rounded text-xs overflow-x-auto">koten-ai/Zeus  (generate + embed)
-├── ai/
-│   ├── README.md                 # index of AI surfaces
-│   ├── CHANGELOG.md              # cross-cutting history
-│   ├── chat_request/             # ★ maintenance & distribution kit
-│   │   ├── README.md
-│   │   ├── DISTRIBUTION.md
-│   │   ├── ORGANIZE_PLAN.md
-│   │   ├── scripts/              # check / publish / pull
-│   │   └── dist/                 # pulled pins (gitignored)
-│   ├── V2/
-│   │   ├── prompt/core/*.md      # ★ edit system prompt fragments here
-│   │   ├── chat_request_*_v2.json          # generated FULL (embed)
-│   │   └── variants/min/*_v2_min.json       # generated MIN → publish
-│   ├── V1/                       # legacy generated (embed)
-│   └── workbench_prompt_helper/  # separate product (Prompt Helper)
-│
-koten-ai/zeus_chat_request  (publish for clients)
-├── index.html                    # ★ this map (Hub-style AI Catalog)
-├── CHAT_REQUEST.md
-├── manifest.json
-├── v2/min/*.json                 # published min baselines
-└── scripts/                      # refresh_manifest, sync-from-zeus</pre>
-          <h3>Don't hand-edit JSON</h3>
+├── ai/V2/prompt/core/*.md     # edit system prose (RED rules text)
+├── ai/V2/*_v2.json            # full generated
+├── ai/V2/variants/min/*       # min → publish here
+└── ai/chat_request/           # maintenance scripts
+
+koten-ai/zeus_chat_request
+├── index.html                 # this map + size treemap
+├── v2/min/*.json
+└── manifest.json</pre>
+          <h3>Color policy</h3>
           <ul>
-            <li><strong>Edit:</strong> Zeus <code>ai/V2/prompt/core/*.md</code> + <code>chat_request_gen.go</code></li>
-            <li><strong>Generate:</strong> <code>make ai-snapshot-min</code></li>
-            <li><strong>Publish:</strong> <code>make chat-request-publish</code> → this repo</li>
-            <li><strong>Clients:</strong> pull pin → stamp on live Zeus</li>
-          </ul>
-          <h3>Boxes map to envelope</h3>
-          <ul>
-            <li><span class="text-error font-semibold">Don't edit / Rules</span> — <code>messages</code>, <code>verbs</code>, <code>masq</code>, hashed pointers</li>
-            <li><span class="text-success font-semibold">Editable / guidance</span> — <code>optimal_paths</code>, facet schemas (full only; stripped on min)</li>
-            <li><span class="text-info font-semibold">Wire</span> — only <code>messages</code> + tools reach the LLM</li>
-          </ul>
-          <h3>Suggested cleanup (engine ai/*)</h3>
-          <ul>
-            <li>Keep <code>by_use_case/</code> demos but link from <code>ai/chat_request/</code>; avoid dual V1 copies long-term</li>
-            <li>Move orphan essays (<code>more_balance_to_chat.md</code>, <code>PROMPT_SANDBOX.md</code>) → <code>ai/chat_request/notes/</code> or design_docs</li>
-            <li>Single entry: <code>ai/README.md</code> → chat_request hub + PROMPT_BUILDER</li>
+            <li><span class="txt-ro font-semibold">RED</span> — Rules: <code>messages</code>, <code>verbs</code>, <code>masq</code>, hashed pointers. Change only via generator / deliberate contract bump.</li>
+            <li><span class="txt-ed font-semibold">GREEN</span> — Guidance: <code>optimal_paths</code>, facet docs, strategy. Hash-excluded; safe to tune for a scope.</li>
+            <li><span class="txt-inj font-semibold">BLUE</span> — Injected at assemble time: SCOPE BRIEF, MINI-SCHEMA, business_logic, user turns. Not stored in this baseline JSON.</li>
           </ul>
         </div>
       </div>
@@ -147,104 +180,45 @@ koten-ai/zeus_chat_request  (publish for clients)
   </div>
 
   <script>
-/**
- * Structure map for zeus.chat_request.v2
- * edit: 'rules' | 'guidance' | 'meta' | 'wire'
- * minTypical: whether v2_min usually has this key
- */
+/** @typedef {'rules'|'guidance'|'meta'|'inject'} ClassKind */
+
+const COLORS = {
+  rules: "#ef4444",
+  guidance: "#22c55e",
+  meta: "#a78bfa",
+  inject: "#3b82f6",
+  miss: "#fbbf24",
+};
+
 const STRUCTURE = [
-  {
-    key: "_format",
-    title: "_format / _version",
-    edit: "meta",
-    minTypical: true,
-    summary: "Envelope identity. Must be zeus.chat_request.v2.",
-    path: "_format",
-  },
-  {
-    key: "_hash_policy",
-    title: "_hash_policy",
-    edit: "rules",
-    minTypical: true,
-    summary: "Which JSON pointers are Rules (hashed) vs excluded (guidance, contract, metadata).",
-    path: "_hash_policy",
-  },
-  {
-    key: "contract",
-    title: "contract",
-    edit: "meta",
-    minTypical: true,
-    summary: "Stamp block: id, hash, builder. Server is sole authority for hash after verify.",
-    path: "contract",
-  },
-  {
-    key: "messages",
-    title: "messages (system prompt)",
-    edit: "rules",
-    wire: true,
-    minTypical: true,
-    summary: "What the model reads. Evidence-loop terminate rules MUST live here (min deletes guidance).",
-    path: "messages",
-  },
-  {
-    key: "verbs",
-    title: "verbs (tools)",
-    edit: "rules",
-    wire: true,
-    minTypical: true,
-    summary: "Function schemas. return.required must include query_decomposition.",
-    path: "verbs",
-  },
-  {
-    key: "masq",
-    title: "masq (cost tiers)",
-    edit: "rules",
-    minTypical: false,
-    summary: "Cost model for verb priority. Present on full; often stripped on min.",
-    path: "masq",
-  },
-  {
-    key: "instructions",
-    title: "instructions",
-    edit: "rules",
-    minTypical: false,
-    summary: "response_expectations, verb_order. system_prompt is usually a marker only.",
-    path: "instructions",
-  },
-  {
-    key: "guidance",
-    title: "guidance (advisory)",
-    edit: "guidance",
-    minTypical: false,
-    summary: "optimal_paths, query_decomposition schema, data_decomposition. Hash-excluded. Min deletes this.",
-    path: "guidance",
-  },
-  {
-    key: "metadata",
-    title: "metadata",
-    edit: "meta",
-    minTypical: false,
-    summary: "mode, generated flags. Not hashed.",
-    path: "metadata",
-  },
-  {
-    key: "_note",
-    title: "_note",
-    edit: "meta",
-    minTypical: true,
-    summary: "Human-readable regen note (MIN profile, evidence-loop reminder).",
-    path: "_note",
-  },
+  { key: "_format", title: "_format / _version", edit: "meta", minTypical: true, summary: "Envelope identity.", path: "_format" },
+  { key: "_hash_policy", title: "_hash_policy", edit: "rules", minTypical: true, summary: "Rules pointers vs excluded guidance.", path: "_hash_policy" },
+  { key: "contract", title: "contract", edit: "meta", minTypical: true, summary: "Stamp: id/hash/builder.", path: "contract" },
+  { key: "messages", title: "messages (system prompt)", edit: "rules", wire: true, minTypical: true, summary: "Model prose. Evidence-loop MUST live here on min.", path: "messages" },
+  { key: "verbs", title: "verbs (tools)", edit: "rules", wire: true, minTypical: true, summary: "Function schemas; return.required includes query_decomposition.", path: "verbs" },
+  { key: "masq", title: "masq (cost tiers)", edit: "rules", minTypical: false, summary: "Cost model. Full profile.", path: "masq" },
+  { key: "instructions", title: "instructions", edit: "rules", minTypical: false, summary: "response_expectations / verb_order.", path: "instructions" },
+  { key: "guidance", title: "guidance (advisory)", edit: "guidance", minTypical: false, summary: "optimal_paths, facet schemas. Min deletes this.", path: "guidance" },
+  { key: "metadata", title: "metadata", edit: "meta", minTypical: false, summary: "mode flags.", path: "metadata" },
+  { key: "_note", title: "_note", edit: "meta", minTypical: true, summary: "Human regen note.", path: "_note" },
 ];
 
 const EVIDENCE_FIELDS = [
   { name: "summary", required: true },
-  { name: "query_decomposition", required: true, note: "intent facets — hot-path / evidence loop" },
-  { name: "decomposition", required: true, note: "MINI-SCHEMA data extraction" },
-  { name: "confidence", required: true, note: "string high|med|low only" },
+  { name: "query_decomposition", required: true, note: "intent facets — hot-path" },
+  { name: "decomposition", required: true, note: "MINI-SCHEMA data" },
+  { name: "confidence", required: true, note: "string high|med|low" },
   { name: "node_refs", required: false },
   { name: "entity_refs", required: false },
   { name: "provenance", required: false },
+];
+
+/** Runtime injects — not in file; relative estimates for context competition */
+const INJECT_ESTIMATES = [
+  { name: "SCOPE BRIEF + MINI-SCHEMA", bytes: 6000, note: "Injected per scope at assemble" },
+  { name: "business_logic / prompt_override", bytes: 1500, note: "Operator injections" },
+  { name: "user turns (typical 1–3)", bytes: 2500, note: "Conversation history" },
+  { name: "tool results (round 1)", bytes: 4000, note: "Varies widely" },
 ];
 
 let state = {
@@ -253,13 +227,27 @@ let state = {
   mode: null,
   catalog: null,
   catalogs: {},
+  chartMain: null,
+  chartWire: null,
 };
 
 function toast(msg) {
   const el = document.getElementById("toast");
   document.getElementById("toast-msg").textContent = msg;
   el.classList.remove("hidden");
-  setTimeout(() => el.classList.add("hidden"), 1800);
+  setTimeout(() => el.classList.add("hidden"), 1600);
+}
+
+function jsonBytes(v) {
+  try {
+    return new TextEncoder().encode(JSON.stringify(v)).length;
+  } catch {
+    return 0;
+  }
+}
+
+function hasKey(doc, key) {
+  return doc && Object.prototype.hasOwnProperty.call(doc, key) && doc[key] != null;
 }
 
 function getAt(obj, path) {
@@ -267,8 +255,12 @@ function getAt(obj, path) {
   return path.split(".").reduce((a, k) => (a == null ? a : a[k]), obj);
 }
 
-function hasKey(doc, key) {
-  return doc && Object.prototype.hasOwnProperty.call(doc, key) && doc[key] != null;
+function classForKey(key) {
+  if (key === "guidance" || key.startsWith("guidance.")) return "guidance";
+  if (key === "messages" || key === "verbs" || key === "masq" || key === "instructions" || key === "_hash_policy")
+    return "rules";
+  if (key === "contract" || key === "metadata" || key.startsWith("_")) return "meta";
+  return "meta";
 }
 
 function boxClass(edit, missing) {
@@ -281,24 +273,20 @@ function boxClass(edit, missing) {
 
 function editBadge(edit, missing) {
   if (missing) return '<span class="badge badge-warning badge-sm">Missing</span>';
-  if (edit === "rules") return '<span class="badge badge-error badge-outline badge-sm">Don\'t edit · Rules</span>';
-  if (edit === "guidance") return '<span class="badge badge-success badge-outline badge-sm">Editable · guidance</span>';
-  if (edit === "wire") return '<span class="badge badge-info badge-outline badge-sm">On the wire</span>';
+  if (edit === "rules") return '<span class="badge badge-error badge-outline badge-sm border-red-500">Don\'t change</span>';
+  if (edit === "guidance") return '<span class="badge badge-success badge-outline badge-sm border-green-500">Editable</span>';
   return '<span class="badge badge-secondary badge-outline badge-sm">Meta</span>';
 }
 
-function previewValue(v) {
-  if (v == null) return "null";
-  if (typeof v === "string") return v.length > 120 ? v.slice(0, 120) + "…" : v;
-  if (typeof v === "number" || typeof v === "boolean") return String(v);
-  if (Array.isArray(v)) return `array[${v.length}]`;
-  if (typeof v === "object") return `object{${Object.keys(v).length} keys}`;
-  return String(v);
+function classLabel(c) {
+  if (c === "rules") return "don't change";
+  if (c === "guidance") return "editable";
+  if (c === "inject") return "injected";
+  return "meta";
 }
 
 function findReturnVerb(doc) {
-  const verbs = doc.verbs || [];
-  for (const v of verbs) {
+  for (const v of doc.verbs || []) {
     const fn = v.function || v;
     if (fn.name === "return") return fn;
   }
@@ -306,9 +294,304 @@ function findReturnVerb(doc) {
 }
 
 function systemContent(doc) {
-  const msgs = doc.messages || [];
-  const m = msgs.find((x) => x.role === "system");
+  const m = (doc.messages || []).find((x) => x.role === "system");
   return (m && m.content) || "";
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function buildSizeTree(doc, includeInject) {
+  const children = [];
+  const tableRows = [];
+
+  // Top-level keys
+  for (const [k, v] of Object.entries(doc)) {
+    const cls = classForKey(k);
+    if (k === "messages") {
+      const kids = (v || []).map((msg, i) => {
+        const b = jsonBytes(msg);
+        tableRows.push({ path: `messages[${i}].${msg.role || "msg"}`, cls: "rules", bytes: b });
+        return {
+          name: `${msg.role || "msg"} (${b} B)`,
+          value: b,
+          path: `messages[${i}]`,
+          cls: "rules",
+          itemStyle: { color: COLORS.rules, borderColor: "#7f1d1d", borderWidth: 2 },
+          label: { color: "#fecaca" },
+        };
+      });
+      const total = kids.reduce((s, c) => s + c.value, 0);
+      children.push({
+        name: `messages (${total} B)`,
+        path: "messages",
+        cls: "rules",
+        children: kids,
+        itemStyle: { color: COLORS.rules, borderColor: "#991b1b", borderWidth: 2 },
+        label: { color: "#fecaca" },
+      });
+      continue;
+    }
+    if (k === "verbs") {
+      const kids = (v || []).map((verb) => {
+        const fn = verb.function || verb;
+        const b = jsonBytes(verb);
+        tableRows.push({ path: `verbs.${fn.name || "?"}`, cls: "rules", bytes: b });
+        return {
+          name: `${fn.name || "?"} (${b} B)`,
+          value: b,
+          path: `verbs.${fn.name}`,
+          cls: "rules",
+          itemStyle: { color: COLORS.rules, borderColor: "#7f1d1d", borderWidth: 2 },
+          label: { color: "#fecaca" },
+        };
+      });
+      const total = kids.reduce((s, c) => s + c.value, 0);
+      children.push({
+        name: `verbs (${total} B)`,
+        path: "verbs",
+        cls: "rules",
+        children: kids,
+        itemStyle: { color: COLORS.rules, borderColor: "#991b1b", borderWidth: 2 },
+        label: { color: "#fecaca" },
+      });
+      continue;
+    }
+    if (k === "guidance" && v && typeof v === "object") {
+      const kids = Object.keys(v).map((gk) => {
+        const b = jsonBytes(v[gk]);
+        tableRows.push({ path: `guidance.${gk}`, cls: "guidance", bytes: b });
+        return {
+          name: `${gk} (${b} B)`,
+          value: Math.max(b, 1),
+          path: `guidance.${gk}`,
+          cls: "guidance",
+          itemStyle: { color: COLORS.guidance, borderColor: "#14532d", borderWidth: 2 },
+          label: { color: "#bbf7d0" },
+        };
+      });
+      const total = kids.reduce((s, c) => s + c.value, 0);
+      children.push({
+        name: `guidance (${total} B)`,
+        path: "guidance",
+        cls: "guidance",
+        children: kids.length ? kids : [{ name: "(empty)", value: 1 }],
+        itemStyle: { color: COLORS.guidance, borderColor: "#166534", borderWidth: 2 },
+        label: { color: "#bbf7d0" },
+      });
+      continue;
+    }
+
+    const b = jsonBytes(v);
+    tableRows.push({ path: k, cls, bytes: b });
+    const color = COLORS[cls] || COLORS.meta;
+    children.push({
+      name: `${k} (${b} B)`,
+      value: Math.max(b, 1),
+      path: k,
+      cls,
+      itemStyle: {
+        color,
+        borderColor: cls === "rules" ? "#7f1d1d" : cls === "guidance" ? "#14532d" : "#4c1d95",
+        borderWidth: 2,
+      },
+      label: {
+        color: cls === "rules" ? "#fecaca" : cls === "guidance" ? "#bbf7d0" : "#e9d5ff",
+      },
+    });
+  }
+
+  if (includeInject) {
+    const kids = INJECT_ESTIMATES.map((x) => {
+      tableRows.push({ path: `[inject] ${x.name}`, cls: "inject", bytes: x.bytes });
+      return {
+        name: `${x.name} (~${x.bytes} B)`,
+        value: x.bytes,
+        path: `inject:${x.name}`,
+        cls: "inject",
+        estimate: true,
+        note: x.note,
+        itemStyle: { color: COLORS.inject, borderColor: "#1e3a8a", borderWidth: 2 },
+        label: { color: "#bfdbfe" },
+      };
+    });
+    const total = kids.reduce((s, c) => s + c.value, 0);
+    children.push({
+      name: `runtime inject (~${total} B est.)`,
+      path: "inject",
+      cls: "inject",
+      children: kids,
+      itemStyle: { color: COLORS.inject, borderColor: "#1e40af", borderWidth: 2 },
+      label: { color: "#bfdbfe" },
+    });
+  }
+
+  tableRows.sort((a, b) => b.bytes - a.bytes);
+  return { children, tableRows };
+}
+
+function buildWireTree(doc, includeInject) {
+  const sys = systemContent(doc);
+  const sysB = jsonBytes(sys);
+  const verbKids = (doc.verbs || []).map((verb) => {
+    const fn = verb.function || verb;
+    const b = jsonBytes(verb);
+    return {
+      name: `${fn.name} (${b} B)`,
+      value: b,
+      cls: "rules",
+      itemStyle: { color: COLORS.rules, borderColor: "#7f1d1d", borderWidth: 2 },
+      label: { color: "#fecaca" },
+    };
+  });
+  const children = [
+    {
+      name: `system prompt (${sysB} B)`,
+      value: sysB,
+      cls: "rules",
+      itemStyle: { color: COLORS.rules, borderColor: "#991b1b", borderWidth: 2 },
+      label: { color: "#fecaca" },
+    },
+    {
+      name: `tools/verbs (${verbKids.reduce((s, c) => s + c.value, 0)} B)`,
+      cls: "rules",
+      children: verbKids,
+      itemStyle: { color: COLORS.rules, borderColor: "#991b1b", borderWidth: 2 },
+      label: { color: "#fecaca" },
+    },
+  ];
+  if (includeInject) {
+    children.push({
+      name: "runtime inject (est.)",
+      cls: "inject",
+      children: INJECT_ESTIMATES.map((x) => ({
+        name: `${x.name} (~${x.bytes} B)`,
+        value: x.bytes,
+        cls: "inject",
+        itemStyle: { color: COLORS.inject, borderColor: "#1e3a8a", borderWidth: 2 },
+        label: { color: "#bfdbfe" },
+      })),
+      itemStyle: { color: COLORS.inject, borderColor: "#1e40af", borderWidth: 2 },
+      label: { color: "#bfdbfe" },
+    });
+  }
+  return children;
+}
+
+function treemapOption(data, title) {
+  return {
+    backgroundColor: "transparent",
+    title: {
+      text: title,
+      left: 8,
+      top: 4,
+      textStyle: { color: "#e5e7eb", fontSize: 12, fontWeight: 600 },
+    },
+    tooltip: {
+      formatter(info) {
+        const d = info.data || {};
+        const v = info.value;
+        const cls = d.cls || "";
+        const note = d.note ? `<br/>${d.note}` : "";
+        const est = d.estimate ? "<br/><i>estimate — not in file</i>" : "";
+        return `<b>${info.name}</b><br/>${v} bytes · ${classLabel(cls)}${note}${est}`;
+      },
+    },
+    series: [
+      {
+        type: "treemap",
+        width: "100%",
+        height: "90%",
+        top: 28,
+        roam: false,
+        nodeClick: "zoomToNode",
+        breadcrumb: {
+          show: true,
+          bottom: 4,
+          itemStyle: { color: "#374151", textStyle: { color: "#e5e7eb" } },
+        },
+        label: {
+          show: true,
+          formatter: "{b}",
+          fontSize: 11,
+        },
+        upperLabel: { show: true, height: 22, color: "#f9fafb" },
+        itemStyle: {
+          borderColor: "#111827",
+          borderWidth: 1,
+          gapWidth: 2,
+        },
+        levels: [
+          {
+            itemStyle: { borderWidth: 0, gapWidth: 3 },
+            upperLabel: { show: false },
+          },
+          {
+            itemStyle: { gapWidth: 2 },
+            emphasis: { itemStyle: { borderColor: "#f9fafb" } },
+          },
+          {
+            colorSaturation: [0.35, 0.55],
+            itemStyle: { gapWidth: 1, borderColorSaturation: 0.6 },
+          },
+        ],
+        data,
+      },
+    ],
+  };
+}
+
+function ensureCharts() {
+  if (!state.chartMain) {
+    state.chartMain = echarts.init(document.getElementById("treemap-chart"), null, { renderer: "canvas" });
+  }
+  if (!state.chartWire) {
+    state.chartWire = echarts.init(document.getElementById("treemap-wire"), null, { renderer: "canvas" });
+  }
+}
+
+function renderSizeMaps(doc) {
+  ensureCharts();
+  const includeInject = document.getElementById("chk-inject").checked;
+  const { children, tableRows } = buildSizeTree(doc, includeInject);
+  const diskBytes = tableRows.filter((r) => r.cls !== "inject").reduce((s, r) => s + r.bytes, 0);
+  const injBytes = tableRows.filter((r) => r.cls === "inject").reduce((s, r) => s + r.bytes, 0);
+  document.getElementById("size-totals").textContent = includeInject
+    ? `on-disk ${diskBytes.toLocaleString()} B · inject est. ${injBytes.toLocaleString()} B · total view ${(diskBytes + injBytes).toLocaleString()} B`
+    : `on-disk ${diskBytes.toLocaleString()} B`;
+
+  state.chartMain.setOption(treemapOption(children, "Full catalog JSON (area = bytes)"), true);
+  state.chartWire.setOption(treemapOption(buildWireTree(doc, includeInject), "Wire-ish payload"), true);
+
+  const tbody = document.querySelector("#size-table tbody");
+  tbody.innerHTML = tableRows
+    .map((r) => {
+      const pct = diskBytes ? ((100 * r.bytes) / (r.cls === "inject" ? diskBytes + injBytes : diskBytes)).toFixed(1) : "0";
+      const cls =
+        r.cls === "rules" ? "txt-ro" : r.cls === "guidance" ? "txt-ed" : r.cls === "inject" ? "txt-inj" : "opacity-80";
+      return `<tr>
+        <td class="font-mono text-[11px] ${cls}">${escapeHtml(r.path)}</td>
+        <td class="${cls}">${escapeHtml(classLabel(r.cls))}</td>
+        <td class="text-right font-mono">${r.bytes.toLocaleString()}</td>
+        <td class="text-right font-mono">${pct}%</td>
+      </tr>`;
+    })
+    .join("");
+
+  // click → flash path in status
+  state.chartMain.off("click");
+  state.chartMain.on("click", (params) => {
+    if (params.data && params.data.path) {
+      document.getElementById("status").textContent = `Selected: ${params.data.path} · ${params.value} bytes · ${classLabel(
+        params.data.cls || ""
+      )}`;
+    }
+  });
 }
 
 function renderSummary(doc, mode, manifestEntry) {
@@ -317,22 +600,21 @@ function renderSummary(doc, mode, manifestEntry) {
   const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
   const sys = systemContent(doc);
   const hasEvidence = /evidence loop|query_decomposition/i.test(sys);
+  const disk = jsonBytes(doc);
   const cards = [
     {
       t: "Mode / profile",
-      b: `${mode} · ${manifestEntry?.format || doc._format || "?"} · profile v2_min`,
+      b: `${mode} · ${manifestEntry?.format || doc._format || "?"} · v2_min`,
       c: "box-meta",
     },
     {
-      t: "Contract stamp",
-      b: (doc.contract && (doc.contract.hash || doc.contract.id)) || doc._hash || "—",
-      c: "box-meta",
+      t: "On-disk size",
+      b: `${disk.toLocaleString()} bytes`,
+      c: "box-ro",
     },
     {
       t: "Evidence-loop ready?",
-      b: hasEvidence && req.has("query_decomposition")
-        ? "YES — system + return.required"
-        : "GAPS — see panel below",
+      b: hasEvidence && req.has("query_decomposition") ? "YES" : "GAPS",
       c: hasEvidence && req.has("query_decomposition") ? "box-ed" : "box-miss",
     },
   ];
@@ -355,46 +637,25 @@ function renderSections(doc) {
     const present = hasKey(doc, s.key);
     const missing = !present;
     const val = present ? getAt(doc, s.path) : null;
-    const sizeHint = present
-      ? typeof val === "string"
-        ? `${val.length} chars`
-        : Array.isArray(val)
-          ? `${val.length} items`
-          : typeof val === "object"
-            ? `${Object.keys(val).length} keys`
-            : typeof val
-      : "—";
+    const b = present ? jsonBytes(val) : 0;
     const expectedNote =
       !present && s.minTypical === false
-        ? "Expected missing on min (full profile only)"
+        ? "Expected missing on min (full only)"
         : !present && s.minTypical
           ? "Unexpected missing on min"
-          : present && s.minTypical === false
-            ? "Present (bonus vs typical min)"
-            : "";
-
+          : "";
     return `
       <div class="card bg-base-100 shadow section-card ${boxClass(s.edit, missing)}">
         <div class="card-body p-4 gap-2">
           <div class="flex items-start justify-between gap-2">
-            <h3 class="font-semibold text-sm">${escapeHtml(s.title)}</h3>
+            <h3 class="font-semibold text-sm ${s.edit === "rules" ? "txt-ro" : s.edit === "guidance" ? "txt-ed" : ""}">${escapeHtml(
+              s.title
+            )}</h3>
             ${editBadge(s.edit, missing)}
           </div>
           <p class="text-xs opacity-80">${escapeHtml(s.summary)}</p>
-          <div class="text-[11px] font-mono opacity-70">size: ${escapeHtml(sizeHint)}</div>
-          ${
-            expectedNote
-              ? `<div class="text-[11px] ${missing ? "text-warning" : "text-success"}">${escapeHtml(expectedNote)}</div>`
-              : ""
-          }
-          ${
-            present
-              ? `<details class="text-xs"><summary class="cursor-pointer opacity-70">preview</summary>
-                 <pre class="bg-base-200 p-2 rounded mt-1 max-h-32 overflow-auto">${escapeHtml(
-                   typeof val === "string" ? val.slice(0, 800) : JSON.stringify(val, null, 2).slice(0, 800)
-                 )}</pre></details>`
-              : ""
-          }
+          <div class="text-[11px] font-mono opacity-70">${present ? b.toLocaleString() + " B" : "—"}</div>
+          ${expectedNote ? `<div class="text-[11px] text-warning">${escapeHtml(expectedNote)}</div>` : ""}
         </div>
       </div>`;
   }).join("");
@@ -405,35 +666,50 @@ function renderWire(doc) {
   const sys = systemContent(doc);
   const verbs = doc.verbs || [];
   grid.innerHTML = `
-    <div class="card bg-base-100 shadow box-wire">
+    <div class="card bg-base-100 shadow box-ro">
       <div class="card-body p-4">
         <div class="flex justify-between items-center">
-          <h3 class="font-semibold text-sm">messages[0] system</h3>
-          <span class="badge badge-info badge-outline badge-sm">On the wire</span>
+          <h3 class="font-semibold text-sm txt-ro">messages[0] system</h3>
+          <span class="badge badge-error badge-outline badge-sm">${jsonBytes(sys).toLocaleString()} B</span>
         </div>
-        <p class="text-xs opacity-70">${sys.length} chars · this is the only prose the model sees</p>
-        <pre class="bg-base-200 p-2 rounded text-[11px] max-h-48 overflow-auto">${escapeHtml(sys.slice(0, 2500))}${
-    sys.length > 2500 ? "\n…" : ""
+        <pre class="bg-base-200 p-2 rounded text-[11px] max-h-48 overflow-auto txt-ro">${escapeHtml(sys.slice(0, 2200))}${
+    sys.length > 2200 ? "\n…" : ""
   }</pre>
       </div>
     </div>
-    <div class="card bg-base-100 shadow box-wire">
+    <div class="card bg-base-100 shadow box-ro">
       <div class="card-body p-4">
         <div class="flex justify-between items-center">
-          <h3 class="font-semibold text-sm">verbs → tools</h3>
-          <span class="badge badge-info badge-outline badge-sm">${verbs.length} tools</span>
+          <h3 class="font-semibold text-sm txt-ro">verbs → tools</h3>
+          <span class="badge badge-error badge-outline badge-sm">${verbs.length} · ${jsonBytes(verbs).toLocaleString()} B</span>
         </div>
         <ul class="text-xs space-y-1 max-h-48 overflow-auto">
           ${verbs
             .map((v) => {
               const fn = v.function || v;
               const req = (fn.parameters && fn.parameters.required) || [];
-              return `<li><code class="text-info">${escapeHtml(fn.name || "?")}</code>
-                <span class="opacity-60">${escapeHtml((fn.description || "").slice(0, 60))}</span>
+              return `<li class="txt-ro"><code>${escapeHtml(fn.name || "?")}</code>
+                <span class="opacity-60">${jsonBytes(v)} B</span>
                 ${req.length ? `<span class="badge badge-ghost badge-xs">req: ${escapeHtml(req.join(", "))}</span>` : ""}
               </li>`;
             })
             .join("")}
+        </ul>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow box-wire md:col-span-2">
+      <div class="card-body p-4">
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold text-sm txt-inj">Runtime inject (not in this JSON)</h3>
+          <span class="badge badge-info badge-outline badge-sm">BLUE</span>
+        </div>
+        <ul class="text-xs space-y-1">
+          ${INJECT_ESTIMATES.map(
+            (x) =>
+              `<li class="txt-inj"><strong>${escapeHtml(x.name)}</strong> ~${x.bytes.toLocaleString()} B — ${escapeHtml(
+                x.note
+              )}</li>`
+          ).join("")}
         </ul>
       </div>
     </div>`;
@@ -446,11 +722,10 @@ function renderEvidence(doc) {
   const props = (ret && ret.parameters && ret.parameters.properties) || {};
   const sys = systemContent(doc);
   const sysOk = /evidence loop|query_decomposition/i.test(sys);
-
   const rows = EVIDENCE_FIELDS.map((f) => {
     const inReq = req.has(f.name);
     const inProps = Object.prototype.hasOwnProperty.call(props, f.name);
-    const ok = f.required ? inReq && inProps : inProps || !f.required;
+    const ok = f.required ? inReq && inProps : true;
     return `<tr class="${ok ? "" : "bg-warning/10"}">
       <td class="font-mono text-xs">${escapeHtml(f.name)}</td>
       <td>${f.required ? "required" : "optional"}</td>
@@ -459,32 +734,23 @@ function renderEvidence(doc) {
       <td class="text-xs opacity-70">${escapeHtml(f.note || "")}</td>
     </tr>`;
   }).join("");
-
   panel.innerHTML = `
     <div class="card-body p-4 ${sysOk && req.has("query_decomposition") ? "box-ed" : "box-miss"}">
       <div class="flex flex-wrap gap-2 items-center justify-between">
         <h3 class="font-semibold">Terminate envelope (return verb)</h3>
         <div class="flex gap-2">
-          <span class="badge ${sysOk ? "badge-success" : "badge-warning"} badge-sm">system prompt ${
-            sysOk ? "OK" : "weak"
-          }</span>
-          <span class="badge ${req.has("query_decomposition") ? "badge-success" : "badge-error"} badge-sm">query_decomposition required ${
-            req.has("query_decomposition") ? "OK" : "MISSING"
+          <span class="badge ${sysOk ? "badge-success" : "badge-warning"} badge-sm">system ${sysOk ? "OK" : "weak"}</span>
+          <span class="badge ${req.has("query_decomposition") ? "badge-success" : "badge-error"} badge-sm">query_decomposition ${
+            req.has("query_decomposition") ? "required OK" : "MISSING"
           }</span>
         </div>
       </div>
-      <p class="text-xs opacity-80">Hot-path / evidence-loop analytics need intent facets on every terminating turn.
-      Min profiles strip <code>guidance</code> — contract must appear in system text + return.required.</p>
       <div class="overflow-x-auto">
         <table class="table table-xs">
-          <thead><tr><th>field</th><th>role</th><th>in required[]</th><th>in properties</th><th>note</th></tr></thead>
+          <thead><tr><th>field</th><th>role</th><th>required[]</th><th>properties</th><th>note</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
-      <details class="text-xs mt-2">
-        <summary class="cursor-pointer">return.function.description</summary>
-        <pre class="bg-base-200 p-2 rounded mt-1">${escapeHtml((ret && ret.description) || "—")}</pre>
-      </details>
     </div>`;
 }
 
@@ -493,23 +759,24 @@ function renderJson(doc, mode) {
   document.getElementById("json-pre").textContent = JSON.stringify(doc, null, 2);
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 function setView(view) {
   state.view = view;
   document.getElementById("view-boxes").classList.toggle("hidden", view !== "boxes");
+  document.getElementById("view-size").classList.toggle("hidden", view !== "size");
   document.getElementById("view-json").classList.toggle("hidden", view !== "json");
   document.getElementById("view-org").classList.toggle("hidden", view !== "org");
   document.querySelectorAll("[data-view]").forEach((btn) => {
     btn.classList.toggle("btn-primary", btn.getAttribute("data-view") === view);
     btn.classList.toggle("btn-ghost", btn.getAttribute("data-view") !== view);
   });
+  if (view === "size" && state.catalog) {
+    // charts need visible container for sizing
+    setTimeout(() => {
+      renderSizeMaps(state.catalog);
+      state.chartMain && state.chartMain.resize();
+      state.chartWire && state.chartWire.resize();
+    }, 30);
+  }
 }
 
 async function loadManifest() {
@@ -548,8 +815,9 @@ async function selectMode(mode) {
     renderWire(doc);
     renderEvidence(doc);
     renderJson(doc, mode);
+    if (state.view === "size") renderSizeMaps(doc);
     document.getElementById("status").textContent = `Loaded ${mode} · ${
-      entry ? entry.bytes + " bytes · sha256 " + (entry.sha256 || "").slice(0, 12) + "…" : ""
+      entry ? entry.bytes + " bytes · sha256 " + (entry.sha256 || "").slice(0, 12) + "…" : jsonBytes(doc) + " B"
     }`;
   } catch (e) {
     document.getElementById("status").textContent = String(e);
@@ -568,21 +836,26 @@ document.getElementById("btn-copy-json").addEventListener("click", async () => {
     toast("Copy failed");
   }
 });
+document.getElementById("chk-inject").addEventListener("change", () => {
+  if (state.catalog) renderSizeMaps(state.catalog);
+});
+window.addEventListener("resize", () => {
+  state.chartMain && state.chartMain.resize();
+  state.chartWire && state.chartWire.resize();
+});
 
 (async function init() {
   try {
     const man = await loadManifest();
     state.manifest = man;
-    document.getElementById("manifest-line").textContent =
-      `${man.repo || "zeus_chat_request"} · profile ${man.profile || "?"} · ${
-        (man.catalogs || []).length
-      } catalogs · schema ${man.schema_version || "?"}`;
+    document.getElementById("manifest-line").textContent = `${man.repo || "zeus_chat_request"} · ${
+      (man.catalogs || []).length
+    } catalogs · profile ${man.profile || "?"}`;
     fillModes(man);
     await selectMode(state.mode);
   } catch (e) {
     document.getElementById("status").textContent =
-      "Failed to load manifest.json — serve this directory over HTTP (python3 -m http.server). " + e;
-    document.getElementById("manifest-line").textContent = "manifest load failed";
+      "Failed to load manifest — serve this directory over HTTP (python3 -m http.server 8766). " + e;
   }
 })();
   </script>

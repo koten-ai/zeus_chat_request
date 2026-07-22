@@ -512,6 +512,79 @@
       margin: 0.25rem -0.5rem;
     }
     #search-meta { font-size: 11px; white-space: nowrap; }
+    .search-panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 0.35rem);
+      z-index: 60;
+      max-height: min(70vh, 28rem);
+      overflow: auto;
+      border-radius: 0.75rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 14%, transparent);
+      background: oklch(var(--b1));
+      box-shadow: 0 16px 48px rgba(0,0,0,0.28);
+      padding: 0.5rem;
+    }
+    .search-panel[hidden] { display: none !important; }
+    .search-group {
+      margin-bottom: 0.55rem;
+    }
+    .search-group:last-child { margin-bottom: 0; }
+    .search-group-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.65;
+      padding: 0.25rem 0.4rem 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .search-group-title .badge { font-size: 9px; }
+    .search-hit {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border-radius: 0.5rem;
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 0.45rem 0.55rem;
+      cursor: pointer;
+      color: inherit;
+    }
+    .search-hit:hover,
+    .search-hit:focus-visible {
+      background: color-mix(in oklab, oklch(var(--bc)) 8%, transparent);
+      border-color: color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      outline: none;
+    }
+    .search-hit-title {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .search-hit-snip {
+      font-size: 11px;
+      margin-top: 0.15rem;
+      color: color-mix(in oklab, oklch(var(--bc)) 72%, transparent);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 3.6em;
+      overflow: hidden;
+    }
+    .search-hit-path {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      opacity: 0.65;
+      margin-top: 0.1rem;
+    }
+    .search-empty {
+      font-size: 12px;
+      padding: 0.75rem;
+      opacity: 0.75;
+    }
   </style>
 </head>
 <body class="bg-base-300 text-base-content min-h-screen">
@@ -528,14 +601,17 @@
             id="site-search"
             type="search"
             class="grow min-w-0"
-            placeholder="Search help &amp; glossary…"
+            placeholder="Search whole page: help, prompt, verbs…"
             autocomplete="off"
             spellcheck="false"
-            aria-label="Search help and glossary"
+            aria-label="Search whole page: help, glossary, prompt, catalog, tools"
+            aria-controls="search-panel"
+            aria-expanded="false"
           />
           <kbd class="kbd kbd-xs hidden sm:inline opacity-60">/</kbd>
         </label>
-        <div id="search-meta" class="text-muted absolute left-0 top-full mt-0.5 px-1 hidden sm:block"></div>
+        <div id="search-meta" class="text-muted absolute left-0 top-full mt-0.5 px-1 hidden sm:block z-50"></div>
+        <div id="search-panel" class="search-panel" hidden role="listbox" aria-label="Search results"></div>
       </div>
     </div>
     <div class="flex-none gap-2 items-center flex-wrap justify-end">
@@ -843,7 +919,7 @@
           <div class="help-block" data-help-block id="help-ui" data-search="cards toc chapters size json content panel theme search expand collapse open">
             <h2>How to use this UI</h2>
             <ul>
-              <li><b>Search (top bar)</b> — filters Help + Glossary; typing jumps to Help. Press <kbd class="kbd kbd-xs">/</kbd> to focus, <kbd class="kbd kbd-xs">Esc</kbd> clears (or closes the content panel if open).</li>
+              <li><b>Search (top bar)</b> — whole page: <b>Help</b>, <b>Glossary</b>, system <b>Prompt</b> text, <b>Catalog</b> keys, <b>Tools/verbs</b>, BLUE <b>Inject</b> estimates, <b>Output scheme</b>. Results group by type with snippets; click a hit to jump. Press <kbd class="kbd kbd-xs">/</kbd> to focus, <kbd class="kbd kbd-xs">Esc</kbd> clears.</li>
               <li><b>Theme</b> — sun/moon toggle locks light/dark; <b>Auto</b> follows the OS (default).</li>
               <li><b>Cards</b> — four chapters with a sticky left <b>On this page</b> TOC:
                 <ol>
@@ -1095,7 +1171,7 @@ const GLOSSARY = [
   { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence)." },
   { term: "Rules (hashed)", kind: "rules", def: "What production promised: messages, verbs, masq, etc. Change ⇒ new hash." },
   { term: "ScopeConfig", kind: "inject", def: "Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production." },
-  { term: "Search (this UI)", kind: "meta", def: "Top-bar search filters Help blocks and glossary cards. Typing switches to the Help tab automatically." },
+  { term: "Search (this UI)", kind: "meta", def: "Top-bar search across the whole page: Help, Glossary, system Prompt text, catalog keys, verbs/tools, injects. Results group by type; click a hit to jump." },
   { term: "Size map", kind: "meta", def: "Treemap where area ∝ bytes (~tokens ≈ bytes/4). Click tiles to open the content panel; toggle BLUE inject estimates." },
   { term: "Standard output scheme", kind: "rules", def: "Layer A model terminate fields + Layer B server report. Same A across modes/deploys so every call is machine-parseable." },
   { term: "System prompt (messages)", kind: "rules", def: "Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules." },
@@ -1125,10 +1201,11 @@ function renderGlossary() {
   if (!grid) return;
   const sorted = GLOSSARY.slice().sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: "base" }));
   grid.innerHTML = sorted
-    .map((g) => {
+    .map((g, i) => {
       const border = GLOSSARY_BORDER[g.kind] || GLOSSARY_BORDER.meta;
       const hay = (g.term + " " + g.def + " " + (g.kind || "")).toLowerCase();
-      return `<div class="glossary-card p-3 rounded-lg bg-base-200 border-l-4 ${border}" data-glossary data-search="${escapeHtml(hay)}">
+      const id = "glossary-term-" + i;
+      return `<div class="glossary-card p-3 rounded-lg bg-base-200 border-l-4 ${border}" id="${id}" data-glossary data-search="${escapeHtml(hay)}">
         <dt class="font-bold">${escapeHtml(g.term)}</dt>
         <dd class="text-muted mt-1">${escapeHtml(g.def)}</dd>
       </div>`;
@@ -1138,68 +1215,368 @@ function renderGlossary() {
   if (count) count.textContent = `(${sorted.length} terms)`;
 }
 
-function applySiteSearch(raw) {
-  const q = (raw || "").trim().toLowerCase();
-  const meta = document.getElementById("search-meta");
-  const hint = document.getElementById("help-search-hint");
+/** Search result buckets — order in the dropdown */
+const SEARCH_GROUPS = [
+  { id: "help", label: "Help", chip: "chip-meta" },
+  { id: "glossary", label: "Glossary", chip: "chip-meta" },
+  { id: "prompt", label: "Prompt", chip: "chip-ro" },
+  { id: "catalog", label: "Catalog", chip: "chip-ro" },
+  { id: "tools", label: "Tools / verbs", chip: "chip-ro" },
+  { id: "inject", label: "Inject (BLUE)", chip: "chip-inj" },
+  { id: "output", label: "Output scheme", chip: "chip-ed" },
+];
+
+function snippetAround(text, q, radius) {
+  const t = String(text || "").replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  const qq = (q || "").toLowerCase();
+  const lower = t.toLowerCase();
+  let i = qq ? lower.indexOf(qq) : 0;
+  if (i < 0) i = 0;
+  const r = radius || 70;
+  const start = Math.max(0, i - r);
+  const end = Math.min(t.length, i + (qq ? qq.length : 0) + r);
+  let snip = t.slice(start, end);
+  if (start > 0) snip = "…" + snip;
+  if (end < t.length) snip = snip + "…";
+  return snip;
+}
+
+function buildSearchIndex(doc) {
+  const items = [];
+  const push = (item) => {
+    if (!item || !item.body) return;
+    items.push({
+      group: item.group,
+      title: item.title,
+      path: item.path || "",
+      body: String(item.body),
+      action: item.action || null,
+    });
+  };
+
+  // Help blocks (static DOM)
+  document.querySelectorAll("[data-help-block]").forEach((el, i) => {
+    const h = el.querySelector("h2, h3");
+    const title = (h && h.textContent.trim()) || el.id || "Help " + (i + 1);
+    push({
+      group: "help",
+      title,
+      path: el.id ? "#" + el.id : "help",
+      body: ((el.getAttribute("data-search") || "") + " " + el.textContent).trim(),
+      action: { type: "help", id: el.id || null, el },
+    });
+  });
+
+  // Glossary
+  GLOSSARY.forEach((g, i) => {
+    push({
+      group: "glossary",
+      title: g.term,
+      path: "glossary",
+      body: g.term + " " + g.def + " " + (g.kind || ""),
+      action: { type: "glossary", index: i },
+    });
+  });
+
+  if (!doc) return items;
+
+  // Prompt / system message(s)
+  (doc.messages || []).forEach((msg, i) => {
+    const role = msg.role || "msg";
+    const content = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content || msg);
+    push({
+      group: "prompt",
+      title: role === "system" ? "System prompt" : "Message · " + role,
+      path: "messages[" + i + "]",
+      body: content,
+      action: { type: "path", path: "messages[" + i + "]", cls: "rules", view: "json" },
+    });
+  });
+
+  // Catalog top-level + STRUCTURE
+  for (const s of STRUCTURE) {
+    const present = hasKey(doc, s.key);
+    const val = present ? doc[s.key] : null;
+    const body = [
+      s.title,
+      s.key,
+      s.why || "",
+      s.aiNeeds || "",
+      present ? JSON.stringify(val) : "missing on min",
+    ].join("\n");
+    push({
+      group: "catalog",
+      title: s.title,
+      path: s.path || s.key,
+      body,
+      action: {
+        type: "path",
+        path: s.path || s.key,
+        cls: present ? (s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta") : "miss",
+        view: "boxes",
+      },
+    });
+  }
+  // leftover top-level keys not in STRUCTURE
+  Object.keys(doc).forEach((k) => {
+    if (STRUCTURE.some((s) => s.key === k)) return;
+    push({
+      group: "catalog",
+      title: k,
+      path: k,
+      body: JSON.stringify(doc[k]),
+      action: { type: "path", path: k, cls: classForKey(k), view: "json" },
+    });
+  });
+
+  // Verbs / tools
+  (doc.verbs || []).forEach((verb) => {
+    const fn = verb.function || verb;
+    const name = fn.name || "?";
+    const body = JSON.stringify(verb);
+    push({
+      group: "tools",
+      title: name,
+      path: "verbs." + name,
+      body: (fn.description || "") + "\n" + body,
+      action: { type: "path", path: "verbs." + name, cls: "rules", view: "json" },
+    });
+  });
+
+  // Blue inject estimates
+  (typeof INJECT_ESTIMATES !== "undefined" ? INJECT_ESTIMATES : []).forEach((x) => {
+    push({
+      group: "inject",
+      title: x.name,
+      path: "inject:" + x.name,
+      body: x.name + " " + (x.note || "") + " estimate " + x.bytes + " bytes",
+      action: { type: "path", path: "inject:" + x.name, cls: "inject", view: "boxes" },
+    });
+  });
+
+  // Output scheme field docs
+  (typeof EVIDENCE_FIELDS !== "undefined" ? EVIDENCE_FIELDS : []).forEach((f) => {
+    push({
+      group: "output",
+      title: "Terminate · " + f.name,
+      path: "verbs.return." + f.name,
+      body: f.name + " " + (f.note || "") + " " + (f.layer || "") + " " + (f.required ? "required" : "optional"),
+      action: { type: "path", path: "verbs.return", cls: "rules", view: "boxes" },
+    });
+  });
+  (typeof QD_FACETS !== "undefined" ? QD_FACETS : []).forEach((f) => {
+    push({
+      group: "output",
+      title: "query_decomposition · " + f.name,
+      path: "query_decomposition." + f.name,
+      body: f.name + " " + (f.note || ""),
+      action: { type: "anchor", view: "boxes", id: "out-layer-a" },
+    });
+  });
+  (typeof REPORT_TREE !== "undefined" ? REPORT_TREE : []).forEach((b) => {
+    const kids = (b.kids || []).map((k) => k.path + " " + k.note).join(" ");
+    push({
+      group: "output",
+      title: "Report · " + b.title,
+      path: b.path,
+      body: b.title + " " + (b.note || "") + " " + kids,
+      action: { type: "anchor", view: "boxes", id: "out-layer-b" },
+    });
+  });
+
+  return items;
+}
+
+function filterHelpInPlace(q) {
   const empty = document.getElementById("glossary-empty");
-
-  const cards = document.querySelectorAll("[data-glossary]");
-  const blocks = document.querySelectorAll("[data-help-block]");
   let gHits = 0;
-  let hHits = 0;
-
-  cards.forEach((el) => {
+  document.querySelectorAll("[data-glossary]").forEach((el) => {
     const hay = (el.getAttribute("data-search") || el.textContent || "").toLowerCase();
     const hit = !q || hay.includes(q);
     el.classList.toggle("is-hidden", !hit);
     el.classList.toggle("is-hit", !!q && hit);
     if (hit) gHits++;
   });
-
-  blocks.forEach((el) => {
+  document.querySelectorAll("[data-help-block]").forEach((el) => {
     const hay = ((el.getAttribute("data-search") || "") + " " + (el.textContent || "")).toLowerCase();
     const hit = !q || hay.includes(q);
     el.classList.toggle("is-hidden", !hit);
     el.classList.toggle("is-hit", !!q && hit);
-    if (hit) hHits++;
   });
-
   if (empty) empty.classList.toggle("hidden", !q || gHits > 0);
+}
+
+function hideSearchPanel() {
+  const panel = document.getElementById("search-panel");
+  const input = document.getElementById("site-search");
+  if (panel) panel.hidden = true;
+  if (input) input.setAttribute("aria-expanded", "false");
+}
+
+function showSearchPanel() {
+  const panel = document.getElementById("search-panel");
+  const input = document.getElementById("site-search");
+  if (panel) panel.hidden = false;
+  if (input) input.setAttribute("aria-expanded", "true");
+}
+
+function activateSearchHit(hit) {
+  const a = hit.action || {};
+  hideSearchPanel();
+  if (a.type === "help") {
+    setView("help");
+    setTimeout(() => {
+      const el = a.id ? document.getElementById(a.id) : a.el;
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      el?.classList.add("is-hit");
+    }, 40);
+    return;
+  }
+  if (a.type === "glossary") {
+    setView("help");
+    setTimeout(() => {
+      // ids assigned in order after sort — find by term text
+      const cards = [...document.querySelectorAll("[data-glossary]")];
+      const el = cards.find((c) => (c.querySelector("dt")?.textContent || "") === hit.title) || cards[a.index];
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.classList.add("is-hit");
+    }, 40);
+    return;
+  }
+  if (a.type === "anchor") {
+    if (a.view) setView(a.view);
+    setTimeout(() => {
+      document.getElementById(a.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+    return;
+  }
+  if (a.type === "path") {
+    if (a.view) setView(a.view);
+    setTimeout(() => {
+      openPath(a.path, undefined, a.cls);
+      if (a.view === "json") {
+        const jb = document.querySelector(`#json-annotated .json-block[data-path="${CSS.escape(a.path)}"]`);
+        jb?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } else if (a.view === "boxes") {
+        const card = document.querySelector(`.card-click[data-path="${CSS.escape(a.path)}"]`);
+        card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }, 50);
+  }
+}
+
+function applySiteSearch(raw) {
+  const q = (raw || "").trim().toLowerCase();
+  const meta = document.getElementById("search-meta");
+  const hint = document.getElementById("help-search-hint");
+  const panel = document.getElementById("search-panel");
+  const input = document.getElementById("site-search");
+
+  filterHelpInPlace(q);
 
   if (!q) {
     if (meta) meta.textContent = "";
     if (hint) hint.textContent = "";
+    hideSearchPanel();
     return;
   }
 
-  const msg = `${gHits} glossary · ${hHits} help`;
-  if (meta) meta.textContent = msg;
-  if (hint) hint.textContent = `Showing ${msg} for “${raw.trim()}”.`;
+  const index = buildSearchIndex(state.catalog);
+  const hits = index.filter((it) => it.body.toLowerCase().includes(q) || (it.title || "").toLowerCase().includes(q));
 
-  // Jump to Help so results are visible
-  if (state.view !== "help") setView("help");
+  // Group
+  const byGroup = {};
+  SEARCH_GROUPS.forEach((g) => {
+    byGroup[g.id] = [];
+  });
+  hits.forEach((h) => {
+    if (!byGroup[h.group]) byGroup[h.group] = [];
+    byGroup[h.group].push(h);
+  });
+
+  const counts = SEARCH_GROUPS.map((g) => ({ g, n: (byGroup[g.id] || []).length })).filter((x) => x.n > 0);
+  const total = hits.length;
+  const summary = counts.map((x) => `${x.n} ${x.g.label}`).join(" · ") || "0 hits";
+  if (meta) meta.textContent = total + " · " + summary;
+  if (hint) hint.textContent = total ? `Whole-page search: ${summary}.` : `No matches for “${raw.trim()}”.`;
+
+  if (!panel) return;
+  if (!total) {
+    panel.innerHTML = `<div class="search-empty">No matches for <b>${escapeHtml(raw.trim())}</b> in Help, Glossary, Prompt, Catalog, Tools, Injects, or Output scheme.</div>`;
+    showSearchPanel();
+    return;
+  }
+
+  // Cap per group for UI
+  const MAX_PER = 8;
+  panel.innerHTML = SEARCH_GROUPS.map((g) => {
+    const list = byGroup[g.id] || [];
+    if (!list.length) return "";
+    const shown = list.slice(0, MAX_PER);
+    const more = list.length - shown.length;
+    const rows = shown
+      .map((hit, idx) => {
+        const snip = snippetAround(hit.body, q, 64);
+        return `<button type="button" class="search-hit" role="option" data-group="${g.id}" data-idx="${idx}" data-full-idx="${list.indexOf(hit)}">
+          <div class="search-hit-title">${escapeHtml(hit.title)}</div>
+          ${hit.path ? `<div class="search-hit-path">${escapeHtml(hit.path)}</div>` : ""}
+          <div class="search-hit-snip"><pre class="m-0 p-0 bg-transparent font-sans text-[11px] whitespace-pre-wrap">${escapeHtml(snip)}</pre></div>
+        </button>`;
+      })
+      .join("");
+    return `<div class="search-group" data-search-group="${g.id}">
+      <div class="search-group-title"><span class="badge ${g.chip}">${escapeHtml(g.label)}</span> ${list.length}</div>
+      ${rows}
+      ${more > 0 ? `<div class="text-[10px] opacity-60 px-2 pb-1">+${more} more — refine your query</div>` : ""}
+    </div>`;
+  }).join("");
+
+  // Wire clicks — map button back to hit via group + filtered list order
+  panel.querySelectorAll(".search-hit").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const gid = btn.getAttribute("data-group");
+      const fi = Number(btn.getAttribute("data-full-idx"));
+      const hit = (byGroup[gid] || [])[fi];
+      if (hit) activateSearchHit(hit);
+    });
+  });
+
+  // stash for keyboard
+  state._searchHits = hits;
+  showSearchPanel();
 }
 
 function initSiteSearch() {
   renderGlossary();
   const input = document.getElementById("site-search");
+  const panel = document.getElementById("search-panel");
   if (!input) return;
 
   let t = null;
   const run = () => applySiteSearch(input.value);
   input.addEventListener("input", () => {
     clearTimeout(t);
-    t = setTimeout(run, 120);
+    t = setTimeout(run, 100);
+  });
+  input.addEventListener("focus", () => {
+    if (input.value.trim()) applySiteSearch(input.value);
   });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
-      if (input.value) {
+      if (input.value || (panel && !panel.hidden)) {
         e.preventDefault();
+        e.stopPropagation();
         input.value = "";
         applySiteSearch("");
+        input.blur();
       }
     }
+  });
+
+  document.addEventListener("click", (e) => {
+    const wrap = input.closest(".relative");
+    if (wrap && !wrap.contains(e.target)) hideSearchPanel();
   });
 
   // / focuses search (when not typing in another field)
@@ -2586,7 +2963,10 @@ async function selectMode(mode) {
     });
     document.getElementById("status").textContent = `Mode ${mode}: ${MODE_BLURBS[mode] || ""} · ${
       entry ? entry.bytes + " B" : jsonBytes(doc) + " B"
-    }. Use the left TOC to jump chapters; Open → cards open content.`;
+    }. Search the whole page (prompt, verbs, help…); Open → cards open content.`;
+    // Refresh global search index if user has a query open
+    const sq = document.getElementById("site-search")?.value;
+    if (sq && sq.trim()) applySiteSearch(sq);
   } catch (e) {
     document.getElementById("status").textContent = String(e);
   }

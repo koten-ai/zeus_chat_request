@@ -68,6 +68,8 @@
     .json-block.inject .json-block-head, .json-block.inject pre { color: #bfdbfe; }
     .json-block.miss .json-block-head, .json-block.miss pre { color: #fde68a; }
     .json-block.selected { outline: 2px solid #f9fafb; outline-offset: 2px; }
+    .json-block.collapsed .json-block-body { display: none; }
+    .json-block.collapsed .json-why { display: none; }
     .json-block pre {
       margin: 0;
       padding: 0.5rem 0.65rem;
@@ -79,6 +81,20 @@
       font-size: 11px;
       line-height: 1.4;
     }
+    #content-panel.is-empty #content-body-wrap { display: none; }
+    #content-panel.is-empty { opacity: 0.85; }
+    #content-panel:not(.is-empty) {
+      border-color: rgba(255,255,255,0.35);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    #content-panel .btn-close-content {
+      min-width: 2.25rem;
+    }
+    .glossary-grid { display: grid; gap: 0.65rem; }
+    @media (min-width: 768px) { .glossary-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1200px) { .glossary-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .help-toc a { text-decoration: underline; text-underline-offset: 2px; opacity: 0.9; }
+    .help-toc a:hover { opacity: 1; }
     .json-key-chip {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-weight: 700;
@@ -126,25 +142,31 @@
 
     <div id="status" class="text-sm opacity-70"></div>
 
-    <!-- SHARED content drawer (cards + treemap + table) -->
-    <div id="content-panel" class="card bg-base-100 shadow-lg sticky top-16 z-30 border-2 border-base-content/20">
-      <div class="card-body p-4 gap-2">
+    <!-- SHARED content drawer (cards + treemap + JSON + table) -->
+    <div id="content-panel" class="card bg-base-100 shadow-lg sticky top-16 z-30 border-2 border-base-content/20 is-empty">
+      <div class="card-body p-3 sm:p-4 gap-2">
         <div class="flex flex-wrap items-start justify-between gap-2">
-          <div class="min-w-0">
-            <div class="text-[10px] uppercase tracking-wide opacity-50">Selected content</div>
-            <h3 class="font-semibold text-base break-all" id="content-title">Click a card or tree tile</h3>
-            <p class="text-xs opacity-80" id="content-sub">Why the AI needs this · what you can change · readable body below.</p>
+          <div class="min-w-0 flex-1">
+            <div class="text-[10px] uppercase tracking-wide opacity-50">Selected content · Esc or ✕ to close</div>
+            <h3 class="font-semibold text-base break-all" id="content-title">Nothing selected</h3>
+            <p class="text-xs opacity-80" id="content-sub">Click a card, size tile, table row, or JSON block to inspect it here.</p>
           </div>
-          <div class="flex flex-wrap gap-2 items-center">
+          <div class="flex flex-wrap gap-2 items-center shrink-0">
             <span class="badge badge-ghost badge-sm font-mono" id="content-bytes">— B</span>
             <span class="badge badge-ghost badge-sm font-mono" id="content-tokens">— ~tok</span>
             <span class="badge badge-outline badge-sm" id="content-class">—</span>
-            <button type="button" class="btn btn-xs" id="btn-copy-content" disabled>Copy</button>
+            <button type="button" class="btn btn-xs" id="btn-copy-content" disabled title="Copy body">Copy</button>
+            <button type="button" class="btn btn-sm btn-error btn-outline btn-close-content gap-1" id="btn-close-content" title="Close content panel (Esc)" aria-label="Close content panel">
+              <span aria-hidden="true">✕</span><span class="hidden sm:inline">Close</span>
+            </button>
           </div>
         </div>
-        <div id="content-why" class="text-sm rounded-lg p-3 bg-base-200 border border-base-content/10 hidden"></div>
-        <div id="content-body" class="bg-base-200 rounded-lg min-h-[6rem] p-3 text-sm opacity-80">
-          Tip: open <b>Cards</b> and click any bordered box, or <b>Size map</b> and click a colored tile.
+        <div id="content-body-wrap" class="space-y-2">
+          <div id="content-why" class="text-sm rounded-lg p-3 bg-base-200 border border-base-content/10 hidden"></div>
+          <div id="content-body" class="bg-base-200 rounded-lg min-h-[4rem] p-3 text-sm opacity-80"></div>
+          <div class="flex justify-end">
+            <button type="button" class="btn btn-xs btn-ghost" id="btn-close-content-bottom" title="Close content panel (Esc)">✕ Close panel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -231,17 +253,21 @@
             <div>
               <h2 class="card-title text-base" id="json-title">JSON</h2>
               <p class="text-xs opacity-70">
-                Colored <b>boxes match Cards + Size map</b>. Click a section header to open the content panel.
-                Keys use the same RED / GREEN / BLUE / PURPLE language.
+                Colored <b>boxes match Cards + Size map</b>. ▾ expands the box body; header opens the sticky content panel (✕ or Esc closes it).
+                Use <b>Expand all / Collapse all</b> for every section. Keys use RED / GREEN / BLUE / PURPLE.
               </p>
             </div>
             <div class="flex flex-wrap gap-2 items-center">
+              <div class="join border border-base-content/20 rounded-lg overflow-hidden">
+                <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-expand-all" title="Expand all JSON section bodies">Expand all</button>
+                <button type="button" class="btn btn-sm join-item" id="btn-json-collapse-all" title="Collapse all JSON section bodies">Collapse all</button>
+              </div>
               <label class="label cursor-pointer gap-2 py-0">
-                <span class="label-text text-xs">Plain raw (no color)</span>
+                <span class="label-text text-xs">Plain raw</span>
                 <input type="checkbox" id="chk-json-plain" class="toggle toggle-sm" />
               </label>
               <label class="label cursor-pointer gap-2 py-0">
-                <span class="label-text text-xs">Show blue inject stubs</span>
+                <span class="label-text text-xs">Blue inject stubs</span>
                 <input type="checkbox" id="chk-json-inject" class="toggle toggle-sm toggle-info" checked />
               </label>
               <button type="button" class="btn btn-xs" id="btn-copy-json">Copy full JSON</button>
@@ -265,7 +291,19 @@
     <section id="view-help" class="hidden space-y-4 help">
       <div class="card bg-base-100 shadow">
         <div class="card-body prose prose-invert prose-sm max-w-none">
-          <h2 class="mt-0">Simple picture: how it fits together</h2>
+          <h2 class="mt-0">Help · FAQ · Glossary</h2>
+          <p class="help-toc not-prose text-sm flex flex-wrap gap-x-3 gap-y-1 opacity-90">
+            Jump:
+            <a href="#help-picture">How it fits</a>
+            <a href="#help-colors">Colors</a>
+            <a href="#help-ui">This UI</a>
+            <a href="#glossary">Glossary A–Z</a>
+            <a href="#help-injects">Blue injects</a>
+            <a href="#help-faq">FAQ</a>
+            <a href="#help-troubleshoot">Troubleshooting</a>
+          </p>
+
+          <h2 id="help-picture">Simple picture: how it fits together</h2>
           <pre class="bg-base-200 p-3 rounded text-xs not-prose overflow-x-auto">You ask a question
         │
         ▼
@@ -279,100 +317,115 @@
   Answer + query_decomposition (for analytics) + refs</pre>
           <p><b>This repo</b> holds <b>baseline templates</b> (by mode). Your production file is refined in Hub Workbench and <b>stamped</b> on your Zeus so the hash matches what you deploy.</p>
 
-          <h2>Color policy (cards = tree)</h2>
+          <h2 id="help-colors">Color policy (cards = tree = JSON)</h2>
           <ul>
             <li><span class="txt-ro font-bold">RED</span> — <b>Rules</b>. Shipped in the catalog; changing them changes the contract hash. Edit only via Zeus generator / deliberate release.</li>
             <li><span class="txt-ed font-bold">GREEN</span> — <b>Editable guidance</b>. Business-friendly advice (optimal paths, facet docs). Hash-excluded on full profiles. Often <b>missing on min</b> (yellow card).</li>
             <li><span class="txt-inj font-bold">BLUE</span> — <b>Injected at runtime</b> by Zeus Client / Hub (not stored in the baseline JSON). Competes for tokens with the red system prompt.</li>
             <li><span class="txt-meta font-bold">PURPLE</span> — Meta / stamp labels (id, hash, notes).</li>
+            <li><span class="text-yellow-200 font-bold">YELLOW</span> — Present on full profiles, <b>missing on this min file</b>. Not an error—min is intentionally lean.</li>
           </ul>
 
-          <h2>Glossary (plain language)</h2>
-          <dl class="not-prose space-y-3 text-sm">
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500">
-              <dt class="font-bold">chat_request*.json</dt>
-              <dd class="opacity-90">The <b>menu + house rules</b> the AI sees: which tools it may call and how to answer. One file per <b>mode</b>.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500">
-              <dt class="font-bold">Rules (hashed)</dt>
-              <dd class="opacity-90">Parts that define “what production promised.” If they change, the <b>contract hash</b> changes. Clients bind that hash so nothing drifts silently.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500">
-              <dt class="font-bold">Guidance (editable)</dt>
-              <dd class="opacity-90">Hints for the model (paths, examples, business tone). Usually <b>not</b> in the hash so you can tune without breaking every client binding.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400">
-              <dt class="font-bold">Contract / stamp</dt>
-              <dd class="opacity-90">Server-issued fingerprint of the rules. Production: verify/stamp on <b>your</b> Zeus, then clients send <code>contract_id</code> + <code>contract_hash</code> every turn.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500">
-              <dt class="font-bold">verbs / tools</dt>
-              <dd class="opacity-90">Functions the model is allowed to call (<code>find</code>, <code>search</code>, <code>pipeline</code>, <code>return</code>, …). No verb ⇒ model can’t use that capability safely.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500">
-              <dt class="font-bold">MINI-SCHEMA / scope brief</dt>
-              <dd class="opacity-90">Live description of <b>your</b> data (entity types, fields, counts). Injected so the model doesn’t invent columns. Comes from Zeus for the bound scope.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500">
-              <dt class="font-bold">Business rules / prompt_override</dt>
-              <dd class="opacity-90">Your company language and policies (“always use our product names”, “never invent prices”). Injected by Hub/Workbench or client config—not hard-coded forever into the public baseline.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500">
-              <dt class="font-bold">query_decomposition</dt>
-              <dd class="opacity-90">Structured <b>intent facets</b> the model must return on finish (e.g. intent=Best, entity=Hotel). Powers hot-path analytics / Compare—not just pretty text.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500">
-              <dt class="font-bold">decomposition</dt>
-              <dd class="opacity-90">Data extraction shape grounded in MINI-SCHEMA (targets, predicates, output type). Helps routing and verification.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400">
-              <dt class="font-bold">min vs full profile</dt>
-              <dd class="opacity-90"><b>min</b> (this repo) = smaller payload, verbs + system rules kept, bulky guidance often stripped. <b>full</b> = engine Hub snapshots with full guidance/instructions.</dd>
-            </div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500">
-              <dt class="font-bold">Standard output schema</dt>
-              <dd class="opacity-90">Every terminating <code>return</code> / pipeline uses the <b>same required fields</b> across modes and deployments: <code>summary</code>, <code>query_decomposition</code>, <code>decomposition</code>, <code>confidence</code>. That standardization lets analytics and clients parse every call the same way.</dd>
-            </div>
-          </dl>
+          <h2 id="help-ui">How to use this page</h2>
+          <ul>
+            <li><b>Cards</b> — one box per structural section; click to open the sticky <b>Selected content</b> panel.</li>
+            <li><b>Size map</b> — area ≈ bytes (and ~tokens). Click a tile for the same panel. Toggle inject estimates to see BLUE competition.</li>
+            <li><b>JSON</b> — color-coded sections. <b>▾ / ▸</b> expands or collapses a section body. <b>Expand all / Collapse all</b> for every section. Click a header (or body) to open the content panel.</li>
+            <li><b>Close content</b> — red-outline <b>✕ Close</b> on the panel, the link under the body, or keyboard <b>Esc</b>.</li>
+            <li><b>Mode dropdown</b> — which baseline file you inspect (analytics, fraud, …). Does not change your production Zeus until you stamp there.</li>
+          </ul>
 
-          <h2>What Zeus Client injects (BLUE) and why</h2>
+          <h2 id="glossary">Glossary A–Z (plain language)</h2>
+          <p class="text-xs opacity-70">Same color borders as Cards / Size map / JSON blocks. Left border: red = rules, green = editable, blue = injected, purple = meta.</p>
+          <div class="not-prose glossary-grid text-sm">
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">@as.ids</dt><dd class="opacity-90 mt-1">How pipelines pass IDs between steps (e.g. find → project). Wrong shape = empty results.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">A/B / eval pack</dt><dd class="opacity-90 mt-1">Compare two catalog stamps (or injects) on the same questions before promoting to production.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Baseline vs stamped</dt><dd class="opacity-90 mt-1"><b>Baseline</b> = GitHub template. <b>Stamped</b> = verified on <i>your</i> Zeus with a server hash for production binding.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Boundary / scope</dt><dd class="opacity-90 mt-1">Hard wall: the model may only touch data in the bound bucket/scope. Stops cross-tenant leaks.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Bucket</dt><dd class="opacity-90 mt-1">Couchbase data container. Zeus scopes sit on buckets; chat never invents a bucket outside the bound session.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Business logic / prompt_override</dt><dd class="opacity-90 mt-1">Your company language &amp; policies. Injected (BLUE) from Hub/Workbench—not hard-coded into public baselines.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">chat_request*.json</dt><dd class="opacity-90 mt-1">The <b>menu + house rules</b> the AI sees: tools it may call + how to answer. One file per <b>mode</b>.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Cheap vs expensive verbs</dt><dd class="opacity-90 mt-1">find/get are cheap; search/analyze cost more. Prompt steers “cheapest first” so chats stay fast and affordable.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">confidence</dt><dd class="opacity-90 mt-1">Required terminate field: only the strings <code>high</code>, <code>med</code>, or <code>low</code> (not a float). Used for analytics and UX badges.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Contract / stamp / hash</dt><dd class="opacity-90 mt-1">Server fingerprint of Rules. Clients send <code>contract_id</code> + <code>contract_hash</code> every turn to detect drift.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Contract drift</dt><dd class="opacity-90 mt-1">Client rules no longer match the stamped hash—someone changed the catalog without rebinding.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">decomposition</dt><dd class="opacity-90 mt-1">Structured data plan (targets, predicates, output type) grounded in MINI-SCHEMA. Required on terminate.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">DCP / projection</dt><dd class="opacity-90 mt-1">How Zeus keeps graph bags (nodes/edges) in sync with source documents. Entity map drives what gets projected.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Entity map</dt><dd class="opacity-90 mt-1">Operator map of fields → types/FKs. Feeds projection + what appears in MINI-SCHEMA.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">entity_types / edge_types</dt><dd class="opacity-90 mt-1">Denormalized type lists on graph docs so filters avoid full primary scans. Ops/index concern, not model prose.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Envelope (V2)</dt><dd class="opacity-90 mt-1">The chat_request.v2 shape: Rules + optional guidance + wire/inject slots. Same envelope, different modes.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">Evidence loop / hot-path</dt><dd class="opacity-90 mt-1">Product loop: capture real turns → cluster success/failure paths → improve catalog → A/B. Needs <code>query_decomposition</code>.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">find vs search</dt><dd class="opacity-90 mt-1"><b>find</b> = exact/filter (cheap). <b>search</b> = FTS/vector/hybrid (expensive). Prefer find when filters exist.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">FTS / hybrid / vector</dt><dd class="opacity-90 mt-1">Text search, embedding search, or blend. Powerful but costlier than keyed find—model should use when filters alone fail.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">get / bag / graph</dt><dd class="opacity-90 mt-1">Fetch projected node/edge bags after you know IDs. Graph verbs explore relationships; don’t start there blindly.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">Guidance</dt><dd class="opacity-90 mt-1">GREEN advisory block (optimal paths, facet docs). Often hash-excluded; often stripped on min.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Hash policy</dt><dd class="opacity-90 mt-1">Which JSON paths are Rules vs excluded when stamping. Lets guidance change without always breaking clients.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Hub / Workbench</dt><dd class="opacity-90 mt-1">Operator UI on Zeus admin to refine catalogs, inject business text, stamp contracts, run chat A/B.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">instructions</dt><dd class="opacity-90 mt-1">Structured rules (response_expectations, verb_order). Full profiles; min often folds essentials into <code>messages</code>.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">Intent facets</dt><dd class="opacity-90 mt-1">Slots like intent, entity, geo, audience—the shape of <code>query_decomposition</code> for clustering questions.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">LLM / tool-calling</dt><dd class="opacity-90 mt-1">The model does not run N1QL itself; it chooses allowed <b>verbs</b>; Zeus Client executes them and returns facts.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">masq</dt><dd class="opacity-90 mt-1">Cost tiers for verbs (cheap/mod/expensive). Helps the model pick cheaper tools first.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">manifest.json</dt><dd class="opacity-90 mt-1">Index of modes + byte sizes in this repo. The UI loads it first, then the chosen <code>v2/min/…json</code>.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">min vs full</dt><dd class="opacity-90 mt-1"><b>min</b> (this repo) = smaller client payload. <b>full</b> = engine snapshots with guidance/instructions bulk.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">MINI-SCHEMA / scope brief</dt><dd class="opacity-90 mt-1">Live description of your entities/fields/counts. Injected so the model doesn’t invent columns.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Mode</dt><dd class="opacity-90 mt-1">Profile of behavior (analytics, fraud, auto…). Same envelope shape; different defaults and tool emphasis.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">optimal_paths</dt><dd class="opacity-90 mt-1">Suggested multi-step tool recipes for common intents. Guidance (green), not hard-coded execution.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">pipeline</dt><dd class="opacity-90 mt-1">One server-side multi-step call (find→order→project). Preferred over many chat rounds.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">PROMPT_BUILDER / fragments</dt><dd class="opacity-90 mt-1">How Zeus engineers assemble system prompts from versioned pieces (not hand-pasted 5k-line monoliths).</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">query_decomposition</dt><dd class="opacity-90 mt-1">Required terminate object: business intent facets (intent+entity…). Powers hot-path analytics.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">return / return_result</dt><dd class="opacity-90 mt-1">Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence).</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Rules (hashed)</dt><dd class="opacity-90 mt-1">What production promised: messages, verbs, masq, etc. Change ⇒ new hash.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">ScopeConfig</dt><dd class="opacity-90 mt-1">Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Standard output schema</dt><dd class="opacity-90 mt-1">Same required terminate fields across modes/deploys so every call is machine-parseable.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">System prompt (<code>messages</code>)</dt><dd class="opacity-90 mt-1">Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Token budget</dt><dd class="opacity-90 mt-1">Context window is limited. RED system + RED verbs + BLUE injects + history all compete—Size map shows the fight.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Tool result / multi-round</dt><dd class="opacity-90 mt-1">After each verb, Zeus returns facts into the conversation; the model may call more tools or terminate.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">verbs / tools</dt><dd class="opacity-90 mt-1">Allowed Zeus API functions for the model. No verb ⇒ no safe access to that capability.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Wire payload</dt><dd class="opacity-90 mt-1">What actually goes to the LLM: catalog system+tools plus BLUE injects and conversation—not the whole pretty JSON file.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">zeus_chat_request repo</dt><dd class="opacity-90 mt-1">Published baselines for clients without cloning the engine. This UI maps that structure.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Zeus Client</dt><dd class="opacity-90 mt-1">Middleman: loads catalog, injects blue context, calls LLM, executes verbs on Zeus, returns answers.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Zeus engine / Hub</dt><dd class="opacity-90 mt-1"><b>Engine</b> serves APIs + projection. <b>Hub</b> is the operator admin UI (status, scope config, chat workbench).</dd></div>
+          </div>
+
+          <h2 id="help-injects">What Zeus Client injects (BLUE) and why</h2>
           <table class="table table-sm not-prose">
-            <thead><tr><th>Injected piece</th><th>Why</th></tr></thead>
+            <thead><tr><th>Injected piece</th><th>Why</th><th>Who sets it</th></tr></thead>
             <tbody>
-              <tr><td>User message(s)</td><td>The actual question / conversation.</td></tr>
-              <tr><td>Scope binding</td><td>Which bucket/scope to query (hard boundary).</td></tr>
-              <tr><td>SCOPE BRIEF + MINI-SCHEMA</td><td>What entities/fields exist so the model doesn’t invent schema.</td></tr>
-              <tr><td>Business logic / prompt_override</td><td>Your domain language and policies.</td></tr>
-              <tr><td>Contract id + hash</td><td>Prove the ruleset didn’t drift mid-session.</td></tr>
-              <tr><td>Tool results each round</td><td>Facts from Zeus after each verb call.</td></tr>
+              <tr><td>User message(s)</td><td>The actual question / conversation</td><td>End user / client app</td></tr>
+              <tr><td>Scope binding</td><td>Which bucket/scope is allowed</td><td>Client session / Hub</td></tr>
+              <tr><td>SCOPE BRIEF + MINI-SCHEMA</td><td>Live entity types &amp; fields so the model doesn’t invent schema</td><td>Zeus for bound scope</td></tr>
+              <tr><td>Business logic / prompt_override</td><td>Your domain language &amp; policies</td><td>Hub Workbench / scope config</td></tr>
+              <tr><td>Contract id + hash</td><td>Prove rules didn’t drift mid-session</td><td>Stamp on Zeus, client binds</td></tr>
+              <tr><td>Tool results each round</td><td>Facts after Zeus runs find/search/…</td><td>Zeus API responses</td></tr>
             </tbody>
           </table>
-          <p>Baselines in GitHub intentionally <b>omit</b> blue content—your live cluster fills it in.</p>
+          <p>Baselines in GitHub intentionally <b>omit</b> blue content—your live cluster fills it in. That is why BLUE tiles are estimates on the Size map.</p>
 
-          <h2>FAQ</h2>
+          <h2 id="help-faq">FAQ</h2>
           <h3>What is the difference between AUTO, ANALYTICS, FRAUD, … in the dropdown?</h3>
-          <p>Each file is a <b>mode profile</b>: same idea (tools + rules), different emphasis.</p>
+          <p>Each file is a <b>mode profile</b>: same envelope idea (tools + rules), different emphasis.</p>
           <ul>
-            <li><b>analytics</b> — default “real links, not noise”; balanced graph + semantic tools.</li>
+            <li><b>analytics</b> — default “real links, not noise”; balanced graph + semantic tools. Most demos start here.</li>
             <li><b>auto</b> — discovery / safe-during-setup; not a long-term production mode.</li>
-            <li><b>fraud</b> — keep more “noise”; lower confidence floor; graph structure matters more.</li>
-            <li><b>code / research / open</b> — more exploratory or code/doc oriented tool mix.</li>
-            <li><b>tenant / private / regulated</b> — stricter tenancy / compliance posture in the product stack.</li>
-            <li><b>custom</b> — placeholder for operator-tuned modes.</li>
+            <li><b>fraud</b> — keep more weak signals; graph structure matters more; lower confidence floor.</li>
+            <li><b>code</b> — code/doc style exploration.</li>
+            <li><b>research / open</b> — more exploratory tool mix.</li>
+            <li><b>tenant / private / regulated</b> — stronger tenancy / privacy / compliance posture in the product stack.</li>
+            <li><b>custom</b> — shell for operator-tuned modes.</li>
           </ul>
-          <p>The dropdown only switches which baseline you inspect. Your product picks a mode per scope in Zeus.</p>
+          <p>This dropdown only switches which <b>baseline</b> you inspect. Production: assign a mode per scope in Zeus.</p>
 
           <h3>Where do I put “talk about my business” for the AI?</h3>
           <ol>
-            <li><b>Hub Workbench / scope config</b> — business injections, prompt overrides, entity map language (preferred).</li>
-            <li><b>guidance</b> on a <b>full</b> catalog (optimal_paths, notes) — green / editable, hash-excluded.</li>
-            <li><b>Not</b> by hand-editing red <code>messages</code>/<code>verbs</code> in this public baseline if you care about stamp/hash stability—use the Zeus generator + Workbench, then stamp.</li>
+            <li><b>Hub Workbench / scope config</b> — business injections, prompt overrides, entity map labels (preferred, BLUE at runtime).</li>
+            <li><b>guidance</b> on a <b>full</b> catalog (optimal_paths, notes) — GREEN, often hash-excluded.</li>
+            <li><b>Not</b> by forever hand-editing RED <code>messages</code>/<code>verbs</code> in this public baseline if you care about stamp stability—use Zeus generator + Workbench, then stamp.</li>
           </ol>
 
           <h3>How do I optimize chat_request?</h3>
           <ol>
             <li>Use <b>Size map</b>: shrink what dominates tokens (usually system prompt + tools).</li>
-            <li>Prefer <b>min</b> for clients; keep evidence-loop terminate fields.</li>
+            <li>Prefer <b>min</b> for clients; keep evidence-loop terminate fields (query_decomposition required).</li>
             <li>Push domain knowledge into <b>MINI-SCHEMA + blue injects</b>, not a 50-page system essay.</li>
             <li>Use <b>pipeline</b> / cheaper verbs; don’t expose tools you don’t need for that mode.</li>
             <li>Stamp on Zeus; A/B with eval packs before swapping production hashes.</li>
@@ -391,8 +444,35 @@
           <h3>Why is guidance yellow / missing on min?</h3>
           <p>Min profiles drop bulky green guidance to save tokens. Rules (red) + injects (blue) still run. Put durable business policy in Hub injects; use full profiles when you need green optimal_paths in-file.</p>
 
+          <h3>Why do RED / GREEN / BLUE sizes matter?</h3>
+          <p>Every byte in the wire payload costs latency and money. RED is the fixed menu; BLUE is live truth for your tenant; GREEN is optional coaching. If BLUE+RED already fill the window, history and long answers get truncated—use Size map to see the fight before you ship.</p>
+
+          <h3>What is the evidence loop in one sentence?</h3>
+          <p>Log every terminate’s <code>query_decomposition</code> (and outcomes), cluster which intents succeed/fail, then improve verbs/guidance/injects and re-stamp—not “prompt folklore.”</p>
+
+          <h3>min file vs full file — which do clients load?</h3>
+          <p>Clients should load the <b>stamped min</b> (or equivalent slim profile) from your Zeus, not necessarily this GitHub copy. Full snapshots live in the engine for authors; this repo publishes mins for transparency and client pinning.</p>
+
           <h3>Can I edit the JSON in this repo by hand?</h3>
           <p>Baselines are <b>generated</b> in Zeus (<code>make ai-snapshot-min</code>) then published here. Prefer editing Zeus prompt fragments / generator, regenerate, publish—don’t maintain a second hand-edited truth.</p>
+
+          <h3>How do expand/collapse and the content panel work?</h3>
+          <ul>
+            <li>JSON <b>▾</b> toggles only that section’s body (keeps the page scannable).</li>
+            <li><b>Expand all / Collapse all</b> toggles every section at once.</li>
+            <li>Clicking a section header opens the sticky panel with full text + bytes/~tokens.</li>
+            <li>Close with <b>✕ Close</b>, the bottom “Close panel” link, or <b>Esc</b>.</li>
+          </ul>
+
+          <h2 id="help-troubleshoot">Troubleshooting (common “why?”)</h2>
+          <ul>
+            <li><b>Empty answers / invented fields</b> — MINI-SCHEMA or entity map incomplete; model is guessing columns. Fix ScopeConfig / entity map, not only the system prompt.</li>
+            <li><b>Slow or expensive chats</b> — too many search/hybrid calls; trim verbs; push optimal_paths / masq; prefer pipeline.</li>
+            <li><b>Contract / hash errors</b> — client still pins old stamp after catalog change. Re-stamp and rebind client.</li>
+            <li><b>Missing query_decomposition in logs</b> — min system prompt lost evidence-loop rules, or model terminated without the schema. Check RED messages + return verb description.</li>
+            <li><b>Cross-scope leakage fears</b> — boundary is server-enforced; still never put secrets in RED baselines that ship to every client.</li>
+            <li><b>This page won’t load data</b> — must be served over HTTP from the repo root (e.g. <code>python3 -m http.server 8766</code>), not opened as a <code>file://</code> URL.</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -670,8 +750,32 @@ function resolvePathContent(doc, path) {
   return { value: null, note: path, why: "" };
 }
 
+function closeContentPanel() {
+  state.selectedPath = null;
+  lastContentText = "";
+  const panel = document.getElementById("content-panel");
+  panel.classList.add("is-empty");
+  document.getElementById("content-title").textContent = "Nothing selected";
+  document.getElementById("content-sub").textContent =
+    "Click a card, size tile, table row, or JSON block to inspect it here.";
+  document.getElementById("content-bytes").textContent = "— B";
+  document.getElementById("content-tokens").textContent = "— ~tok";
+  document.getElementById("content-class").textContent = "—";
+  document.getElementById("content-class").className = "badge badge-outline badge-sm";
+  document.getElementById("btn-copy-content").disabled = true;
+  document.getElementById("content-why").classList.add("hidden");
+  document.getElementById("content-why").innerHTML = "";
+  document.getElementById("content-body").innerHTML = "";
+  document.querySelectorAll(".card-click.selected").forEach((el) => el.classList.remove("selected"));
+  document.querySelectorAll("#json-annotated .json-block.selected").forEach((b) => b.classList.remove("selected"));
+  document.getElementById("status").textContent =
+    (state.mode ? `Mode ${state.mode}. ` : "") + "Content panel closed.";
+}
+
 function showContentPanel({ path, bytes, cls, value, note, why }) {
   state.selectedPath = path;
+  const panel = document.getElementById("content-panel");
+  panel.classList.remove("is-empty");
   document.querySelectorAll(".card-click").forEach((el) => {
     el.classList.toggle("selected", el.getAttribute("data-path") === path);
   });
@@ -718,6 +822,21 @@ function showContentPanel({ path, bytes, cls, value, note, why }) {
   document.querySelectorAll("#json-annotated .json-block").forEach((b) => {
     b.classList.toggle("selected", b.getAttribute("data-path") === path);
   });
+
+  // Auto-expand the matching JSON block when selecting from cards/tree
+  const jb = document.querySelector(`#json-annotated .json-block[data-path="${CSS.escape(path)}"]`);
+  if (jb) {
+    jb.classList.remove("collapsed");
+    const t = jb.querySelector(".json-toggle");
+    if (t) t.textContent = "▾";
+  }
+
+  // Keep the sticky panel in view (especially after scrolling deep into JSON)
+  try {
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } catch (_) {
+    /* ignore */
+  }
 }
 
 function openPath(path, bytes, cls) {
@@ -1000,38 +1119,64 @@ function renderAnnotatedJson(doc) {
 
   root.querySelectorAll(".json-block").forEach((block) => {
     const head = block.querySelector(".json-block-head");
-    const open = () => {
+    const toggle = block.querySelector(".json-toggle");
+    const openPanel = () => {
       root.querySelectorAll(".json-block").forEach((b) => b.classList.remove("selected"));
       block.classList.add("selected");
+      block.classList.remove("collapsed");
+      if (toggle) toggle.textContent = "▾";
       openPath(block.getAttribute("data-path"), Number(block.getAttribute("data-bytes")), block.getAttribute("data-cls"));
     };
-    head.addEventListener("click", open);
-    // also allow click on pre to select
-    block.querySelector("pre")?.addEventListener("click", open);
+    toggle?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const now = block.classList.toggle("collapsed");
+      toggle.textContent = now ? "▸" : "▾";
+    });
+    head.addEventListener("click", (e) => {
+      if (e.target.closest(".json-toggle")) return;
+      openPanel();
+    });
+    block.querySelector("pre")?.addEventListener("click", openPanel);
+    // init chevron
+    if (toggle) toggle.textContent = block.classList.contains("collapsed") ? "▸" : "▾";
   });
 
   // highlight selected
   if (state.selectedPath) {
     const sel = root.querySelector(`.json-block[data-path="${CSS.escape(state.selectedPath)}"]`);
-    if (sel) sel.classList.add("selected");
+    if (sel) {
+      sel.classList.add("selected");
+      sel.classList.remove("collapsed");
+    }
   }
 }
 
 function jsonBlockHtml({ path, keyLabel, title, cls, bytes, why, body, present, nested, estimate }) {
   const nest = nested ? "ml-3 md:ml-6" : "";
-  return `<div class="json-block ${cls} ${nest}" data-path="${escapeHtml(path)}" data-bytes="${bytes}" data-cls="${cls}">
-    <div class="json-block-head" title="Click to open content panel (same as cards/tiles)">
+  // Nested verb/message blocks start collapsed so the page is scannable
+  const collapsed = nested ? "collapsed" : "";
+  return `<div class="json-block ${cls} ${nest} ${collapsed}" data-path="${escapeHtml(path)}" data-bytes="${bytes}" data-cls="${cls}">
+    <div class="json-block-head" title="Click header: open content panel. Use ▾ to expand/collapse body.">
+      <button type="button" class="btn btn-ghost btn-xs btn-circle json-toggle" aria-label="Expand or collapse">▾</button>
       <span class="json-key-chip">${escapeHtml(keyLabel)}</span>
       <span class="opacity-80">${escapeHtml(title)}</span>
       <span class="badge badge-ghost badge-xs font-mono">${formatBytes(bytes)}</span>
       <span class="badge badge-ghost badge-xs font-mono">${formatTokens(bytes)}</span>
       <span class="badge badge-xs border border-current opacity-90">${escapeHtml(classLabel(cls))}${estimate ? " · est." : ""}</span>
       ${!present ? '<span class="badge badge-warning badge-xs">missing</span>' : ""}
-      <span class="opacity-50 text-[10px] ml-auto">click → content panel</span>
+      <span class="opacity-50 text-[10px] ml-auto hidden sm:inline">open panel</span>
     </div>
-    ${why ? `<div class="px-2 pt-1 text-[11px] opacity-80">${escapeHtml(why)}</div>` : ""}
-    <pre>${escapeHtml(body)}</pre>
+    ${why ? `<div class="json-why px-2 pt-1 text-[11px] opacity-80">${escapeHtml(why)}</div>` : ""}
+    <div class="json-block-body"><pre>${escapeHtml(body)}</pre></div>
   </div>`;
+}
+
+function setJsonBlocksCollapsed(collapsed) {
+  document.querySelectorAll("#json-annotated .json-block").forEach((b) => {
+    b.classList.toggle("collapsed", !!collapsed);
+    const btn = b.querySelector(".json-toggle");
+    if (btn) btn.textContent = collapsed ? "▸" : "▾";
+  });
 }
 
 /* —— treemap —— */
@@ -1304,10 +1449,26 @@ document.getElementById("btn-copy-content").addEventListener("click", async () =
     toast("Copy failed");
   }
 });
+document.getElementById("btn-close-content")?.addEventListener("click", () => closeContentPanel());
+document.getElementById("btn-close-content-bottom")?.addEventListener("click", () => closeContentPanel());
 document.getElementById("chk-inject").addEventListener("change", () => state.catalog && renderSizeMaps(state.catalog));
 document.getElementById("chk-json-plain")?.addEventListener("change", () => applyJsonViewMode());
 document.getElementById("chk-json-inject")?.addEventListener("change", () => {
   if (state.catalog) renderAnnotatedJson(state.catalog);
+});
+document.getElementById("btn-json-expand-all")?.addEventListener("click", () => {
+  setJsonBlocksCollapsed(false);
+  toast("Expanded all JSON sections");
+});
+document.getElementById("btn-json-collapse-all")?.addEventListener("click", () => {
+  setJsonBlocksCollapsed(true);
+  toast("Collapsed all JSON sections");
+});
+// Esc closes content panel when something is selected
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!state.selectedPath) return;
+  closeContentPanel();
 });
 window.addEventListener("resize", () => {
   state.chartMain?.resize();

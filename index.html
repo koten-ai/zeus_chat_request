@@ -986,19 +986,31 @@
       </div>
     </section>
 
-    <!-- JSON -->
+    <!-- JSON: tabs = chat_request catalog | Output scheme -->
     <section id="view-json" class="hidden space-y-3">
-      <div class="card bg-base-100 shadow">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div role="tablist" class="tabs tabs-boxed bg-base-100 shadow-sm p-1">
+          <button type="button" role="tab" class="tab tab-active" data-json-tab="catalog" aria-selected="true">chat_request</button>
+          <button type="button" role="tab" class="tab" data-json-tab="output" aria-selected="false">Output</button>
+        </div>
+        <p class="text-xs text-muted max-w-xl">
+          <b>chat_request</b> = baseline catalog file for this mode.
+          <b>Output</b> = Layer A terminate + Layer B server report shapes (not the catalog file).
+        </p>
+      </div>
+
+      <!-- TAB: chat_request catalog -->
+      <div id="json-tab-catalog" class="card bg-base-100 shadow" data-json-panel="catalog">
         <div class="card-body p-3 gap-3">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 class="card-title text-base" id="json-title">JSON</h2>
-              <p class="text-xs opacity-70">
-                Colored <b>boxes match Cards + Size map</b>. ▾ expands the box body; header opens the sticky content panel (✕ or Esc closes it).
-                Use <b>Expand all / Collapse all</b> for every section. Keys use RED / GREEN / BLUE / PURPLE.
+              <p class="text-xs text-muted">
+                Colored <b>boxes match Cards + Size map</b>. ▾ expands the box body; header opens the sticky content panel (✕ or Esc).
+                Use <b>Expand all / Collapse all</b>. Keys use RED / GREEN / BLUE / PURPLE.
               </p>
             </div>
-            <div class="flex flex-wrap gap-2 items-center">
+            <div class="flex flex-wrap gap-2 items-center" id="json-catalog-toolbar">
               <div class="join border border-base-content/20 rounded-lg overflow-hidden">
                 <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-expand-all" title="Expand all JSON section bodies">Expand all</button>
                 <button type="button" class="btn btn-sm join-item" id="btn-json-collapse-all" title="Collapse all JSON section bodies">Collapse all</button>
@@ -1020,10 +1032,43 @@
             <span class="badge chip-inj">BLUE = Injected (not in file)</span>
             <span class="badge chip-meta">PURPLE = Meta</span>
           </div>
-          <!-- colored sections -->
           <div id="json-annotated"></div>
-          <!-- plain fallback -->
           <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-pre"></pre>
+        </div>
+      </div>
+
+      <!-- TAB: Output scheme (Layer A / B) -->
+      <div id="json-tab-output" class="card bg-base-100 shadow hidden" data-json-panel="output">
+        <div class="card-body p-3 gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="card-title text-base">Output JSON · terminate + turn report</h2>
+              <p class="text-xs text-muted max-w-3xl">
+                <span class="txt-ed font-semibold">Layer A</span> = what the model must emit to finish a turn.
+                <span class="txt-meta font-semibold">Layer B</span> = what Zeus stores (attribution / decision / report).
+                Same expand/collapse + click-to-inspect as the catalog tab.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <div class="join border border-base-content/20 rounded-lg overflow-hidden">
+                <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-out-expand-all">Expand all</button>
+                <button type="button" class="btn btn-sm join-item" id="btn-json-out-collapse-all">Collapse all</button>
+              </div>
+              <label class="label cursor-pointer gap-2 py-0">
+                <span class="label-text text-xs">Plain raw</span>
+                <input type="checkbox" id="chk-json-out-plain" class="toggle toggle-sm" />
+              </label>
+              <button type="button" class="btn btn-xs" id="btn-copy-json-output">Copy full Output JSON</button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 text-[11px]">
+            <span class="badge chip-ed">GREEN · Layer A terminate</span>
+            <span class="badge chip-meta">PURPLE · Layer B report</span>
+            <span class="badge chip-miss">YELLOW · WIP / gaps</span>
+            <span class="badge chip-ro">RED · from this catalog’s return/pipeline</span>
+          </div>
+          <div id="json-output-annotated"></div>
+          <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-output-pre"></pre>
         </div>
       </div>
     </section>
@@ -1785,6 +1830,11 @@ function showSearchPanel() {
 function activateSearchHit(hit) {
   const a = hit.action || {};
   hideSearchPanel();
+  // Output-scheme hits open the JSON → Output tab
+  if (hit.group === "output") {
+    setView("json");
+    setJsonTab("output");
+  }
   if (a.type === "help") {
     setView("help");
     setTimeout(() => {
@@ -2278,7 +2328,17 @@ const MODE_BLURBS = {
   custom: "Operator-defined mode shell.",
 };
 
-let state = { view: "boxes", manifest: null, mode: null, catalog: null, catalogs: {}, chartMain: null, chartWire: null, selectedPath: null };
+let state = {
+  view: "boxes",
+  jsonTab: "catalog", // catalog | output
+  manifest: null,
+  mode: null,
+  catalog: null,
+  catalogs: {},
+  chartMain: null,
+  chartWire: null,
+  selectedPath: null,
+};
 let lastContentText = "";
 
 function toast(msg) {
@@ -2359,7 +2419,67 @@ function prettyContent(value, path) {
   catch { return { kind: "prose", text: String(value) }; }
 }
 function resolvePathContent(doc, path) {
-  if (!doc || !path) return { value: null, note: "", why: "" };
+  if (!path) return { value: null, note: "", why: "" };
+  // Synthetic Output-tab paths (Layer A / B) — not keys in chat_request
+  if (String(path).startsWith("output.")) {
+    const outDoc = buildOutputJsonDoc(doc || state.catalog || {});
+    const map = {
+      "output.layer_a.ideal": {
+        value: outDoc.layer_a_model_terminate.ideal_example,
+        note: "Layer A · ideal terminate",
+        why: "Required machine-parseable fields: summary, query_decomposition, decomposition, confidence.",
+        cls: "guidance",
+      },
+      "output.layer_a.facets": {
+        value: outDoc.layer_a_model_terminate.query_decomposition_facets,
+        note: "Layer A · QD facets",
+        why: "Business intent slots for hot-path clustering.",
+        cls: "guidance",
+      },
+      "output.layer_a.catalog_return": {
+        value: outDoc.layer_a_model_terminate.from_this_catalog.return,
+        note: "Layer A · return on this catalog",
+        why: "What this mode’s return verb declares.",
+        cls: "rules",
+      },
+      "output.layer_a.catalog_pipeline": {
+        value: outDoc.layer_a_model_terminate.from_this_catalog.pipeline,
+        note: "Layer A · pipeline terminate props",
+        why: "1-call short-circuit fields on pipeline.",
+        cls: "rules",
+      },
+      "output.layer_b.skeleton": {
+        value: outDoc.layer_b_server_report.compact_skeleton,
+        note: "Layer B · report skeleton",
+        why: "Server turn store: attribution + decision + report + stored_at.",
+        cls: "meta",
+      },
+      "output.layer_b.tree": {
+        value: outDoc.layer_b_server_report.tree,
+        note: "Layer B · field tree",
+        why: "Human map of report.detail / spans / storage.",
+        cls: "meta",
+      },
+      "output.wip": {
+        value: outDoc.wip_checklist,
+        note: "WIP checklist",
+        why: "Real Hub turn: what was present vs still missing.",
+        cls: "miss",
+      },
+    };
+    const hit = map[path];
+    if (hit) {
+      return {
+        value: hit.value,
+        note: hit.note,
+        why: hit.why,
+        bytes: jsonBytes(hit.value),
+        cls: hit.cls,
+      };
+    }
+    return { value: outDoc, note: "Full Output scheme JSON", why: "Layer A + Layer B envelope." };
+  }
+  if (!doc) return { value: null, note: "", why: "" };
   if (path === "inject" || String(path).startsWith("inject:")) {
     const name = String(path).replace(/^inject:/, "");
     const est = INJECT_ESTIMATES.find((x) => x.name === name);
@@ -2476,13 +2596,15 @@ function showContentPanel({ path, bytes, cls, value, note, why }) {
 
   document.getElementById("status").textContent = `Selected: ${path} · ${formatBytes(bytes)} · ${formatTokens(bytes)} · ${classLabel(cls || "")}`;
 
-  // Sync selection on JSON colored blocks (same path as cards/tiles)
-  document.querySelectorAll("#json-annotated .json-block").forEach((b) => {
+  // Sync selection on JSON colored blocks (catalog + output tabs)
+  document.querySelectorAll("#json-annotated .json-block, #json-output-annotated .json-block").forEach((b) => {
     b.classList.toggle("selected", b.getAttribute("data-path") === path);
   });
 
   // Auto-expand the matching JSON block when selecting from cards/tree
-  const jb = document.querySelector(`#json-annotated .json-block[data-path="${CSS.escape(path)}"]`);
+  const jb = document.querySelector(
+    `#json-annotated .json-block[data-path="${CSS.escape(path)}"], #json-output-annotated .json-block[data-path="${CSS.escape(path)}"]`
+  );
   if (jb) {
     jb.classList.remove("collapsed");
     const t = jb.querySelector(".json-toggle");
@@ -2498,11 +2620,12 @@ function showContentPanel({ path, bytes, cls, value, note, why }) {
 }
 
 function openPath(path, bytes, cls) {
-  if (!state.catalog && !String(path).startsWith("inject")) return;
+  const p = String(path || "");
+  if (!state.catalog && !p.startsWith("inject") && !p.startsWith("output.")) return;
   const resolved = resolvePathContent(state.catalog || {}, path);
   let b = bytes;
   if (b == null) b = resolved.bytes != null ? resolved.bytes : jsonBytes(resolved.value);
-  let c = cls || classForKey(path.split(/[.[]/)[0] || path);
+  let c = cls || resolved.cls || classForKey(path.split(/[.[]/)[0] || path);
   if (resolved.missing) c = "miss";
   if (resolved.estimate) c = "inject";
   showContentPanel({
@@ -2905,13 +3028,288 @@ function renderJson(doc, mode) {
   const plain = JSON.stringify(doc, null, 2);
   document.getElementById("json-pre").textContent = plain;
   renderAnnotatedJson(doc);
+  renderJsonOutput(doc, mode);
   applyJsonViewMode();
+  applyJsonOutputViewMode();
+  setJsonTab(state.jsonTab || "catalog");
 }
 
 function applyJsonViewMode() {
   const plain = document.getElementById("chk-json-plain")?.checked;
-  document.getElementById("json-pre").classList.toggle("hidden", !plain);
-  document.getElementById("json-annotated").classList.toggle("hidden", !!plain);
+  document.getElementById("json-pre")?.classList.toggle("hidden", !plain);
+  document.getElementById("json-annotated")?.classList.toggle("hidden", !!plain);
+}
+
+function applyJsonOutputViewMode() {
+  const plain = document.getElementById("chk-json-out-plain")?.checked;
+  document.getElementById("json-output-pre")?.classList.toggle("hidden", !plain);
+  document.getElementById("json-output-annotated")?.classList.toggle("hidden", !!plain);
+}
+
+function setJsonTab(tab) {
+  const t = tab === "output" ? "output" : "catalog";
+  state.jsonTab = t;
+  document.querySelectorAll("[data-json-tab]").forEach((btn) => {
+    const on = btn.getAttribute("data-json-tab") === t;
+    btn.classList.toggle("tab-active", on);
+    btn.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.querySelectorAll("[data-json-panel]").forEach((panel) => {
+    panel.classList.toggle("hidden", panel.getAttribute("data-json-panel") !== t);
+  });
+  if (t === "output" && state.catalog) {
+    renderJsonOutput(state.catalog, state.mode);
+    applyJsonOutputViewMode();
+  }
+  if (t === "catalog" && state.catalog) {
+    applyJsonViewMode();
+  }
+}
+
+/** Ideal Layer A / B shapes for Output tab (not the catalog file). */
+function buildOutputJsonDoc(doc) {
+  const ret = findReturnVerb(doc || {});
+  const pipe = (doc?.verbs || []).map((v) => v.function || v).find((fn) => fn.name === "pipeline");
+  const retReq = (ret && ret.parameters && ret.parameters.required) || [];
+  const retProps = (ret && ret.parameters && ret.parameters.properties) || {};
+  const pipeProps = (pipe && pipe.parameters && pipe.parameters.properties) || {};
+
+  const idealTerminate = {
+    summary: "Hotels in Paris: … (facts after tools, or planned facts on 1-call pipeline)",
+    query_decomposition: {
+      intent: "list hotels in a city",
+      entity: "Hotel",
+      attribute: ["name", "city", "address"],
+      geo: "Paris",
+    },
+    decomposition: {
+      targets: ["Hotel"],
+      predicates: [{ field: "city", op: "eq", value: "Paris" }],
+      output: "rows",
+    },
+    confidence: "med",
+    node_refs: ["hotel_…"],
+    entity_refs: [],
+    provenance: [{ via: "pipeline", as: "hotels" }],
+  };
+
+  const facets = {};
+  (QD_FACETS || []).forEach((f) => {
+    facets[f.name] = {
+      when: f.required ? "core" : "when signaled",
+      note: f.note,
+    };
+  });
+
+  const catalogReturn = {
+    verb: "return",
+    required: retReq,
+    properties: retProps,
+    present_on_catalog: !!ret,
+  };
+
+  const catalogPipelineTerminate = {
+    verb: "pipeline",
+    top_level_terminate_props: Object.keys(pipeProps).filter((k) =>
+      ["summary", "query_decomposition", "decomposition", "confidence", "node_refs", "entity_refs", "provenance", "return"].includes(k)
+    ),
+    note: "Terminating fields may ride on pipeline top-level for 1-call short-circuit (turn_complete).",
+  };
+
+  const reportSkeleton = {
+    attribution: { verdict: "ok", trace_status: "ok" },
+    decision: { Keep: true, Rule: "slow", Rate: 1 },
+    report: {
+      req_id: "…",
+      chat_id: "…",
+      turn_id: "…",
+      source: "admin",
+      scope: "bucket/scope",
+      mode: state.mode || "auto",
+      status: "ok",
+      duration_ms: 2704,
+      model: "grok-…",
+      tool_usage: [{ name: "pipeline", count: 1, ms: 4, bytes: 2154 }],
+      detail: {
+        envelope: { scope: "…", mode: state.mode || "auto" },
+        edge: { method: "POST", path: "/admin/api/chat", status: 200 },
+        storage: { queries: ["/* N1QL */"], fts_queries: ["/* FTS */"] },
+        ai: {
+          tool_calls: ["pipeline", "find"],
+          calls: [
+            {
+              name: "pipeline",
+              args: { steps: [], summary: "…", query_decomposition: { intent: "…", entity: "…" } },
+              result: { data: {}, summary: "…", turn_complete: true },
+            },
+          ],
+          requests: [{ messages: ["/* system+user */"], tools: ["/* catalog */"] }],
+          finish: "tool_calls",
+          tokens: {},
+        },
+      },
+      spans: [{ subsystem: "ai|pipeline|fts|tool", phase: "…", duration_ns: 0 }],
+    },
+    stored_at: "2026-…",
+  };
+
+  const reportTree = {};
+  (REPORT_TREE || []).forEach((b) => {
+    reportTree[b.path] = {
+      title: b.title,
+      note: b.note,
+      kids: (b.kids || []).map((k) => ({ path: k.path, note: k.note })),
+    };
+  });
+
+  const wip = {
+    example: "What hotels are in Paris? · mode auto · grok · 1 round",
+    present: (REAL_TURN_GAPS || []).filter((g) => g.have).map((g) => g.item),
+    missing: (REAL_TURN_GAPS || []).filter((g) => !g.have).map((g) => ({ item: g.item, note: g.note })),
+  };
+
+  return {
+    _format: "zeus.output_scheme.v1",
+    _note: "Not the chat_request catalog — Layer A (model terminate) + Layer B (server report).",
+    layer_a_model_terminate: {
+      ideal_example: idealTerminate,
+      query_decomposition_facets: facets,
+      from_this_catalog: {
+        return: catalogReturn,
+        pipeline: catalogPipelineTerminate,
+      },
+    },
+    layer_b_server_report: {
+      compact_skeleton: reportSkeleton,
+      tree: reportTree,
+    },
+    wip_checklist: wip,
+  };
+}
+
+function wireJsonBlocks(root) {
+  if (!root) return;
+  root.querySelectorAll(".json-block").forEach((block) => {
+    const head = block.querySelector(".json-block-head");
+    const toggle = block.querySelector(".json-toggle");
+    const openPanel = () => {
+      root.querySelectorAll(".json-block").forEach((b) => b.classList.remove("selected"));
+      block.classList.add("selected");
+      block.classList.remove("collapsed");
+      if (toggle) toggle.textContent = "▾";
+      openPath(block.getAttribute("data-path"), Number(block.getAttribute("data-bytes")), block.getAttribute("data-cls"));
+    };
+    // clone-free: remove old listeners by replacing head? simpler: only add once via flag
+    if (block.dataset.wired === "1") return;
+    block.dataset.wired = "1";
+    toggle?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const now = block.classList.toggle("collapsed");
+      toggle.textContent = now ? "▸" : "▾";
+    });
+    head?.addEventListener("click", (e) => {
+      if (e.target.closest(".json-toggle")) return;
+      openPanel();
+    });
+    block.querySelector("pre")?.addEventListener("click", openPanel);
+    if (toggle) toggle.textContent = block.classList.contains("collapsed") ? "▸" : "▾";
+  });
+}
+
+function renderJsonOutput(doc, mode) {
+  const root = document.getElementById("json-output-annotated");
+  const pre = document.getElementById("json-output-pre");
+  if (!root) return;
+  const outDoc = buildOutputJsonDoc(doc);
+  if (pre) pre.textContent = JSON.stringify(outDoc, null, 2);
+
+  const blocks = [
+    {
+      path: "output.layer_a.ideal",
+      keyLabel: "layer_a.ideal_example",
+      title: "Layer A · ideal terminate (return / pipeline top-level)",
+      cls: "guidance",
+      body: outDoc.layer_a_model_terminate.ideal_example,
+      why: "Required machine-parseable fields every mode/deploy: summary, query_decomposition, decomposition, confidence.",
+      nested: false,
+    },
+    {
+      path: "output.layer_a.facets",
+      keyLabel: "layer_a.query_decomposition_facets",
+      title: "Layer A · query_decomposition facets",
+      cls: "guidance",
+      body: outDoc.layer_a_model_terminate.query_decomposition_facets,
+      why: "Business intent slots for hot-path clustering. Core: intent + entity.",
+      nested: false,
+    },
+    {
+      path: "output.layer_a.catalog_return",
+      keyLabel: "layer_a.from_catalog.return",
+      title: "Layer A · return verb on this catalog",
+      cls: "rules",
+      body: outDoc.layer_a_model_terminate.from_this_catalog.return,
+      why: "What this mode’s return tool actually declares (required + properties).",
+      nested: false,
+    },
+    {
+      path: "output.layer_a.catalog_pipeline",
+      keyLabel: "layer_a.from_catalog.pipeline",
+      title: "Layer A · pipeline top-level terminate props",
+      cls: "rules",
+      body: outDoc.layer_a_model_terminate.from_this_catalog.pipeline,
+      why: "1-call path: put terminate fields on pipeline so the server can short-circuit.",
+      nested: false,
+    },
+    {
+      path: "output.layer_b.skeleton",
+      keyLabel: "layer_b.compact_skeleton",
+      title: "Layer B · server report skeleton (Hub turn store)",
+      cls: "meta",
+      body: outDoc.layer_b_server_report.compact_skeleton,
+      why: "Outer store envelope: attribution + decision + report + stored_at. Ops telemetry, not chat_request.",
+      nested: false,
+    },
+    {
+      path: "output.layer_b.tree",
+      keyLabel: "layer_b.tree",
+      title: "Layer B · report field tree (docs)",
+      cls: "meta",
+      body: outDoc.layer_b_server_report.tree,
+      why: "Human map of report.detail.ai, storage, spans, …",
+      nested: true,
+    },
+    {
+      path: "output.wip",
+      keyLabel: "wip_checklist",
+      title: "WIP checklist · real Hub turn gaps",
+      cls: "miss",
+      body: outDoc.wip_checklist,
+      why: "What a real Grok→Zeus Paris-hotels turn had vs still missing for the evidence loop.",
+      nested: true,
+    },
+  ];
+
+  root.innerHTML =
+    `<div class="text-[11px] opacity-70 mb-2 font-mono">// Output scheme for mode <b>${escapeHtml(mode || "")}</b> — not chat_request_*.json</div>` +
+    blocks
+      .map((b) => {
+        const bodyStr = JSON.stringify(b.body, null, 2);
+        const bytes = jsonBytes(b.body);
+        return jsonBlockHtml({
+          path: b.path,
+          keyLabel: b.keyLabel,
+          title: b.title,
+          cls: b.cls,
+          bytes,
+          why: b.why,
+          body: bodyStr,
+          present: true,
+          nested: !!b.nested,
+        });
+      })
+      .join("");
+
+  wireJsonBlocks(root);
 }
 
 function renderAnnotatedJson(doc) {
@@ -3087,8 +3485,9 @@ function jsonBlockHtml({ path, keyLabel, title, cls, bytes, why, body, present, 
   </div>`;
 }
 
-function setJsonBlocksCollapsed(collapsed) {
-  document.querySelectorAll("#json-annotated .json-block").forEach((b) => {
+function setJsonBlocksCollapsed(collapsed, rootSel) {
+  const root = rootSel || "#json-annotated";
+  document.querySelectorAll(root + " .json-block").forEach((b) => {
     b.classList.toggle("collapsed", !!collapsed);
     const btn = b.querySelector(".json-toggle");
     if (btn) btn.textContent = collapsed ? "▸" : "▾";
@@ -3361,7 +3760,10 @@ function setView(view) {
   }
   if (view === "json" && state.catalog) {
     renderAnnotatedJson(state.catalog);
+    renderJsonOutput(state.catalog, state.mode);
     applyJsonViewMode();
+    applyJsonOutputViewMode();
+    setJsonTab(state.jsonTab || "catalog");
   }
   if (view === "boxes") {
     // re-observe after evidence panel rebuild may have recreated A/B anchors
@@ -3432,10 +3834,21 @@ document.getElementById("mode-select").addEventListener("change", (e) => selectM
 document.getElementById("btn-copy-json").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(document.getElementById("json-pre").textContent);
-    toast("Copied full JSON");
+    toast("Copied full chat_request JSON");
   } catch {
     toast("Copy failed");
   }
+});
+document.getElementById("btn-copy-json-output")?.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(document.getElementById("json-output-pre").textContent || "");
+    toast("Copied Output scheme JSON");
+  } catch {
+    toast("Copy failed");
+  }
+});
+document.querySelectorAll("[data-json-tab]").forEach((btn) => {
+  btn.addEventListener("click", () => setJsonTab(btn.getAttribute("data-json-tab")));
 });
 document.getElementById("btn-copy-content").addEventListener("click", async () => {
   try {
@@ -3449,16 +3862,25 @@ document.getElementById("btn-close-content")?.addEventListener("click", () => cl
 document.getElementById("btn-close-content-bottom")?.addEventListener("click", () => closeContentPanel());
 document.getElementById("chk-inject").addEventListener("change", () => state.catalog && renderSizeMaps(state.catalog));
 document.getElementById("chk-json-plain")?.addEventListener("change", () => applyJsonViewMode());
+document.getElementById("chk-json-out-plain")?.addEventListener("change", () => applyJsonOutputViewMode());
 document.getElementById("chk-json-inject")?.addEventListener("change", () => {
   if (state.catalog) renderAnnotatedJson(state.catalog);
 });
 document.getElementById("btn-json-expand-all")?.addEventListener("click", () => {
-  setJsonBlocksCollapsed(false);
-  toast("Expanded all JSON sections");
+  setJsonBlocksCollapsed(false, "#json-annotated");
+  toast("Expanded all chat_request sections");
 });
 document.getElementById("btn-json-collapse-all")?.addEventListener("click", () => {
-  setJsonBlocksCollapsed(true);
-  toast("Collapsed all JSON sections");
+  setJsonBlocksCollapsed(true, "#json-annotated");
+  toast("Collapsed all chat_request sections");
+});
+document.getElementById("btn-json-out-expand-all")?.addEventListener("click", () => {
+  setJsonBlocksCollapsed(false, "#json-output-annotated");
+  toast("Expanded all Output sections");
+});
+document.getElementById("btn-json-out-collapse-all")?.addEventListener("click", () => {
+  setJsonBlocksCollapsed(true, "#json-output-annotated");
+  toast("Collapsed all Output sections");
 });
 // Esc: clear search first, else close content panel when something is selected
 document.addEventListener("keydown", (e) => {

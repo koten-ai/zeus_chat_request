@@ -26,9 +26,43 @@
     .txt-ed { color: #86efac; }
     .txt-inj { color: #93c5fd; }
     .txt-meta { color: #d8b4fe; }
-    .card-click { cursor: pointer; transition: transform .08s ease, box-shadow .08s; }
-    .card-click:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.35); }
-    .card-click.selected { outline: 2px solid #f9fafb; outline-offset: 2px; }
+    .card-static { cursor: default; }
+    .card-click {
+      cursor: pointer;
+      transition: transform .1s ease, box-shadow .1s ease, border-color .1s ease;
+      position: relative;
+    }
+    .card-click:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(0,0,0,.4);
+      filter: brightness(1.06);
+    }
+    .card-click:focus-visible {
+      outline: 2px solid #f9fafb;
+      outline-offset: 3px;
+    }
+    .card-click.selected {
+      outline: 2px solid #f9fafb;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 10px 28px rgba(0,0,0,.4);
+    }
+    .card-click-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      white-space: nowrap;
+    }
+    .card-click:hover .card-click-hint,
+    .card-click.selected .card-click-hint {
+      opacity: 1;
+    }
+    .card-click-hint .arrow { transition: transform .1s ease; }
+    .card-click:hover .card-click-hint .arrow { transform: translateX(2px); }
     pre.json, pre.content, .prose-sys {
       white-space: pre-wrap;
       word-break: break-word;
@@ -175,16 +209,17 @@
     <section id="view-boxes" class="space-y-4">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-3" id="summary-row"></div>
 
-      <div class="flex items-end justify-between gap-2">
+      <div class="flex items-end justify-between gap-2 flex-wrap">
         <div>
           <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70">Catalog sections</h2>
-          <p class="text-xs opacity-60">Click a card to see content + “why the AI needs this”. Colors match the Size map.</p>
+          <p class="text-xs opacity-60">Each card with <span class="font-semibold opacity-90">Open →</span> is clickable — opens the content panel above. Colors match the Size map.</p>
         </div>
+        <span class="badge badge-outline badge-sm gap-1 opacity-80" title="Look for Open → on cards">🖱️ Clickable</span>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="section-grid"></div>
 
       <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">On the wire vs injected</h2>
-      <p class="text-xs opacity-60 -mt-2">Red pieces ship in this file. Blue pieces are added when Zeus Client / Hub talks to the model.</p>
+      <p class="text-xs opacity-60 -mt-2">Red pieces ship in this file. Blue pieces are added when Zeus Client / Hub talks to the model. Cards with <b>Open →</b> open the content panel.</p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wire-grid"></div>
 
       <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">Standard output (every terminate call)</h2>
@@ -857,6 +892,26 @@ function openPath(path, bytes, cls) {
   });
 }
 
+function clickHintHtml(label) {
+  return `<span class="card-click-hint badge badge-ghost badge-sm border border-base-content/20">${escapeHtml(label || "Open")}<span class="arrow" aria-hidden="true">→</span></span>`;
+}
+
+function wireCardClick(root, handler) {
+  (root || document).querySelectorAll(".card-click").forEach((el) => {
+    if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+    if (!el.getAttribute("title")) el.setAttribute("title", "Click to open in content panel");
+    const go = () => handler(el);
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        go();
+      }
+    });
+  });
+}
+
 function renderSummary(doc, mode, entry) {
   const disk = jsonBytes(doc);
   const ret = findReturnVerb(doc);
@@ -869,17 +924,18 @@ function renderSummary(doc, mode, entry) {
     { t: "Standard terminate schema", b: ok ? "OK" : "Gaps", s: "summary + query_decomposition + decomposition + confidence", c: ok ? "box-ed tile-edit" : "box-miss tile-miss", path: "verbs.return" },
   ]
     .map(
-      (x) => `<div class="card bg-base-100 shadow section-card ${x.c} ${x.path ? "card-click" : ""}" ${x.path ? `data-path="${x.path}"` : ""}>
+      (x) => `<div class="card bg-base-100 shadow section-card ${x.c} ${x.path ? "card-click" : "card-static"}" ${x.path ? `data-path="${x.path}"` : ""}>
       <div class="card-body p-4 gap-1">
-        <div class="text-xs uppercase opacity-60">${escapeHtml(x.t)}</div>
+        <div class="flex items-start justify-between gap-2">
+          <div class="text-xs uppercase opacity-60">${escapeHtml(x.t)}</div>
+          ${x.path ? clickHintHtml("Open") : `<span class="text-[10px] uppercase opacity-40">info only</span>`}
+        </div>
         <div class="font-mono text-sm">${escapeHtml(x.b)}</div>
         <div class="text-xs opacity-70">${escapeHtml(x.s)}</div>
       </div></div>`
     )
     .join("");
-  document.querySelectorAll("#summary-row .card-click").forEach((el) => {
-    el.addEventListener("click", () => openPath(el.getAttribute("data-path")));
-  });
+  wireCardClick(document.getElementById("summary-row"), (el) => openPath(el.getAttribute("data-path")));
 }
 
 function renderSections(doc) {
@@ -891,26 +947,30 @@ function renderSections(doc) {
     const b = present ? jsonBytes(val) : 0;
     const expected =
       !present && !s.minTypical ? "Expected missing on min — use full profile or Hub injects." : !present && s.minTypical ? "Unexpected missing." : "";
-    return `<div class="card bg-base-100 shadow section-card card-click ${boxClass(s.edit, missing)}" data-path="${escapeHtml(s.path)}">
+    return `<div class="card bg-base-100 shadow section-card card-click ${boxClass(s.edit, missing)}" data-path="${escapeHtml(s.path)}" title="Click to open ${escapeHtml(s.path)}">
       <div class="card-body p-4 gap-2">
         <div class="flex items-start justify-between gap-2">
           <h3 class="font-semibold text-sm ${s.edit === "rules" ? "txt-ro" : s.edit === "guidance" ? "txt-ed" : "txt-meta"}">${escapeHtml(s.title)}</h3>
-          ${editBadge(s.edit, missing)}
+          <div class="flex flex-wrap items-center gap-1 justify-end shrink-0">
+            ${editBadge(s.edit, missing)}
+            ${clickHintHtml("Open")}
+          </div>
         </div>
         <p class="text-xs"><span class="font-semibold opacity-70">Why AI needs it:</span> ${escapeHtml(s.why)}</p>
         <p class="text-xs opacity-70">${escapeHtml(s.aiNeeds || "")}</p>
-        <div class="text-[11px] font-mono opacity-80">${present ? formatBytes(b) + " · " + formatTokens(b) : "—"} · click to open</div>
+        <div class="flex flex-wrap items-center justify-between gap-2 mt-auto pt-1 border-t border-base-content/10">
+          <div class="text-[11px] font-mono opacity-80">${present ? formatBytes(b) + " · " + formatTokens(b) : "—"}</div>
+          <span class="text-[11px] opacity-70">Click card for full content</span>
+        </div>
         ${expected ? `<div class="text-[11px] text-warning">${escapeHtml(expected)}</div>` : ""}
       </div>
     </div>`;
   }).join("");
-  grid.querySelectorAll(".card-click").forEach((el) => {
-    el.addEventListener("click", () => {
-      const path = el.getAttribute("data-path");
-      const s = STRUCTURE.find((x) => x.path === path);
-      const present = hasKey(doc, s.key);
-      openPath(path, present ? jsonBytes(doc[s.key]) : 0, present ? s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta" : "miss");
-    });
+  wireCardClick(grid, (el) => {
+    const path = el.getAttribute("data-path");
+    const s = STRUCTURE.find((x) => x.path === path);
+    const present = hasKey(doc, s.key);
+    openPath(path, present ? jsonBytes(doc[s.key]) : 0, present ? s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta" : "miss");
   });
 }
 
@@ -918,41 +978,57 @@ function renderWire(doc) {
   const sys = systemContent(doc);
   const verbs = doc.verbs || [];
   document.getElementById("wire-grid").innerHTML = `
-    <div class="card bg-base-100 shadow card-click box-ro tile-rules" data-path="messages[0]">
-      <div class="card-body p-4">
-        <div class="flex justify-between"><h3 class="font-semibold text-sm txt-ro">System prompt (in file)</h3>
-        <span class="badge border-2 border-red-500 text-red-300 bg-red-950/40 badge-sm">${formatBytes(jsonBytes(sys))} · ${formatTokens(jsonBytes(sys))}</span></div>
-        <p class="text-xs opacity-80">Why: teaches tool use + standard terminate schema. Click to read.</p>
+    <div class="card bg-base-100 shadow card-click box-ro tile-rules" data-path="messages[0]" title="Click to open system prompt">
+      <div class="card-body p-4 gap-2">
+        <div class="flex flex-wrap justify-between gap-2 items-start">
+          <h3 class="font-semibold text-sm txt-ro">System prompt (in file)</h3>
+          <div class="flex flex-wrap gap-1 items-center">
+            <span class="badge border-2 border-red-500 text-red-300 bg-red-950/40 badge-sm">${formatBytes(jsonBytes(sys))} · ${formatTokens(jsonBytes(sys))}</span>
+            ${clickHintHtml("Open")}
+          </div>
+        </div>
+        <p class="text-xs opacity-80">Why: teaches tool use + standard terminate schema.</p>
         <pre class="bg-base-200 p-2 rounded text-[11px] max-h-36 overflow-auto txt-ro">${escapeHtml(sys.slice(0, 900))}${sys.length > 900 ? "\n…" : ""}</pre>
+        <div class="text-[11px] opacity-70 border-t border-base-content/10 pt-1">Click card for full content</div>
       </div>
     </div>
-    <div class="card bg-base-100 shadow card-click box-ro tile-rules" data-path="verbs">
-      <div class="card-body p-4">
-        <div class="flex justify-between"><h3 class="font-semibold text-sm txt-ro">Verbs / tools (in file)</h3>
-        <span class="badge border-2 border-red-500 text-red-300 bg-red-950/40 badge-sm">${verbs.length} · ${formatBytes(jsonBytes(verbs))}</span></div>
-        <p class="text-xs opacity-80">Why: allowed Zeus API surface. Click to inspect.</p>
+    <div class="card bg-base-100 shadow card-click box-ro tile-rules" data-path="verbs" title="Click to open verbs list">
+      <div class="card-body p-4 gap-2">
+        <div class="flex flex-wrap justify-between gap-2 items-start">
+          <h3 class="font-semibold text-sm txt-ro">Verbs / tools (in file)</h3>
+          <div class="flex flex-wrap gap-1 items-center">
+            <span class="badge border-2 border-red-500 text-red-300 bg-red-950/40 badge-sm">${verbs.length} · ${formatBytes(jsonBytes(verbs))}</span>
+            ${clickHintHtml("Open")}
+          </div>
+        </div>
+        <p class="text-xs opacity-80">Why: allowed Zeus API surface.</p>
         <ul class="text-xs max-h-36 overflow-auto space-y-0.5">${verbs
           .map((v) => {
             const fn = v.function || v;
             return `<li class="txt-ro"><code>${escapeHtml(fn.name)}</code> <span class="opacity-60">${jsonBytes(v)} B</span></li>`;
           })
           .join("")}</ul>
+        <div class="text-[11px] opacity-70 border-t border-base-content/10 pt-1">Click card for full content</div>
       </div>
     </div>
     ${INJECT_ESTIMATES.map(
-      (x) => `<div class="card bg-base-100 shadow card-click box-wire tile-inj" data-path="inject:${escapeHtml(x.name)}">
+      (x) => `<div class="card bg-base-100 shadow card-click box-wire tile-inj" data-path="inject:${escapeHtml(x.name)}" title="Click for inject details">
       <div class="card-body p-4 gap-1">
-        <div class="flex justify-between gap-2">
+        <div class="flex flex-wrap justify-between gap-2 items-start">
           <h3 class="font-semibold text-sm txt-inj">${escapeHtml(x.name)}</h3>
-          <span class="badge border-2 border-blue-500 text-blue-300 bg-blue-950/40 badge-sm">${formatBytes(x.bytes)} · ${formatTokens(x.bytes)}</span>
+          <div class="flex flex-wrap gap-1 items-center">
+            <span class="badge border-2 border-blue-500 text-blue-300 bg-blue-950/40 badge-sm">${formatBytes(x.bytes)} · ${formatTokens(x.bytes)}</span>
+            ${clickHintHtml("Open")}
+          </div>
         </div>
         <p class="text-xs"><span class="font-semibold opacity-70">Why inject:</span> ${escapeHtml(x.note)}</p>
-        <p class="text-[11px] opacity-60">BLUE — not in this JSON · click for details</p>
+        <div class="flex flex-wrap justify-between gap-2 text-[11px] opacity-70 border-t border-base-content/10 pt-1 mt-1">
+          <span>BLUE — not in this JSON</span>
+          <span>Click card for details</span>
+        </div>
       </div></div>`
     ).join("")}`;
-  document.querySelectorAll("#wire-grid .card-click").forEach((el) => {
-    el.addEventListener("click", () => openPath(el.getAttribute("data-path")));
-  });
+  wireCardClick(document.getElementById("wire-grid"), (el) => openPath(el.getAttribute("data-path")));
 }
 
 function renderEvidence(doc) {

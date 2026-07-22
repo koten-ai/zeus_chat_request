@@ -618,6 +618,38 @@
     #section-grid .box-ed::before { background: var(--c-edit); }
     #section-grid .box-meta::before { background: var(--c-meta); }
     #section-grid .box-miss::before { background: var(--c-miss); }
+
+    /* Card tile filters (legend chips) */
+    .tile-filter-bar .tile-filter {
+      cursor: pointer;
+      user-select: none;
+      transition: transform .08s ease, filter .08s ease, opacity .12s ease, box-shadow .12s ease;
+      opacity: 0.42;
+      filter: grayscale(0.25);
+      border: none;
+    }
+    .tile-filter-bar .tile-filter:hover {
+      opacity: 0.85;
+      filter: none;
+      transform: translateY(-1px);
+    }
+    .tile-filter-bar .tile-filter.is-on {
+      opacity: 1;
+      filter: none;
+      box-shadow: 0 0 0 2px color-mix(in oklab, oklch(var(--bc)) 35%, transparent);
+      font-weight: 700;
+    }
+    [data-theme="light"] .tile-filter-bar .tile-filter {
+      opacity: 0.55;
+    }
+    [data-theme="light"] .tile-filter-bar .tile-filter.is-on {
+      opacity: 1;
+    }
+    .tile-filter-hint { font-size: 11px; }
+    [data-tile].is-filter-hidden { display: none !important; }
+    .wire-zone.is-filter-hidden { display: none !important; }
+    .chapter.is-filter-empty { opacity: 0.55; }
+
     .site-search {
       min-width: 10rem;
       max-width: 18rem;
@@ -807,16 +839,24 @@
   </div>
 
   <main class="max-w-7xl mx-auto p-4 space-y-4">
-    <!-- Shared color legend (matches tree tiles + cards) -->
-    <div class="alert bg-base-100 shadow-sm text-sm py-3">
-      <div class="flex flex-wrap gap-2 items-center w-full">
-        <span class="font-semibold mr-1">Same colors everywhere:</span>
-        <span class="badge chip-ro">RED · Don't change (Rules)</span>
-        <span class="badge chip-ed">GREEN · You can change (guidance)</span>
-        <span class="badge chip-inj">BLUE · Injected by Zeus / client</span>
-        <span class="badge chip-meta">PURPLE · Meta / stamp</span>
-        <span class="badge chip-miss">YELLOW · Missing on this file</span>
-        <span class="ml-auto text-xs text-muted" id="manifest-line">Loading…</span>
+    <!-- Color legend + Cards tile filters (click to show/hide kinds) -->
+    <div class="alert bg-base-100 shadow-sm text-sm py-3 tile-filter-bar" id="tile-filter-bar">
+      <div class="flex flex-col gap-2 w-full">
+        <div class="flex flex-wrap gap-2 items-center w-full">
+          <span class="font-semibold mr-1 shrink-0" id="legend-label">Filter tiles:</span>
+          <button type="button" class="badge badge-ghost tile-filter tile-filter-all is-on" data-tile-filter="all" title="Show all tile kinds">All</button>
+          <button type="button" class="badge chip-ro tile-filter" data-tile-filter="rules" title="Rules / don't change (RED)">Rules</button>
+          <button type="button" class="badge chip-ro tile-filter" data-tile-filter="verbs" title="Verbs / tools only">Verbs</button>
+          <button type="button" class="badge chip-ed tile-filter" data-tile-filter="guidance" title="Editable guidance (GREEN)">Guidance</button>
+          <button type="button" class="badge chip-inj tile-filter" data-tile-filter="inject" title="Runtime injects (BLUE)">Inject</button>
+          <button type="button" class="badge chip-meta tile-filter" data-tile-filter="meta" title="Meta / stamp (PURPLE)">Meta</button>
+          <button type="button" class="badge chip-miss tile-filter" data-tile-filter="miss" title="Missing on this min file (YELLOW)">Missing</button>
+          <span class="ml-auto text-xs text-muted" id="manifest-line">Loading…</span>
+        </div>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 items-center text-[11px] text-muted tile-filter-hint">
+          <span id="tile-filter-status">Showing all tiles · click a badge to filter (multi-select)</span>
+          <span class="hidden sm:inline opacity-80">Same colors on Size map / JSON · RED Rules · GREEN Guidance · BLUE Inject · PURPLE Meta · YELLOW Missing</span>
+        </div>
       </div>
     </div>
 
@@ -2331,6 +2371,8 @@ const MODE_BLURBS = {
 let state = {
   view: "boxes",
   jsonTab: "catalog", // catalog | output
+  /** Active Cards filters: empty / has "all" = show everything. Else Set of rules|verbs|guidance|inject|meta|miss */
+  tileFilters: new Set(["all"]),
   manifest: null,
   mode: null,
   catalog: null,
@@ -2658,6 +2700,91 @@ function wireCardClick(root, handler) {
   });
 }
 
+function tileAttrs(kind, tags) {
+  const k = kind || "meta";
+  const t = (tags || []).filter(Boolean).join(" ");
+  return `data-tile data-tile-kind="${escapeHtml(k)}" data-tile-tags="${escapeHtml(t)}"`;
+}
+
+function applyCardFilters() {
+  const filters = state.tileFilters || new Set(["all"]);
+  const showAll = !filters.size || filters.has("all");
+  let shown = 0;
+  let total = 0;
+
+  document.querySelectorAll("[data-tile]").forEach((el) => {
+    total++;
+    const kind = el.getAttribute("data-tile-kind") || "";
+    const tags = (el.getAttribute("data-tile-tags") || "").split(/\s+/).filter(Boolean);
+    let ok = showAll;
+    if (!showAll) {
+      ok = false;
+      if (filters.has(kind)) ok = true;
+      if (filters.has("verbs") && (tags.includes("verbs") || kind === "verbs")) ok = true;
+      // "rules" also matches verb tiles that are rules-class
+      if (filters.has("rules") && kind === "rules") ok = true;
+      if (filters.has("miss") && kind === "miss") ok = true;
+    }
+    el.classList.toggle("is-filter-hidden", !ok);
+    if (ok) shown++;
+  });
+
+  // Hide empty wire zones
+  document.querySelectorAll(".wire-zone").forEach((zone) => {
+    const any = [...zone.querySelectorAll("[data-tile]")].some((t) => !t.classList.contains("is-filter-hidden"));
+    zone.classList.toggle("is-filter-hidden", !any && !showAll);
+  });
+
+  // Dim chapters with no visible tiles
+  document.querySelectorAll("#view-boxes .chapter").forEach((ch) => {
+    const tiles = ch.querySelectorAll("[data-tile]");
+    if (!tiles.length) {
+      ch.classList.remove("is-filter-empty");
+      return;
+    }
+    const any = [...tiles].some((t) => !t.classList.contains("is-filter-hidden"));
+    ch.classList.toggle("is-filter-empty", !any);
+  });
+
+  // UI state on badges
+  document.querySelectorAll("[data-tile-filter]").forEach((btn) => {
+    const id = btn.getAttribute("data-tile-filter");
+    const on = showAll ? id === "all" : filters.has(id);
+    btn.classList.toggle("is-on", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+
+  const status = document.getElementById("tile-filter-status");
+  if (status) {
+    if (showAll) status.textContent = `Showing all tiles (${total}) · click a badge to filter`;
+    else {
+      const names = [...filters].join(", ");
+      status.textContent = `Filter: ${names} · ${shown} / ${total} tiles · click again to toggle · All to reset`;
+    }
+  }
+}
+
+function toggleTileFilter(id) {
+  if (!state.tileFilters) state.tileFilters = new Set(["all"]);
+  const f = state.tileFilters;
+  if (id === "all") {
+    state.tileFilters = new Set(["all"]);
+  } else {
+    f.delete("all");
+    if (f.has(id)) f.delete(id);
+    else f.add(id);
+    if (!f.size) state.tileFilters = new Set(["all"]);
+  }
+  applyCardFilters();
+}
+
+function initTileFilters() {
+  document.querySelectorAll("[data-tile-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => toggleTileFilter(btn.getAttribute("data-tile-filter")));
+  });
+  applyCardFilters();
+}
+
 function renderSummary(doc, mode, entry) {
   const disk = jsonBytes(doc);
   const ret = findReturnVerb(doc);
@@ -2665,12 +2792,20 @@ function renderSummary(doc, mode, entry) {
   const ok = /query_decomposition/i.test(systemContent(doc)) && req.has("query_decomposition");
   const blurb = MODE_BLURBS[mode] || "Mode profile for tools + behavior.";
   document.getElementById("summary-row").innerHTML = [
-    { t: "Mode", b: mode, s: blurb, c: "box-meta tile-meta", path: null },
-    { t: "On-disk size", b: `${formatBytes(disk)} · ${formatTokens(disk)}`, s: "Everything in this baseline file.", c: "box-ro tile-rules", path: null },
-    { t: "Standard terminate schema", b: ok ? "OK" : "Gaps", s: "summary + query_decomposition + decomposition + confidence", c: ok ? "box-ed tile-edit" : "box-miss tile-miss", path: "verbs.return" },
+    { t: "Mode", b: mode, s: blurb, c: "box-meta tile-meta", path: null, kind: "meta", tags: ["summary"] },
+    { t: "On-disk size", b: `${formatBytes(disk)} · ${formatTokens(disk)}`, s: "Everything in this baseline file.", c: "box-ro tile-rules", path: null, kind: "rules", tags: ["summary", "size"] },
+    {
+      t: "Standard terminate schema",
+      b: ok ? "OK" : "Gaps",
+      s: "summary + query_decomposition + decomposition + confidence",
+      c: ok ? "box-ed tile-edit" : "box-miss tile-miss",
+      path: "verbs.return",
+      kind: ok ? "guidance" : "miss",
+      tags: ["summary", "verbs", "output", "return"],
+    },
   ]
     .map(
-      (x) => `<div class="card bg-base-100 shadow section-card ${x.c} ${x.path ? "card-click" : "card-static"}" ${x.path ? `data-path="${x.path}"` : ""}>
+      (x) => `<div class="card bg-base-100 shadow section-card ${x.c} ${x.path ? "card-click" : "card-static"}" ${tileAttrs(x.kind, x.tags)} ${x.path ? `data-path="${x.path}"` : ""}>
       <div class="card-body p-4 gap-1">
         <div class="flex items-start justify-between gap-2">
           <div class="text-xs uppercase opacity-60">${escapeHtml(x.t)}</div>
@@ -2682,6 +2817,7 @@ function renderSummary(doc, mode, entry) {
     )
     .join("");
   wireCardClick(document.getElementById("summary-row"), (el) => openPath(el.getAttribute("data-path")));
+  applyCardFilters();
 }
 
 function renderSections(doc) {
@@ -2695,7 +2831,11 @@ function renderSections(doc) {
       !present && !s.minTypical ? "Expected missing on min — use full profile or Hub injects." : !present && s.minTypical ? "Unexpected missing." : "";
     const keyColor =
       s.edit === "rules" ? "txt-ro" : s.edit === "guidance" ? "txt-ed" : "txt-meta";
-    return `<div class="card bg-base-100 shadow section-card card-click ${boxClass(s.edit, missing)}" data-path="${escapeHtml(s.path)}" title="Click to open ${escapeHtml(s.path)}">
+    const kind = missing ? "miss" : s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta";
+    const tags = [s.key];
+    if (s.key === "verbs" || s.path === "verbs") tags.push("verbs", "tools");
+    if (s.key === "messages") tags.push("prompt", "messages");
+    return `<div class="card bg-base-100 shadow section-card card-click ${boxClass(s.edit, missing)}" ${tileAttrs(kind, tags)} data-path="${escapeHtml(s.path)}" title="Click to open ${escapeHtml(s.path)}">
       <div class="card-body p-4 gap-2">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0">
@@ -2723,13 +2863,14 @@ function renderSections(doc) {
     const present = hasKey(doc, s.key);
     openPath(path, present ? jsonBytes(doc[s.key]) : 0, present ? s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta" : "miss");
   });
+  applyCardFilters();
 }
 
 function renderWire(doc) {
   const sys = systemContent(doc);
   const verbs = doc.verbs || [];
   const inFile = `
-    <div class="card bg-base-100 shadow card-click box-ro tile-rules" data-path="messages[0]" title="Click to open system prompt">
+    <div class="card bg-base-100 shadow card-click box-ro tile-rules" ${tileAttrs("rules", ["prompt", "messages", "system"])} data-path="messages[0]" title="Click to open system prompt">
       <div class="card-body p-3 gap-2">
         <div class="flex flex-wrap justify-between gap-2 items-start">
           <h3 class="font-semibold text-sm txt-ro">System prompt (in file)</h3>
@@ -2742,7 +2883,7 @@ function renderWire(doc) {
         <pre class="bg-base-200 p-2 rounded text-[11px] max-h-36 overflow-auto txt-ro">${escapeHtml(sys.slice(0, 900))}${sys.length > 900 ? "\n…" : ""}</pre>
       </div>
     </div>
-    <div class="card bg-base-100 shadow card-click box-ro tile-rules mt-2" data-path="verbs" title="Click to open verbs list">
+    <div class="card bg-base-100 shadow card-click box-ro tile-rules mt-2" ${tileAttrs("rules", ["verbs", "tools"])} data-path="verbs" title="Click to open verbs list">
       <div class="card-body p-3 gap-2">
         <div class="flex flex-wrap justify-between gap-2 items-start">
           <h3 class="font-semibold text-sm txt-ro">Verbs / tools (in file)</h3>
@@ -2762,7 +2903,7 @@ function renderWire(doc) {
     </div>`;
 
   const injected = INJECT_ESTIMATES.map(
-    (x) => `<div class="card bg-base-100 shadow card-click box-wire tile-inj mb-2 last:mb-0" data-path="inject:${escapeHtml(x.name)}" title="Click for inject details">
+    (x) => `<div class="card bg-base-100 shadow card-click box-wire tile-inj mb-2 last:mb-0" ${tileAttrs("inject", ["inject", "blue"])} data-path="inject:${escapeHtml(x.name)}" title="Click for inject details">
       <div class="card-body p-3 gap-1">
         <div class="flex flex-wrap justify-between gap-2 items-start">
           <h3 class="font-semibold text-sm txt-inj">${escapeHtml(x.name)}</h3>
@@ -2792,6 +2933,7 @@ function renderWire(doc) {
       ${injected}
     </div>`;
   wireCardClick(document.getElementById("wire-grid"), (el) => openPath(el.getAttribute("data-path")));
+  applyCardFilters();
 }
 
 function renderEvidence(doc) {
@@ -3751,6 +3893,18 @@ function setView(view) {
   // TOC only relevant on Cards page
   const tocWrap = document.querySelector(".cards-toc-wrap");
   if (tocWrap) tocWrap.classList.toggle("opacity-40", view !== "boxes");
+  // Tile filter chips primarily for Cards (still visible as color legend elsewhere)
+  const filterBar = document.getElementById("tile-filter-bar");
+  const legendLabel = document.getElementById("legend-label");
+  if (legendLabel) legendLabel.textContent = view === "boxes" ? "Filter tiles:" : "Same colors everywhere:";
+  if (filterBar) {
+    filterBar.classList.toggle("opacity-95", view === "boxes");
+    filterBar.title =
+      view === "boxes"
+        ? "Click badges to filter Cards tiles (multi-select)"
+        : "Color legend · open Cards to filter tiles by kind";
+  }
+  if (view === "boxes") applyCardFilters();
   if (view === "size" && state.catalog) {
     setTimeout(() => {
       renderSizeMaps(state.catalog);
@@ -3903,6 +4057,7 @@ window.addEventListener("resize", () => {
   try {
     initThemeController();
     initSiteSearch();
+    initTileFilters();
     initCardsToc();
     const man = await loadManifest();
     state.manifest = man;

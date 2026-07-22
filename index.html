@@ -633,10 +633,10 @@
             id="site-search"
             type="search"
             class="grow min-w-0"
-            placeholder="Search whole page: help, prompt, verbs…"
+            placeholder="/help schema · /output *compos · or free text…"
             autocomplete="off"
             spellcheck="false"
-            aria-label="Search whole page: help, glossary, prompt, catalog, tools"
+            aria-label="Search whole page. Use /help /output /prompt scopes and * wildcards"
             aria-controls="search-panel"
             aria-expanded="false"
           />
@@ -951,7 +951,9 @@
           <div class="help-block" data-help-block id="help-ui" data-search="cards toc chapters size json content panel theme search expand collapse open">
             <h2>How to use this UI</h2>
             <ul>
-              <li><b>Search (top bar)</b> — whole page: <b>Help</b>, <b>Glossary</b>, system <b>Prompt</b> text, <b>Catalog</b> keys, <b>Tools/verbs</b>, BLUE <b>Inject</b> estimates, <b>Output scheme</b>. Results group by type with snippets; click a hit to jump. Press <kbd class="kbd kbd-xs">/</kbd> to focus, <kbd class="kbd kbd-xs">Esc</kbd> clears.</li>
+              <li><b>Search (top bar)</b> — whole page: Help, Glossary, Prompt, Catalog, Tools, Inject, Output.
+                Scope with a prefix: <code class="text-xs">/help mini-schema</code>, <code class="text-xs">/output *ecomposition</code>, <code class="text-xs">/prompt pipeline</code>.
+                Use <code class="text-xs">*</code> as a wildcard. Free text still searches everything. Press <kbd class="kbd kbd-xs">/</kbd> to focus, <kbd class="kbd kbd-xs">Esc</kbd> clears.</li>
               <li><b>Theme</b> — sun/moon toggle locks light/dark; <b>Auto</b> follows the OS (default).</li>
               <li><b>Cards</b> — four chapters with a sticky left <b>On this page</b> TOC:
                 <ol>
@@ -1203,7 +1205,7 @@ const GLOSSARY = [
   { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence)." },
   { term: "Rules (hashed)", kind: "rules", def: "What production promised: messages, verbs, masq, etc. Change ⇒ new hash." },
   { term: "ScopeConfig", kind: "inject", def: "Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production." },
-  { term: "Search (this UI)", kind: "meta", def: "Top-bar search across the whole page: Help, Glossary, system Prompt text, catalog keys, verbs/tools, injects. Results group by type; click a hit to jump." },
+  { term: "Search (this UI)", kind: "meta", def: "Top-bar search across the whole page. Scope with /help /glossary /prompt /catalog /tools /inject /output (e.g. /help mini-schema). Use * as wildcard (e.g. /output *ecomposition). Yellow mark shows matches; click a hit to jump." },
   { term: "Size map", kind: "meta", def: "Treemap where area ∝ bytes (~tokens ≈ bytes/4). Click tiles to open the content panel; toggle BLUE inject estimates." },
   { term: "Standard output scheme", kind: "rules", def: "Layer A model terminate fields + Layer B server report. Same A across modes/deploys so every call is machine-parseable." },
   { term: "System prompt (messages)", kind: "rules", def: "Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules." },
@@ -1249,29 +1251,127 @@ function renderGlossary() {
 
 /** Search result buckets — order in the dropdown */
 const SEARCH_GROUPS = [
-  { id: "help", label: "Help", chip: "chip-meta" },
-  { id: "glossary", label: "Glossary", chip: "chip-meta" },
-  { id: "prompt", label: "Prompt", chip: "chip-ro" },
-  { id: "catalog", label: "Catalog", chip: "chip-ro" },
-  { id: "tools", label: "Tools / verbs", chip: "chip-ro" },
-  { id: "inject", label: "Inject (BLUE)", chip: "chip-inj" },
-  { id: "output", label: "Output scheme", chip: "chip-ed" },
+  { id: "help", label: "Help", chip: "chip-meta", slash: "/help" },
+  { id: "glossary", label: "Glossary", chip: "chip-meta", slash: "/glossary" },
+  { id: "prompt", label: "Prompt", chip: "chip-ro", slash: "/prompt" },
+  { id: "catalog", label: "Catalog", chip: "chip-ro", slash: "/catalog" },
+  { id: "tools", label: "Tools / verbs", chip: "chip-ro", slash: "/tools" },
+  { id: "inject", label: "Inject (BLUE)", chip: "chip-inj", slash: "/inject" },
+  { id: "output", label: "Output scheme", chip: "chip-ed", slash: "/output" },
 ];
+
+/** /help /output /prompt … → group id */
+const SEARCH_SCOPE_ALIASES = {
+  help: "help",
+  h: "help",
+  faq: "help",
+  glossary: "glossary",
+  gloss: "glossary",
+  g: "glossary",
+  term: "glossary",
+  terms: "glossary",
+  prompt: "prompt",
+  p: "prompt",
+  system: "prompt",
+  messages: "prompt",
+  msg: "prompt",
+  catalog: "catalog",
+  cat: "catalog",
+  c: "catalog",
+  keys: "catalog",
+  structure: "catalog",
+  tools: "tools",
+  tool: "tools",
+  t: "tools",
+  verbs: "tools",
+  verb: "tools",
+  inject: "inject",
+  inj: "inject",
+  i: "inject",
+  blue: "inject",
+  wire: "inject",
+  output: "output",
+  out: "output",
+  o: "output",
+  return: "output",
+  terminate: "output",
+  scheme: "output",
+};
 
 function escapeRegExp(s) {
   return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** Escape HTML, then wrap every case-insensitive match of q in <mark class="search-hl"> */
-function highlightQuery(plain, q) {
-  const text = String(plain || "");
-  if (!q) return escapeHtml(text);
+/**
+ * Parse "/help mini-schema" or "/output *ecomposition" or free text.
+ * Multiple scopes: "/help /glossary stamp"
+ */
+function parseSearchQuery(raw) {
+  let s = String(raw || "").trim();
+  const scopes = new Set();
+  while (s.startsWith("/")) {
+    const m = s.match(/^\/([a-zA-Z]+)(?:\s+|$)/);
+    if (!m) break;
+    const alias = m[1].toLowerCase();
+    const id = SEARCH_SCOPE_ALIASES[alias];
+    if (!id) break; // unknown /token → leave in free-text pattern
+    scopes.add(id);
+    s = s.slice(m[0].length).trim();
+  }
+  return {
+    scopes: scopes.size ? scopes : null, // null = all groups
+    pattern: s,
+    raw: String(raw || "").trim(),
+  };
+}
+
+/** Token with * → regex. Multi-word = AND. */
+function tokenToRegExp(token, flags) {
+  const parts = String(token).split("*").map(escapeRegExp);
+  return new RegExp(parts.join(".*?"), flags || "i");
+}
+
+function textMatchesPattern(text, pattern) {
+  if (!pattern) return true;
+  const hay = String(text || "");
+  const tokens = pattern.trim().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return true;
+  return tokens.every((tok) => {
+    try {
+      if (tok.includes("*")) return tokenToRegExp(tok, "i").test(hay);
+      return hay.toLowerCase().includes(tok.toLowerCase());
+    } catch (_) {
+      return hay.toLowerCase().includes(tok.toLowerCase());
+    }
+  });
+}
+
+/** Combined highlight regex for all tokens (literals + wildcards). */
+function patternHighlightRegExp(pattern) {
+  if (!pattern || !String(pattern).trim()) return null;
+  const tokens = String(pattern).trim().split(/\s+/).filter(Boolean);
+  if (!tokens.length) return null;
   try {
-    const re = new RegExp("(" + escapeRegExp(q) + ")", "gi");
+    const alts = tokens.map((tok) => {
+      if (tok.includes("*")) return tok.split("*").map(escapeRegExp).join(".*?");
+      return escapeRegExp(tok);
+    });
+    return new RegExp("(" + alts.join("|") + ")", "gi");
+  } catch (_) {
+    return null;
+  }
+}
+
+/** Escape HTML, then wrap pattern matches in yellow <mark class="search-hl"> */
+function highlightQuery(plain, pattern) {
+  const text = String(plain || "");
+  if (!pattern || !String(pattern).trim()) return escapeHtml(text);
+  const re = patternHighlightRegExp(pattern);
+  if (!re) return escapeHtml(text);
+  try {
     const parts = text.split(re);
     return parts
       .map((part, i) => {
-        // split with capturing group: odd indices are matches when re has one group
         if (i % 2 === 1) return `<mark class="search-hl">${escapeHtml(part)}</mark>`;
         return escapeHtml(part);
       })
@@ -1281,16 +1381,32 @@ function highlightQuery(plain, q) {
   }
 }
 
-function snippetAround(text, q, radius) {
+function snippetAround(text, pattern, radius) {
   const t = String(text || "").replace(/\s+/g, " ").trim();
   if (!t) return "";
-  const qq = (q || "").toLowerCase();
-  const lower = t.toLowerCase();
-  let i = qq ? lower.indexOf(qq) : 0;
-  if (i < 0) i = 0;
   const r = radius || 70;
+  let i = 0;
+  let matchLen = 0;
+  if (pattern && String(pattern).trim()) {
+    const re = patternHighlightRegExp(pattern);
+    if (re) {
+      re.lastIndex = 0;
+      const m = re.exec(t);
+      if (m) {
+        i = m.index;
+        matchLen = m[0].length;
+      }
+    } else {
+      const qq = pattern.toLowerCase();
+      const j = t.toLowerCase().indexOf(qq);
+      if (j >= 0) {
+        i = j;
+        matchLen = pattern.length;
+      }
+    }
+  }
   const start = Math.max(0, i - r);
-  const end = Math.min(t.length, i + (qq ? qq.length : 0) + r);
+  const end = Math.min(t.length, i + matchLen + r);
   let snip = t.slice(start, end);
   if (start > 0) snip = "…" + snip;
   if (end < t.length) snip = snip + "…";
@@ -1298,7 +1414,7 @@ function snippetAround(text, q, radius) {
 }
 
 /** Walk text nodes and wrap matches; store original once for restore */
-function applyDomHighlight(root, q) {
+function applyDomHighlight(root, pattern) {
   if (!root) return;
   // restore previous
   if (root.dataset.hlOrig != null) {
@@ -1306,16 +1422,12 @@ function applyDomHighlight(root, q) {
   } else {
     root.dataset.hlOrig = root.innerHTML;
   }
-  if (!q) return;
+  if (!pattern || !String(pattern).trim()) return;
+  const re = patternHighlightRegExp(pattern);
+  if (!re) return;
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
   const nodes = [];
   while (walker.nextNode()) nodes.push(walker.currentNode);
-  let re;
-  try {
-    re = new RegExp(escapeRegExp(q), "gi");
-  } catch (_) {
-    return;
-  }
   nodes.forEach((node) => {
     const val = node.nodeValue;
     if (!val) return;
@@ -1486,36 +1598,47 @@ function buildSearchIndex(doc) {
   return items;
 }
 
-function filterHelpInPlace(q) {
+function filterHelpInPlace(pattern, scopes) {
   const empty = document.getElementById("glossary-empty");
+  const wantGloss = !scopes || scopes.has("glossary");
+  const wantHelp = !scopes || scopes.has("help");
+  const active = !!(pattern && String(pattern).trim());
   let gHits = 0;
+
   document.querySelectorAll("[data-glossary]").forEach((el) => {
-    // highlight against original search text (pre-highlight)
     if (el.dataset.hlOrig != null) el.innerHTML = el.dataset.hlOrig;
-    const hay = (el.getAttribute("data-search") || el.textContent || "").toLowerCase();
-    const hit = !q || hay.includes(q);
-    el.classList.toggle("is-hidden", !hit);
-    el.classList.toggle("is-hit", !!q && hit);
-    if (hit && q) applyDomHighlight(el, q);
-    else if (!q && el.dataset.hlOrig != null) {
+    const hay = el.getAttribute("data-search") || el.textContent || "";
+    const inScope = wantGloss;
+    const hit = inScope && (!active || textMatchesPattern(hay, pattern));
+    el.classList.toggle("is-hidden", !hit && (active || (scopes && !wantGloss)));
+    if (!active && !scopes) el.classList.remove("is-hidden");
+    if (!wantGloss && scopes) el.classList.add("is-hidden");
+    el.classList.toggle("is-hit", !!(active && hit));
+    if (hit && active) applyDomHighlight(el, pattern);
+    else if (!active && el.dataset.hlOrig != null) {
       el.innerHTML = el.dataset.hlOrig;
       delete el.dataset.hlOrig;
     }
-    if (hit) gHits++;
+    if (hit || (!active && wantGloss && !scopes)) gHits++;
   });
+
   document.querySelectorAll("[data-help-block]").forEach((el) => {
     if (el.dataset.hlOrig != null) el.innerHTML = el.dataset.hlOrig;
-    const hay = ((el.getAttribute("data-search") || "") + " " + (el.textContent || "")).toLowerCase();
-    const hit = !q || hay.includes(q);
-    el.classList.toggle("is-hidden", !hit);
-    el.classList.toggle("is-hit", !!q && hit);
-    if (hit && q) applyDomHighlight(el, q);
-    else if (!q && el.dataset.hlOrig != null) {
+    const hay = (el.getAttribute("data-search") || "") + " " + (el.textContent || "");
+    const inScope = wantHelp;
+    const hit = inScope && (!active || textMatchesPattern(hay, pattern));
+    if (!wantHelp && scopes) el.classList.add("is-hidden");
+    else if (!active && !scopes) el.classList.remove("is-hidden");
+    else el.classList.toggle("is-hidden", !hit);
+    el.classList.toggle("is-hit", !!(active && hit));
+    if (hit && active) applyDomHighlight(el, pattern);
+    else if (!active && el.dataset.hlOrig != null) {
       el.innerHTML = el.dataset.hlOrig;
       delete el.dataset.hlOrig;
     }
   });
-  if (empty) empty.classList.toggle("hidden", !q || gHits > 0);
+
+  if (empty) empty.classList.toggle("hidden", !active || gHits > 0 || (scopes && !wantGloss));
 }
 
 function hideSearchPanel() {
@@ -1577,24 +1700,79 @@ function activateSearchHit(hit) {
   }
 }
 
+function searchScopeHintHtml() {
+  return `<div class="search-empty space-y-2">
+    <div class="font-semibold text-xs">Scope with a prefix, then type words or wildcards:</div>
+    <div class="flex flex-wrap gap-1">
+      ${SEARCH_GROUPS.map(
+        (g) =>
+          `<button type="button" class="btn btn-xs btn-ghost border border-base-content/15 search-scope-chip" data-scope-insert="${escapeHtml(
+            g.slash + " "
+          )}">${escapeHtml(g.slash)}</button>`
+      ).join("")}
+    </div>
+    <div class="text-[11px] opacity-80">
+      Examples: <code class="text-[11px]">/help mini-schema</code>
+      · <code class="text-[11px]">/output *ecomposition</code>
+      · <code class="text-[11px]">/prompt pipeline</code>
+      · <code class="text-[11px]">/tools find</code>
+      <br/>Free text without <code class="text-[11px]">/</code> still searches <b>everything</b>.
+      <code class="text-[11px]">*</code> matches any characters.
+    </div>
+  </div>`;
+}
+
 function applySiteSearch(raw) {
-  const q = (raw || "").trim().toLowerCase();
+  const parsed = parseSearchQuery(raw);
+  const { scopes, pattern } = parsed;
   const meta = document.getElementById("search-meta");
   const hint = document.getElementById("help-search-hint");
   const panel = document.getElementById("search-panel");
   const input = document.getElementById("site-search");
+  const hasInput = !!(raw && String(raw).trim());
+  const hasPattern = !!(pattern && pattern.trim());
+  const hasScopeOnly = hasInput && scopes && !hasPattern;
 
-  filterHelpInPlace(q);
+  // In-page help/glossary filter when those groups are relevant
+  if (!hasInput) {
+    filterHelpInPlace("", null);
+  } else if (!scopes || scopes.has("help") || scopes.has("glossary")) {
+    filterHelpInPlace(pattern, scopes);
+  } else {
+    filterHelpInPlace("", null); // clear highlights when scoped away from help
+  }
 
-  if (!q) {
+  if (!hasInput) {
     if (meta) meta.textContent = "";
     if (hint) hint.textContent = "";
     hideSearchPanel();
     return;
   }
 
+  // Typing only "/" or incomplete — show scope cheat-sheet
+  if (hasInput && !scopes && raw.trim() === "/") {
+    if (panel) {
+      panel.innerHTML = searchScopeHintHtml();
+      panel.querySelectorAll("[data-scope-insert]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (!input) return;
+          input.value = btn.getAttribute("data-scope-insert") || "";
+          input.focus();
+          applySiteSearch(input.value);
+        });
+      });
+      showSearchPanel();
+    }
+    if (meta) meta.textContent = "pick a scope";
+    return;
+  }
+
   const index = buildSearchIndex(state.catalog);
-  const hits = index.filter((it) => it.body.toLowerCase().includes(q) || (it.title || "").toLowerCase().includes(q));
+  const hits = index.filter((it) => {
+    if (scopes && !scopes.has(it.group)) return false;
+    const blob = (it.title || "") + "\n" + (it.path || "") + "\n" + (it.body || "");
+    return textMatchesPattern(blob, pattern);
+  });
 
   // Group
   const byGroup = {};
@@ -1608,42 +1786,67 @@ function applySiteSearch(raw) {
 
   const counts = SEARCH_GROUPS.map((g) => ({ g, n: (byGroup[g.id] || []).length })).filter((x) => x.n > 0);
   const total = hits.length;
+  const scopeLabel = scopes ? [...scopes].map((id) => "/" + id).join(" ") + " " : "";
   const summary = counts.map((x) => `${x.n} ${x.g.label}`).join(" · ") || "0 hits";
-  if (meta) meta.textContent = total + " · " + summary;
-  if (hint) hint.textContent = total ? `Whole-page search: ${summary}.` : `No matches for “${raw.trim()}”.`;
+  if (meta) meta.textContent = (hasScopeOnly ? "scope " : "") + total + " · " + summary;
+  if (hint) {
+    hint.textContent = total
+      ? `${scopeLabel}search: ${summary}${hasPattern ? ` · pattern “${pattern}”` : " · all in scope"}.`
+      : `No matches for “${raw.trim()}”.`;
+  }
 
   if (!panel) return;
   if (!total) {
-    panel.innerHTML = `<div class="search-empty">No matches for <b>${escapeHtml(raw.trim())}</b> in Help, Glossary, Prompt, Catalog, Tools, Injects, or Output scheme.</div>`;
+    panel.innerHTML = `<div class="search-empty">No matches for <b>${escapeHtml(raw.trim())}</b>.
+      Try another scope (${SEARCH_GROUPS.map((g) => g.slash).join(", ")}) or a looser pattern with <code>*</code>.</div>
+      ${searchScopeHintHtml()}`;
+    panel.querySelectorAll("[data-scope-insert]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!input) return;
+        input.value = btn.getAttribute("data-scope-insert") || "";
+        input.focus();
+        applySiteSearch(input.value);
+      });
+    });
     showSearchPanel();
     return;
   }
 
-  // Cap per group for UI
+  const hlPat = pattern; // yellow mark uses free-text / wildcard pattern (not the /scope)
   const MAX_PER = 8;
-  panel.innerHTML = SEARCH_GROUPS.map((g) => {
-    const list = byGroup[g.id] || [];
-    if (!list.length) return "";
-    const shown = list.slice(0, MAX_PER);
-    const more = list.length - shown.length;
-    const rows = shown
-      .map((hit, idx) => {
-        const snip = snippetAround(hit.body, q, 64);
-        return `<button type="button" class="search-hit" role="option" data-group="${g.id}" data-idx="${idx}" data-full-idx="${list.indexOf(hit)}">
-          <div class="search-hit-title">${highlightQuery(hit.title, q)}</div>
-          ${hit.path ? `<div class="search-hit-path">${highlightQuery(hit.path, q)}</div>` : ""}
-          <div class="search-hit-snip"><pre>${highlightQuery(snip, q)}</pre></div>
+  const scopeBar = scopes
+    ? `<div class="text-[10px] px-1 pb-1 opacity-70">Scoped to ${[...scopes]
+        .map((id) => {
+          const g = SEARCH_GROUPS.find((x) => x.id === id);
+          return g ? g.slash : "/" + id;
+        })
+        .join(" · ")}${hasPattern ? " · pattern " + escapeHtml(pattern) : " · listing all in scope"}</div>`
+    : "";
+
+  panel.innerHTML =
+    scopeBar +
+    SEARCH_GROUPS.map((g) => {
+      const list = byGroup[g.id] || [];
+      if (!list.length) return "";
+      const shown = list.slice(0, MAX_PER);
+      const more = list.length - shown.length;
+      const rows = shown
+        .map((hit, idx) => {
+          const snip = snippetAround(hit.body, hlPat, 64);
+          return `<button type="button" class="search-hit" role="option" data-group="${g.id}" data-idx="${idx}" data-full-idx="${list.indexOf(hit)}">
+          <div class="search-hit-title">${highlightQuery(hit.title, hlPat)}</div>
+          ${hit.path ? `<div class="search-hit-path">${highlightQuery(hit.path, hlPat)}</div>` : ""}
+          <div class="search-hit-snip"><pre>${highlightQuery(snip, hlPat)}</pre></div>
         </button>`;
-      })
-      .join("");
-    return `<div class="search-group" data-search-group="${g.id}">
-      <div class="search-group-title"><span class="badge ${g.chip}">${escapeHtml(g.label)}</span> ${list.length}</div>
+        })
+        .join("");
+      return `<div class="search-group" data-search-group="${g.id}">
+      <div class="search-group-title"><span class="badge ${g.chip}">${escapeHtml(g.slash || g.label)}</span> ${escapeHtml(g.label)} · ${list.length}</div>
       ${rows}
       ${more > 0 ? `<div class="text-[10px] opacity-60 px-2 pb-1">+${more} more — refine your query</div>` : ""}
     </div>`;
-  }).join("");
+    }).join("");
 
-  // Wire clicks — map button back to hit via group + filtered list order
   panel.querySelectorAll(".search-hit").forEach((btn) => {
     btn.addEventListener("click", () => {
       const gid = btn.getAttribute("data-group");
@@ -1653,7 +1856,6 @@ function applySiteSearch(raw) {
     });
   });
 
-  // stash for keyboard
   state._searchHits = hits;
   showSearchPanel();
 }
@@ -1672,6 +1874,21 @@ function initSiteSearch() {
   });
   input.addEventListener("focus", () => {
     if (input.value.trim()) applySiteSearch(input.value);
+    else {
+      // empty focus → show scope cheat-sheet
+      const panel = document.getElementById("search-panel");
+      if (panel) {
+        panel.innerHTML = searchScopeHintHtml();
+        panel.querySelectorAll("[data-scope-insert]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            input.value = btn.getAttribute("data-scope-insert") || "";
+            input.focus();
+            applySiteSearch(input.value);
+          });
+        });
+        showSearchPanel();
+      }
+    }
   });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {

@@ -222,8 +222,9 @@
       <p class="text-xs opacity-60 -mt-2">Red pieces ship in this file. Blue pieces are added when Zeus Client / Hub talks to the model. Cards with <b>Open →</b> open the content panel.</p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="wire-grid"></div>
 
-      <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">Standard output (every terminate call)</h2>
-      <div id="evidence-panel" class="card bg-base-100 shadow section-card"></div>
+      <h2 class="text-sm font-semibold uppercase tracking-wide opacity-70 mt-4">Output scheme (model terminate + server report)</h2>
+      <p class="text-xs opacity-60 -mt-2 max-w-4xl">Two layers: what the <b>LLM must emit</b> to finish a turn, and what <b>Zeus stores</b> for that turn (trace / hot-path). Structure below matches a real Hub chat report shape.</p>
+      <div id="evidence-panel" class="space-y-3"></div>
     </section>
 
     <!-- SIZE MAP -->
@@ -411,7 +412,11 @@
             <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">return / return_result</dt><dd class="opacity-90 mt-1">Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence).</dd></div>
             <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Rules (hashed)</dt><dd class="opacity-90 mt-1">What production promised: messages, verbs, masq, etc. Change ⇒ new hash.</dd></div>
             <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">ScopeConfig</dt><dd class="opacity-90 mt-1">Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Standard output schema</dt><dd class="opacity-90 mt-1">Same required terminate fields across modes/deploys so every call is machine-parseable.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">attribution / decision / report</dt><dd class="opacity-90 mt-1">Outer server store envelope for a chat turn: quality verdict, keep/sample rule, then the full <code>report</code> with metrics + detail + spans.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">report.detail.ai.calls</dt><dd class="opacity-90 mt-1">Ordered tool invocations with args + results. Where pipeline steps and terminate fields should land as structured JSON.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">report.spans</dt><dd class="opacity-90 mt-1">Timeline slices (dispatch, ai.round, pipeline step, fts, tool) with duration_ns for performance forensics.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Standard output scheme</dt><dd class="opacity-90 mt-1"><b>Layer A</b> model terminate fields (summary + query_decomposition + …). <b>Layer B</b> server report document. Same A across modes; B is ops telemetry.</dd></div>
+            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">turn_complete</dt><dd class="opacity-90 mt-1">Pipeline/return result flag: server can short-circuit without another LLM round when terminate fields were supplied with the tool call.</dd></div>
             <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">System prompt (<code>messages</code>)</dt><dd class="opacity-90 mt-1">Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules.</dd></div>
             <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Token budget</dt><dd class="opacity-90 mt-1">Context window is limited. RED system + RED verbs + BLUE injects + history all compete—Size map shows the fight.</dd></div>
             <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Tool result / multi-round</dt><dd class="opacity-90 mt-1">After each verb, Zeus returns facts into the conversation; the model may call more tools or terminate.</dd></div>
@@ -467,14 +472,16 @@
           </ol>
 
           <h3>What is “schema output standardization”?</h3>
-          <p>No matter which mode or which deployment, when the model <b>finishes a turn</b> it must emit the same structured envelope (at least):</p>
+          <p>Two layers (see Cards → <b>Output scheme</b>):</p>
+          <p><b>Layer A — model terminate</b> (same every mode/deploy). When the model <b>finishes a turn</b> it must emit:</p>
           <ul>
             <li><code>summary</code> — human answer facts</li>
             <li><code>query_decomposition</code> — business intent facets (intent + entity + …)</li>
             <li><code>decomposition</code> — data targets/predicates from MINI-SCHEMA</li>
             <li><code>confidence</code> — string <code>high|med|low</code> only</li>
           </ul>
-          <p>That way every call, every environment, can be logged, compared, and fed into hot-path analytics the same way. See the green “Standard output” panel on the Cards tab.</p>
+          <p>Those fields can sit on <code>return</code> or on the top level of a terminating <code>pipeline</code> (1-call short-circuit).</p>
+          <p><b>Layer B — server report</b> is what Zeus stores for the turn: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, <code>detail.ai.calls</code>, storage FTS/N1QL, <code>spans</code>) + <code>stored_at</code>. Real Hub traces often have B filled while A is still WIP (summary only, empty tokens, missing query_decomposition) — the Cards checklist documents that gap.</p>
 
           <h3>Why is guidance yellow / missing on min?</h3>
           <p>Min profiles drop bulky green guidance to save tokens. Rules (red) + injects (blue) still run. Put durable business policy in Hub injects; use full profiles when you need green optimal_paths in-file.</p>
@@ -629,14 +636,113 @@ const INJECT_ESTIMATES = [
   { name: "tool results (round 1)", bytes: 4000, note: "Facts returned after Zeus executes verbs." },
 ];
 
+/** Model terminate fields (return verb / top-level pipeline terminate). */
 const EVIDENCE_FIELDS = [
-  { name: "summary", required: true, note: "Human-readable answer facts" },
-  { name: "query_decomposition", required: true, note: "Intent facets for analytics (intent+entity…)" },
-  { name: "decomposition", required: true, note: "Data targets/predicates from MINI-SCHEMA" },
-  { name: "confidence", required: true, note: "string high|med|low only" },
-  { name: "node_refs", required: false, note: "Grounding node ids" },
-  { name: "entity_refs", required: false, note: "Grounding entities" },
-  { name: "provenance", required: false, note: "Where facts came from" },
+  { name: "summary", required: true, layer: "answer", note: "Human-readable facts (string). Not a step narrative." },
+  { name: "query_decomposition", required: true, layer: "intent", note: "Business intent facets object — hot-path / evidence-loop primary key." },
+  { name: "decomposition", required: true, layer: "data", note: "Data plan: targets, predicates, output type (grounded in MINI-SCHEMA)." },
+  { name: "confidence", required: true, layer: "answer", note: "STRING only: high | med | low (never a number/object)." },
+  { name: "node_refs", required: false, layer: "ground", note: "Node ids that support the answer." },
+  { name: "entity_refs", required: false, layer: "ground", note: "Entity refs for grounding." },
+  { name: "provenance", required: false, layer: "ground", note: "Where facts came from (tool steps / bags)." },
+];
+
+/** Facets inside query_decomposition (ideal; WIP models often only emit intent). */
+const QD_FACETS = [
+  { name: "intent", required: true, note: "User goal in plain language (e.g. list hotels in Paris)." },
+  { name: "entity", required: true, note: "Primary entity type string from scope (e.g. Hotel)." },
+  { name: "attribute", required: false, note: "Fields / attributes requested (name, city, …)." },
+  { name: "geo", required: false, note: "Place filter when present (Paris, region…)." },
+  { name: "audience", required: false, note: "Who the answer is for, if signaled." },
+  { name: "theme", required: false, note: "Topic cluster for analytics." },
+  { name: "parts", required: false, note: "Array of mini-decomps when the user asked multi-part questions." },
+];
+
+/**
+ * Server turn report skeleton — mirrors real Hub chat storage:
+ * attribution + decision + report{ metrics, detail, spans } + stored_at
+ * (not the chat_request catalog; this is what operators mine after a turn).
+ */
+const REPORT_TREE = [
+  {
+    path: "attribution",
+    title: "attribution",
+    note: "Trace quality verdict (ok / partial / …). Did we get a usable debug trail?",
+    kids: [
+      { path: "attribution.verdict", note: "ok | …" },
+      { path: "attribution.trace_status", note: "ok | …" },
+    ],
+  },
+  {
+    path: "decision",
+    title: "decision (keep / sample)",
+    note: "Retention policy for this turn in the evidence store.",
+    kids: [
+      { path: "decision.Keep", note: "bool — keep in store?" },
+      { path: "decision.Rule", note: "e.g. slow — why kept" },
+      { path: "decision.Rate", note: "sample rate weight" },
+    ],
+  },
+  {
+    path: "report",
+    title: "report (turn rollup)",
+    note: "One chat turn: ids, timing, tokens, tools, nested detail.",
+    kids: [
+      { path: "report.req_id / chat_id / turn_id", note: "Correlation ids" },
+      { path: "report.source / scope / mode", note: "admin|client · bucket/scope · mode profile" },
+      { path: "report.status · duration_ms · model", note: "ok/error · wall clock · LLM id" },
+      { path: "report.*_ms_total · bytes · tokens", note: "ai vs api vs other; prompt/completion split" },
+      { path: "report.tool_usage[]", note: "Per-verb count/ms/bytes (pipeline, find, …)" },
+      { path: "report.rounds[]", note: "Per LLM round timing" },
+      { path: "report.detail", note: "Full nested trace (edge, auth, storage, ai, …)" },
+      { path: "report.spans[]", note: "Timeline: dispatch → ai.round → tool/pipeline/fts" },
+    ],
+  },
+  {
+    path: "report.detail",
+    title: "report.detail (nested)",
+    note: "Deep path for one request.",
+    kids: [
+      { path: "detail.envelope", note: "scope, mode, chat_id, turn_id" },
+      { path: "detail.edge", note: "HTTP path/status/bytes (e.g. POST /admin/api/chat)" },
+      { path: "detail.auth · rate · dispatch", note: "Who allowed; rate limit; mode_resolved" },
+      { path: "detail.storage", note: "N1QL queries[] + fts_queries[] with hits/ops" },
+      { path: "detail.ai", note: "model, tool_calls, calls[], tokens, finish, requests[]" },
+    ],
+  },
+  {
+    path: "report.detail.ai",
+    title: "report.detail.ai (LLM loop)",
+    note: "What the model saw and called.",
+    kids: [
+      { path: "ai.model · finish", note: "Model id · finish=tool_calls|stop|…" },
+      { path: "ai.tool_calls[] · calls[]", note: "Ordered verbs + full args/results" },
+      { path: "ai.calls[].args", note: "pipeline steps / find where / return envelope" },
+      { path: "ai.calls[].result", note: "data, summary, turn_complete, meta.step_costs" },
+      { path: "ai.requests[].messages", note: "system + user (and later tool) messages" },
+      { path: "ai.requests[].tools", note: "Tool catalog actually offered this turn" },
+      { path: "ai.tokens", note: "prompt/completion when provider reports them" },
+    ],
+  },
+  {
+    path: "stored_at",
+    title: "stored_at",
+    note: "When Zeus persisted this report document.",
+    kids: [],
+  },
+];
+
+/** Educational gaps from a real WIP Hub turn (travel-sample hotels in Paris). */
+const REAL_TURN_GAPS = [
+  { have: true, item: "pipeline executed (search → project) + FTS/N1QL spans", note: "detail.storage + report.spans present" },
+  { have: true, item: "summary string on pipeline result", note: "turn_complete path can short-circuit" },
+  { have: true, item: "tool_usage rollup (pipeline + find)", note: "report.tool_usage[]" },
+  { have: true, item: "attribution + decision.Keep", note: "outer store envelope" },
+  { have: false, item: "query_decomposition on terminate", note: "REQUIRED for hot-path — missing on WIP min terminate" },
+  { have: false, item: "decomposition + confidence", note: "return required[] not fully filled" },
+  { have: false, item: "ai.tokens populated", note: "often {} until provider/metrics wired" },
+  { have: false, item: "project rows with real fields", note: "missing:true on hotel_details → entity map / bag projection" },
+  { have: false, item: "find status beyond planned", note: "extra find planned while pipeline already ran" },
 ];
 
 const MODE_BLURBS = {
@@ -1033,31 +1139,231 @@ function renderWire(doc) {
 
 function renderEvidence(doc) {
   const ret = findReturnVerb(doc);
+  const pipe = (doc.verbs || []).map((v) => v.function || v).find((fn) => fn.name === "pipeline");
   const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
   const props = (ret && ret.parameters && ret.parameters.properties) || {};
+  const pipeProps = (pipe && pipe.parameters && pipe.parameters.properties) || {};
   const sysOk = /query_decomposition/i.test(systemContent(doc));
-  const rows = EVIDENCE_FIELDS.map((f) => {
-    const ok = !f.required || (req.has(f.name) && Object.prototype.hasOwnProperty.call(props, f.name));
-    return `<tr class="${ok ? "" : "bg-warning/10"}"><td class="font-mono text-xs">${escapeHtml(f.name)}</td>
-      <td>${f.required ? "required" : "optional"}</td><td>${req.has(f.name) ? "✅" : "—"}</td>
-      <td>${Object.prototype.hasOwnProperty.call(props, f.name) ? "✅" : "—"}</td>
-      <td class="text-xs opacity-70">${escapeHtml(f.note || "")}</td></tr>`;
+  const catalogOk = sysOk && req.has("query_decomposition") && Object.prototype.hasOwnProperty.call(props, "query_decomposition");
+
+  const termRows = EVIDENCE_FIELDS.map((f) => {
+    const inReq = req.has(f.name);
+    const inProps = Object.prototype.hasOwnProperty.call(props, f.name);
+    const inPipe = Object.prototype.hasOwnProperty.call(pipeProps, f.name);
+    const ok = !f.required || (inReq && inProps);
+    return `<tr class="${ok ? "" : "bg-warning/10"}">
+      <td class="font-mono text-xs">${escapeHtml(f.name)}</td>
+      <td><span class="badge badge-ghost badge-xs">${escapeHtml(f.layer || "")}</span></td>
+      <td>${f.required ? '<span class="text-warning font-semibold">required</span>' : "optional"}</td>
+      <td>${inReq ? "✅" : "—"}</td>
+      <td>${inProps ? "✅" : "—"}</td>
+      <td>${inPipe ? "✅" : "—"}</td>
+      <td class="text-xs opacity-80">${escapeHtml(f.note || "")}</td>
+    </tr>`;
   }).join("");
+
+  const facetRows = QD_FACETS.map(
+    (f) => `<tr>
+      <td class="font-mono text-xs">${escapeHtml(f.name)}</td>
+      <td>${f.required ? "core" : "when signaled"}</td>
+      <td class="text-xs opacity-80">${escapeHtml(f.note)}</td>
+    </tr>`
+  ).join("");
+
+  const reportBlocks = REPORT_TREE.map((block) => {
+    const kids = (block.kids || [])
+      .map(
+        (k) => `<li class="flex flex-wrap gap-x-2 gap-y-0.5">
+        <code class="text-[11px] text-success/90">${escapeHtml(k.path)}</code>
+        <span class="text-[11px] opacity-70">${escapeHtml(k.note)}</span>
+      </li>`
+      )
+      .join("");
+    return `<div class="rounded-lg bg-base-200/80 border border-base-content/10 p-3">
+      <div class="font-mono text-xs font-bold txt-meta">${escapeHtml(block.title)}</div>
+      <p class="text-[11px] opacity-80 mt-0.5 mb-1.5">${escapeHtml(block.note)}</p>
+      ${kids ? `<ul class="space-y-1 pl-0 list-none">${kids}</ul>` : ""}
+    </div>`;
+  }).join("");
+
+  const gapRows = REAL_TURN_GAPS.map(
+    (g) => `<tr class="${g.have ? "" : "bg-warning/10"}">
+      <td class="text-center">${g.have ? "✅" : "⬜"}</td>
+      <td class="text-xs font-medium">${escapeHtml(g.item)}</td>
+      <td class="text-[11px] opacity-70">${escapeHtml(g.note)}</td>
+    </tr>`
+  ).join("");
+
+  const idealExample = `{
+  "summary": "Hotels in Paris: … (facts after tools, or planned facts on 1-call pipeline)",
+  "query_decomposition": {
+    "intent": "list hotels in a city",
+    "entity": "Hotel",
+    "attribute": ["name", "city", "address"],
+    "geo": "Paris"
+  },
+  "decomposition": {
+    "targets": ["Hotel"],
+    "predicates": [{ "field": "city", "op": "eq", "value": "Paris" }],
+    "output": "rows"
+  },
+  "confidence": "med",
+  "node_refs": ["hotel_…"],
+  "entity_refs": [],
+  "provenance": [{ "via": "pipeline", "as": "hotels" }]
+}`;
+
+  const reportSkeleton = `{
+  "attribution": { "verdict": "ok", "trace_status": "ok" },
+  "decision": { "Keep": true, "Rule": "slow", "Rate": 1 },
+  "report": {
+    "req_id": "…", "chat_id": "…", "turn_id": "…",
+    "source": "admin", "scope": "bucket/scope", "mode": "auto",
+    "status": "ok", "duration_ms": 2704, "model": "grok-…",
+    "tool_usage": [{ "name": "pipeline", "count": 1, "ms": 4 }],
+    "detail": {
+      "envelope": { "scope": "…", "mode": "auto" },
+      "edge": { "method": "POST", "path": "/admin/api/chat", "status": 200 },
+      "storage": { "queries": [/* N1QL */], "fts_queries": [/* FTS */] },
+      "ai": {
+        "tool_calls": ["pipeline", "find"],
+        "calls": [{ "name": "pipeline", "args": { "steps": […], "summary": "…" }, "result": {…} }],
+        "requests": [{ "messages": [/* system+user */], "tools": [/* catalog */] }],
+        "finish": "tool_calls"
+      }
+    },
+    "spans": [{ "subsystem": "ai|pipeline|fts|tool", "phase": "…", "duration_ns": … }]
+  },
+  "stored_at": "2026-…"
+}`;
+
   document.getElementById("evidence-panel").innerHTML = `
-    <div class="card-body p-4 ${sysOk && req.has("query_decomposition") ? "box-ed tile-edit" : "box-miss tile-miss"}">
-      <div class="flex flex-wrap justify-between gap-2 items-center">
-        <div>
-          <h3 class="font-semibold">Standard output schema (every mode / deploy)</h3>
-          <p class="text-xs opacity-80">Same terminate fields everywhere so analytics and clients parse every call identically.</p>
+    <!-- Layer legend -->
+    <div class="card bg-base-100 shadow ${catalogOk ? "box-ed tile-edit" : "box-miss tile-miss"}">
+      <div class="card-body p-4 gap-3">
+        <div class="flex flex-wrap justify-between gap-2 items-start">
+          <div>
+            <h3 class="font-semibold text-base">Two-layer output scheme</h3>
+            <p class="text-xs opacity-80 max-w-3xl">
+              <b>Layer A</b> = what the model emits to <i>finish</i> (return verb or terminating pipeline fields).
+              <b>Layer B</b> = what Zeus <i>stores</i> for operators (attribution + decision + report + spans).
+              Catalog mode <code class="text-xs">${escapeHtml(state.mode || "")}</code>
+              ${catalogOk ? "declares the required terminate fields." : "still has gaps vs the evidence-loop contract."}
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-1">
+            <button type="button" class="btn btn-xs btn-outline" id="btn-open-return">Open return verb</button>
+            <button type="button" class="btn btn-xs btn-outline" id="btn-open-pipeline">Open pipeline verb</button>
+          </div>
         </div>
-        <button type="button" class="btn btn-xs btn-outline" id="btn-open-return">Open return verb</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+          <div class="rounded-lg p-3 bg-base-200 border-l-4 border-green-500">
+            <div class="font-bold txt-ed">A · Model terminate</div>
+            <p class="opacity-80 mt-1">On final answer: <code>summary</code> + <code>query_decomposition</code> + <code>decomposition</code> + <code>confidence</code>.
+            May ride on <code>return</code> or top-level of <code>pipeline</code> (1-call short-circuit with <code>turn_complete</code>).</p>
+          </div>
+          <div class="rounded-lg p-3 bg-base-200 border-l-4 border-purple-400">
+            <div class="font-bold txt-meta">B · Server report</div>
+            <p class="opacity-80 mt-1">Persisted after the HTTP chat turn: ids, timings, tool_usage, detail.ai.calls, storage FTS/N1QL, spans.
+            This is the document you open in Hub debug / session store — not the chat_request JSON itself.</p>
+          </div>
+        </div>
       </div>
-      <div class="overflow-x-auto mt-2">
-        <table class="table table-xs"><thead><tr><th>field</th><th>role</th><th>required[]</th><th>properties</th><th>meaning</th></tr></thead>
-        <tbody>${rows}</tbody></table>
+    </div>
+
+    <!-- Layer A: terminate fields -->
+    <div class="card bg-base-100 shadow box-ed tile-edit">
+      <div class="card-body p-4 gap-3">
+        <div>
+          <h3 class="font-semibold">A1 · Terminate fields (same every mode)</h3>
+          <p class="text-xs opacity-80">Checked against this catalog’s <code>return</code> required/properties and whether <code>pipeline</code> also accepts them at top level.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table table-xs">
+            <thead><tr>
+              <th>field</th><th>layer</th><th>role</th><th>return required[]</th><th>return props</th><th>pipeline props</th><th>meaning</th>
+            </tr></thead>
+            <tbody>${termRows}</tbody>
+          </table>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold mb-1">A2 · Inside <code>query_decomposition</code></h4>
+          <p class="text-xs opacity-70 mb-2">Business facets for clustering. At minimum <b>intent</b> + <b>entity</b>.</p>
+          <div class="overflow-x-auto">
+            <table class="table table-xs">
+              <thead><tr><th>facet</th><th>when</th><th>meaning</th></tr></thead>
+              <tbody>${facetRows}</tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <h4 class="text-sm font-semibold m-0">A3 · Ideal terminate example</h4>
+            <button type="button" class="btn btn-xs" id="btn-copy-ideal-term">Copy</button>
+          </div>
+          <pre class="bg-base-200 p-3 rounded-lg text-[11px] max-h-56 overflow-auto font-mono" id="ideal-term-pre">${escapeHtml(idealExample)}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer B: server report -->
+    <div class="card bg-base-100 shadow box-meta tile-meta">
+      <div class="card-body p-4 gap-3">
+        <div>
+          <h3 class="font-semibold txt-meta">B1 · Server report document (Hub turn store)</h3>
+          <p class="text-xs opacity-80">Shape of a real Grok→Zeus conversation report (work-in-progress traces look like this). Outer keys: <code>attribution</code>, <code>decision</code>, <code>report</code>, <code>stored_at</code>.</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 not-prose">${reportBlocks}</div>
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+            <h4 class="text-sm font-semibold m-0">B2 · Compact skeleton</h4>
+            <button type="button" class="btn btn-xs" id="btn-copy-report-skel">Copy</button>
+          </div>
+          <pre class="bg-base-200 p-3 rounded-lg text-[11px] max-h-64 overflow-auto font-mono" id="report-skel-pre">${escapeHtml(reportSkeleton)}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIP gap checklist from real turn -->
+    <div class="card bg-base-100 shadow box-miss tile-miss">
+      <div class="card-body p-4 gap-2">
+        <div>
+          <h3 class="font-semibold">WIP checklist · real Hub turn (hotels in Paris)</h3>
+          <p class="text-xs opacity-80 max-w-3xl">
+            Example: user <i>“What hotels are in Paris?”</i> · mode <code>auto</code> · model grok · 1 round · pipeline(search+project) + planned find.
+            Not everything required for the evidence loop was present — that’s expected while catalogs and projection catch up.
+          </p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="table table-xs">
+            <thead><tr><th></th><th>piece</th><th>note</th></tr></thead>
+            <tbody>${gapRows}</tbody>
+          </table>
+        </div>
+        <p class="text-[11px] opacity-70">
+          Goal: every production terminate fills <b>A</b> fully so <b>B.detail.ai.calls</b> carries parseable <code>query_decomposition</code> for N1QL/analytics — not only a free-text summary.
+        </p>
       </div>
     </div>`;
+
   document.getElementById("btn-open-return")?.addEventListener("click", () => openPath("verbs.return"));
+  document.getElementById("btn-open-pipeline")?.addEventListener("click", () => openPath("verbs.pipeline"));
+  document.getElementById("btn-copy-ideal-term")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("ideal-term-pre").textContent);
+      toast("Copied ideal terminate example");
+    } catch {
+      toast("Copy failed");
+    }
+  });
+  document.getElementById("btn-copy-report-skel")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("report-skel-pre").textContent);
+      toast("Copied report skeleton");
+    } catch {
+      toast("Copy failed");
+    }
+  });
 }
 
 function renderJson(doc, mode) {

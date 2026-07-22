@@ -57,37 +57,177 @@
     }
     [data-theme="light"] {
       color-scheme: light;
-      --c-rules: #dc2626;
-      --c-edit: #16a34a;
-      --c-inj: #2563eb;
-      --c-meta: #7c3aed;
-      --c-miss: #d97706;
-      /* darker labels so day mode stays readable */
-      --txt-ro: #b91c1c;
-      --txt-ed: #15803d;
-      --txt-inj: #1d4ed8;
-      --txt-meta: #6d28d9;
-      --txt-miss: #b45309;
-      --chip-ro-fg: #991b1b;
-      --chip-ro-bg: #fee2e2;
-      --chip-ed-fg: #166534;
-      --chip-ed-bg: #dcfce7;
-      --chip-inj-fg: #1e40af;
-      --chip-inj-bg: #dbeafe;
-      --chip-meta-fg: #5b21b6;
-      --chip-meta-bg: #ede9fe;
-      --chip-miss-fg: #92400e;
-      --chip-miss-bg: #fef3c7;
+      /* Force daisyUI content ink darker than default light theme */
+      --bc: 14% 0.02 265;
+      --nc: 14% 0.02 265;
+      --pc: 14% 0.02 265;
+      --sc: 14% 0.02 265;
+      --ac: 14% 0.02 265;
+      --ink: #0f172a;          /* slate-900 — primary text */
+      --ink-strong: #020617;  /* slate-950 */
+      --ink-muted: #1e293b;   /* slate-800 — secondary (was too light) */
+      --ink-soft: #334155;    /* slate-700 — tertiary */
+      --c-rules: #b91c1c;
+      --c-edit: #15803d;
+      --c-inj: #1d4ed8;
+      --c-meta: #6d28d9;
+      --c-miss: #b45309;
+      /* labels: deep, not pastel */
+      --txt-ro: #7f1d1d;
+      --txt-ed: #14532d;
+      --txt-inj: #1e3a8a;
+      --txt-meta: #4c1d95;
+      --txt-miss: #78350f;
+      --chip-ro-fg: #7f1d1d;
+      --chip-ro-bg: #fecaca;
+      --chip-ed-fg: #14532d;
+      --chip-ed-bg: #bbf7d0;
+      --chip-inj-fg: #1e3a8a;
+      --chip-inj-bg: #bfdbfe;
+      --chip-meta-fg: #4c1d95;
+      --chip-meta-bg: #ddd6fe;
+      --chip-miss-fg: #78350f;
+      --chip-miss-bg: #fde68a;
       --json-ro-bg: #fef2f2;
       --json-ed-bg: #f0fdf4;
       --json-meta-bg: #f5f3ff;
       --json-inj-bg: #eff6ff;
       --json-miss-bg: #fffbeb;
-      --json-pre-bg: rgba(15, 23, 42, 0.04);
-      --focus-ring: #111827;
-      --muted-boost: 1;
+      --json-pre-bg: #f1f5f9;
+      --focus-ring: #0f172a;
     }
     body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+
+    /* —— Day mode: hard contrast (no washed grays) —— */
+    [data-theme="light"] body,
+    [data-theme="light"] {
+      color: var(--ink);
+    }
+    [data-theme="light"] .navbar,
+    [data-theme="light"] .card,
+    [data-theme="light"] .alert,
+    [data-theme="light"] .chapter,
+    [data-theme="light"] .help,
+    [data-theme="light"] .search-panel,
+    [data-theme="light"] .menu,
+    [data-theme="light"] .table,
+    [data-theme="light"] .select,
+    [data-theme="light"] .input,
+    [data-theme="light"] .btn:not(.btn-primary):not(.btn-error) {
+      color: var(--ink);
+    }
+    [data-theme="light"] h1,
+    [data-theme="light"] h2,
+    [data-theme="light"] h3,
+    [data-theme="light"] h4,
+    [data-theme="light"] .card-title,
+    [data-theme="light"] .font-semibold,
+    [data-theme="light"] .font-bold {
+      color: var(--ink-strong);
+    }
+    [data-theme="light"] .text-muted,
+    [data-theme="light"] .muted,
+    [data-theme="light"] .label-text,
+    [data-theme="light"] .zone-label,
+    [data-theme="light"] .cards-toc-title,
+    [data-theme="light"] .cards-toc a,
+    [data-theme="light"] .search-hit-snip,
+    [data-theme="light"] .search-hit-path,
+    [data-theme="light"] .search-group-title,
+    [data-theme="light"] .search-empty,
+    [data-theme="light"] .glossary-card dd,
+    [data-theme="light"] .chapter-head p,
+    [data-theme="light"] #status,
+    [data-theme="light"] #manifest-line,
+    [data-theme="light"] #search-meta,
+    [data-theme="light"] #help-search-hint,
+    [data-theme="light"] #glossary-count,
+    [data-theme="light"] .help p,
+    [data-theme="light"] .help li,
+    [data-theme="light"] .help dd,
+    [data-theme="light"] .help-prose :where(p, li, dd, td, th),
+    [data-theme="light"] .card-body p,
+    [data-theme="light"] .card-body .text-xs,
+    [data-theme="light"] .card-body .text-\[11px\],
+    [data-theme="light"] .card-body .text-\[10px\] {
+      color: var(--ink-muted) !important;
+      opacity: 1 !important;
+    }
+    /* Tailwind opacity-* was washing slate text to invisible gray */
+    [data-theme="light"] .opacity-40,
+    [data-theme="light"] .opacity-50,
+    [data-theme="light"] .opacity-60,
+    [data-theme="light"] .opacity-70,
+    [data-theme="light"] .opacity-80,
+    [data-theme="light"] .opacity-90 {
+      opacity: 1 !important;
+      color: var(--ink-muted);
+    }
+    [data-theme="light"] svg.theme-icon,
+    [data-theme="light"] .theme-icon {
+      color: var(--ink-muted);
+      opacity: 0.85 !important;
+    }
+    [data-theme="light"] .badge-ghost {
+      color: var(--ink-muted);
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+    }
+    [data-theme="light"] .btn-ghost {
+      color: var(--ink);
+    }
+    [data-theme="light"] .btn-ghost:hover {
+      background: #e2e8f0;
+      color: var(--ink-strong);
+    }
+    [data-theme="light"] pre,
+    [data-theme="light"] code,
+    [data-theme="light"] .font-mono {
+      color: var(--ink);
+    }
+    [data-theme="light"] .json-block pre {
+      color: inherit;
+    }
+    [data-theme="light"] .content-panel #content-body,
+    [data-theme="light"] #content-body,
+    [data-theme="light"] #content-title,
+    [data-theme="light"] #content-sub,
+    [data-theme="light"] #content-why {
+      color: var(--ink);
+    }
+    [data-theme="light"] #content-sub {
+      color: var(--ink-muted) !important;
+    }
+    [data-theme="light"] .table th {
+      color: var(--ink-muted);
+    }
+    [data-theme="light"] .table td {
+      color: var(--ink);
+    }
+    [data-theme="light"] .cards-toc a {
+      opacity: 1;
+    }
+    [data-theme="light"] .cards-toc a.is-active {
+      color: var(--ink-strong);
+      font-weight: 700;
+    }
+    [data-theme="light"] .prose,
+    [data-theme="light"] .help-prose {
+      --tw-prose-body: #0f172a;
+      --tw-prose-headings: #020617;
+      --tw-prose-lead: #1e293b;
+      --tw-prose-links: #1d4ed8;
+      --tw-prose-bold: #020617;
+      --tw-prose-counters: #334155;
+      --tw-prose-bullets: #475569;
+      --tw-prose-quotes: #0f172a;
+      --tw-prose-code: #0f172a;
+      --tw-prose-captions: #334155;
+      color: #0f172a;
+    }
+    [data-theme="light"] .card-click-hint {
+      color: var(--ink-soft) !important;
+    }
     .box-ro, .tile-rules { border: 2px solid var(--c-rules) !important; border-left-width: 6px !important; }
     .box-ed, .tile-edit { border: 2px solid var(--c-edit) !important; border-left-width: 6px !important; }
     .box-wire, .tile-inj { border: 2px solid var(--c-inj) !important; border-left-width: 6px !important; }
@@ -145,22 +285,15 @@
     }
     .card-click-hint .arrow { transition: transform .1s ease; }
     .card-click:hover .card-click-hint .arrow { transform: translateX(2px); }
-    /* Secondary text: prefer readable mix over pure opacity wash */
+    /* Secondary text — dark mode can wash; light mode uses solid --ink-muted above */
     .text-muted,
     .muted {
+      color: color-mix(in oklab, oklch(var(--bc)) 78%, transparent);
+    }
+    [data-theme="dark"] .text-muted,
+    [data-theme="dark"] .muted {
       color: color-mix(in oklab, oklch(var(--bc)) 72%, transparent);
     }
-    [data-theme="light"] .text-muted,
-    [data-theme="light"] .muted {
-      color: color-mix(in oklab, oklch(var(--bc)) 82%, transparent);
-    }
-    /* Lift common low-opacity utility text in light mode (was nearly invisible) */
-    [data-theme="light"] .opacity-40 { opacity: 0.72 !important; }
-    [data-theme="light"] .opacity-50 { opacity: 0.78 !important; }
-    [data-theme="light"] .opacity-60 { opacity: 0.84 !important; }
-    [data-theme="light"] .opacity-70 { opacity: 0.9 !important; }
-    [data-theme="light"] .opacity-80 { opacity: 0.94 !important; }
-    [data-theme="light"] .opacity-90 { opacity: 0.97 !important; }
     pre.json, pre.content, .prose-sys {
       white-space: pre-wrap;
       word-break: break-word;
@@ -242,11 +375,7 @@
     .help h4 { margin-top: 0.75rem; font-size: 0.9rem; font-weight: 600; color: oklch(var(--bc)); }
     .help p, .help li {
       font-size: 0.875rem;
-      color: color-mix(in oklab, oklch(var(--bc)) 90%, transparent);
-    }
-    [data-theme="light"] .help p,
-    [data-theme="light"] .help li {
-      color: color-mix(in oklab, oklch(var(--bc)) 94%, transparent);
+      color: color-mix(in oklab, oklch(var(--bc)) 92%, transparent);
     }
     .help code { font-size: 0.8rem; }
     /* Cards page: chapter layout + sticky TOC */
@@ -385,11 +514,7 @@
       border-bottom: 1px solid color-mix(in oklab, oklch(var(--bc)) 10%, transparent);
     }
     .chapter-head p {
-      color: color-mix(in oklab, oklch(var(--bc)) 78%, transparent);
-    }
-    [data-theme="light"] .chapter-head p {
-      color: color-mix(in oklab, oklch(var(--bc)) 86%, transparent);
-      opacity: 1 !important;
+      color: color-mix(in oklab, oklch(var(--bc)) 82%, transparent);
     }
     .chapter-head .ch-num {
       width: 2.1rem;
@@ -436,10 +561,7 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
       margin-bottom: 0.5rem;
-      color: color-mix(in oklab, oklch(var(--bc)) 78%, transparent);
-    }
-    [data-theme="light"] .zone-label {
-      color: color-mix(in oklab, oklch(var(--bc)) 88%, transparent);
+      color: color-mix(in oklab, oklch(var(--bc)) 82%, transparent);
     }
     .wire-zones {
       display: grid;
@@ -460,14 +582,19 @@
     .help-prose { color: oklch(var(--bc)); }
     .help-prose :where(h1, h2, h3, h4, h5, strong, b) { color: oklch(var(--bc)); }
     .help-prose :where(p, li, dd, td, th) {
-      color: color-mix(in oklab, oklch(var(--bc)) 88%, transparent);
-    }
-    [data-theme="light"] .help-prose :where(p, li, dd, td, th) {
-      color: color-mix(in oklab, oklch(var(--bc)) 92%, transparent);
+      color: color-mix(in oklab, oklch(var(--bc)) 90%, transparent);
     }
     .help-prose code {
       color: oklch(var(--bc));
       background: color-mix(in oklab, oklch(var(--b2)) 90%, transparent);
+    }
+    [data-theme="light"] .help-prose code {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    [data-theme="light"] .zone-label {
+      color: var(--ink-muted) !important;
+      opacity: 1 !important;
     }
     .wire-zone-title {
       font-size: 11px;

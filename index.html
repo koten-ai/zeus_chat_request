@@ -37,7 +37,52 @@
       font-size: 12px;
       line-height: 1.5;
     }
-    pre.json { max-height: 70vh; font-size: 11px; }
+    pre.json { max-height: none; font-size: 11px; }
+    #json-annotated { max-height: 72vh; overflow: auto; }
+    .json-block {
+      margin: 0.5rem 0;
+      border-radius: 0.5rem;
+      border-width: 2px;
+      border-style: solid;
+      overflow: hidden;
+    }
+    .json-block.rules { border-color: var(--c-rules); background: rgba(127, 29, 29, 0.25); }
+    .json-block.guidance { border-color: var(--c-edit); background: rgba(20, 83, 45, 0.25); }
+    .json-block.meta { border-color: var(--c-meta); background: rgba(76, 29, 149, 0.2); }
+    .json-block.inject { border-color: var(--c-inj); background: rgba(30, 58, 138, 0.3); }
+    .json-block.miss { border-color: var(--c-miss); background: rgba(113, 63, 18, 0.25); }
+    .json-block-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.75rem;
+      align-items: center;
+      padding: 0.35rem 0.6rem;
+      font-size: 11px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .json-block.rules .json-block-head, .json-block.rules pre { color: #fecaca; }
+    .json-block.guidance .json-block-head, .json-block.guidance pre { color: #bbf7d0; }
+    .json-block.meta .json-block-head, .json-block.meta pre { color: #e9d5ff; }
+    .json-block.inject .json-block-head, .json-block.inject pre { color: #bfdbfe; }
+    .json-block.miss .json-block-head, .json-block.miss pre { color: #fde68a; }
+    .json-block.selected { outline: 2px solid #f9fafb; outline-offset: 2px; }
+    .json-block pre {
+      margin: 0;
+      padding: 0.5rem 0.65rem;
+      background: rgba(0,0,0,0.25);
+      max-height: 28rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .json-key-chip {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 700;
+    }
     .section-card { min-height: 8.5rem; }
     #toast { position: fixed; bottom: 1rem; right: 1rem; z-index: 50; }
     #treemap-chart { width: 100%; height: 440px; }
@@ -179,14 +224,39 @@
     </section>
 
     <!-- JSON -->
-    <section id="view-json" class="hidden">
+    <section id="view-json" class="hidden space-y-3">
       <div class="card bg-base-100 shadow">
-        <div class="card-body p-3">
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <h2 class="card-title text-base" id="json-title">JSON</h2>
-            <button type="button" class="btn btn-xs" id="btn-copy-json">Copy</button>
+        <div class="card-body p-3 gap-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="card-title text-base" id="json-title">JSON</h2>
+              <p class="text-xs opacity-70">
+                Colored <b>boxes match Cards + Size map</b>. Click a section header to open the content panel.
+                Keys use the same RED / GREEN / BLUE / PURPLE language.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center">
+              <label class="label cursor-pointer gap-2 py-0">
+                <span class="label-text text-xs">Plain raw (no color)</span>
+                <input type="checkbox" id="chk-json-plain" class="toggle toggle-sm" />
+              </label>
+              <label class="label cursor-pointer gap-2 py-0">
+                <span class="label-text text-xs">Show blue inject stubs</span>
+                <input type="checkbox" id="chk-json-inject" class="toggle toggle-sm toggle-info" checked />
+              </label>
+              <button type="button" class="btn btn-xs" id="btn-copy-json">Copy full JSON</button>
+            </div>
           </div>
-          <pre class="json bg-base-200 p-3 rounded-lg" id="json-pre"></pre>
+          <div class="flex flex-wrap gap-2 text-[11px]">
+            <span class="badge border-2 border-red-500 text-red-300 bg-red-950/40">RED block = Rules</span>
+            <span class="badge border-2 border-green-500 text-green-300 bg-green-950/40">GREEN = Editable</span>
+            <span class="badge border-2 border-blue-500 text-blue-300 bg-blue-950/40">BLUE = Injected (not in file)</span>
+            <span class="badge border-2 border-purple-400 text-purple-200 bg-purple-950/40">PURPLE = Meta</span>
+          </div>
+          <!-- colored sections -->
+          <div id="json-annotated"></div>
+          <!-- plain fallback -->
+          <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-pre"></pre>
         </div>
       </div>
     </section>
@@ -643,6 +713,11 @@ function showContentPanel({ path, bytes, cls, value, note, why }) {
       : `<div class="prose-sys content bg-base-300 p-3 rounded-lg ${colorCls}">${escapeHtml(pretty.text)}</div>`;
 
   document.getElementById("status").textContent = `Selected: ${path} · ${formatBytes(bytes)} · ${formatTokens(bytes)} · ${classLabel(cls || "")}`;
+
+  // Sync selection on JSON colored blocks (same path as cards/tiles)
+  document.querySelectorAll("#json-annotated .json-block").forEach((b) => {
+    b.classList.toggle("selected", b.getAttribute("data-path") === path);
+  });
 }
 
 function openPath(path, bytes, cls) {
@@ -792,7 +867,171 @@ function renderEvidence(doc) {
 
 function renderJson(doc, mode) {
   document.getElementById("json-title").textContent = `v2/min/chat_request_${mode}_v2_min.json`;
-  document.getElementById("json-pre").textContent = JSON.stringify(doc, null, 2);
+  const plain = JSON.stringify(doc, null, 2);
+  document.getElementById("json-pre").textContent = plain;
+  renderAnnotatedJson(doc);
+  applyJsonViewMode();
+}
+
+function applyJsonViewMode() {
+  const plain = document.getElementById("chk-json-plain")?.checked;
+  document.getElementById("json-pre").classList.toggle("hidden", !plain);
+  document.getElementById("json-annotated").classList.toggle("hidden", !!plain);
+}
+
+function renderAnnotatedJson(doc) {
+  const root = document.getElementById("json-annotated");
+  if (!doc) {
+    root.innerHTML = "";
+    return;
+  }
+  const showInject = document.getElementById("chk-json-inject")?.checked !== false;
+  const keys = Object.keys(doc);
+  // stable-ish order matching STRUCTURE then leftovers
+  const order = STRUCTURE.map((s) => s.key).filter((k) => keys.includes(k));
+  keys.forEach((k) => {
+    if (!order.includes(k)) order.push(k);
+  });
+
+  let html = "";
+  for (const k of order) {
+    const present = hasKey(doc, k);
+    const struct = STRUCTURE.find((s) => s.key === k);
+    let cls = classForKey(k);
+    if (!present) cls = "miss";
+    const val = present ? doc[k] : null;
+    const b = present ? jsonBytes(val) : 0;
+    const pretty = present ? JSON.stringify(val, null, 2) : `// not present on this profile\n// ${struct ? struct.why : ""}`;
+    const label = struct ? struct.title : k;
+    const why = struct ? struct.why : "";
+    html += jsonBlockHtml({
+      path: k,
+      keyLabel: k,
+      title: label,
+      cls,
+      bytes: b,
+      why,
+      body: pretty,
+      present,
+    });
+
+    // Expand messages / verbs one level so they connect to tree leaves
+    if (present && k === "messages" && Array.isArray(val)) {
+      val.forEach((msg, i) => {
+        const path = `messages[${i}]`;
+        const mb = jsonBytes(msg);
+        const body =
+          msg && msg.role === "system"
+            ? typeof msg.content === "string"
+              ? msg.content
+              : JSON.stringify(msg, null, 2)
+            : JSON.stringify(msg, null, 2);
+        html += jsonBlockHtml({
+          path,
+          keyLabel: path,
+          title: `messages[${i}] · ${msg.role || "msg"}`,
+          cls: "rules",
+          bytes: mb,
+          why: "System/user message the model may read from the catalog (rules).",
+          body,
+          present: true,
+          nested: true,
+        });
+      });
+    }
+    if (present && k === "verbs" && Array.isArray(val)) {
+      val.forEach((verb) => {
+        const fn = verb.function || verb;
+        const path = `verbs.${fn.name || "?"}`;
+        const vb = jsonBytes(verb);
+        html += jsonBlockHtml({
+          path,
+          keyLabel: path,
+          title: `verb · ${fn.name || "?"}`,
+          cls: "rules",
+          bytes: vb,
+          why: "One allowed tool schema. Same as a red tile under verbs.",
+          body: JSON.stringify(verb, null, 2),
+          present: true,
+          nested: true,
+        });
+      });
+    }
+    if (present && k === "guidance" && val && typeof val === "object") {
+      Object.keys(val).forEach((gk) => {
+        const path = `guidance.${gk}`;
+        const gb = jsonBytes(val[gk]);
+        html += jsonBlockHtml({
+          path,
+          keyLabel: path,
+          title: `guidance.${gk}`,
+          cls: "guidance",
+          bytes: gb,
+          why: "Editable advisory field (green).",
+          body: JSON.stringify(val[gk], null, 2),
+          present: true,
+          nested: true,
+        });
+      });
+    }
+  }
+
+  if (showInject) {
+    html += `<div class="text-xs font-semibold uppercase tracking-wide opacity-60 mt-4 mb-1">Not in this file — runtime injects (BLUE)</div>`;
+    INJECT_ESTIMATES.forEach((x) => {
+      html += jsonBlockHtml({
+        path: `inject:${x.name}`,
+        keyLabel: `[inject] ${x.name}`,
+        title: x.name,
+        cls: "inject",
+        bytes: x.bytes,
+        why: x.note,
+        body: `// BLUE — Zeus Client / Hub injects this at assemble time\n// ${x.note}\n// ~${formatBytes(x.bytes)} · ${formatTokens(x.bytes)}\n\nnull  // placeholder: not stored in baseline chat_request*.json`,
+        present: true,
+        nested: false,
+        estimate: true,
+      });
+    });
+  }
+
+  // top-level wrapper visual
+  root.innerHTML = `<div class="text-[11px] opacity-60 mb-2 font-mono">{  // colored sections map 1:1 to Cards + Size map paths
+}</div>${html}`;
+
+  root.querySelectorAll(".json-block").forEach((block) => {
+    const head = block.querySelector(".json-block-head");
+    const open = () => {
+      root.querySelectorAll(".json-block").forEach((b) => b.classList.remove("selected"));
+      block.classList.add("selected");
+      openPath(block.getAttribute("data-path"), Number(block.getAttribute("data-bytes")), block.getAttribute("data-cls"));
+    };
+    head.addEventListener("click", open);
+    // also allow click on pre to select
+    block.querySelector("pre")?.addEventListener("click", open);
+  });
+
+  // highlight selected
+  if (state.selectedPath) {
+    const sel = root.querySelector(`.json-block[data-path="${CSS.escape(state.selectedPath)}"]`);
+    if (sel) sel.classList.add("selected");
+  }
+}
+
+function jsonBlockHtml({ path, keyLabel, title, cls, bytes, why, body, present, nested, estimate }) {
+  const nest = nested ? "ml-3 md:ml-6" : "";
+  return `<div class="json-block ${cls} ${nest}" data-path="${escapeHtml(path)}" data-bytes="${bytes}" data-cls="${cls}">
+    <div class="json-block-head" title="Click to open content panel (same as cards/tiles)">
+      <span class="json-key-chip">${escapeHtml(keyLabel)}</span>
+      <span class="opacity-80">${escapeHtml(title)}</span>
+      <span class="badge badge-ghost badge-xs font-mono">${formatBytes(bytes)}</span>
+      <span class="badge badge-ghost badge-xs font-mono">${formatTokens(bytes)}</span>
+      <span class="badge badge-xs border border-current opacity-90">${escapeHtml(classLabel(cls))}${estimate ? " · est." : ""}</span>
+      ${!present ? '<span class="badge badge-warning badge-xs">missing</span>' : ""}
+      <span class="opacity-50 text-[10px] ml-auto">click → content panel</span>
+    </div>
+    ${why ? `<div class="px-2 pt-1 text-[11px] opacity-80">${escapeHtml(why)}</div>` : ""}
+    <pre>${escapeHtml(body)}</pre>
+  </div>`;
 }
 
 /* —— treemap —— */
@@ -989,14 +1228,18 @@ function setView(view) {
     btn.classList.toggle("btn-primary", on);
     btn.classList.toggle("btn-ghost", !on);
   });
-  // content panel useful on cards + size
-  document.getElementById("content-panel").classList.toggle("hidden", view === "help" || view === "json");
+  // content panel on cards, size, and colored JSON (not help)
+  document.getElementById("content-panel").classList.toggle("hidden", view === "help");
   if (view === "size" && state.catalog) {
     setTimeout(() => {
       renderSizeMaps(state.catalog);
       state.chartMain?.resize();
       state.chartWire?.resize();
     }, 40);
+  }
+  if (view === "json" && state.catalog) {
+    renderAnnotatedJson(state.catalog);
+    applyJsonViewMode();
   }
 }
 
@@ -1048,7 +1291,7 @@ document.getElementById("mode-select").addEventListener("change", (e) => selectM
 document.getElementById("btn-copy-json").addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText(document.getElementById("json-pre").textContent);
-    toast("Copied JSON");
+    toast("Copied full JSON");
   } catch {
     toast("Copy failed");
   }
@@ -1062,6 +1305,10 @@ document.getElementById("btn-copy-content").addEventListener("click", async () =
   }
 });
 document.getElementById("chk-inject").addEventListener("change", () => state.catalog && renderSizeMaps(state.catalog));
+document.getElementById("chk-json-plain")?.addEventListener("change", () => applyJsonViewMode());
+document.getElementById("chk-json-inject")?.addEventListener("change", () => {
+  if (state.catalog) renderAnnotatedJson(state.catalog);
+});
 window.addEventListener("resize", () => {
   state.chartMain?.resize();
   state.chartWire?.resize();

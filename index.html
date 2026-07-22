@@ -585,6 +585,38 @@
       padding: 0.75rem;
       opacity: 0.75;
     }
+    /* Yellow highlight on typed query matches */
+    mark.search-hl,
+    .search-hl {
+      background: #fde047; /* yellow-300 */
+      color: #111827;
+      padding: 0 0.12em;
+      border-radius: 0.15rem;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+      font-weight: 650;
+    }
+    [data-theme="dark"] mark.search-hl,
+    [data-theme="dark"] .search-hl {
+      background: #facc15; /* yellow-400 — pops on dark */
+      color: #111827;
+    }
+    .search-hit-snip pre {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: 11px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: none;
+      overflow: visible;
+    }
+    .glossary-card mark.search-hl,
+    .help-block mark.search-hl {
+      background: #fde047;
+      color: #111827;
+    }
   </style>
 </head>
 <body class="bg-base-300 text-base-content min-h-screen">
@@ -1226,6 +1258,29 @@ const SEARCH_GROUPS = [
   { id: "output", label: "Output scheme", chip: "chip-ed" },
 ];
 
+function escapeRegExp(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Escape HTML, then wrap every case-insensitive match of q in <mark class="search-hl"> */
+function highlightQuery(plain, q) {
+  const text = String(plain || "");
+  if (!q) return escapeHtml(text);
+  try {
+    const re = new RegExp("(" + escapeRegExp(q) + ")", "gi");
+    const parts = text.split(re);
+    return parts
+      .map((part, i) => {
+        // split with capturing group: odd indices are matches when re has one group
+        if (i % 2 === 1) return `<mark class="search-hl">${escapeHtml(part)}</mark>`;
+        return escapeHtml(part);
+      })
+      .join("");
+  } catch (_) {
+    return escapeHtml(text);
+  }
+}
+
 function snippetAround(text, q, radius) {
   const t = String(text || "").replace(/\s+/g, " ").trim();
   if (!t) return "";
@@ -1240,6 +1295,49 @@ function snippetAround(text, q, radius) {
   if (start > 0) snip = "…" + snip;
   if (end < t.length) snip = snip + "…";
   return snip;
+}
+
+/** Walk text nodes and wrap matches; store original once for restore */
+function applyDomHighlight(root, q) {
+  if (!root) return;
+  // restore previous
+  if (root.dataset.hlOrig != null) {
+    root.innerHTML = root.dataset.hlOrig;
+  } else {
+    root.dataset.hlOrig = root.innerHTML;
+  }
+  if (!q) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  let re;
+  try {
+    re = new RegExp(escapeRegExp(q), "gi");
+  } catch (_) {
+    return;
+  }
+  nodes.forEach((node) => {
+    const val = node.nodeValue;
+    if (!val) return;
+    re.lastIndex = 0;
+    if (!re.test(val)) return;
+    re.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0;
+    let m;
+    const src = val;
+    while ((m = re.exec(src)) !== null) {
+      if (m.index > last) frag.appendChild(document.createTextNode(src.slice(last, m.index)));
+      const mark = document.createElement("mark");
+      mark.className = "search-hl";
+      mark.textContent = m[0];
+      frag.appendChild(mark);
+      last = m.index + m[0].length;
+      if (m[0].length === 0) re.lastIndex++;
+    }
+    if (last < src.length) frag.appendChild(document.createTextNode(src.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  });
 }
 
 function buildSearchIndex(doc) {
@@ -1392,17 +1490,30 @@ function filterHelpInPlace(q) {
   const empty = document.getElementById("glossary-empty");
   let gHits = 0;
   document.querySelectorAll("[data-glossary]").forEach((el) => {
+    // highlight against original search text (pre-highlight)
+    if (el.dataset.hlOrig != null) el.innerHTML = el.dataset.hlOrig;
     const hay = (el.getAttribute("data-search") || el.textContent || "").toLowerCase();
     const hit = !q || hay.includes(q);
     el.classList.toggle("is-hidden", !hit);
     el.classList.toggle("is-hit", !!q && hit);
+    if (hit && q) applyDomHighlight(el, q);
+    else if (!q && el.dataset.hlOrig != null) {
+      el.innerHTML = el.dataset.hlOrig;
+      delete el.dataset.hlOrig;
+    }
     if (hit) gHits++;
   });
   document.querySelectorAll("[data-help-block]").forEach((el) => {
+    if (el.dataset.hlOrig != null) el.innerHTML = el.dataset.hlOrig;
     const hay = ((el.getAttribute("data-search") || "") + " " + (el.textContent || "")).toLowerCase();
     const hit = !q || hay.includes(q);
     el.classList.toggle("is-hidden", !hit);
     el.classList.toggle("is-hit", !!q && hit);
+    if (hit && q) applyDomHighlight(el, q);
+    else if (!q && el.dataset.hlOrig != null) {
+      el.innerHTML = el.dataset.hlOrig;
+      delete el.dataset.hlOrig;
+    }
   });
   if (empty) empty.classList.toggle("hidden", !q || gHits > 0);
 }
@@ -1519,9 +1630,9 @@ function applySiteSearch(raw) {
       .map((hit, idx) => {
         const snip = snippetAround(hit.body, q, 64);
         return `<button type="button" class="search-hit" role="option" data-group="${g.id}" data-idx="${idx}" data-full-idx="${list.indexOf(hit)}">
-          <div class="search-hit-title">${escapeHtml(hit.title)}</div>
-          ${hit.path ? `<div class="search-hit-path">${escapeHtml(hit.path)}</div>` : ""}
-          <div class="search-hit-snip"><pre class="m-0 p-0 bg-transparent font-sans text-[11px] whitespace-pre-wrap">${escapeHtml(snip)}</pre></div>
+          <div class="search-hit-title">${highlightQuery(hit.title, q)}</div>
+          ${hit.path ? `<div class="search-hit-path">${highlightQuery(hit.path, q)}</div>` : ""}
+          <div class="search-hit-snip"><pre>${highlightQuery(snip, q)}</pre></div>
         </button>`;
       })
       .join("");

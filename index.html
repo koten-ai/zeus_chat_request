@@ -491,16 +491,55 @@
     #section-grid .box-ed::before { background: var(--c-edit); }
     #section-grid .box-meta::before { background: var(--c-meta); }
     #section-grid .box-miss::before { background: var(--c-miss); }
+    .site-search {
+      min-width: 10rem;
+      max-width: 18rem;
+      width: 100%;
+    }
+    @media (min-width: 768px) {
+      .site-search { min-width: 14rem; max-width: 20rem; }
+    }
+    .glossary-card.is-hit {
+      outline: 2px solid var(--c-inj);
+      outline-offset: 1px;
+    }
+    .help-block.is-hidden,
+    .glossary-card.is-hidden { display: none !important; }
+    .help-block.is-hit {
+      border-radius: 0.5rem;
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--c-inj) 55%, transparent);
+      padding: 0.35rem 0.5rem;
+      margin: 0.25rem -0.5rem;
+    }
+    #search-meta { font-size: 11px; white-space: nowrap; }
   </style>
 </head>
 <body class="bg-base-300 text-base-content min-h-screen">
-  <div class="navbar bg-base-100 border-b border-base-content/10 sticky top-0 z-40 px-4">
-    <div class="flex-1 gap-3 min-w-0">
-      <span class="font-bold text-lg shrink-0">chat_request map</span>
-      <span class="badge badge-ghost badge-sm hidden sm:inline">zeus_chat_request</span>
+  <div class="navbar bg-base-100 border-b border-base-content/10 sticky top-0 z-40 px-3 sm:px-4 min-h-16 flex-wrap gap-y-2 py-2">
+    <div class="flex-1 gap-2 sm:gap-3 min-w-0 items-center">
+      <span class="font-bold text-base sm:text-lg shrink-0">chat_request map</span>
+      <span class="badge badge-ghost badge-sm hidden lg:inline">zeus_chat_request</span>
+      <div class="relative flex-1 max-w-xl min-w-[10rem]">
+        <label class="input input-bordered input-sm flex items-center gap-2 site-search w-full max-w-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" />
+          </svg>
+          <input
+            id="site-search"
+            type="search"
+            class="grow min-w-0"
+            placeholder="Search help &amp; glossary…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search help and glossary"
+          />
+          <kbd class="kbd kbd-xs hidden sm:inline opacity-60">/</kbd>
+        </label>
+        <div id="search-meta" class="text-muted absolute left-0 top-full mt-0.5 px-1 hidden sm:block"></div>
+      </div>
     </div>
     <div class="flex-none gap-2 items-center flex-wrap justify-end">
-      <select id="mode-select" class="select select-bordered select-sm w-36" title="Mode = which tool surface + behavior profile"></select>
+      <select id="mode-select" class="select select-bordered select-sm w-32 sm:w-36" title="Mode = which tool surface + behavior profile"></select>
       <div class="join">
         <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes">Cards</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="size">Size map</button>
@@ -759,19 +798,24 @@
       <div class="card bg-base-100 shadow">
         <div class="card-body prose prose-sm max-w-none help-prose">
           <h2 class="mt-0">Help · FAQ · Glossary</h2>
-          <p class="help-toc not-prose text-sm flex flex-wrap gap-x-3 gap-y-1 opacity-90">
+          <p class="not-prose text-sm text-muted mb-2">
+            Use the <b>search box in the top bar</b> (or press <kbd class="kbd kbd-xs">/</kbd>) to filter this page and the glossary.
+            <span id="help-search-hint" class="ml-1"></span>
+          </p>
+          <p class="help-toc not-prose text-sm flex flex-wrap gap-x-3 gap-y-1">
             Jump:
             <a href="#help-picture">How it fits</a>
             <a href="#help-colors">Colors</a>
             <a href="#help-ui">This UI</a>
-            <a href="#glossary">Glossary A–Z</a>
+            <a href="#glossary">Glossary</a>
             <a href="#help-injects">Blue injects</a>
             <a href="#help-faq">FAQ</a>
             <a href="#help-troubleshoot">Troubleshooting</a>
           </p>
 
-          <h2 id="help-picture">Simple picture: how it fits together</h2>
-          <pre class="bg-base-200 p-3 rounded text-xs not-prose overflow-x-auto">You ask a question
+          <div class="help-block" data-help-block id="help-picture" data-search="flow client inject terminate stamp baseline">
+            <h2 class="!mt-4">Simple picture: how it fits together</h2>
+            <pre class="bg-base-200 p-3 rounded text-xs not-prose overflow-x-auto">You ask a question
         │
         ▼
   Zeus Client (or Hub chat)
@@ -779,173 +823,142 @@
         │  2) inject BLUE pieces: scope brief, mini-schema, business rules, your message
         │  3) call the LLM with tools (verbs)
         │  4) LLM calls Zeus APIs (find / search / pipeline / …)
-        │  5) LLM terminates with STANDARD output fields
+        │  5) LLM terminates with STANDARD output fields (Layer A)
         ▼
-  Answer + query_decomposition (for analytics) + refs</pre>
-          <p><b>This repo</b> holds <b>baseline templates</b> (by mode). Your production file is refined in Hub Workbench and <b>stamped</b> on your Zeus so the hash matches what you deploy.</p>
-
-          <h2 id="help-colors">Color policy (cards = tree = JSON)</h2>
-          <ul>
-            <li><span class="txt-ro font-bold">RED</span> — <b>Rules</b>. Shipped in the catalog; changing them changes the contract hash. Edit only via Zeus generator / deliberate release.</li>
-            <li><span class="txt-ed font-bold">GREEN</span> — <b>Editable guidance</b>. Business-friendly advice (optimal paths, facet docs). Hash-excluded on full profiles. Often <b>missing on min</b> (yellow card).</li>
-            <li><span class="txt-inj font-bold">BLUE</span> — <b>Injected at runtime</b> by Zeus Client / Hub (not stored in the baseline JSON). Competes for tokens with the red system prompt.</li>
-            <li><span class="txt-meta font-bold">PURPLE</span> — Meta / stamp labels (id, hash, notes).</li>
-            <li><span class="txt-miss font-bold">YELLOW</span> — Present on full profiles, <b>missing on this min file</b>. Not an error—min is intentionally lean.</li>
-          </ul>
-
-          <h2 id="help-ui">How to use this page</h2>
-          <ul>
-            <li><b>Cards</b> — one box per structural section; click to open the sticky <b>Selected content</b> panel.</li>
-            <li><b>Size map</b> — area ≈ bytes (and ~tokens). Click a tile for the same panel. Toggle inject estimates to see BLUE competition.</li>
-            <li><b>JSON</b> — color-coded sections. <b>▾ / ▸</b> expands or collapses a section body. <b>Expand all / Collapse all</b> for every section. Click a header (or body) to open the content panel.</li>
-            <li><b>Close content</b> — red-outline <b>✕ Close</b> on the panel, the link under the body, or keyboard <b>Esc</b>.</li>
-            <li><b>Mode dropdown</b> — which baseline file you inspect (analytics, fraud, …). Does not change your production Zeus until you stamp there.</li>
-          </ul>
-
-          <h2 id="glossary">Glossary A–Z (plain language)</h2>
-          <p class="text-xs opacity-70">Same color borders as Cards / Size map / JSON blocks. Left border: red = rules, green = editable, blue = injected, purple = meta.</p>
-          <div class="not-prose glossary-grid text-sm">
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">@as.ids</dt><dd class="opacity-90 mt-1">How pipelines pass IDs between steps (e.g. find → project). Wrong shape = empty results.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">A/B / eval pack</dt><dd class="opacity-90 mt-1">Compare two catalog stamps (or injects) on the same questions before promoting to production.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Baseline vs stamped</dt><dd class="opacity-90 mt-1"><b>Baseline</b> = GitHub template. <b>Stamped</b> = verified on <i>your</i> Zeus with a server hash for production binding.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Boundary / scope</dt><dd class="opacity-90 mt-1">Hard wall: the model may only touch data in the bound bucket/scope. Stops cross-tenant leaks.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Bucket</dt><dd class="opacity-90 mt-1">Couchbase data container. Zeus scopes sit on buckets; chat never invents a bucket outside the bound session.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Business logic / prompt_override</dt><dd class="opacity-90 mt-1">Your company language &amp; policies. Injected (BLUE) from Hub/Workbench—not hard-coded into public baselines.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">chat_request*.json</dt><dd class="opacity-90 mt-1">The <b>menu + house rules</b> the AI sees: tools it may call + how to answer. One file per <b>mode</b>.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Cheap vs expensive verbs</dt><dd class="opacity-90 mt-1">find/get are cheap; search/analyze cost more. Prompt steers “cheapest first” so chats stay fast and affordable.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">confidence</dt><dd class="opacity-90 mt-1">Required terminate field: only the strings <code>high</code>, <code>med</code>, or <code>low</code> (not a float). Used for analytics and UX badges.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Contract / stamp / hash</dt><dd class="opacity-90 mt-1">Server fingerprint of Rules. Clients send <code>contract_id</code> + <code>contract_hash</code> every turn to detect drift.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Contract drift</dt><dd class="opacity-90 mt-1">Client rules no longer match the stamped hash—someone changed the catalog without rebinding.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">decomposition</dt><dd class="opacity-90 mt-1">Structured data plan (targets, predicates, output type) grounded in MINI-SCHEMA. Required on terminate.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">DCP / projection</dt><dd class="opacity-90 mt-1">How Zeus keeps graph bags (nodes/edges) in sync with source documents. Entity map drives what gets projected.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Entity map</dt><dd class="opacity-90 mt-1">Operator map of fields → types/FKs. Feeds projection + what appears in MINI-SCHEMA.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">entity_types / edge_types</dt><dd class="opacity-90 mt-1">Denormalized type lists on graph docs so filters avoid full primary scans. Ops/index concern, not model prose.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Envelope (V2)</dt><dd class="opacity-90 mt-1">The chat_request.v2 shape: Rules + optional guidance + wire/inject slots. Same envelope, different modes.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">Evidence loop / hot-path</dt><dd class="opacity-90 mt-1">Product loop: capture real turns → cluster success/failure paths → improve catalog → A/B. Needs <code>query_decomposition</code>.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">find vs search</dt><dd class="opacity-90 mt-1"><b>find</b> = exact/filter (cheap). <b>search</b> = FTS/vector/hybrid (expensive). Prefer find when filters exist.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">FTS / hybrid / vector</dt><dd class="opacity-90 mt-1">Text search, embedding search, or blend. Powerful but costlier than keyed find—model should use when filters alone fail.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">get / bag / graph</dt><dd class="opacity-90 mt-1">Fetch projected node/edge bags after you know IDs. Graph verbs explore relationships; don’t start there blindly.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">Guidance</dt><dd class="opacity-90 mt-1">GREEN advisory block (optimal paths, facet docs). Often hash-excluded; often stripped on min.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Hash policy</dt><dd class="opacity-90 mt-1">Which JSON paths are Rules vs excluded when stamping. Lets guidance change without always breaking clients.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Hub / Workbench</dt><dd class="opacity-90 mt-1">Operator UI on Zeus admin to refine catalogs, inject business text, stamp contracts, run chat A/B.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">instructions</dt><dd class="opacity-90 mt-1">Structured rules (response_expectations, verb_order). Full profiles; min often folds essentials into <code>messages</code>.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">Intent facets</dt><dd class="opacity-90 mt-1">Slots like intent, entity, geo, audience—the shape of <code>query_decomposition</code> for clustering questions.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">LLM / tool-calling</dt><dd class="opacity-90 mt-1">The model does not run N1QL itself; it chooses allowed <b>verbs</b>; Zeus Client executes them and returns facts.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">masq</dt><dd class="opacity-90 mt-1">Cost tiers for verbs (cheap/mod/expensive). Helps the model pick cheaper tools first.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">manifest.json</dt><dd class="opacity-90 mt-1">Index of modes + byte sizes in this repo. The UI loads it first, then the chosen <code>v2/min/…json</code>.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">min vs full</dt><dd class="opacity-90 mt-1"><b>min</b> (this repo) = smaller client payload. <b>full</b> = engine snapshots with guidance/instructions bulk.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">MINI-SCHEMA / scope brief</dt><dd class="opacity-90 mt-1">Live description of your entities/fields/counts. Injected so the model doesn’t invent columns.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Mode</dt><dd class="opacity-90 mt-1">Profile of behavior (analytics, fraud, auto…). Same envelope shape; different defaults and tool emphasis.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">optimal_paths</dt><dd class="opacity-90 mt-1">Suggested multi-step tool recipes for common intents. Guidance (green), not hard-coded execution.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">pipeline</dt><dd class="opacity-90 mt-1">One server-side multi-step call (find→order→project). Preferred over many chat rounds.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">PROMPT_BUILDER / fragments</dt><dd class="opacity-90 mt-1">How Zeus engineers assemble system prompts from versioned pieces (not hand-pasted 5k-line monoliths).</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">query_decomposition</dt><dd class="opacity-90 mt-1">Required terminate object: business intent facets (intent+entity…). Powers hot-path analytics.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">return / return_result</dt><dd class="opacity-90 mt-1">Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence).</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Rules (hashed)</dt><dd class="opacity-90 mt-1">What production promised: messages, verbs, masq, etc. Change ⇒ new hash.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">ScopeConfig</dt><dd class="opacity-90 mt-1">Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">attribution / decision / report</dt><dd class="opacity-90 mt-1">Outer server store envelope for a chat turn: quality verdict, keep/sample rule, then the full <code>report</code> with metrics + detail + spans.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">report.detail.ai.calls</dt><dd class="opacity-90 mt-1">Ordered tool invocations with args + results. Where pipeline steps and terminate fields should land as structured JSON.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">report.spans</dt><dd class="opacity-90 mt-1">Timeline slices (dispatch, ai.round, pipeline step, fts, tool) with duration_ns for performance forensics.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Standard output scheme</dt><dd class="opacity-90 mt-1"><b>Layer A</b> model terminate fields (summary + query_decomposition + …). <b>Layer B</b> server report document. Same A across modes; B is ops telemetry.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-green-500"><dt class="font-bold">turn_complete</dt><dd class="opacity-90 mt-1">Pipeline/return result flag: server can short-circuit without another LLM round when terminate fields were supplied with the tool call.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">System prompt (<code>messages</code>)</dt><dd class="opacity-90 mt-1">Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Token budget</dt><dd class="opacity-90 mt-1">Context window is limited. RED system + RED verbs + BLUE injects + history all compete—Size map shows the fight.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">Tool result / multi-round</dt><dd class="opacity-90 mt-1">After each verb, Zeus returns facts into the conversation; the model may call more tools or terminate.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-red-500"><dt class="font-bold">verbs / tools</dt><dd class="opacity-90 mt-1">Allowed Zeus API functions for the model. No verb ⇒ no safe access to that capability.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-blue-500"><dt class="font-bold">Wire payload</dt><dd class="opacity-90 mt-1">What actually goes to the LLM: catalog system+tools plus BLUE injects and conversation—not the whole pretty JSON file.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">zeus_chat_request repo</dt><dd class="opacity-90 mt-1">Published baselines for clients without cloning the engine. This UI maps that structure.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Zeus Client</dt><dd class="opacity-90 mt-1">Middleman: loads catalog, injects blue context, calls LLM, executes verbs on Zeus, returns answers.</dd></div>
-            <div class="p-3 rounded-lg bg-base-200 border-l-4 border-purple-400"><dt class="font-bold">Zeus engine / Hub</dt><dd class="opacity-90 mt-1"><b>Engine</b> serves APIs + projection. <b>Hub</b> is the operator admin UI (status, scope config, chat workbench).</dd></div>
+  Answer + query_decomposition  →  Zeus stores a turn report (Layer B)</pre>
+            <p><b>This repo</b> holds <b>baseline templates</b> (by mode). Production catalogs are refined in Hub Workbench and <b>stamped</b> on your Zeus so the hash matches what you deploy.</p>
           </div>
 
-          <h2 id="help-injects">What Zeus Client injects (BLUE) and why</h2>
-          <table class="table table-sm not-prose">
-            <thead><tr><th>Injected piece</th><th>Why</th><th>Who sets it</th></tr></thead>
-            <tbody>
-              <tr><td>User message(s)</td><td>The actual question / conversation</td><td>End user / client app</td></tr>
-              <tr><td>Scope binding</td><td>Which bucket/scope is allowed</td><td>Client session / Hub</td></tr>
-              <tr><td>SCOPE BRIEF + MINI-SCHEMA</td><td>Live entity types &amp; fields so the model doesn’t invent schema</td><td>Zeus for bound scope</td></tr>
-              <tr><td>Business logic / prompt_override</td><td>Your domain language &amp; policies</td><td>Hub Workbench / scope config</td></tr>
-              <tr><td>Contract id + hash</td><td>Prove rules didn’t drift mid-session</td><td>Stamp on Zeus, client binds</td></tr>
-              <tr><td>Tool results each round</td><td>Facts after Zeus runs find/search/…</td><td>Zeus API responses</td></tr>
-            </tbody>
-          </table>
-          <p>Baselines in GitHub intentionally <b>omit</b> blue content—your live cluster fills it in. That is why BLUE tiles are estimates on the Size map.</p>
+          <div class="help-block" data-help-block id="help-colors" data-search="red green blue purple yellow rules guidance inject meta missing">
+            <h2>Color policy (same on Cards · Size map · JSON)</h2>
+            <ul>
+              <li><span class="txt-ro font-bold">RED</span> — <b>Rules</b>. In the catalog; changing them changes the contract hash.</li>
+              <li><span class="txt-ed font-bold">GREEN</span> — <b>Editable guidance</b>. Often hash-excluded; often <b>missing on min</b> (yellow).</li>
+              <li><span class="txt-inj font-bold">BLUE</span> — <b>Injected at runtime</b> (not in this JSON). Competes for tokens with the system prompt.</li>
+              <li><span class="txt-meta font-bold">PURPLE</span> — Meta / stamp labels (id, hash, notes).</li>
+              <li><span class="txt-miss font-bold">YELLOW</span> — Expected on full profiles, <b>absent on this min file</b> (not always an error).</li>
+            </ul>
+          </div>
+
+          <div class="help-block" data-help-block id="help-ui" data-search="cards toc chapters size json content panel theme search expand collapse open">
+            <h2>How to use this UI</h2>
+            <ul>
+              <li><b>Search (top bar)</b> — filters Help + Glossary; typing jumps to Help. Press <kbd class="kbd kbd-xs">/</kbd> to focus, <kbd class="kbd kbd-xs">Esc</kbd> clears (or closes the content panel if open).</li>
+              <li><b>Theme</b> — sun/moon toggle locks light/dark; <b>Auto</b> follows the OS (default).</li>
+              <li><b>Cards</b> — four chapters with a sticky left <b>On this page</b> TOC:
+                <ol>
+                  <li><b>Snapshot</b> — mode / size / terminate health</li>
+                  <li><b>Catalog parts</b> — one card per JSON key (<span class="font-mono text-xs">Open →</span> = clickable)</li>
+                  <li><b>Wire vs inject</b> — RED in-file vs BLUE runtime zones</li>
+                  <li><b>Output scheme</b> — Layer A (model terminate) + Layer B (server report) + WIP checklist</li>
+                </ol>
+              </li>
+              <li><b>Size map</b> — treemap area ∝ bytes (~tokens). Click a tile → content panel.</li>
+              <li><b>JSON</b> — color boxes; <b>▾</b> expands one section; <b>Expand all / Collapse all</b>; header opens the panel.</li>
+              <li><b>Content panel</b> — sticky inspector. Close with <b>✕ Close</b>, bottom link, or <b>Esc</b>.</li>
+              <li><b>Mode dropdown</b> — which baseline you inspect. Does not change production until you stamp on Zeus.</li>
+            </ul>
+          </div>
+
+          <h2 id="glossary">Glossary <span class="text-sm font-normal text-muted" id="glossary-count"></span></h2>
+          <p class="text-xs text-muted not-prose">Left border color matches RED / GREEN / BLUE / PURPLE / YELLOW. Search from the top bar filters these cards.</p>
+          <div class="not-prose glossary-grid text-sm" id="glossary-grid"></div>
+          <p id="glossary-empty" class="hidden not-prose text-sm text-muted">No glossary terms match. Clear search or try another word.</p>
+
+          <div class="help-block" data-help-block id="help-injects" data-search="inject blue mini-schema scope brief business prompt_override contract">
+            <h2>What Zeus Client injects (BLUE) and why</h2>
+            <table class="table table-sm not-prose">
+              <thead><tr><th>Injected piece</th><th>Why</th><th>Who sets it</th></tr></thead>
+              <tbody>
+                <tr><td>User message(s)</td><td>The actual question / conversation</td><td>End user / client app</td></tr>
+                <tr><td>Scope binding</td><td>Which bucket/scope is allowed</td><td>Client session / Hub</td></tr>
+                <tr><td>SCOPE BRIEF + MINI-SCHEMA</td><td>Live entity types &amp; fields so the model doesn’t invent schema</td><td>Zeus for bound scope</td></tr>
+                <tr><td>Business logic / prompt_override</td><td>Your domain language &amp; policies</td><td>Hub Workbench / scope config</td></tr>
+                <tr><td>Contract id + hash</td><td>Prove rules didn’t drift mid-session</td><td>Stamp on Zeus, client binds</td></tr>
+                <tr><td>Tool results each round</td><td>Facts after Zeus runs find/search/…</td><td>Zeus API responses</td></tr>
+              </tbody>
+            </table>
+            <p>Baselines in GitHub intentionally <b>omit</b> blue content—your live cluster fills it in. BLUE tiles on the Size map are estimates.</p>
+          </div>
 
           <h2 id="help-faq">FAQ</h2>
-          <h3>What is the difference between AUTO, ANALYTICS, FRAUD, … in the dropdown?</h3>
-          <p>Each file is a <b>mode profile</b>: same envelope idea (tools + rules), different emphasis.</p>
-          <ul>
-            <li><b>analytics</b> — default “real links, not noise”; balanced graph + semantic tools. Most demos start here.</li>
-            <li><b>auto</b> — discovery / safe-during-setup; not a long-term production mode.</li>
-            <li><b>fraud</b> — keep more weak signals; graph structure matters more; lower confidence floor.</li>
-            <li><b>code</b> — code/doc style exploration.</li>
-            <li><b>research / open</b> — more exploratory tool mix.</li>
-            <li><b>tenant / private / regulated</b> — stronger tenancy / privacy / compliance posture in the product stack.</li>
-            <li><b>custom</b> — shell for operator-tuned modes.</li>
-          </ul>
-          <p>This dropdown only switches which <b>baseline</b> you inspect. Production: assign a mode per scope in Zeus.</p>
 
-          <h3>Where do I put “talk about my business” for the AI?</h3>
-          <ol>
-            <li><b>Hub Workbench / scope config</b> — business injections, prompt overrides, entity map labels (preferred, BLUE at runtime).</li>
-            <li><b>guidance</b> on a <b>full</b> catalog (optimal_paths, notes) — GREEN, often hash-excluded.</li>
-            <li><b>Not</b> by forever hand-editing RED <code>messages</code>/<code>verbs</code> in this public baseline if you care about stamp stability—use Zeus generator + Workbench, then stamp.</li>
-          </ol>
+          <div class="help-block" data-help-block data-search="mode auto analytics fraud dropdown profile">
+            <h3>What is the difference between AUTO, ANALYTICS, FRAUD, …?</h3>
+            <p>Each file is a <b>mode profile</b>: same envelope idea (tools + rules), different emphasis.</p>
+            <ul>
+              <li><b>analytics</b> — default balanced demos</li>
+              <li><b>auto</b> — discovery / setup; not long-term production</li>
+              <li><b>fraud</b> — keep weak signals; graph-heavy</li>
+              <li><b>code / research / open</b> — more exploratory mixes</li>
+              <li><b>tenant / private / regulated</b> — stronger boundary posture</li>
+              <li><b>custom</b> — operator shell</li>
+            </ul>
+            <p>This dropdown only switches which <b>baseline</b> you inspect. Production: assign a mode per scope in Zeus.</p>
+          </div>
 
-          <h3>How do I optimize chat_request?</h3>
-          <ol>
-            <li>Use <b>Size map</b>: shrink what dominates tokens (usually system prompt + tools).</li>
-            <li>Prefer <b>min</b> for clients; keep evidence-loop terminate fields (query_decomposition required).</li>
-            <li>Push domain knowledge into <b>MINI-SCHEMA + blue injects</b>, not a 50-page system essay.</li>
-            <li>Use <b>pipeline</b> / cheaper verbs; don’t expose tools you don’t need for that mode.</li>
-            <li>Stamp on Zeus; A/B with eval packs before swapping production hashes.</li>
-          </ol>
+          <div class="help-block" data-help-block data-search="business language workbench inject guidance edit">
+            <h3>Where do I put “talk about my business” for the AI?</h3>
+            <ol>
+              <li><b>Hub Workbench / ScopeConfig</b> — injects &amp; entity map (preferred, BLUE).</li>
+              <li><b>guidance</b> on a <b>full</b> catalog (GREEN, often hash-excluded).</li>
+              <li><b>Not</b> by forever hand-editing public RED baselines if you care about stamp stability.</li>
+            </ol>
+          </div>
 
-          <h3>What is “schema output standardization”?</h3>
-          <p>Two layers (see Cards → <b>Output scheme</b>):</p>
-          <p><b>Layer A — model terminate</b> (same every mode/deploy). When the model <b>finishes a turn</b> it must emit:</p>
-          <ul>
-            <li><code>summary</code> — human answer facts</li>
-            <li><code>query_decomposition</code> — business intent facets (intent + entity + …)</li>
-            <li><code>decomposition</code> — data targets/predicates from MINI-SCHEMA</li>
-            <li><code>confidence</code> — string <code>high|med|low</code> only</li>
-          </ul>
-          <p>Those fields can sit on <code>return</code> or on the top level of a terminating <code>pipeline</code> (1-call short-circuit).</p>
-          <p><b>Layer B — server report</b> is what Zeus stores for the turn: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, <code>detail.ai.calls</code>, storage FTS/N1QL, <code>spans</code>) + <code>stored_at</code>. Real Hub traces often have B filled while A is still WIP (summary only, empty tokens, missing query_decomposition) — the Cards checklist documents that gap.</p>
+          <div class="help-block" data-help-block data-search="optimize tokens size map min pipeline stamp">
+            <h3>How do I optimize chat_request?</h3>
+            <ol>
+              <li>Use <b>Size map</b> — shrink what dominates tokens.</li>
+              <li>Prefer <b>min</b>; keep evidence-loop terminate fields.</li>
+              <li>Push domain knowledge into <b>MINI-SCHEMA + blue injects</b>.</li>
+              <li>Prefer <b>pipeline</b> / cheaper verbs; drop unused tools.</li>
+              <li>Stamp on Zeus; A/B before promoting hashes.</li>
+            </ol>
+          </div>
 
-          <h3>Why is guidance yellow / missing on min?</h3>
-          <p>Min profiles drop bulky green guidance to save tokens. Rules (red) + injects (blue) still run. Put durable business policy in Hub injects; use full profiles when you need green optimal_paths in-file.</p>
+          <div class="help-block" data-help-block data-search="output scheme layer a layer b terminate report query_decomposition">
+            <h3>What is the output scheme (Layer A vs B)?</h3>
+            <p><b>Layer A — model terminate</b> (same every mode): <code>summary</code>, <code>query_decomposition</code>, <code>decomposition</code>, <code>confidence</code> on <code>return</code> or terminating <code>pipeline</code>.</p>
+            <p><b>Layer B — server report</b>: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, <code>detail.ai.calls</code>, FTS/N1QL, <code>spans</code>) + <code>stored_at</code>. See Cards → chapter 4.</p>
+          </div>
 
-          <h3>Why do RED / GREEN / BLUE sizes matter?</h3>
-          <p>Every byte in the wire payload costs latency and money. RED is the fixed menu; BLUE is live truth for your tenant; GREEN is optional coaching. If BLUE+RED already fill the window, history and long answers get truncated—use Size map to see the fight before you ship.</p>
+          <div class="help-block" data-help-block data-search="guidance yellow missing min">
+            <h3>Why is guidance yellow / missing on min?</h3>
+            <p>Min drops bulky GREEN guidance to save tokens. Rules + injects still run. Put durable policy in Hub injects.</p>
+          </div>
 
-          <h3>What is the evidence loop in one sentence?</h3>
-          <p>Log every terminate’s <code>query_decomposition</code> (and outcomes), cluster which intents succeed/fail, then improve verbs/guidance/injects and re-stamp—not “prompt folklore.”</p>
+          <div class="help-block" data-help-block data-search="evidence loop hot path analytics">
+            <h3>What is the evidence loop in one sentence?</h3>
+            <p>Log every terminate’s <code>query_decomposition</code>, cluster success/failure intents, improve catalog/injects, re-stamp — not prompt folklore.</p>
+          </div>
 
-          <h3>min file vs full file — which do clients load?</h3>
-          <p>Clients should load the <b>stamped min</b> (or equivalent slim profile) from your Zeus, not necessarily this GitHub copy. Full snapshots live in the engine for authors; this repo publishes mins for transparency and client pinning.</p>
+          <div class="help-block" data-help-block data-search="edit hand generator snapshot publish">
+            <h3>Can I edit the JSON in this repo by hand?</h3>
+            <p>Baselines are <b>generated</b> in Zeus then published here. Prefer fragments → regenerate → publish.</p>
+          </div>
 
-          <h3>Can I edit the JSON in this repo by hand?</h3>
-          <p>Baselines are <b>generated</b> in Zeus (<code>make ai-snapshot-min</code>) then published here. Prefer editing Zeus prompt fragments / generator, regenerate, publish—don’t maintain a second hand-edited truth.</p>
+          <div class="help-block" data-help-block data-search="expand collapse content panel close escape open">
+            <h3>Expand/collapse and the content panel?</h3>
+            <ul>
+              <li>JSON <b>▾</b> toggles one section; <b>Expand all / Collapse all</b> for everything.</li>
+              <li>Cards / tiles / JSON headers open the sticky panel (<b>Open →</b>).</li>
+              <li>Close with <b>✕ Close</b>, bottom link, or <b>Esc</b>.</li>
+            </ul>
+          </div>
 
-          <h3>How do expand/collapse and the content panel work?</h3>
-          <ul>
-            <li>JSON <b>▾</b> toggles only that section’s body (keeps the page scannable).</li>
-            <li><b>Expand all / Collapse all</b> toggles every section at once.</li>
-            <li>Clicking a section header opens the sticky panel with full text + bytes/~tokens.</li>
-            <li>Close with <b>✕ Close</b>, the bottom “Close panel” link, or <b>Esc</b>.</li>
-          </ul>
-
-          <h2 id="help-troubleshoot">Troubleshooting (common “why?”)</h2>
-          <ul>
-            <li><b>Empty answers / invented fields</b> — MINI-SCHEMA or entity map incomplete; model is guessing columns. Fix ScopeConfig / entity map, not only the system prompt.</li>
-            <li><b>Slow or expensive chats</b> — too many search/hybrid calls; trim verbs; push optimal_paths / masq; prefer pipeline.</li>
-            <li><b>Contract / hash errors</b> — client still pins old stamp after catalog change. Re-stamp and rebind client.</li>
-            <li><b>Missing query_decomposition in logs</b> — min system prompt lost evidence-loop rules, or model terminated without the schema. Check RED messages + return verb description.</li>
-            <li><b>Cross-scope leakage fears</b> — boundary is server-enforced; still never put secrets in RED baselines that ship to every client.</li>
-            <li><b>This page won’t load data</b> — must be served over HTTP from the repo root (e.g. <code>python3 -m http.server 8766</code>), not opened as a <code>file://</code> URL.</li>
-          </ul>
+          <div class="help-block" data-help-block id="help-troubleshoot" data-search="troubleshoot empty slow hash query_decomposition file http">
+            <h2>Troubleshooting</h2>
+            <ul>
+              <li><b>Empty answers / invented fields</b> — fix entity map / MINI-SCHEMA, not only the system prompt.</li>
+              <li><b>Slow or expensive chats</b> — too many search/hybrid calls; prefer pipeline; trim verbs.</li>
+              <li><b>Contract / hash errors</b> — re-stamp and rebind the client.</li>
+              <li><b>Missing query_decomposition</b> — terminate envelope incomplete; check RED messages + return/pipeline props.</li>
+              <li><b>project rows missing:true</b> — projection / bag / entity map issue (ops), not only the prompt.</li>
+              <li><b>Page won’t load data</b> — serve over HTTP from repo root (<code>python3 -m http.server 8766</code>), not <code>file://</code>.</li>
+              <li><b>Light mode hard to read</b> — hard-refresh after updates; theme <b>Auto</b> follows the OS.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -1030,6 +1043,174 @@ function initThemeController() {
   };
   if (mq.addEventListener) mq.addEventListener("change", onOsChange);
   else if (mq.addListener) mq.addListener(onOsChange);
+}
+
+/** Glossary for Help (searchable). kind: rules|guidance|inject|meta|miss */
+const GLOSSARY = [
+  { term: "@as.ids", kind: "rules", def: "How pipelines pass IDs between steps (e.g. find → project). Wrong shape = empty results." },
+  { term: "A/B / eval pack", kind: "rules", def: "Compare two catalog stamps (or injects) on the same questions before promoting to production." },
+  { term: "attribution / decision / report", kind: "meta", def: "Outer server store envelope for a chat turn: quality verdict, keep/sample rule, then the full report with metrics + detail + spans (Layer B)." },
+  { term: "Auto theme", kind: "meta", def: "Navbar control that follows the OS light/dark preference (default). Toggle locks light or dark; Auto returns to system." },
+  { term: "Baseline vs stamped", kind: "meta", def: "Baseline = GitHub template in this repo. Stamped = verified on your Zeus with a server hash for production binding." },
+  { term: "Boundary / scope", kind: "inject", def: "Hard wall: the model may only touch data in the bound bucket/scope. Stops cross-tenant leaks." },
+  { term: "Bucket", kind: "meta", def: "Couchbase data container. Zeus scopes sit on buckets; chat never invents a bucket outside the bound session." },
+  { term: "Business logic / prompt_override", kind: "inject", def: "Your company language & policies. Injected (BLUE) from Hub/Workbench—not hard-coded into public baselines." },
+  { term: "Cards chapters", kind: "meta", def: "Cards page is split into 1 Snapshot · 2 Catalog parts · 3 Wire vs inject · 4 Output scheme, with a sticky On-this-page TOC." },
+  { term: "chat_request*.json", kind: "rules", def: "The menu + house rules the AI sees: tools it may call + how to answer. One file per mode." },
+  { term: "Cheap vs expensive verbs", kind: "rules", def: "find/get are cheap; search/analyze cost more. Prompt steers cheapest first so chats stay fast and affordable." },
+  { term: "confidence", kind: "guidance", def: "Required terminate field: only the strings high, med, or low (not a float). Used for analytics and UX badges." },
+  { term: "Content panel", kind: "meta", def: "Sticky inspector at the top of the page. Opens when you click Open → cards, size tiles, or JSON blocks. Close with ✕ or Esc." },
+  { term: "Contract / stamp / hash", kind: "meta", def: "Server fingerprint of Rules. Clients send contract_id + contract_hash every turn to detect drift." },
+  { term: "Contract drift", kind: "rules", def: "Client rules no longer match the stamped hash—someone changed the catalog without rebinding." },
+  { term: "decomposition", kind: "guidance", def: "Structured data plan (targets, predicates, output type) grounded in MINI-SCHEMA. Required on terminate." },
+  { term: "DCP / projection", kind: "rules", def: "How Zeus keeps graph bags (nodes/edges) in sync with source documents. Entity map drives what gets projected." },
+  { term: "Entity map", kind: "inject", def: "Operator map of fields → types/FKs. Feeds projection + what appears in MINI-SCHEMA." },
+  { term: "entity_types / edge_types", kind: "rules", def: "Denormalized type lists on graph docs so filters avoid full primary scans. Ops/index concern, not model prose." },
+  { term: "Envelope (V2)", kind: "meta", def: "The chat_request.v2 shape: Rules + optional guidance + wire/inject slots. Same envelope, different modes." },
+  { term: "Evidence loop / hot-path", kind: "guidance", def: "Capture real turns → cluster success/failure paths → improve catalog → A/B. Needs query_decomposition on terminate." },
+  { term: "Expand all / Collapse all", kind: "meta", def: "JSON view buttons that open or close every colored section body so long catalogs stay scannable." },
+  { term: "find vs search", kind: "rules", def: "find = exact/filter (cheap). search = FTS/vector/hybrid (expensive). Prefer find when filters exist." },
+  { term: "FTS / hybrid / vector", kind: "rules", def: "Text search, embedding search, or blend. Powerful but costlier than keyed find." },
+  { term: "get / bag / graph", kind: "rules", def: "Fetch projected node/edge bags after you know IDs. Graph verbs explore relationships; don’t start there blindly." },
+  { term: "Guidance", kind: "guidance", def: "GREEN advisory block (optimal paths, facet docs). Often hash-excluded; often stripped on min." },
+  { term: "Hash policy", kind: "meta", def: "Which JSON paths are Rules vs excluded when stamping. Lets guidance change without always breaking clients." },
+  { term: "Hub / Workbench", kind: "inject", def: "Operator UI on Zeus admin to refine catalogs, inject business text, stamp contracts, run chat A/B." },
+  { term: "instructions", kind: "rules", def: "Structured rules (response_expectations, verb_order). Full profiles; min often folds essentials into messages." },
+  { term: "Intent facets", kind: "guidance", def: "Slots like intent, entity, geo, audience—the shape of query_decomposition for clustering questions." },
+  { term: "Layer A / Layer B", kind: "rules", def: "Output scheme: A = model terminate fields (summary + query_decomposition + …). B = server report document (attribution, report, spans)." },
+  { term: "LLM / tool-calling", kind: "rules", def: "The model does not run N1QL itself; it chooses allowed verbs; Zeus Client executes them and returns facts." },
+  { term: "manifest.json", kind: "meta", def: "Index of modes + byte sizes in this repo. The UI loads it first, then the chosen v2/min/…json." },
+  { term: "masq", kind: "rules", def: "Cost tiers for verbs (cheap/mod/expensive). Helps the model pick cheaper tools first." },
+  { term: "min vs full", kind: "meta", def: "min (this repo) = smaller client payload. full = engine snapshots with guidance/instructions bulk." },
+  { term: "MINI-SCHEMA / scope brief", kind: "inject", def: "Live description of your entities/fields/counts. Injected so the model doesn’t invent columns." },
+  { term: "Mode", kind: "rules", def: "Profile of behavior (analytics, fraud, auto…). Same envelope shape; different defaults and tool emphasis." },
+  { term: "On this page TOC", kind: "meta", def: "Sticky mid-viewport nav on Cards. Jumps to chapters 1–4 and Output scheme subsections (A / B / WIP)." },
+  { term: "Open →", kind: "meta", def: "Chip on clickable cards. Means the card opens the content panel (not just decorative)." },
+  { term: "optimal_paths", kind: "guidance", def: "Suggested multi-step tool recipes for common intents. Guidance (green), not hard-coded execution." },
+  { term: "pipeline", kind: "rules", def: "One server-side multi-step call (find→order→project). Preferred over many chat rounds. May carry terminate fields at top level." },
+  { term: "PROMPT_BUILDER / fragments", kind: "meta", def: "How Zeus engineers assemble system prompts from versioned pieces (not hand-pasted monoliths)." },
+  { term: "query_decomposition", kind: "guidance", def: "Required terminate object: business intent facets (intent+entity…). Powers hot-path analytics." },
+  { term: "report.detail.ai.calls", kind: "meta", def: "Ordered tool invocations with args + results in the server report. Where pipeline steps and terminate fields land as JSON." },
+  { term: "report.spans", kind: "meta", def: "Timeline slices (dispatch, ai.round, pipeline step, fts, tool) with duration_ns for performance forensics." },
+  { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence)." },
+  { term: "Rules (hashed)", kind: "rules", def: "What production promised: messages, verbs, masq, etc. Change ⇒ new hash." },
+  { term: "ScopeConfig", kind: "inject", def: "Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production." },
+  { term: "Search (this UI)", kind: "meta", def: "Top-bar search filters Help blocks and glossary cards. Typing switches to the Help tab automatically." },
+  { term: "Size map", kind: "meta", def: "Treemap where area ∝ bytes (~tokens ≈ bytes/4). Click tiles to open the content panel; toggle BLUE inject estimates." },
+  { term: "Standard output scheme", kind: "rules", def: "Layer A model terminate fields + Layer B server report. Same A across modes/deploys so every call is machine-parseable." },
+  { term: "System prompt (messages)", kind: "rules", def: "Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules." },
+  { term: "Theme toggle", kind: "meta", def: "Sun/moon control in the navbar. Default is system; choice persists in localStorage (cr-map-theme)." },
+  { term: "Token budget", kind: "inject", def: "Context window is limited. RED system + RED verbs + BLUE injects + history all compete—Size map shows the fight." },
+  { term: "Tool result / multi-round", kind: "rules", def: "After each verb, Zeus returns facts into the conversation; the model may call more tools or terminate." },
+  { term: "turn_complete", kind: "guidance", def: "Pipeline/return flag: server can short-circuit without another LLM round when terminate fields were supplied with the tool call." },
+  { term: "verbs / tools", kind: "rules", def: "Allowed Zeus API functions for the model. No verb ⇒ no safe access to that capability." },
+  { term: "Wire payload", kind: "inject", def: "What actually goes to the LLM: catalog system+tools plus BLUE injects and conversation—not the whole pretty JSON file." },
+  { term: "Wire vs inject (chapter 3)", kind: "meta", def: "Cards chapter that splits RED in-file pieces from BLUE runtime inject estimates side by side." },
+  { term: "WIP checklist", kind: "miss", def: "Cards output chapter list of what a real Hub turn had vs still missing (e.g. query_decomposition, tokens, project missing:true)." },
+  { term: "zeus_chat_request repo", kind: "meta", def: "Published baselines for clients without cloning the engine. This UI maps that structure." },
+  { term: "Zeus Client", kind: "meta", def: "Middleman: loads catalog, injects blue context, calls LLM, executes verbs on Zeus, returns answers." },
+  { term: "Zeus engine / Hub", kind: "meta", def: "Engine serves APIs + projection. Hub is the operator admin UI (status, scope config, chat workbench)." },
+];
+
+const GLOSSARY_BORDER = {
+  rules: "border-red-500",
+  guidance: "border-green-500",
+  inject: "border-blue-500",
+  meta: "border-purple-400",
+  miss: "border-yellow-400",
+};
+
+function renderGlossary() {
+  const grid = document.getElementById("glossary-grid");
+  if (!grid) return;
+  const sorted = GLOSSARY.slice().sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: "base" }));
+  grid.innerHTML = sorted
+    .map((g) => {
+      const border = GLOSSARY_BORDER[g.kind] || GLOSSARY_BORDER.meta;
+      const hay = (g.term + " " + g.def + " " + (g.kind || "")).toLowerCase();
+      return `<div class="glossary-card p-3 rounded-lg bg-base-200 border-l-4 ${border}" data-glossary data-search="${escapeHtml(hay)}">
+        <dt class="font-bold">${escapeHtml(g.term)}</dt>
+        <dd class="text-muted mt-1">${escapeHtml(g.def)}</dd>
+      </div>`;
+    })
+    .join("");
+  const count = document.getElementById("glossary-count");
+  if (count) count.textContent = `(${sorted.length} terms)`;
+}
+
+function applySiteSearch(raw) {
+  const q = (raw || "").trim().toLowerCase();
+  const meta = document.getElementById("search-meta");
+  const hint = document.getElementById("help-search-hint");
+  const empty = document.getElementById("glossary-empty");
+
+  const cards = document.querySelectorAll("[data-glossary]");
+  const blocks = document.querySelectorAll("[data-help-block]");
+  let gHits = 0;
+  let hHits = 0;
+
+  cards.forEach((el) => {
+    const hay = (el.getAttribute("data-search") || el.textContent || "").toLowerCase();
+    const hit = !q || hay.includes(q);
+    el.classList.toggle("is-hidden", !hit);
+    el.classList.toggle("is-hit", !!q && hit);
+    if (hit) gHits++;
+  });
+
+  blocks.forEach((el) => {
+    const hay = ((el.getAttribute("data-search") || "") + " " + (el.textContent || "")).toLowerCase();
+    const hit = !q || hay.includes(q);
+    el.classList.toggle("is-hidden", !hit);
+    el.classList.toggle("is-hit", !!q && hit);
+    if (hit) hHits++;
+  });
+
+  if (empty) empty.classList.toggle("hidden", !q || gHits > 0);
+
+  if (!q) {
+    if (meta) meta.textContent = "";
+    if (hint) hint.textContent = "";
+    return;
+  }
+
+  const msg = `${gHits} glossary · ${hHits} help`;
+  if (meta) meta.textContent = msg;
+  if (hint) hint.textContent = `Showing ${msg} for “${raw.trim()}”.`;
+
+  // Jump to Help so results are visible
+  if (state.view !== "help") setView("help");
+}
+
+function initSiteSearch() {
+  renderGlossary();
+  const input = document.getElementById("site-search");
+  if (!input) return;
+
+  let t = null;
+  const run = () => applySiteSearch(input.value);
+  input.addEventListener("input", () => {
+    clearTimeout(t);
+    t = setTimeout(run, 120);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (input.value) {
+        e.preventDefault();
+        input.value = "";
+        applySiteSearch("");
+      }
+    }
+  });
+
+  // / focuses search (when not typing in another field)
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.target?.isContentEditable) return;
+    e.preventDefault();
+    input.focus();
+    input.select();
+  });
 }
 
 const COLORS = {
@@ -2444,9 +2625,15 @@ document.getElementById("btn-json-collapse-all")?.addEventListener("click", () =
   setJsonBlocksCollapsed(true);
   toast("Collapsed all JSON sections");
 });
-// Esc closes content panel when something is selected
+// Esc: clear search first, else close content panel when something is selected
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  const search = document.getElementById("site-search");
+  if (search && search.value) {
+    search.value = "";
+    applySiteSearch("");
+    return;
+  }
   if (!state.selectedPath) return;
   closeContentPanel();
 });
@@ -2458,6 +2645,7 @@ window.addEventListener("resize", () => {
 (async function init() {
   try {
     initThemeController();
+    initSiteSearch();
     initCardsToc();
     const man = await loadManifest();
     state.manifest = man;

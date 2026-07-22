@@ -808,9 +808,8 @@
     <div class="flex-none gap-2 items-center flex-wrap justify-end">
       <select id="mode-select" class="select select-bordered select-sm w-32 sm:w-36" title="Mode = which tool surface + behavior profile"></select>
       <div class="join">
-        <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes">Cards</button>
+        <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes" title="Structure: tiles + expandable JSON">Structure</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="size">Size map</button>
-        <button type="button" class="btn btn-sm join-item btn-ghost" data-view="json">JSON</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="help">Help / FAQ</button>
       </div>
       <!-- daisyUI theme-controller: sun/moon toggle; default follows system -->
@@ -855,7 +854,7 @@
         </div>
         <div class="flex flex-wrap gap-x-3 gap-y-1 items-center text-[11px] text-muted tile-filter-hint">
           <span id="tile-filter-status">Showing all tiles · click a badge to filter (multi-select)</span>
-          <span class="hidden sm:inline opacity-80">Same colors on Size map / JSON · RED Rules · GREEN Guidance · BLUE Inject · PURPLE Meta · YELLOW Missing</span>
+          <span class="hidden sm:inline opacity-80">Same colors on Structure + Size map · RED Rules · GREEN Guidance · BLUE Inject · PURPLE Meta · YELLOW Missing</span>
         </div>
       </div>
     </div>
@@ -891,21 +890,21 @@
       </div>
     </div>
 
-    <!-- CARDS VIEW: chapters + sticky mid-viewport TOC -->
+    <!-- STRUCTURE: combined tiles + expandable JSON (was Cards + JSON) -->
     <section id="view-boxes" class="cards-layout">
-      <aside class="cards-toc-wrap" aria-label="Cards page table of contents">
+      <aside class="cards-toc-wrap" aria-label="Structure page table of contents">
         <nav class="cards-toc" id="cards-toc">
           <div class="cards-toc-title">On this page</div>
           <ul class="cards-toc-list">
             <li><a href="#chapter-snapshot" data-toc="chapter-snapshot"><span class="toc-num">1</span><span>Snapshot</span></a></li>
-            <li><a href="#chapter-catalog" data-toc="chapter-catalog"><span class="toc-num">2</span><span>Catalog parts</span></a></li>
+            <li><a href="#chapter-catalog" data-toc="chapter-catalog"><span class="toc-num">2</span><span>chat_request JSON</span></a></li>
             <li><a href="#chapter-wire" data-toc="chapter-wire"><span class="toc-num">3</span><span>Wire vs inject</span></a></li>
             <li><a href="#chapter-output" data-toc="chapter-output"><span class="toc-num">4</span><span>Output scheme</span></a></li>
             <li class="toc-sub"><a href="#out-layer-a" data-toc="out-layer-a">A · Model terminate</a></li>
             <li class="toc-sub"><a href="#out-layer-b" data-toc="out-layer-b">B · Server report</a></li>
             <li class="toc-sub"><a href="#out-wip" data-toc="out-wip">WIP checklist</a></li>
           </ul>
-          <p class="text-[10px] opacity-50 px-1 pt-2 leading-snug hidden lg:block">Sticky while you scroll. Click a chapter to jump.</p>
+          <p class="text-[10px] opacity-50 px-1 pt-2 leading-snug hidden lg:block">Tiles + JSON in one place. Sticky while you scroll.</p>
         </nav>
       </aside>
 
@@ -916,7 +915,7 @@
             <span class="ch-num" aria-hidden="true">1</span>
             <div class="min-w-0 flex-1">
               <h2>Snapshot · this mode at a glance</h2>
-              <p>Quick health strip for the selected mode — not the full catalog. Only the green terminate tile is clickable.</p>
+              <p>Quick health strip. Only the terminate tile is clickable. Use filter badges above for Rules / Verbs / …</p>
             </div>
             <span class="badge badge-ghost badge-sm">info strip</span>
           </header>
@@ -926,19 +925,49 @@
           </div>
         </article>
 
-        <!-- 2 Catalog structure -->
+        <!-- 2 Catalog = expandable JSON blocks (merged tiles+json) -->
         <article class="chapter chapter-catalog" id="chapter-catalog">
           <header class="chapter-head">
             <span class="ch-num" aria-hidden="true">2</span>
             <div class="min-w-0 flex-1">
-              <h2>Catalog parts · keys in the JSON file</h2>
-              <p>Each card is one top-level key (messages, verbs, guidance, …). Border color = edit class. Cards with <b>Open →</b> open the content panel.</p>
+              <h2>chat_request · expandable structure</h2>
+              <p>
+                One colored block per key (and nested verbs/messages). <b>▾</b> expands JSON in place;
+                click header/body for the sticky content panel. Same colors as Size map.
+              </p>
+              <p class="text-[11px] font-mono text-muted mt-1" id="json-title">v2/min/…</p>
             </div>
-            <span class="badge badge-outline badge-sm gap-1">🖱️ clickable cards</span>
           </header>
-          <div class="chapter-body">
-            <div class="zone-label">Structure map · same colors as Size map / JSON</div>
+          <div class="chapter-body space-y-3">
+            <div class="flex flex-wrap gap-2 items-center justify-between">
+              <div class="flex flex-wrap gap-2 text-[11px]">
+                <span class="badge chip-ro">RED · Rules</span>
+                <span class="badge chip-ed">GREEN · Guidance</span>
+                <span class="badge chip-inj">BLUE · Inject</span>
+                <span class="badge chip-meta">PURPLE · Meta</span>
+              </div>
+              <div class="flex flex-wrap gap-2 items-center" id="json-catalog-toolbar">
+                <div class="join border border-base-content/20 rounded-lg overflow-hidden">
+                  <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-expand-all" title="Expand all sections">Expand all</button>
+                  <button type="button" class="btn btn-sm join-item" id="btn-json-collapse-all" title="Collapse all sections">Collapse all</button>
+                </div>
+                <label class="label cursor-pointer gap-2 py-0">
+                  <span class="label-text text-xs">Plain raw</span>
+                  <input type="checkbox" id="chk-json-plain" class="toggle toggle-sm" />
+                </label>
+                <label class="label cursor-pointer gap-2 py-0">
+                  <span class="label-text text-xs">Blue inject stubs</span>
+                  <input type="checkbox" id="chk-json-inject" class="toggle toggle-sm toggle-info" checked />
+                </label>
+                <button type="button" class="btn btn-xs" id="btn-copy-json">Copy full JSON</button>
+              </div>
+            </div>
+            <!-- compact purpose tiles (why) — optional second row, filtered with same badges -->
+            <div class="zone-label">Purpose tiles (why each key exists) · filter with badges above</div>
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="section-grid"></div>
+            <div class="zone-label mt-2">JSON body · expand a block or use Expand all</div>
+            <div id="json-annotated"></div>
+            <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-pre"></pre>
           </div>
         </article>
 
@@ -956,17 +985,48 @@
           </div>
         </article>
 
-        <!-- 4 Output scheme -->
+        <!-- 4 Output scheme: tables + expandable JSON -->
         <article class="chapter chapter-output" id="chapter-output">
           <header class="chapter-head">
             <span class="ch-num" aria-hidden="true">4</span>
             <div class="min-w-0 flex-1">
               <h2>Output scheme · model terminate + server report</h2>
-              <p>Two layers: what the <b>LLM must emit</b> to finish a turn, and what <b>Zeus stores</b> for that turn (trace / hot-path). Use the TOC sub-links for A / B / WIP.</p>
+              <p>
+                <span class="txt-ed font-semibold">Layer A</span> = terminate fields.
+                <span class="txt-meta font-semibold">Layer B</span> = Hub turn report.
+                Tables + expandable JSON blocks below.
+              </p>
             </div>
           </header>
-          <div class="chapter-body">
+          <div class="chapter-body space-y-4">
             <div id="evidence-panel" class="space-y-3"></div>
+            <div class="border-t border-base-content/10 pt-3 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 class="font-semibold text-sm m-0">Output as JSON</h3>
+                  <p class="text-xs text-muted m-0">Ideal terminate, QD facets, report skeleton, WIP gaps — same expand/click behavior as catalog blocks.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                  <div class="join border border-base-content/20 rounded-lg overflow-hidden">
+                    <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-out-expand-all">Expand all</button>
+                    <button type="button" class="btn btn-sm join-item" id="btn-json-out-collapse-all">Collapse all</button>
+                  </div>
+                  <label class="label cursor-pointer gap-2 py-0">
+                    <span class="label-text text-xs">Plain raw</span>
+                    <input type="checkbox" id="chk-json-out-plain" class="toggle toggle-sm" />
+                  </label>
+                  <button type="button" class="btn btn-xs" id="btn-copy-json-output">Copy Output JSON</button>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2 text-[11px]">
+                <span class="badge chip-ed">GREEN · Layer A</span>
+                <span class="badge chip-meta">PURPLE · Layer B</span>
+                <span class="badge chip-miss">YELLOW · WIP</span>
+                <span class="badge chip-ro">RED · from catalog</span>
+              </div>
+              <div id="json-output-annotated"></div>
+              <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-output-pre"></pre>
+            </div>
           </div>
         </article>
       </div>
@@ -1026,92 +1086,6 @@
       </div>
     </section>
 
-    <!-- JSON: tabs = chat_request catalog | Output scheme -->
-    <section id="view-json" class="hidden space-y-3">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div role="tablist" class="tabs tabs-boxed bg-base-100 shadow-sm p-1">
-          <button type="button" role="tab" class="tab tab-active" data-json-tab="catalog" aria-selected="true">chat_request</button>
-          <button type="button" role="tab" class="tab" data-json-tab="output" aria-selected="false">Output</button>
-        </div>
-        <p class="text-xs text-muted max-w-xl">
-          <b>chat_request</b> = baseline catalog file for this mode.
-          <b>Output</b> = Layer A terminate + Layer B server report shapes (not the catalog file).
-        </p>
-      </div>
-
-      <!-- TAB: chat_request catalog -->
-      <div id="json-tab-catalog" class="card bg-base-100 shadow" data-json-panel="catalog">
-        <div class="card-body p-3 gap-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h2 class="card-title text-base" id="json-title">JSON</h2>
-              <p class="text-xs text-muted">
-                Colored <b>boxes match Cards + Size map</b>. ▾ expands the box body; header opens the sticky content panel (✕ or Esc).
-                Use <b>Expand all / Collapse all</b>. Keys use RED / GREEN / BLUE / PURPLE.
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 items-center" id="json-catalog-toolbar">
-              <div class="join border border-base-content/20 rounded-lg overflow-hidden">
-                <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-expand-all" title="Expand all JSON section bodies">Expand all</button>
-                <button type="button" class="btn btn-sm join-item" id="btn-json-collapse-all" title="Collapse all JSON section bodies">Collapse all</button>
-              </div>
-              <label class="label cursor-pointer gap-2 py-0">
-                <span class="label-text text-xs">Plain raw</span>
-                <input type="checkbox" id="chk-json-plain" class="toggle toggle-sm" />
-              </label>
-              <label class="label cursor-pointer gap-2 py-0">
-                <span class="label-text text-xs">Blue inject stubs</span>
-                <input type="checkbox" id="chk-json-inject" class="toggle toggle-sm toggle-info" checked />
-              </label>
-              <button type="button" class="btn btn-xs" id="btn-copy-json">Copy full JSON</button>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-2 text-[11px]">
-            <span class="badge chip-ro">RED block = Rules</span>
-            <span class="badge chip-ed">GREEN = Editable</span>
-            <span class="badge chip-inj">BLUE = Injected (not in file)</span>
-            <span class="badge chip-meta">PURPLE = Meta</span>
-          </div>
-          <div id="json-annotated"></div>
-          <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-pre"></pre>
-        </div>
-      </div>
-
-      <!-- TAB: Output scheme (Layer A / B) -->
-      <div id="json-tab-output" class="card bg-base-100 shadow hidden" data-json-panel="output">
-        <div class="card-body p-3 gap-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h2 class="card-title text-base">Output JSON · terminate + turn report</h2>
-              <p class="text-xs text-muted max-w-3xl">
-                <span class="txt-ed font-semibold">Layer A</span> = what the model must emit to finish a turn.
-                <span class="txt-meta font-semibold">Layer B</span> = what Zeus stores (attribution / decision / report).
-                Same expand/collapse + click-to-inspect as the catalog tab.
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 items-center">
-              <div class="join border border-base-content/20 rounded-lg overflow-hidden">
-                <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-out-expand-all">Expand all</button>
-                <button type="button" class="btn btn-sm join-item" id="btn-json-out-collapse-all">Collapse all</button>
-              </div>
-              <label class="label cursor-pointer gap-2 py-0">
-                <span class="label-text text-xs">Plain raw</span>
-                <input type="checkbox" id="chk-json-out-plain" class="toggle toggle-sm" />
-              </label>
-              <button type="button" class="btn btn-xs" id="btn-copy-json-output">Copy full Output JSON</button>
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-2 text-[11px]">
-            <span class="badge chip-ed">GREEN · Layer A terminate</span>
-            <span class="badge chip-meta">PURPLE · Layer B report</span>
-            <span class="badge chip-miss">YELLOW · WIP / gaps</span>
-            <span class="badge chip-ro">RED · from this catalog’s return/pipeline</span>
-          </div>
-          <div id="json-output-annotated"></div>
-          <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-output-pre"></pre>
-        </div>
-      </div>
-    </section>
 
     <!-- HELP / FAQ / GLOSSARY -->
     <section id="view-help" class="hidden space-y-4 help">
@@ -1712,7 +1686,7 @@ function buildSearchIndex(doc) {
       title: role === "system" ? "System prompt" : "Message · " + role,
       path: "messages[" + i + "]",
       body: content,
-      action: { type: "path", path: "messages[" + i + "]", cls: "rules", view: "json" },
+      action: { type: "path", path: "messages[" + i + "]", cls: "rules", view: "boxes" },
     });
   });
 
@@ -1870,9 +1844,9 @@ function showSearchPanel() {
 function activateSearchHit(hit) {
   const a = hit.action || {};
   hideSearchPanel();
-  // Output-scheme hits open the JSON → Output tab
+  // Output-scheme hits open Structure → chapter 4
   if (hit.group === "output") {
-    setView("json");
+    setView("boxes");
     setJsonTab("output");
   }
   if (a.type === "help") {
@@ -3166,14 +3140,16 @@ function renderEvidence(doc) {
 }
 
 function renderJson(doc, mode) {
-  document.getElementById("json-title").textContent = `v2/min/chat_request_${mode}_v2_min.json`;
+  const titleEl = document.getElementById("json-title");
+  if (titleEl) titleEl.textContent = `v2/min/chat_request_${mode}_v2_min.json`;
   const plain = JSON.stringify(doc, null, 2);
-  document.getElementById("json-pre").textContent = plain;
+  const pre = document.getElementById("json-pre");
+  if (pre) pre.textContent = plain;
   renderAnnotatedJson(doc);
   renderJsonOutput(doc, mode);
   applyJsonViewMode();
   applyJsonOutputViewMode();
-  setJsonTab(state.jsonTab || "catalog");
+  applyCardFilters();
 }
 
 function applyJsonViewMode() {
@@ -3188,24 +3164,19 @@ function applyJsonOutputViewMode() {
   document.getElementById("json-output-annotated")?.classList.toggle("hidden", !!plain);
 }
 
+/** Focus Structure chapters (catalog vs output). Replaces old JSON tabs. */
 function setJsonTab(tab) {
   const t = tab === "output" ? "output" : "catalog";
   state.jsonTab = t;
-  document.querySelectorAll("[data-json-tab]").forEach((btn) => {
-    const on = btn.getAttribute("data-json-tab") === t;
-    btn.classList.toggle("tab-active", on);
-    btn.setAttribute("aria-selected", on ? "true" : "false");
-  });
-  document.querySelectorAll("[data-json-panel]").forEach((panel) => {
-    panel.classList.toggle("hidden", panel.getAttribute("data-json-panel") !== t);
-  });
-  if (t === "output" && state.catalog) {
-    renderJsonOutput(state.catalog, state.mode);
-    applyJsonOutputViewMode();
-  }
-  if (t === "catalog" && state.catalog) {
-    applyJsonViewMode();
-  }
+  if (state.view !== "boxes") setView("boxes");
+  const id = t === "output" ? "chapter-output" : "chapter-catalog";
+  setTimeout(() => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (t === "output" && state.catalog) {
+      renderJsonOutput(state.catalog, state.mode);
+      applyJsonOutputViewMode();
+    }
+  }, 40);
 }
 
 /** Ideal Layer A / B shapes for Output tab (not the catalog file). */
@@ -3570,34 +3541,15 @@ function renderAnnotatedJson(doc) {
   }
 
   // top-level wrapper visual
-  root.innerHTML = `<div class="text-[11px] opacity-60 mb-2 font-mono">{  // colored sections map 1:1 to Cards + Size map paths
-}</div>${html}`;
+  root.innerHTML = `<div class="text-[11px] text-muted mb-2 font-mono">// Expand blocks for JSON · click header for content panel · filter with badges above</div>${html}`;
 
   root.querySelectorAll(".json-block").forEach((block) => {
-    const head = block.querySelector(".json-block-head");
-    const toggle = block.querySelector(".json-toggle");
-    const openPanel = () => {
-      root.querySelectorAll(".json-block").forEach((b) => b.classList.remove("selected"));
-      block.classList.add("selected");
-      block.classList.remove("collapsed");
-      if (toggle) toggle.textContent = "▾";
-      openPath(block.getAttribute("data-path"), Number(block.getAttribute("data-bytes")), block.getAttribute("data-cls"));
-    };
-    toggle?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const now = block.classList.toggle("collapsed");
-      toggle.textContent = now ? "▸" : "▾";
-    });
-    head.addEventListener("click", (e) => {
-      if (e.target.closest(".json-toggle")) return;
-      openPanel();
-    });
-    block.querySelector("pre")?.addEventListener("click", openPanel);
-    // init chevron
-    if (toggle) toggle.textContent = block.classList.contains("collapsed") ? "▸" : "▾";
+    block.dataset.wired = "";
   });
+  wireJsonBlocks(root);
+  applyCardFilters();
 
-  // highlight selected
+  // keep selection expand if any
   if (state.selectedPath) {
     const sel = root.querySelector(`.json-block[data-path="${CSS.escape(state.selectedPath)}"]`);
     if (sel) {
@@ -3611,7 +3563,15 @@ function jsonBlockHtml({ path, keyLabel, title, cls, bytes, why, body, present, 
   const nest = nested ? "ml-3 md:ml-6" : "";
   // Nested verb/message blocks start collapsed so the page is scannable
   const collapsed = nested ? "collapsed" : "";
-  return `<div class="json-block ${cls} ${nest} ${collapsed}" data-path="${escapeHtml(path)}" data-bytes="${bytes}" data-cls="${cls}">
+  const kind = !present || cls === "miss" ? "miss" : cls === "guidance" ? "guidance" : cls === "inject" ? "inject" : cls === "rules" ? "rules" : "meta";
+  const tags = [];
+  const p = String(path || "");
+  if (p.includes("verbs") || p.startsWith("verbs")) tags.push("verbs", "tools");
+  if (p.startsWith("messages")) tags.push("prompt", "messages");
+  if (p.startsWith("inject")) tags.push("inject", "blue");
+  if (p.startsWith("output.")) tags.push("output");
+  if (p.includes("return")) tags.push("return", "output");
+  return `<div class="json-block ${cls} ${nest} ${collapsed}" ${tileAttrs(kind, tags)} data-path="${escapeHtml(path)}" data-bytes="${bytes}" data-cls="${cls}">
     <div class="json-block-head" title="Click header: open content panel. Use ▾ to expand/collapse body.">
       <button type="button" class="btn btn-ghost btn-xs btn-circle json-toggle" aria-label="Expand or collapse">▾</button>
       <span class="json-key-chip">${escapeHtml(keyLabel)}</span>
@@ -3878,57 +3838,53 @@ function initCardsToc() {
 }
 
 function setView(view) {
+  // JSON tab merged into Structure (boxes)
+  if (view === "json") view = "boxes";
   state.view = view;
-  ["boxes", "size", "json", "help"].forEach((v) => {
-    const el = document.getElementById("view-" + (v === "boxes" ? "boxes" : v === "size" ? "size" : v === "json" ? "json" : "help"));
+  ["boxes", "size", "help"].forEach((v) => {
+    const el = document.getElementById("view-" + v);
     if (el) el.classList.toggle("hidden", view !== v);
   });
+  // hide legacy json view if still present
+  document.getElementById("view-json")?.classList.add("hidden");
   document.querySelectorAll("[data-view]").forEach((btn) => {
     const on = btn.getAttribute("data-view") === view;
     btn.classList.toggle("btn-primary", on);
     btn.classList.toggle("btn-ghost", !on);
   });
-  // content panel on cards, size, and colored JSON (not help)
   document.getElementById("content-panel").classList.toggle("hidden", view === "help");
-  // TOC only relevant on Cards page
   const tocWrap = document.querySelector(".cards-toc-wrap");
   if (tocWrap) tocWrap.classList.toggle("opacity-40", view !== "boxes");
-  // Tile filter chips primarily for Cards (still visible as color legend elsewhere)
   const filterBar = document.getElementById("tile-filter-bar");
   const legendLabel = document.getElementById("legend-label");
-  if (legendLabel) legendLabel.textContent = view === "boxes" ? "Filter tiles:" : "Same colors everywhere:";
+  if (legendLabel) legendLabel.textContent = view === "boxes" ? "Filter tiles / blocks:" : "Same colors everywhere:";
   if (filterBar) {
-    filterBar.classList.toggle("opacity-95", view === "boxes");
     filterBar.title =
       view === "boxes"
-        ? "Click badges to filter Cards tiles (multi-select)"
-        : "Color legend · open Cards to filter tiles by kind";
+        ? "Click badges to filter Structure tiles and JSON blocks"
+        : "Color legend · open Structure to filter by kind";
   }
-  if (view === "boxes") applyCardFilters();
+  if (view === "boxes") {
+    applyCardFilters();
+    if (state.catalog) {
+      applyJsonViewMode();
+      applyJsonOutputViewMode();
+    }
+    setTimeout(() => {
+      if (cardsTocObserver) {
+        ["out-layer-a", "out-layer-b", "out-wip", "chapter-catalog", "chapter-output"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) cardsTocObserver.observe(el);
+        });
+      }
+    }, 50);
+  }
   if (view === "size" && state.catalog) {
     setTimeout(() => {
       renderSizeMaps(state.catalog);
       state.chartMain?.resize();
       state.chartWire?.resize();
     }, 40);
-  }
-  if (view === "json" && state.catalog) {
-    renderAnnotatedJson(state.catalog);
-    renderJsonOutput(state.catalog, state.mode);
-    applyJsonViewMode();
-    applyJsonOutputViewMode();
-    setJsonTab(state.jsonTab || "catalog");
-  }
-  if (view === "boxes") {
-    // re-observe after evidence panel rebuild may have recreated A/B anchors
-    setTimeout(() => {
-      if (cardsTocObserver) {
-        ["out-layer-a", "out-layer-b", "out-wip"].forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) cardsTocObserver.observe(el);
-        });
-      }
-    }, 50);
   }
 }
 

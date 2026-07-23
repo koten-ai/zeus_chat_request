@@ -1,5 +1,24 @@
 # zeus_chat_request
 
+**Published Zeus V2 chat_request catalogs** for clients, demos, and integrators.
+
+## Current pin
+
+| Field | Value |
+| --- | --- |
+| **BASE** | `base-1` (see `CURRENT.json`) |
+| **Profile** | `v2_min` |
+| **Paths** | `v2/base/base-1/min/` (immutable) · `v2/min/` (latest alias) |
+
+Each catalog JSON includes `_lineage.base_id`. Customs (Workbench) will set `custom_id` + parent BASE (ZE-223).
+
+See **COMPAT.md** for Zeus version ↔ BASE ranges. Process: CR-1 / ZE-222.
+
+---
+
+
+# zeus_chat_request
+
 **Published Zeus V2 chat_request catalogs** for:
 
 - [Zeus Client](https://github.com/koten-ai/zeus_client_python) (`kotenai-zeus-client`)

@@ -1,13 +1,10 @@
 {
   "schema_version": 2,
-  "repo": "koten-ai/zeus_chat_request",
-  "current_base_id": "base-1",
+  "base_id": "base-1",
+  "kind": "base",
   "profile": "v2_min",
-  "description": "Zeus V2 chat_request catalogs \u2014 BASE sequence + latest min alias",
-  "paths": {
-    "latest_min": "v2/min",
-    "current_base_min": "v2/base/base-1/min"
-  },
+  "created_at": "2026-07-23T19:21:09Z",
+  "repo": "koten-ai/zeus_chat_request",
   "source_engine": {
     "generated_from": "koten-ai/Zeus",
     "path_in_engine": "ai/V2/variants/min/",
@@ -15,13 +12,13 @@
     "engine_git_rev": "ebc3dda"
   },
   "usage": {
-    "stamp": "Always verify/stamp with your Zeus instance before production; do not invent contract hashes",
-    "client_sync": "Prefer pin base_id from Zeus PIN/status; pull v2/base/<base_id>/min",
-    "compat": "See COMPAT.md for Zeus semver \u2194 base-N ranges"
+    "stamp": "Always verify/stamp with your Zeus instance before production",
+    "client_sync": "Pull v2/base/<base_id>/min or v2/min (latest alias)",
+    "lineage": "Each JSON carries _lineage.base_id; customs set custom_id + parent base_id"
   },
   "catalogs": [
     {
-      "file": "v2/min/chat_request_analytics_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_analytics_v2_min.json",
       "mode": "analytics",
       "base_id": "base-1",
       "custom_id": null,
@@ -36,7 +33,7 @@
       "bytes": 16859
     },
     {
-      "file": "v2/min/chat_request_auto_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_auto_v2_min.json",
       "mode": "auto",
       "base_id": "base-1",
       "custom_id": null,
@@ -51,7 +48,7 @@
       "bytes": 14983
     },
     {
-      "file": "v2/min/chat_request_code_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_code_v2_min.json",
       "mode": "code",
       "base_id": "base-1",
       "custom_id": null,
@@ -66,7 +63,7 @@
       "bytes": 16849
     },
     {
-      "file": "v2/min/chat_request_custom_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_custom_v2_min.json",
       "mode": "custom",
       "base_id": "base-1",
       "custom_id": null,
@@ -81,7 +78,7 @@
       "bytes": 16853
     },
     {
-      "file": "v2/min/chat_request_fraud_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_fraud_v2_min.json",
       "mode": "fraud",
       "base_id": "base-1",
       "custom_id": null,
@@ -96,7 +93,7 @@
       "bytes": 16851
     },
     {
-      "file": "v2/min/chat_request_open_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_open_v2_min.json",
       "mode": "open",
       "base_id": "base-1",
       "custom_id": null,
@@ -111,7 +108,7 @@
       "bytes": 16849
     },
     {
-      "file": "v2/min/chat_request_private_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_private_v2_min.json",
       "mode": "private",
       "base_id": "base-1",
       "custom_id": null,
@@ -126,7 +123,7 @@
       "bytes": 16855
     },
     {
-      "file": "v2/min/chat_request_regulated_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_regulated_v2_min.json",
       "mode": "regulated",
       "base_id": "base-1",
       "custom_id": null,
@@ -141,7 +138,7 @@
       "bytes": 16859
     },
     {
-      "file": "v2/min/chat_request_research_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_research_v2_min.json",
       "mode": "research",
       "base_id": "base-1",
       "custom_id": null,
@@ -156,7 +153,7 @@
       "bytes": 16857
     },
     {
-      "file": "v2/min/chat_request_tenant_v2_min.json",
+      "file": "v2/base/base-1/min/chat_request_tenant_v2_min.json",
       "mode": "tenant",
       "base_id": "base-1",
       "custom_id": null,

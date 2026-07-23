@@ -1,0 +1,11 @@
+{
+  "base_id": "base-1",
+  "profile": "v2_min",
+  "engine_git_rev": "ebc3dda",
+  "updated_at": "2026-07-23T19:21:09Z",
+  "paths": {
+    "min": "v2/base/base-1/min",
+    "latest_min": "v2/min",
+    "manifest": "v2/base/base-1/MANIFEST.json"
+  }
+}

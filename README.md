@@ -48,6 +48,43 @@ python3 -m http.server 8766 --bind 127.0.0.1
 # open http://127.0.0.1:8766/index.html
 ```
 
+### Docker Compose (port 3333)
+
+```bash
+docker compose up
+# open http://localhost:3333/   (or /index.html)
+```
+
+On start, `scripts/scan_catalogs.py` rebuilds **`catalog-index.json`** from every
+`v2/**/chat_request*.json` so the mode dropdown lists **all** folders (e.g. `min`
+and `base/base-1/min`), not only the latest alias. Then a static server serves the
+repo root on port **3333**.
+
+Without Docker:
+
+```bash
+python3 scripts/scan_catalogs.py
+python3 -m http.server 3333 --bind 127.0.0.1
+```
+
+### Inspector views (`index.html`)
+
+| View | Purpose |
+| --- | --- |
+| **Structure** | Anatomy, stamp health, assembly storyboard, prompt outline, tiles / full JSON, wire vs inject, output scheme |
+| **Size map** | One treemap: Full catalog vs Wire payload · Zeus API base % |
+| **Diff** | Compare two catalogs (mode/BASE dropdowns, paste, or upload) · section + prompt line diff · API impact notes |
+| **Matrix** | Fingerprint table across all scanned files (hash, prompt σ, terminate, sizes) |
+| **Export brief** | Download a Markdown integrator brief for the selected catalog |
+
+Deep links (examples):
+
+```text
+#view=diff&a=v2/min/chat_request_auto_v2_min.json&b=v2/min/chat_request_analytics_v2_min.json
+#view=matrix
+#view=size&sizeMode=wire&file=v2/min/chat_request_auto_v2_min.json
+```
+
 ## Learn the format
 
 **[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.

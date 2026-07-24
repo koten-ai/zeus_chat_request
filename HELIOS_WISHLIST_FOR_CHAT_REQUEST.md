@@ -29,7 +29,8 @@ Helios must be **stingy about what it asks the AI to emit**.
 3. **Piggyback before expand** — Enrich fields the model already emits via **Zeus post-process**.  
 4. **`optional_when` over always-on** — Never require expensive fields on every turn.  
 5. **Priority is cost-aware** — See §1.1 (scale **1–5**).  
-6. **Emit types Helios can query** — numbers as **JSON numbers**, not strings; add **precomputed sums** when dashboards would otherwise scan arrays (§0.1).
+6. **Emit types Helios can query** — numbers as **JSON numbers**, not strings; add **precomputed sums** when dashboards would otherwise scan arrays (§0.1).  
+7. **Sparse / dirty AI is normal** — missing keys, `null`, `""`; exception flags are **true-only** (§0.2, HEL-WISH-012).
 
 ```text
 Cost-aware pipeline (good):
@@ -120,6 +121,40 @@ AVG(t.report.turn_time_sum_ms) AS avg_path_ms
 | Missing | omit key or `null` | `""` for numbers |
 
 **Examples in each Request below are normative shape sketches** — types in the sample are intentional.
+
+---
+
+## 0.2 Sparse schema & exception flags (Helios world)
+
+Helios does **not** assume a complete record. AI and optional facets are a **schema-less list of optional fields**.
+
+| Wire value | Helios treats as |
+| --- | --- |
+| key **missing** | not set |
+| `null` | not set |
+| `""` / whitespace | not set |
+| wrong type | coerce if safe, else not set |
+
+### Exception flags (presence = true)
+
+Booleans like **`multi_part`** are **exception flags**: emit **only when `true`**. Helios must **not** expect `multi_part: false` on single-part turns.
+
+```text
+is_multi = (multi_part === true)   // only explicit true
+// missing | false | null | "" → single-part (the rule)
+```
+
+| Pattern | QD shape |
+| --- | --- |
+| **Rule (common)** | Primary `query_decomposition` only — no `multi_part` key |
+| **Exception** | `multi_part: true` + `parts_count` + `query_decomposition_parts[]` |
+
+**Data dump + “what matters?”** → still **single** primary QD (analyze/summarize), not multi-part.  
+**Facets** (geo + price on one ask) → fields on primary, not parts.
+
+Full Helios agent rules: sibling repo [Helios `docs/analytics/SCHEMA_AND_SPARSE_DATA.md`](https://github.com/koten-ai/Helios/blob/main/docs/analytics/SCHEMA_AND_SPARSE_DATA.md) · [AGENTS.md](https://github.com/koten-ai/Helios/blob/main/AGENTS.md).
+
+See **[HEL-WISH-012](#hel-wish-012--multi_part-exception--sparse-ai-semantics)**.
 
 ---
 
@@ -218,6 +253,7 @@ AVG(t.report.turn_time_sum_ms) AS avg_path_ms
 | **1** | [009](#hel-wish-009--channel--tenant-safe-identity) | Channel / tenant | cheap | none | raw | Client+Zeus |
 | **2** | [002](#hel-wish-002--client--session-market-geo) | Market geo | cheap | none | raw | Client |
 | **2** | [001](#hel-wish-001--structured-place-geo_norm) | `geo_norm` | mixed | piggyback | raw (+ optional precompute later) | Zeus geocode |
+| **2** | [012](#hel-wish-012--multi_part-exception--sparse-ai-semantics) | `multi_part` + sparse AI | cheap | none (normalize) | both | Zeus |
 | **3** | [004](#hel-wish-004--numeric-price_norm) | `price_norm` | mixed | light / none | raw | Client or AI |
 | **3** | [005](#hel-wish-005--intent_norm-stable-enum) | `intent_norm` | mixed | light / none | raw | Zeus map or AI |
 | **3** | [011](#hel-wish-011--optional-precomputed-demand-rollups) | Demand rollups | cheap | none | **precomputed** | Zeus jobs |
@@ -230,6 +266,7 @@ AVG(t.report.turn_time_sum_ms) AS avg_path_ms
 1. Zeus: outcome scalars + path/evidence counts/sums
 2. Client: language, tz, channel, tenant, market geo
 3. Zeus: geocode existing free-text geo → geo_norm numbers
+3b. Zeus: multi_part true-only + parts_count; strip empty AI strings
 4. AI only if needed: intent_norm / price_norm (optional_when)
 5. Defer: AI constraints, soft sentiment
 ```
@@ -720,6 +757,96 @@ All metrics are **numbers**. Helios reads `demand` / `miss_rate` directly — no
 
 ---
 
+### HEL-WISH-012 — `multi_part` exception + sparse AI semantics
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Multi-goal turns are rare; Helios must keep **one primary QD** as the chart rule and treat multi as an **exception flag**. AI payloads are sparse and dirty — catalogs and Zeus must not require full keys or `false` flags on every turn. |
+| **Insight sought** | Default Explore ignores multi; optional lens: multi-part rate via `multi_part = true` and `AVG(parts_count)`. Never invent multi from a data dump. |
+| **Example** | Related “compare hotels + check cancellation” → `multi_part: true`, `parts_count: 2`, parts array. Unrelated trivia mashup or paste-dump → **primary only**, no flag. |
+| **Fields** | See JSON. Zeus normalizes: strip `""`/`null` junk; set `multi_part` **only if** ≥2 usable parts; set `parts_count` as **number**. |
+| **Required?** | Primary QD intent+entity as today. `multi_part` **optional_when** true multi only. **Never required false.** |
+| **Provider** | **AI** may propose related sub-goals. **Zeus** sets exception flag + count (cheap, authoritative). **Client:** no. |
+| **AI load** | none for flag; light only when user truly multi-goals (not dump) |
+| **Cost class** | cheap (normalize) · mixed if model invents parts often (discourage) |
+| **Data kind** | **both** — flag + `parts_count` precomputed; parts array raw |
+| **Motions** | Explore (default single), Compare, Funnel (optional multi rate) |
+| **Cardinality** | flag low; parts_count low ints |
+| **Privacy** | low |
+| **Provenance** | N/A for flag |
+| **Priority** | **2** (contract clarity + Zeus normalize; unblocks correct Helios filters) |
+| **Depends on** | Catalog guidance text; Helios SCHEMA_AND_SPARSE_DATA |
+| **Acceptance** | Lab single-part turns omit `multi_part`; multi turns have `true` + count ≥ 2; Helios SQL default path does not require `= false`. |
+| **Notes** | Facets ≠ parts. Dump ≠ parts. Cap parts 2–5; `parts_truncated: true` (exception flag) if more. |
+
+**JSON — rule (single job; no multi key):**
+
+```json
+{
+  "query_decomposition": {
+    "intent": "Find",
+    "entity": "Beer",
+    "theme": "craft"
+  }
+}
+```
+
+**JSON — exception (true multi only):**
+
+```json
+{
+  "query_decomposition": {
+    "intent": "Compare",
+    "entity": "Hotel",
+    "geo": "Cancun",
+    "multi_part": true,
+    "parts_count": 2
+  },
+  "query_decomposition_parts": [
+    {
+      "intent": "Compare",
+      "entity": "Hotel",
+      "theme": "beach",
+      "price": "< $300"
+    },
+    {
+      "intent": "Check",
+      "entity": "Policy",
+      "theme": "cancellation"
+    }
+  ]
+}
+```
+
+| Path | Type | Kind | Emit rule |
+| --- | --- | --- | --- |
+| `query_decomposition.*` | object | raw primary | **always** on terminate when QD required |
+| `query_decomposition.multi_part` | **boolean** | exception flag | **only when `true`** |
+| `query_decomposition.parts_count` | **number (int)** | precomputed | when multi; ≥ 2 |
+| `query_decomposition_parts` | object[] | raw | only when multi; cap length |
+| `query_decomposition.parts_truncated` | boolean | exception flag | only when true |
+
+**Helios filters:**
+
+```sql
+-- multi exception
+WHERE t.report.query_decomposition.multi_part = true
+
+-- default (single-part rule): anything not explicitly true
+WHERE t.report.query_decomposition.multi_part IS MISSING
+   OR t.report.query_decomposition.multi_part <> true
+```
+
+**Sparse AI contract (applies to all QD fields, not only multi):**
+
+```text
+usable(F) ⇔ present ∧ not null ∧ not "" ∧ type-ok ∧ (confidence ok if present)
+```
+
+Zeus should prefer **omit** cleaned-empty keys over emitting `""` / `null` so Analytics stays tidy — but Helios must still tolerate dirt.
+
+---
+
 ## 5. Provider × cost matrix
 
 | Request | AI | Client | Zeus | Precomputed scalars? | Pri |
@@ -730,6 +857,7 @@ All metrics are **numbers**. Helios reads `demand` / `miss_rate` directly — no
 | 009 channel | — | **yes** | **yes** | — | **1** |
 | 002 market | — | **yes** | store | — | **2** |
 | 001 geo_norm | piggyback geo | pin optional | **geocode** | lat/lon **numbers** | **2** |
+| 012 multi_part + sparse | propose parts | — | **normalize flag/count** | parts_count | **2** |
 | 004 price | optional | **slider** | validate | min/max **numbers** | **3** |
 | 005 intent_norm | optional | — | map first | enum string | **3** |
 | 011 rollups | — | — | **jobs** | **all metrics** | **3** |
@@ -742,8 +870,9 @@ All metrics are **numbers**. Helios reads `demand` / `miss_rate` directly — no
 
 | Change | Requests | Note |
 | --- | --- | --- |
-| No prompt growth | 002–003, 007–009, 011, 008 | Ship first |
+| No prompt growth | 002–003, 007–009, 011, 008, **012 normalize** | Ship first |
 | Zeus enrich only | 001 geocode | Best Germany path |
+| Guidance: multi exception | **012** | Document true-only `multi_part`; primary always; dump ≠ parts |
 | Minimal AI | 004, 005 | types must be numbers/enums in guidance examples |
 | Avoid hot path | 006 AI, 010 | Client forms / offline |
 
@@ -784,3 +913,4 @@ Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `t
 | --- | --- |
 | 2026-07-24 | Initial wishlist → structured Requests → cost-aware priority 1–5. |
 | 2026-07-24 | **Explicit JSON examples + types**; **raw vs precomputed/both** with turn-time sum pattern; precomputed counts/sums on outcome/path/constraints. |
+| 2026-07-24 | **§0.2 + HEL-WISH-012**: sparse AI semantics; `multi_part` true-only exception; primary QD rule; dump ≠ multi; Helios SCHEMA_AND_SPARSE_DATA cross-link. |

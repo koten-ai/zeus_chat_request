@@ -249,27 +249,48 @@ See **[HEL-WISH-012](#hel-wish-012--multi_part-exception--sparse-ai-semantics)**
 | ---: | --- | --- | --- | --- | --- | --- |
 | **1** | [003](#hel-wish-003--outcome-quality-beyond-statusok) | Outcome quality | cheap | none | **both** | Zeus |
 | **1** | [008](#hel-wish-008--path--rail--evidence-counts) | Path / rail / evidence | cheap | none | **both** | Zeus |
+| **1** | [013](#hel-wish-013--user-text-preview-privacy-safe) | User text preview | cheap | none | raw | Zeus |
+| **1** | [014](#hel-wish-014--funnel--path-stage-enum) | Funnel / path stage enum | cheap | none | both | Zeus |
 | **1** | [007](#hel-wish-007--locale-language-timezone) | Locale / tz | cheap | none | raw | Client |
 | **1** | [009](#hel-wish-009--channel--tenant-safe-identity) | Channel / tenant | cheap | none | raw | Client+Zeus |
 | **2** | [002](#hel-wish-002--client--session-market-geo) | Market geo | cheap | none | raw | Client |
 | **2** | [001](#hel-wish-001--structured-place-geo_norm) | `geo_norm` | mixed | piggyback | raw (+ optional precompute later) | Zeus geocode |
 | **2** | [012](#hel-wish-012--multi_part-exception--sparse-ai-semantics) | `multi_part` + sparse AI | cheap | none (normalize) | both | Zeus |
+| **2** | [016](#hel-wish-016--deployment--ruleset--mode-slice) | Deployment / ruleset id | cheap | none | raw | Client+Zeus |
+| **2** | [017](#hel-wish-017--context-dump-metrics) | Context dump metrics | cheap | none | both | Zeus |
+| **2** | [018](#hel-wish-018--compare-score-parts--candidates) | Compare score parts | cheap* | none | both | Zeus (when ranking) |
+| **2** | [019](#hel-wish-019--refine-offer--recovery-events) | Refine offer / recovery | cheap* | none | both | Zeus / Client UI |
 | **3** | [004](#hel-wish-004--numeric-price_norm) | `price_norm` | mixed | light / none | raw | Client or AI |
 | **3** | [005](#hel-wish-005--intent_norm-stable-enum) | `intent_norm` | mixed | light / none | raw | Zeus map or AI |
 | **3** | [011](#hel-wish-011--optional-precomputed-demand-rollups) | Demand rollups | cheap | none | **precomputed** | Zeus jobs |
+| **3** | [020](#hel-wish-020--chat_id-recovery-link) | chat_id recovery link | cheap | none | raw | Zeus |
+| **3** | [021](#hel-wish-021--tool-sequence-fingerprint) | Tool sequence fingerprint | cheap | none | both | Zeus |
 | **4** | [006](#hel-wish-006--constraints--party) | Constraints / party | mixed | light–heavy | raw | Client forms preferred |
 | **5** | [010](#hel-wish-010--soft-ai-insights-jtbdsentiment) | JTBD / sentiment | expensive | heavy | raw | AI |
+
+\*018/019 only fire when product paths run — no AI tax; zero cost when unused.
 
 ### Build order
 
 ```text
-1. Zeus: outcome scalars + path/evidence counts/sums
-2. Client: language, tz, channel, tenant, market geo
-3. Zeus: geocode existing free-text geo → geo_norm numbers
-3b. Zeus: multi_part true-only + parts_count; strip empty AI strings
-4. AI only if needed: intent_norm / price_norm (optional_when)
-5. Defer: AI constraints, soft sentiment
+1. Zeus: outcome.kind + user_visible_count + empty_reason (003)
+2. Zeus: path.stage / funnel.stage + evidence counts (008, 014)
+3. Zeus: user_text_preview truncate (013); context.chars (017)
+4. Client: language, tz, channel, tenant, market geo, deployment_id
+5. Zeus: multi_part true-only; geocode geo_norm
+6. Product events: compare.candidates scores (018); refine.* (019)
+7. AI only if needed: intent_norm / price_norm (optional_when)
+8. Defer: soft AI JTBD/sentiment
 ```
+
+### Motions → wishlist (post Helios 0.2.0 live train)
+
+| Live Motion | Top remaining gaps |
+| --- | --- |
+| Explore | 013 samples · 001 geo_norm · 017 paste metrics |
+| Compare | 018 score parts · 005 intent_norm · 013 samples |
+| Refine | 019 recovery · 006 blockers · 004 price_norm |
+| Funnel | 014 stages · 016 deployment · 003 empty vs ok |
 
 ---
 
@@ -847,21 +868,312 @@ Zeus should prefer **omit** cleaned-empty keys over emitting `""` / `null` so An
 
 ---
 
+### HEL-WISH-013 — User text preview (privacy-safe)
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Operators drilling Compare/Refine/Explore need to see *what was asked*, not only QD paraphrases. |
+| **Insight sought** | Sample real questions under a cluster without full PII dumps. |
+| **Example** | Compare drill list shows `"which beers use rice?"` not only `Find · Beer`. |
+| **Fields** | See JSON. |
+| **Required?** | **recommended** on terminating turns when user text exists. |
+| **Provider** | **Zeus** from turn input — **not AI**. |
+| **AI load** | none |
+| **Cost class** | cheap |
+| **Data kind** | raw preview; optional `has_user_text` boolean precomputed |
+| **Motions** | Explore, Compare, Refine |
+| **Priority** | **1** |
+| **Acceptance** | Helios drill lists non-empty previews on lab traffic with redaction rules documented. |
+| **Notes** | Cap length (e.g. 200). Prefer omit over empty string. Never full chat body by default. |
+
+```json
+{
+  "user_text_preview": "which beers use rice ingredient?",
+  "user_text_len": 34,
+  "has_user_text": true
+}
+```
+
+| Path | Type | Kind |
+| --- | --- | --- |
+| `user_text_preview` | string | raw (truncated) |
+| `user_text_len` | **number (int)** | precomputed |
+| `has_user_text` | boolean | exception-ish; may omit when false |
+
+---
+
+### HEL-WISH-014 — Funnel / path stage enum
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Funnel Motions need real stage progression, not only QD/status/rounds proxies. |
+| **Insight sought** | True conversion by stage; drop-off between product stages. |
+| **Example** | `path.stage = "candidates"` then later `"action"`. |
+| **Fields** | Extend 008 — see JSON. |
+| **Required?** | **recommended** when runtime knows stage; omit when unknown. |
+| **Provider** | **Zeus** only (rails/tools/lifecycle). |
+| **AI load** | none |
+| **Cost class** | cheap |
+| **Data kind** | both — stage string + optional `stage_rank` number |
+| **Motions** | Funnel primary; Monitor |
+| **Priority** | **1** |
+| **Depends on** | Product stage model; overlaps **008** |
+| **Acceptance** | Funnel Sankey can switch from proxy labels to `path.stage` without SQL dialect change. |
+| **Notes** | Do not AI-guess stages. Enum closed and versioned. |
+
+```json
+{
+  "path": {
+    "stage": "action",
+    "stage_rank": 5,
+    "rail_id": null,
+    "evidence_ref_count": 2
+  }
+}
+```
+
+Suggested enum: `entry` \| `interpreted` \| `path` \| `candidates` \| `action` \| `abandoned` (product may rename).
+
+---
+
+### HEL-WISH-016 — Deployment / ruleset / mode slice
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Funnel leaderboard needs real A/B deployments, not entity slices as fake variants. |
+| **Insight sought** | Which ruleset converts better? |
+| **Example** | `deployment_id = "named-query-first"` vs `"baseline"`. |
+| **Fields** | See JSON. |
+| **Required?** | recommended in multi-deploy experiments |
+| **Provider** | **Zeus Client** or **Zeus** session config |
+| **AI load** | none |
+| **Cost class** | cheap |
+| **Data kind** | raw low-card strings |
+| **Motions** | Funnel; ops Compare of deploys |
+| **Priority** | **2** |
+
+```json
+{
+  "deployment_id": "funnel-tuned-v2",
+  "ruleset": "named_query_first",
+  "mode": "open"
+}
+```
+
+| Path | Type |
+| --- | --- |
+| `deployment_id` | string |
+| `ruleset` | string |
+| `mode` | string (may already exist partially) |
+
+---
+
+### HEL-WISH-017 — Context dump metrics
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Distinguish short asks vs paste dumps (not multi_part). |
+| **Insight sought** | Cost/latency of dump-driven turns; Explore “dump traffic” share. |
+| **Example** | `context.chars = 12000`, `context.kind = "paste"`. |
+| **Fields** | See JSON. |
+| **Required?** | recommended when measurable |
+| **Provider** | **Zeus** (length of user turn / attachments) |
+| **AI load** | none |
+| **Cost class** | cheap |
+| **Data kind** | both |
+| **Motions** | Explore, Funnel cost, Monitor |
+| **Priority** | **2** |
+| **Notes** | Dump ≠ multi_part (see 012). |
+
+```json
+{
+  "context": {
+    "kind": "paste",
+    "chars": 12000,
+    "attachment_count": 0
+  }
+}
+```
+
+| Path | Type | Kind |
+| --- | --- | --- |
+| `context.kind` | string enum `chat`\|`paste`\|`upload` | raw |
+| `context.chars` | **number (int)** | precomputed |
+| `context.attachment_count` | **number (int)** | precomputed |
+
+---
+
+### HEL-WISH-018 — Compare score parts & candidates
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Compare rank board needs real option scores, not demand/fill proxies. |
+| **Insight sought** | Why #1 wins: embedding / entity / graph / constraint parts. |
+| **Example** | Shortlist of hotels with stacked score parts. |
+| **Fields** | Emit **only when** Zeus ranking tools ran. |
+| **Required?** | optional_when ranking executed |
+| **Provider** | **Zeus** ranking path |
+| **AI load** | none for scores |
+| **Cost class** | cheap when unused; product path when ranking |
+| **Data kind** | both — candidates array + precomputed winner id / totals |
+| **Motions** | Compare |
+| **Priority** | **2** |
+| **Notes** | Never invent scores in Analytics from QD alone. |
+
+```json
+{
+  "compare": {
+    "candidates": [
+      {
+        "id": "hotel:casa",
+        "label": "Casa del Mar",
+        "scores": { "embedding": 38, "entity": 22, "graph": 18, "constraint": 12 },
+        "total": 90,
+        "pass": true
+      },
+      {
+        "id": "hotel:playa",
+        "label": "Playa Verde",
+        "scores": { "embedding": 34, "entity": 18, "graph": 20, "constraint": 8 },
+        "total": 80,
+        "pass": true
+      }
+    ],
+    "winner_id": "hotel:casa",
+    "candidate_count": 2
+  }
+}
+```
+
+| Path | Type | Kind |
+| --- | --- | --- |
+| `compare.candidates[]` | object[] | raw |
+| `compare.candidates[].scores.*` | **number** | raw parts |
+| `compare.candidates[].total` | **number** | precomputed per row |
+| `compare.winner_id` | string | precomputed |
+| `compare.candidate_count` | **number (int)** | precomputed |
+
+---
+
+### HEL-WISH-019 — Refine offer / recovery events
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Real Refine Sankey: dead-end → offered → accepted → recovered. |
+| **Insight sought** | Which relaxation works; true recovery rate. |
+| **Example** | `refine.offered=true`, `offer_type="expand_radius"`, `accepted=true`, `recovered=true`. |
+| **Fields** | See JSON. |
+| **Required?** | optional_when Refine product path runs |
+| **Provider** | **Zeus** product; **Client** if UI presents offers |
+| **AI load** | none |
+| **Cost class** | cheap when unused |
+| **Data kind** | both |
+| **Motions** | Refine |
+| **Priority** | **2** |
+| **Depends on** | 006 blocker codes helpful |
+
+```json
+{
+  "refine": {
+    "offered": true,
+    "offer_type": "expand_radius",
+    "accepted": true,
+    "recovered": false,
+    "blocker_code": "empty"
+  }
+}
+```
+
+| Path | Type | Kind |
+| --- | --- | --- |
+| `refine.offered` | boolean | true-only exception OK |
+| `refine.offer_type` | string enum | raw |
+| `refine.accepted` | boolean | raw |
+| `refine.recovered` | boolean | raw |
+| `refine.blocker_code` | string enum | raw |
+
+---
+
+### HEL-WISH-020 — chat_id recovery link
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Detect recovery across turns in the same chat (fail then later ok). |
+| **Insight sought** | True multi-turn recovery rate. |
+| **Fields** | Ensure `chat_id` always on traces; optional `prior_status` / `reask` on later turns. |
+| **Provider** | Zeus |
+| **AI load** | none |
+| **Cost class** | cheap |
+| **Data kind** | raw |
+| **Motions** | Refine, Funnel |
+| **Priority** | **3** |
+| **Depends on** | 003 outcome quality |
+
+```json
+{
+  "chat_id": "chat:abc",
+  "outcome": { "kind": "ok", "reask": true }
+}
+```
+
+---
+
+### HEL-WISH-021 — Tool sequence fingerprint
+
+| Attribute | Value |
+| --- | --- |
+| **Business requirement** | Explain/Funnel path shape without UNNEST full tool_usage every time. |
+| **Insight sought** | Most common tool paths; weak explainability paths. |
+| **Fields** | Ordered tool names → fingerprint string + count. |
+| **Provider** | Zeus from `tool_usage` |
+| **AI load** | none |
+| **Cost class** | cheap |
+| **Data kind** | both |
+| **Motions** | Explain, Funnel |
+| **Priority** | **3** |
+
+```json
+{
+  "path": {
+    "tool_sequence": ["search", "rank", "return"],
+    "tool_sequence_fp": "search>rank>return",
+    "tool_calls_total": 3
+  }
+}
+```
+
+| Path | Type | Kind |
+| --- | --- | --- |
+| `path.tool_sequence` | string[] | raw |
+| `path.tool_sequence_fp` | string | precomputed |
+| `tool_calls_total` | **number** | precomputed (exists) |
+
+---
+
+
 ## 5. Provider × cost matrix
 
 | Request | AI | Client | Zeus | Precomputed scalars? | Pri |
 | --- | --- | --- | --- | --- | ---: |
 | 003 outcome | — | optional | **yes** | **yes** counts | **1** |
 | 008 path | — | — | **yes** | **yes** sums/counts | **1** |
-| 007 locale | — | **yes** | store | offset minutes number | **1** |
+| 013 user text | — | — | **yes** | len | **1** |
+| 014 funnel stage | — | — | **yes** | stage_rank | **1** |
+| 007 locale | — | **yes** | store | offset minutes | **1** |
 | 009 channel | — | **yes** | **yes** | — | **1** |
 | 002 market | — | **yes** | store | — | **2** |
-| 001 geo_norm | piggyback geo | pin optional | **geocode** | lat/lon **numbers** | **2** |
-| 012 multi_part + sparse | propose parts | — | **normalize flag/count** | parts_count | **2** |
-| 004 price | optional | **slider** | validate | min/max **numbers** | **3** |
-| 005 intent_norm | optional | — | map first | enum string | **3** |
-| 011 rollups | — | — | **jobs** | **all metrics** | **3** |
-| 006 constraints | last | **forms** | tools | constraint_count | **4** |
+| 001 geo_norm | piggyback geo | pin optional | **geocode** | lat/lon | **2** |
+| 012 multi_part | propose parts | — | **normalize** | parts_count | **2** |
+| 016 deployment | — | **yes** | **yes** | — | **2** |
+| 017 context dump | — | — | **yes** | chars | **2** |
+| 018 compare scores | — | — | **when rank** | totals | **2** |
+| 019 refine events | — | UI offers | **product** | flags | **2** |
+| 004 price | optional | **slider** | validate | min/max | **3** |
+| 005 intent_norm | optional | — | map first | enum | **3** |
+| 011 rollups | — | — | **jobs** | all | **3** |
+| 020 chat recovery | — | — | **yes** | — | **3** |
+| 021 tool fingerprint | — | — | **yes** | fp | **3** |
+| 006 constraints | last | **forms** | tools | counts | **4** |
 | 010 soft | **only** | — | store | — | **5** |
 
 ---
@@ -870,10 +1182,11 @@ Zeus should prefer **omit** cleaned-empty keys over emitting `""` / `null` so An
 
 | Change | Requests | Note |
 | --- | --- | --- |
-| No prompt growth | 002–003, 007–009, 011, 008, **012 normalize** | Ship first |
+| No prompt growth | 002–003, 007–009, 011, 008, 012–014, 016–017, 020–021 | Ship first |
 | Zeus enrich only | 001 geocode | Best Germany path |
-| Guidance: multi exception | **012** | Document true-only `multi_part`; primary always; dump ≠ parts |
-| Minimal AI | 004, 005 | types must be numbers/enums in guidance examples |
+| Guidance: multi exception | **012** | true-only `multi_part`; dump ≠ parts |
+| Product events | **018** Compare scores · **019** Refine recovery | When product paths exist |
+| Minimal AI | 004, 005 | types must be numbers/enums in guidance |
 | Avoid hot path | 006 AI, 010 | Client forms / offline |
 
 When documenting guidance, **show numeric JSON examples** so models and validators don’t emit `"5"` instead of `5`.
@@ -883,6 +1196,8 @@ When documenting guidance, **show numeric JSON examples** so models and validato
 ## 7. Helios without waiting
 
 Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `tokens_*`, `tool_calls_total`, `status`, QD strings. Motions charts prefer those; wishlist adds **more scalars** and **typed norms**, not more array-only shapes.
+
+**Helios 0.2.0 live train** (Explore · Compare · Refine · Funnel) already ships with proxies. **013–019** are the main unlocks to retire those proxies.
 
 ---
 
@@ -901,9 +1216,11 @@ Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `t
 ## 9. Open questions
 
 - Empty: `status=ok` + `outcome.kind=empty` vs distinct status?  
-- Cap length for `top_result_ids` / `path.steps`?  
+- Cap length for `top_result_ids` / `path.steps` / `user_text_preview`?  
 - Session-level sums vs turn-level only?  
-- Materialized rollup collection naming in Analytics?
+- Materialized rollup collection naming in Analytics?  
+- Closed enums for `path.stage` / `refine.offer_type` / `blocker_code` — who owns the registry?  
+- Compare candidates: max N per turn to protect Analytics size?
 
 ---
 
@@ -914,3 +1231,4 @@ Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `t
 | 2026-07-24 | Initial wishlist → structured Requests → cost-aware priority 1–5. |
 | 2026-07-24 | **Explicit JSON examples + types**; **raw vs precomputed/both** with turn-time sum pattern; precomputed counts/sums on outcome/path/constraints. |
 | 2026-07-24 | **§0.2 + HEL-WISH-012**: sparse AI semantics; `multi_part` true-only exception; primary QD rule; dump ≠ multi; Helios SCHEMA_AND_SPARSE_DATA cross-link. |
+| 2026-07-24 | **HEL-WISH-013–021** after Helios Motions live train: user_text_preview, funnel stage, deployment_id, context dump, compare scores, refine recovery, chat recovery, tool fingerprint. |

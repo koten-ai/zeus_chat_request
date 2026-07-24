@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "description": "Auto-scanned chat_request*.json under v2/ for the inspector UI",
+  "scan_glob": "v2/**/chat_request*.json",
+  "count": 20,
+  "updated_at": "2026-07-24T04:03:47Z",
+  "catalogs": [
+    {
+      "file": "v2/min/chat_request_analytics_v2_min.json",
+      "mode": "analytics",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:3f9f83f6f3ded467b99169816864fdf9"
+      },
+      "sha256": "a059ddf49d652a1c65b3982369d8b9edd76388acc032f3ea2bf19e29bd4cc664",
+      "bytes": 16859
+    },
+    {
+      "file": "v2/min/chat_request_auto_v2_min.json",
+      "mode": "auto",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:126876870d8b2085266aca232a5641b6"
+      },
+      "sha256": "1463fa2774db099b7020ce333ed133c923f9b7abd31b29decf80a8418bec4d95",
+      "bytes": 14983
+    },
+    {
+      "file": "v2/min/chat_request_code_v2_min.json",
+      "mode": "code",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:10a073976ebd01ba6dd7f36956875b11"
+      },
+      "sha256": "2c0adf5daa90144a5c8a2479ec33c35ba295e0fdef532e3c3b1bb4919edadc3a",
+      "bytes": 16849
+    },
+    {
+      "file": "v2/min/chat_request_custom_v2_min.json",
+      "mode": "custom",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:c84a98ffdfb71585fbc08a642f7cad9a"
+      },
+      "sha256": "65159b909bbc532a1a3029f13eaed1b7a9c0e19aec51ef47292d19465f0047cb",
+      "bytes": 16853
+    },
+    {
+      "file": "v2/min/chat_request_fraud_v2_min.json",
+      "mode": "fraud",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:0358294df725710c1ec72c549c7e9fd1"
+      },
+      "sha256": "da2a85d353db67e2e7f334f8cf774658d7b9adc44ab10022f0c21b011305edf3",
+      "bytes": 16851
+    },
+    {
+      "file": "v2/min/chat_request_open_v2_min.json",
+      "mode": "open",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:dc65edc59af5c90d88fa74b46e9ccf66"
+      },
+      "sha256": "d6ef80ef262e5e78fc6467c0a0bb7810b722325d53b90717bc70c7cc88941936",
+      "bytes": 16849
+    },
+    {
+      "file": "v2/min/chat_request_private_v2_min.json",
+      "mode": "private",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:3cfa6cf011de15270e19febd3b410b0e"
+      },
+      "sha256": "49b6ee89ef73247a20bd22ec3d66137d78a1c2ee02f4cbb597044fb2f4e2e4dd",
+      "bytes": 16855
+    },
+    {
+      "file": "v2/min/chat_request_regulated_v2_min.json",
+      "mode": "regulated",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:e315fcc0eb6bca2bc6ed39a72cd85aa8"
+      },
+      "sha256": "d00934b5bd66a8520f224029cd312e1acc136ee20183eee9394cd83c9d198569",
+      "bytes": 16859
+    },
+    {
+      "file": "v2/min/chat_request_research_v2_min.json",
+      "mode": "research",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:b37c6e26ecef15a06b31e0c796e42751"
+      },
+      "sha256": "c166f6748d8b18ed2a81c2a1e8806cea653cf9432b80028897b9f37356a0b491",
+      "bytes": 16857
+    },
+    {
+      "file": "v2/min/chat_request_tenant_v2_min.json",
+      "mode": "tenant",
+      "folder": "v2/min",
+      "folder_label": "min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:f028bb66dd5751b14784f0016c9a4fbb"
+      },
+      "sha256": "878931bf4867d071687a20f0976f527e1105b5aa4d49fee1ab27e8d6c3858c59",
+      "bytes": 16853
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_analytics_v2_min.json",
+      "mode": "analytics",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:3f9f83f6f3ded467b99169816864fdf9"
+      },
+      "sha256": "a059ddf49d652a1c65b3982369d8b9edd76388acc032f3ea2bf19e29bd4cc664",
+      "bytes": 16859
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_auto_v2_min.json",
+      "mode": "auto",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:126876870d8b2085266aca232a5641b6"
+      },
+      "sha256": "1463fa2774db099b7020ce333ed133c923f9b7abd31b29decf80a8418bec4d95",
+      "bytes": 14983
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_code_v2_min.json",
+      "mode": "code",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:10a073976ebd01ba6dd7f36956875b11"
+      },
+      "sha256": "2c0adf5daa90144a5c8a2479ec33c35ba295e0fdef532e3c3b1bb4919edadc3a",
+      "bytes": 16849
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_custom_v2_min.json",
+      "mode": "custom",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:c84a98ffdfb71585fbc08a642f7cad9a"
+      },
+      "sha256": "65159b909bbc532a1a3029f13eaed1b7a9c0e19aec51ef47292d19465f0047cb",
+      "bytes": 16853
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_fraud_v2_min.json",
+      "mode": "fraud",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:0358294df725710c1ec72c549c7e9fd1"
+      },
+      "sha256": "da2a85d353db67e2e7f334f8cf774658d7b9adc44ab10022f0c21b011305edf3",
+      "bytes": 16851
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_open_v2_min.json",
+      "mode": "open",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:dc65edc59af5c90d88fa74b46e9ccf66"
+      },
+      "sha256": "d6ef80ef262e5e78fc6467c0a0bb7810b722325d53b90717bc70c7cc88941936",
+      "bytes": 16849
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_private_v2_min.json",
+      "mode": "private",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:3cfa6cf011de15270e19febd3b410b0e"
+      },
+      "sha256": "49b6ee89ef73247a20bd22ec3d66137d78a1c2ee02f4cbb597044fb2f4e2e4dd",
+      "bytes": 16855
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_regulated_v2_min.json",
+      "mode": "regulated",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:e315fcc0eb6bca2bc6ed39a72cd85aa8"
+      },
+      "sha256": "d00934b5bd66a8520f224029cd312e1acc136ee20183eee9394cd83c9d198569",
+      "bytes": 16859
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_research_v2_min.json",
+      "mode": "research",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:b37c6e26ecef15a06b31e0c796e42751"
+      },
+      "sha256": "c166f6748d8b18ed2a81c2a1e8806cea653cf9432b80028897b9f37356a0b491",
+      "bytes": 16857
+    },
+    {
+      "file": "v2/base/base-1/min/chat_request_tenant_v2_min.json",
+      "mode": "tenant",
+      "folder": "v2/base/base-1/min",
+      "folder_label": "base/base-1/min",
+      "base_id": "base-1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 1,
+      "verb_count": 13,
+      "contract": {
+        "builder": "ai-snapshot",
+        "hash": "md5:f028bb66dd5751b14784f0016c9a4fbb"
+      },
+      "sha256": "878931bf4867d071687a20f0976f527e1105b5aa4d49fee1ab27e8d6c3858c59",
+      "bytes": 16853
+    }
+  ]
+}

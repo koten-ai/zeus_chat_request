@@ -1,0 +1,17 @@
+# Serve the catalog map (index.html + v2/**/chat_request*.json) on http://localhost:3333
+# On start: rescan v2/ into catalog-index.json so the dropdown lists every file.
+services:
+  web:
+    image: python:3.12-alpine
+    working_dir: /srv
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/srv
+    command:
+      - sh
+      - -c
+      - |
+        python scripts/scan_catalogs.py
+        exec python -m http.server 3333 --bind 0.0.0.0
+    restart: unless-stopped

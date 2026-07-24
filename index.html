@@ -57,12 +57,21 @@
     }
     [data-theme="light"] {
       color-scheme: light;
-      /* Force daisyUI content ink darker than default light theme */
-      --bc: 14% 0.02 265;
-      --nc: 14% 0.02 265;
-      --pc: 14% 0.02 265;
-      --sc: 14% 0.02 265;
-      --ac: 14% 0.02 265;
+      /*
+       * daisyUI uses --*c as *label* on filled semantic colors.
+       * --bc = body ink on light surfaces → dark.
+       * --pc/--sc/--ac/… = text ON primary/secondary fills → must be near-white
+       * (forcing dark here made purple/blue buttons unreadable).
+       */
+      --bc: 14% 0.02 265;           /* base-content: body text */
+      --pc: 98% 0.01 265;           /* primary-content: on indigo/purple */
+      --sc: 98% 0.01 265;           /* secondary-content */
+      --ac: 98% 0.01 265;           /* accent-content */
+      --nc: 98% 0.01 265;           /* neutral-content (on dark neutral fill) */
+      --inc: 98% 0.01 230;          /* info-content */
+      --suc: 98% 0.01 145;          /* success-content */
+      --wac: 22% 0.05 85;           /* warning-content: dark on yellow */
+      --erc: 98% 0.01 25;           /* error-content */
       --ink: #0f172a;          /* slate-900 — primary text */
       --ink-strong: #020617;  /* slate-950 */
       --ink-muted: #1e293b;   /* slate-800 — secondary (was too light) */
@@ -78,16 +87,17 @@
       --txt-inj: #1e3a8a;
       --txt-meta: #4c1d95;
       --txt-miss: #78350f;
+      /* chips: saturated border + deep ink on pale tint (never same-on-same) */
       --chip-ro-fg: #7f1d1d;
-      --chip-ro-bg: #fecaca;
+      --chip-ro-bg: #fee2e2;
       --chip-ed-fg: #14532d;
-      --chip-ed-bg: #bbf7d0;
+      --chip-ed-bg: #dcfce7;
       --chip-inj-fg: #1e3a8a;
-      --chip-inj-bg: #bfdbfe;
+      --chip-inj-bg: #dbeafe;
       --chip-meta-fg: #4c1d95;
-      --chip-meta-bg: #ddd6fe;
+      --chip-meta-bg: #ede9fe;
       --chip-miss-fg: #78350f;
-      --chip-miss-bg: #fde68a;
+      --chip-miss-bg: #fef3c7;
       --json-ro-bg: #fef2f2;
       --json-ed-bg: #f0fdf4;
       --json-meta-bg: #f5f3ff;
@@ -112,17 +122,23 @@
     [data-theme="light"] .menu,
     [data-theme="light"] .table,
     [data-theme="light"] .select,
-    [data-theme="light"] .input,
-    [data-theme="light"] .btn:not(.btn-primary):not(.btn-error) {
+    [data-theme="light"] .input {
+      color: var(--ink);
+    }
+    /* Neutral / ghost buttons only — never recolor filled semantic buttons */
+    [data-theme="light"] .btn:not(.btn-primary):not(.btn-secondary):not(.btn-accent):not(.btn-neutral):not(.btn-info):not(.btn-success):not(.btn-warning):not(.btn-error) {
       color: var(--ink);
     }
     [data-theme="light"] h1,
     [data-theme="light"] h2,
     [data-theme="light"] h3,
     [data-theme="light"] h4,
-    [data-theme="light"] .card-title,
-    [data-theme="light"] .font-semibold,
-    [data-theme="light"] .font-bold {
+    [data-theme="light"] .card-title {
+      color: var(--ink-strong);
+    }
+    /* Don't force ink onto badges/buttons that carry their own palette */
+    [data-theme="light"] .font-semibold:not(.btn):not(.badge):not([class*="chip-"]),
+    [data-theme="light"] .font-bold:not(.btn):not(.badge):not([class*="chip-"]) {
       color: var(--ink-strong);
     }
     [data-theme="light"] .text-muted,
@@ -147,19 +163,19 @@
     [data-theme="light"] .help dd,
     [data-theme="light"] .help-prose :where(p, li, dd, td, th),
     [data-theme="light"] .card-body p,
-    [data-theme="light"] .card-body .text-xs,
-    [data-theme="light"] .card-body .text-\[11px\],
-    [data-theme="light"] .card-body .text-\[10px\] {
+    [data-theme="light"] .card-body .text-xs:not(.badge):not(.btn):not([class*="chip-"]),
+    [data-theme="light"] .card-body .text-\[11px\]:not(.badge):not(.btn):not([class*="chip-"]),
+    [data-theme="light"] .card-body .text-\[10px\]:not(.badge):not(.btn):not([class*="chip-"]) {
       color: var(--ink-muted) !important;
       opacity: 1 !important;
     }
-    /* Tailwind opacity-* was washing slate text to invisible gray */
-    [data-theme="light"] .opacity-40,
-    [data-theme="light"] .opacity-50,
-    [data-theme="light"] .opacity-60,
-    [data-theme="light"] .opacity-70,
-    [data-theme="light"] .opacity-80,
-    [data-theme="light"] .opacity-90 {
+    /* Tailwind opacity-* was washing slate text to invisible gray — skip controls */
+    [data-theme="light"] .opacity-40:not(.btn):not(.badge):not([class*="chip-"]),
+    [data-theme="light"] .opacity-50:not(.btn):not(.badge):not([class*="chip-"]),
+    [data-theme="light"] .opacity-60:not(.btn):not(.badge):not([class*="chip-"]),
+    [data-theme="light"] .opacity-70:not(.btn):not(.badge):not([class*="chip-"]),
+    [data-theme="light"] .opacity-80:not(.btn):not(.badge):not([class*="chip-"]),
+    [data-theme="light"] .opacity-90:not(.btn):not(.badge):not([class*="chip-"]) {
       opacity: 1 !important;
       color: var(--ink-muted);
     }
@@ -169,20 +185,244 @@
       opacity: 0.85 !important;
     }
     [data-theme="light"] .badge-ghost {
-      color: var(--ink-muted);
-      background: #e2e8f0;
-      border-color: #cbd5e1;
+      color: var(--ink-muted) !important;
+      background: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
+    }
+    [data-theme="light"] .badge-outline:not([class*="chip-"]) {
+      color: var(--ink) !important;
+      border-color: #94a3b8 !important;
+      background: transparent !important;
     }
     [data-theme="light"] .btn-ghost {
-      color: var(--ink);
+      color: var(--ink) !important;
     }
     [data-theme="light"] .btn-ghost:hover {
-      background: #e2e8f0;
-      color: var(--ink-strong);
+      background: #e2e8f0 !important;
+      color: var(--ink-strong) !important;
     }
+
+    /*
+     * Filled semantic buttons + badges (day mode): white (or dark-on-warning)
+     * labels on solid fills. Covers primary / secondary / accent / neutral /
+     * info / success / warning / error — not only purple primary.
+     */
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost):focus,
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost):active,
+    [data-theme="light"] .btn-primary.btn-active:not(.btn-outline),
+    [data-theme="light"] .btn-secondary:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-secondary:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-secondary:not(.btn-outline):not(.btn-ghost):focus,
+    [data-theme="light"] .btn-accent:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-accent:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-accent:not(.btn-outline):not(.btn-ghost):focus,
+    [data-theme="light"] .btn-neutral:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-neutral:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-neutral:not(.btn-outline):not(.btn-ghost):focus,
+    [data-theme="light"] .btn-info:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-info:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-info:not(.btn-outline):not(.btn-ghost):focus,
+    [data-theme="light"] .btn-success:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-success:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-success:not(.btn-outline):not(.btn-ghost):focus,
+    [data-theme="light"] .btn-error:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-error:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-error:not(.btn-outline):not(.btn-ghost):focus {
+      color: #ffffff !important;
+    }
+    [data-theme="light"] .btn-warning:not(.btn-outline):not(.btn-ghost),
+    [data-theme="light"] .btn-warning:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-warning:not(.btn-outline):not(.btn-ghost):focus {
+      color: #422006 !important; /* amber-950 on yellow fill */
+    }
+
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost) {
+      background-color: #4f46e5 !important;
+      border-color: #4338ca !important;
+    }
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost):hover,
+    [data-theme="light"] .btn-primary:not(.btn-outline):not(.btn-ghost):focus {
+      background-color: #4338ca !important;
+      border-color: #3730a3 !important;
+    }
+    [data-theme="light"] .btn-secondary:not(.btn-outline):not(.btn-ghost) {
+      background-color: #7c3aed !important;
+      border-color: #6d28d9 !important;
+    }
+    [data-theme="light"] .btn-secondary:not(.btn-outline):not(.btn-ghost):hover {
+      background-color: #6d28d9 !important;
+    }
+    [data-theme="light"] .btn-accent:not(.btn-outline):not(.btn-ghost) {
+      background-color: #db2777 !important;
+      border-color: #be185d !important;
+    }
+    [data-theme="light"] .btn-neutral:not(.btn-outline):not(.btn-ghost) {
+      background-color: #334155 !important;
+      border-color: #1e293b !important;
+    }
+    [data-theme="light"] .btn-info:not(.btn-outline):not(.btn-ghost) {
+      background-color: #2563eb !important;
+      border-color: #1d4ed8 !important;
+    }
+    [data-theme="light"] .btn-success:not(.btn-outline):not(.btn-ghost) {
+      background-color: #16a34a !important;
+      border-color: #15803d !important;
+    }
+    [data-theme="light"] .btn-warning:not(.btn-outline):not(.btn-ghost) {
+      background-color: #fbbf24 !important;
+      border-color: #d97706 !important;
+    }
+    [data-theme="light"] .btn-error:not(.btn-outline):not(.btn-ghost) {
+      background-color: #dc2626 !important;
+      border-color: #b91c1c !important;
+    }
+
+    /* Outline semantic buttons: colored label on transparent, invert on hover */
+    [data-theme="light"] .btn-outline.btn-primary {
+      color: #3730a3 !important;
+      background-color: transparent !important;
+      border-color: #4f46e5 !important;
+    }
+    [data-theme="light"] .btn-outline.btn-primary:hover {
+      color: #ffffff !important;
+      background-color: #4f46e5 !important;
+    }
+    [data-theme="light"] .btn-outline.btn-secondary {
+      color: #5b21b6 !important;
+      background-color: transparent !important;
+      border-color: #7c3aed !important;
+    }
+    [data-theme="light"] .btn-outline.btn-secondary:hover {
+      color: #ffffff !important;
+      background-color: #7c3aed !important;
+    }
+    [data-theme="light"] .btn-outline.btn-info {
+      color: #1e40af !important;
+      background-color: transparent !important;
+      border-color: #2563eb !important;
+    }
+    [data-theme="light"] .btn-outline.btn-info:hover {
+      color: #ffffff !important;
+      background-color: #2563eb !important;
+    }
+    [data-theme="light"] .btn-outline.btn-success {
+      color: #14532d !important;
+      background-color: transparent !important;
+      border-color: #16a34a !important;
+    }
+    [data-theme="light"] .btn-outline.btn-success:hover {
+      color: #ffffff !important;
+      background-color: #16a34a !important;
+    }
+    [data-theme="light"] .btn-outline.btn-warning {
+      color: #78350f !important;
+      background-color: transparent !important;
+      border-color: #d97706 !important;
+    }
+    [data-theme="light"] .btn-outline.btn-warning:hover {
+      color: #422006 !important;
+      background-color: #fbbf24 !important;
+    }
+    [data-theme="light"] .btn-outline.btn-error {
+      color: #991b1b !important;
+      background-color: transparent !important;
+      border-color: #dc2626 !important;
+    }
+    [data-theme="light"] .btn-outline.btn-error:hover {
+      color: #ffffff !important;
+      background-color: #dc2626 !important;
+    }
+    [data-theme="light"] .btn-outline.btn-neutral {
+      color: var(--ink) !important;
+      background-color: transparent !important;
+      border-color: #64748b !important;
+    }
+    [data-theme="light"] .btn-outline.btn-neutral:hover {
+      color: #ffffff !important;
+      background-color: #334155 !important;
+    }
+
+    /* Filled semantic badges (same problem as buttons) */
+    [data-theme="light"] .badge-primary {
+      color: #ffffff !important;
+      background-color: #4f46e5 !important;
+      border-color: #4338ca !important;
+    }
+    [data-theme="light"] .badge-secondary {
+      color: #ffffff !important;
+      background-color: #7c3aed !important;
+      border-color: #6d28d9 !important;
+    }
+    [data-theme="light"] .badge-accent {
+      color: #ffffff !important;
+      background-color: #db2777 !important;
+      border-color: #be185d !important;
+    }
+    [data-theme="light"] .badge-neutral {
+      color: #ffffff !important;
+      background-color: #334155 !important;
+      border-color: #1e293b !important;
+    }
+    [data-theme="light"] .badge-info {
+      color: #ffffff !important;
+      background-color: #2563eb !important;
+      border-color: #1d4ed8 !important;
+    }
+    [data-theme="light"] .badge-success {
+      color: #ffffff !important;
+      background-color: #16a34a !important;
+      border-color: #15803d !important;
+    }
+    [data-theme="light"] .badge-warning {
+      color: #422006 !important;
+      background-color: #fbbf24 !important;
+      border-color: #d97706 !important;
+    }
+    [data-theme="light"] .badge-error {
+      color: #ffffff !important;
+      background-color: #dc2626 !important;
+      border-color: #b91c1c !important;
+    }
+
+    /* Kind chips (Rules / Guidance / Inject / Meta / Missing) — keep deep ink on pale tint */
+    [data-theme="light"] .chip-ro,
+    [data-theme="light"] .badge.chip-ro {
+      color: var(--chip-ro-fg) !important;
+      background: var(--chip-ro-bg) !important;
+      border-color: var(--c-rules) !important;
+    }
+    [data-theme="light"] .chip-ed,
+    [data-theme="light"] .badge.chip-ed {
+      color: var(--chip-ed-fg) !important;
+      background: var(--chip-ed-bg) !important;
+      border-color: var(--c-edit) !important;
+    }
+    [data-theme="light"] .chip-inj,
+    [data-theme="light"] .badge.chip-inj {
+      color: var(--chip-inj-fg) !important;
+      background: var(--chip-inj-bg) !important;
+      border-color: var(--c-inj) !important;
+    }
+    [data-theme="light"] .chip-meta,
+    [data-theme="light"] .badge.chip-meta {
+      color: var(--chip-meta-fg) !important;
+      background: var(--chip-meta-bg) !important;
+      border-color: var(--c-meta) !important;
+    }
+    [data-theme="light"] .chip-miss,
+    [data-theme="light"] .badge.chip-miss {
+      color: var(--chip-miss-fg) !important;
+      background: var(--chip-miss-bg) !important;
+      border-color: var(--c-miss) !important;
+    }
+    /* code/mono: don't repaint badges or buttons that use font-mono */
     [data-theme="light"] pre,
-    [data-theme="light"] code,
-    [data-theme="light"] .font-mono {
+    [data-theme="light"] code:not(.btn *):not(.badge *) {
+      color: var(--ink);
+    }
+    [data-theme="light"] .font-mono:not(.btn):not(.badge):not([class*="chip-"]) {
       color: var(--ink);
     }
     [data-theme="light"] .json-block pre {
@@ -369,8 +609,107 @@
     }
     .section-card { min-height: 8.5rem; }
     #toast { position: fixed; bottom: 1rem; right: 1rem; z-index: 50; }
-    #treemap-chart { width: 100%; height: 440px; }
-    #treemap-wire { width: 100%; height: 360px; }
+    #treemap-chart { width: 100%; height: 480px; }
+    /* Multi-line tip next to Full catalog / Wire payload toggle */
+    .size-mode-tip:before {
+      white-space: pre-wrap;
+      text-align: left;
+      max-width: 16rem;
+      width: max-content;
+      line-height: 1.35;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 0.5rem 0.65rem;
+    }
+    [data-theme="light"] .size-mode-tip:before {
+      color: #f8fafc;
+      --tooltip-color: #1e293b;
+    }
+    /* Size map budget strip — primary “what am I looking at” readout */
+    #size-totals {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+      gap: 0.65rem;
+      width: 100%;
+    }
+    #size-totals .size-stat {
+      border-radius: 0.75rem;
+      border: 2px solid color-mix(in oklab, oklch(var(--bc)) 14%, transparent);
+      background: color-mix(in oklab, oklch(var(--b2)) 80%, transparent);
+      padding: 0.65rem 0.85rem;
+      min-width: 0;
+    }
+    #size-totals .size-stat.is-mode {
+      border-color: color-mix(in oklab, #4f46e5 55%, transparent);
+      background: color-mix(in oklab, #4f46e5 14%, oklch(var(--b1)));
+    }
+    #size-totals .size-stat.is-disk {
+      border-color: color-mix(in oklab, var(--c-rules) 50%, transparent);
+    }
+    #size-totals .size-stat.is-inject {
+      border-color: color-mix(in oklab, var(--c-inj) 50%, transparent);
+      background: color-mix(in oklab, var(--c-inj) 10%, oklch(var(--b1)));
+    }
+    #size-totals .size-stat.is-view {
+      border-color: color-mix(in oklab, var(--c-edit) 55%, transparent);
+      background: color-mix(in oklab, var(--c-edit) 12%, oklch(var(--b1)));
+    }
+    #size-totals .size-stat-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 0.2rem;
+    }
+    #size-totals .size-stat-value {
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: oklch(var(--bc));
+    }
+    #size-totals .size-stat-sub {
+      display: block;
+      margin-top: 0.15rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.95rem;
+      font-weight: 650;
+      opacity: 0.85;
+    }
+    #size-totals .size-stat.is-mode .size-stat-value {
+      font-size: 1.2rem;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    [data-theme="light"] #size-totals .size-stat-value,
+    [data-theme="light"] #size-totals .size-stat-sub {
+      color: var(--ink-strong) !important;
+      opacity: 1 !important;
+    }
+    [data-theme="light"] #size-totals .size-stat-label {
+      color: var(--ink-muted) !important;
+      opacity: 1 !important;
+    }
+    [data-theme="light"] #size-totals .size-stat.is-mode {
+      background: #eef2ff;
+      border-color: #6366f1;
+    }
+    [data-theme="light"] #size-totals .size-stat.is-disk {
+      background: #fef2f2;
+      border-color: #ef4444;
+    }
+    [data-theme="light"] #size-totals .size-stat.is-inject {
+      background: #eff6ff;
+      border-color: #3b82f6;
+    }
+    [data-theme="light"] #size-totals .size-stat.is-view {
+      background: #f0fdf4;
+      border-color: #22c55e;
+    }
     .help h3 { margin-top: 1.25rem; font-size: 1rem; font-weight: 700; color: oklch(var(--bc)); }
     .help h4 { margin-top: 0.75rem; font-size: 0.9rem; font-weight: 600; color: oklch(var(--bc)); }
     .help p, .help li {
@@ -539,7 +878,7 @@
       opacity: 0.75;
       max-width: 42rem;
     }
-    .chapter-body { padding: 0.9rem 1rem 1.1rem; }
+    .chapter-body { padding: 0.9rem 1rem 1.1rem; min-width: 0; max-width: 100%; }
     .chapter-snapshot .chapter-head { background: linear-gradient(90deg, rgba(167,139,250,0.18), transparent); }
     .chapter-snapshot .ch-num { background: rgba(167,139,250,0.35); color: #5b21b6; }
     .chapter-catalog .chapter-head { background: linear-gradient(90deg, rgba(239,68,68,0.14), rgba(34,197,94,0.08), transparent); }
@@ -566,15 +905,42 @@
     .wire-zones {
       display: grid;
       gap: 0.75rem;
+      min-width: 0;
+      width: 100%;
     }
     @media (min-width: 900px) {
-      .wire-zones { grid-template-columns: 1fr 1fr; }
+      .wire-zones { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     }
     .wire-zone {
       border-radius: 0.75rem;
       padding: 0.65rem;
       border: 1px dashed color-mix(in oklab, oklch(var(--bc)) 18%, transparent);
       background: color-mix(in oklab, oklch(var(--b2)) 55%, transparent);
+      /* Grid items default min-width:auto — long <pre> lines blow out the card */
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .wire-zone .card,
+    .wire-zone .card-body {
+      min-width: 0;
+      max-width: 100%;
+    }
+    /* System prompt / verb previews must wrap inside the red zone */
+    .wire-zone pre.wire-prompt,
+    .wire-zone .wire-prompt {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .wire-zone ul {
+      min-width: 0;
+      max-width: 100%;
+      overflow-wrap: anywhere;
     }
     .wire-zone.in-file { border-color: color-mix(in oklab, var(--c-rules) 55%, transparent); background: var(--json-ro-bg); }
     .wire-zone.injected { border-color: color-mix(in oklab, var(--c-inj) 55%, transparent); background: var(--json-inj-bg); }
@@ -639,11 +1005,39 @@
       box-shadow: 0 0 0 2px color-mix(in oklab, oklch(var(--bc)) 35%, transparent);
       font-weight: 700;
     }
+    /* Day: keep chip palette (no grayscale wash); dim only slightly when off */
     [data-theme="light"] .tile-filter-bar .tile-filter {
-      opacity: 0.55;
+      opacity: 0.72 !important;
+      filter: none !important;
     }
     [data-theme="light"] .tile-filter-bar .tile-filter.is-on {
-      opacity: 1;
+      opacity: 1 !important;
+      filter: none !important;
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--ink) 22%, transparent);
+    }
+    [data-theme="light"] .tile-filter-bar .tile-filter-all.is-on {
+      color: var(--ink-strong) !important;
+      background: #e2e8f0 !important;
+      border-color: #94a3b8 !important;
+    }
+    [data-theme="light"] .chapter-head .ch-num {
+      font-weight: 800;
+    }
+    [data-theme="light"] .chapter-snapshot .ch-num {
+      background: #ede9fe !important;
+      color: #5b21b6 !important;
+    }
+    [data-theme="light"] .chapter-catalog .ch-num {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+    }
+    [data-theme="light"] .chapter-wire .ch-num {
+      background: #dbeafe !important;
+      color: #1e3a8a !important;
+    }
+    [data-theme="light"] .chapter-output .ch-num {
+      background: #dcfce7 !important;
+      color: #14532d !important;
     }
     .tile-filter-hint { font-size: 11px; }
     [data-tile].is-filter-hidden { display: none !important; }
@@ -806,7 +1200,12 @@
       </div>
     </div>
     <div class="flex-none gap-2 items-center flex-wrap justify-end">
-      <select id="mode-select" class="select select-bordered select-sm w-32 sm:w-36" title="Mode = which tool surface + behavior profile"></select>
+      <span
+        id="base-badge"
+        class="badge badge-primary badge-sm font-mono font-semibold tracking-tight shrink-0"
+        title="BASE lineage id from _lineage.base_id (increments as base-1, base-2, …)"
+      >base-?</span>
+      <select id="mode-select" class="select select-bordered select-sm w-52 sm:w-72 max-w-[min(100vw-2rem,22rem)]" title="Pick a chat_request*.json under v2/ (folder · mode)"></select>
       <div class="join">
         <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes" title="Structure: tiles + expandable JSON">Structure</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="size">Size map</button>
@@ -921,7 +1320,7 @@
           </header>
           <div class="chapter-body">
             <div class="zone-label">Mode · size · terminate health</div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 summary-strip" id="summary-row"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 summary-strip" id="summary-row"></div>
           </div>
         </article>
 
@@ -1046,52 +1445,83 @@
     <section id="view-size" class="hidden space-y-4">
       <div class="card bg-base-100 shadow tile-rules">
         <div class="card-body p-4 gap-3">
-          <div class="flex flex-wrap items-start justify-between gap-2">
-            <div>
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
               <h2 class="card-title text-base">Payload size treemap</h2>
-              <p class="text-xs opacity-70 max-w-3xl">
+              <p class="text-xs opacity-70 max-w-3xl" id="size-map-blurb">
                 Area ∝ bytes. Labels show <b>bytes</b> and <b>~tokens</b> (bytes÷4 budget heuristic).
                 <b>Click any tile</b> → content panel above (same as cards).
               </p>
             </div>
-            <div class="flex flex-col gap-1 text-xs items-end">
-              <label class="label cursor-pointer gap-2 py-0">
+            <div class="flex flex-col gap-2 text-xs items-stretch sm:items-end shrink-0">
+              <div class="flex items-center gap-1.5 justify-end">
+                <div class="join border border-base-content/20 rounded-lg overflow-hidden" role="group" aria-label="Size map view">
+                  <button
+                    type="button"
+                    class="btn btn-sm join-item btn-primary"
+                    id="btn-size-mode-catalog"
+                    data-size-mode="catalog"
+                    title="Full catalog — Entire chat_request file (messages, verbs, guidance, meta, …)"
+                  >
+                    Full catalog
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm join-item btn-ghost"
+                    id="btn-size-mode-wire"
+                    data-size-mode="wire"
+                    title="Wire payload — What tends to hit the model: system prompt + tools (+ optional blue inject estimates)"
+                  >
+                    Wire payload
+                  </button>
+                </div>
+                <span
+                  class="tooltip tooltip-left size-mode-tip"
+                  data-tip="Full catalog — Entire chat_request file (messages, verbs, guidance, meta, …)
+
+Wire payload — What tends to hit the model: system prompt + tools (+ optional blue inject estimates)"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-xs btn-circle min-h-0 h-7 w-7 border border-base-content/20 text-xs font-bold"
+                    aria-label="About Full catalog vs Wire payload"
+                  >?</button>
+                </span>
+              </div>
+              <label class="label cursor-pointer gap-2 py-0 justify-end">
                 <span class="label-text text-xs">Show blue inject estimates</span>
                 <input type="checkbox" id="chk-inject" class="toggle toggle-sm toggle-info" checked />
               </label>
-              <span class="opacity-60" id="size-totals"></span>
             </div>
           </div>
-          <div id="treemap-chart" class="rounded-lg bg-base-200"></div>
+          <div
+            id="size-totals"
+            class="size-totals-bar"
+            role="status"
+            aria-live="polite"
+            aria-label="Payload size summary for the current map view"
+          ></div>
+          <div id="treemap-chart" class="rounded-lg bg-base-200" role="img" aria-label="Payload size treemap"></div>
         </div>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <div class="card bg-base-100 shadow">
-          <div class="card-body p-4">
-            <h3 class="font-semibold text-sm mb-1">Wire-ish view</h3>
-            <p class="text-xs opacity-70 mb-2">System + verbs (+ blue injects if toggled).</p>
-            <div id="treemap-wire" class="rounded-lg bg-base-200"></div>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4">
+          <h3 class="font-semibold text-sm mb-2">Size table (click row)</h3>
+          <div class="overflow-x-auto max-h-96 overflow-y-auto">
+            <table class="table table-xs table-pin-rows" id="size-table">
+              <thead>
+                <tr>
+                  <th>path</th>
+                  <th>class</th>
+                  <th class="text-right">bytes</th>
+                  <th class="text-right">~tokens</th>
+                  <th class="text-right" title="Share of current view total">% of view</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
-        </div>
-        <div class="card bg-base-100 shadow">
-          <div class="card-body p-4">
-            <h3 class="font-semibold text-sm mb-2">Size table (click row)</h3>
-            <div class="overflow-x-auto max-h-80 overflow-y-auto">
-              <table class="table table-xs table-pin-rows" id="size-table">
-                <thead>
-                  <tr>
-                    <th>path</th>
-                    <th>class</th>
-                    <th class="text-right">bytes</th>
-                    <th class="text-right">~tokens</th>
-                    <th class="text-right">%</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-            <p class="text-[10px] opacity-50 mt-2">~tokens ≈ UTF-8 bytes ÷ 4 (relative budget, not an exact model tokenizer).</p>
-          </div>
+          <p class="text-[10px] opacity-50 mt-2">~tokens ≈ UTF-8 bytes ÷ 4 (relative budget, not an exact model tokenizer).</p>
         </div>
       </div>
     </section>
@@ -1159,10 +1589,10 @@
                   <li><b>Output scheme</b> — tables (default) or Full JSON scheme blocks</li>
                 </ol>
               </li>
-              <li><b>Size map</b> — treemap area ∝ bytes (~tokens). Click a tile → content panel.</li>
+              <li><b>Size map</b> — one treemap (area ∝ bytes). Switch <b>Full catalog</b> vs <b>Wire payload</b>; click a tile → content panel.</li>
               <li><b>Filter badges</b> (top) — Rules / Verbs / Guidance / Inject / Meta / Missing filter visible tiles/blocks.</li>
               <li><b>Content panel</b> — sticky inspector. Close with <b>✕ Close</b>, bottom link, or <b>Esc</b>.</li>
-              <li><b>Mode dropdown</b> — which baseline you inspect. Does not change production until you stamp on Zeus.</li>
+              <li><b>Mode dropdown</b> — every <code>v2/**/chat_request*.json</code> found by the scan (grouped by folder: min, base-N, …). Inspect only; does not change production until you stamp on Zeus.</li>
             </ul>
           </div>
 
@@ -1385,7 +1815,8 @@ const GLOSSARY = [
   { term: "Intent facets", kind: "guidance", def: "Slots like intent, entity, geo, audience—the shape of query_decomposition for clustering questions." },
   { term: "Layer A / Layer B", kind: "rules", def: "Output scheme: A = model terminate fields (summary + query_decomposition + …). B = server report document (attribution, report, spans)." },
   { term: "LLM / tool-calling", kind: "rules", def: "The model does not run N1QL itself; it chooses allowed verbs; Zeus Client executes them and returns facts." },
-  { term: "manifest.json", kind: "meta", def: "Index of modes + byte sizes in this repo. The UI loads it first, then the chosen v2/min/…json." },
+  { term: "manifest.json", kind: "meta", def: "Published index of latest v2/min modes + hashes (clients/CI). Inspector prefers catalog-index.json (full v2/** scan)." },
+  { term: "catalog-index.json", kind: "meta", def: "Filesystem scan of v2/**/chat_request*.json. Powers the mode dropdown so every folder (min, base-N, …) is selectable." },
   { term: "masq", kind: "rules", def: "Cost tiers for verbs (cheap/mod/expensive). Helps the model pick cheaper tools first." },
   { term: "min vs full", kind: "meta", def: "min (this repo) = smaller client payload. full = engine snapshots with guidance/instructions bulk." },
   { term: "MINI-SCHEMA / scope brief", kind: "inject", def: "Live description of your entities/fields/counts. Injected so the model doesn’t invent columns." },
@@ -1402,7 +1833,7 @@ const GLOSSARY = [
   { term: "Rules (hashed)", kind: "rules", def: "What production promised: messages, verbs, masq, etc. Change ⇒ new hash." },
   { term: "ScopeConfig", kind: "inject", def: "Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production." },
   { term: "Search (this UI)", kind: "meta", def: "Top-bar search across the whole page. Scope with /help /glossary /prompt /catalog /tools /inject /output (e.g. /help mini-schema). Use * as wildcard (e.g. /output *ecomposition). Yellow mark shows matches; click a hit to jump." },
-  { term: "Size map", kind: "meta", def: "Treemap where area ∝ bytes (~tokens ≈ bytes/4). Click tiles to open the content panel; toggle BLUE inject estimates." },
+  { term: "Size map", kind: "meta", def: "One treemap (area ∝ bytes, ~tokens ≈ bytes/4). Toggle Full catalog vs Wire payload; optional BLUE inject estimates. Click tiles → content panel." },
   { term: "Standard output scheme", kind: "rules", def: "Layer A model terminate fields + Layer B server report. Same A across modes/deploys so every call is machine-parseable." },
   { term: "System prompt (messages)", kind: "rules", def: "Operating instructions the model reads from the catalog (RED). On min, must carry evidence-loop rules." },
   { term: "Theme toggle", kind: "meta", def: "Sun/moon control in the navbar. Default is system; choice persists in localStorage (cr-map-theme)." },
@@ -2364,12 +2795,19 @@ let state = {
   outputMode: "tables",
   /** Active Cards filters: empty / has "all" = show everything. Else Set of rules|verbs|guidance|inject|meta|miss */
   tileFilters: new Set(["all"]),
+  /** Full scan index (catalog-index.json) or manifest fallback */
   manifest: null,
+  /** Catalog entries shown in the dropdown (file + mode + folder) */
+  catalogEntries: [],
+  /** Selected file path, e.g. v2/min/chat_request_auto_v2_min.json */
+  catalogFile: null,
   mode: null,
   catalog: null,
+  /** Cached docs keyed by file path */
   catalogs: {},
   chartMain: null,
-  chartWire: null,
+  /** Size map treemap: catalog (full file) | wire (system + verbs + injects) */
+  sizeMode: "catalog",
   selectedPath: null,
 };
 let lastContentText = "";
@@ -2389,7 +2827,38 @@ function jsonBytes(v) {
 function approxTokens(bytes) { return !bytes ? 0 : Math.max(1, Math.ceil(bytes / 4)); }
 function formatBytes(n) { return Number(n || 0).toLocaleString() + " B"; }
 function formatTokens(bytes) { return "~" + approxTokens(bytes).toLocaleString() + " tok"; }
-function sizeLabel(name, bytes) { return `${name}\n${formatBytes(bytes)} · ${formatTokens(bytes)}`; }
+/** Share of total view (0–100), one decimal when not whole. */
+function formatPct(bytes, total) {
+  if (!total || !bytes) return "0%";
+  const p = (100 * Number(bytes)) / Number(total);
+  if (!Number.isFinite(p)) return "0%";
+  const rounded = Math.round(p * 10) / 10;
+  return (Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1)) + "%";
+}
+/** Treemap tile label: name + bytes + ~tok + % of view. */
+function sizeLabel(name, bytes, total) {
+  const pct = total != null && total > 0 ? ` · ${formatPct(bytes, total)}` : "";
+  return `${name}\n${formatBytes(bytes)} · ${formatTokens(bytes)}${pct}`;
+}
+function treeNodeBytes(n) {
+  if (!n) return 0;
+  if (Array.isArray(n.children) && n.children.length) {
+    return n.children.reduce((s, c) => s + treeNodeBytes(c), 0);
+  }
+  return Number(n.value) || 0;
+}
+/** Rewrite tile names with % of the current view total (area base). */
+function annotateTreePcts(nodes, total) {
+  for (const n of nodes || []) {
+    const b = treeNodeBytes(n);
+    const bare = String(n.name || "").split("\n")[0];
+    n.name = sizeLabel(bare, b, total);
+    n.bytes = b;
+    n.pctOfView = total ? (100 * b) / total : 0;
+    if (n.children && n.children.length) annotateTreePcts(n.children, total);
+  }
+  return nodes;
+}
 function classLabel(c) {
   if (c === "rules") return "don't change";
   if (c === "guidance") return "editable";
@@ -2776,15 +3245,73 @@ function initTileFilters() {
   applyCardFilters();
 }
 
+/** Resolve BASE id (base-1, base-2, …) from lineage, entry, path, or CURRENT pin. */
+function resolveBaseId(doc, entry) {
+  const lin = doc && typeof doc._lineage === "object" && doc._lineage ? doc._lineage : {};
+  if (lin.base_id) return String(lin.base_id);
+  if (entry && entry.base_id) return String(entry.base_id);
+  const file = state.catalogFile || (entry && entry.file) || "";
+  const m = String(file).match(/(?:^|\/)(base-\d+)(?:\/|$)/i);
+  if (m) return m[1];
+  const cur = state.manifest && state.manifest.current_base_id;
+  if (cur) return String(cur);
+  return null;
+}
+
+function updateBaseBadge(doc, entry) {
+  const badge = document.getElementById("base-badge");
+  if (!badge) return;
+  const lin = doc && typeof doc._lineage === "object" && doc._lineage ? doc._lineage : {};
+  const baseId = resolveBaseId(doc, entry);
+  if (baseId) {
+    badge.textContent = baseId;
+    badge.classList.remove("badge-ghost", "opacity-60");
+    badge.classList.add("badge-primary");
+    const bits = [`BASE lineage: ${baseId}`];
+    if (lin.kind) bits.push(`kind=${lin.kind}`);
+    if (lin.profile) bits.push(`profile=${lin.profile}`);
+    if (lin.mode) bits.push(`mode=${lin.mode}`);
+    if (lin.custom_id) bits.push(`custom=${lin.custom_id}`);
+    badge.title = bits.join(" · ");
+    badge.setAttribute("aria-label", bits.join(", "));
+  } else {
+    badge.textContent = "base-?";
+    badge.classList.remove("badge-primary");
+    badge.classList.add("badge-ghost", "opacity-60");
+    badge.title = "No _lineage.base_id on this catalog (expected on v2/base/base-N/…)";
+    badge.setAttribute("aria-label", "BASE id unknown");
+  }
+}
+
 function renderSummary(doc, mode, entry) {
   const disk = jsonBytes(doc);
   const ret = findReturnVerb(doc);
   const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
   const ok = /query_decomposition/i.test(systemContent(doc)) && req.has("query_decomposition");
   const blurb = MODE_BLURBS[mode] || "Mode profile for tools + behavior.";
+  const baseId = resolveBaseId(doc, entry);
   document.getElementById("summary-row").innerHTML = [
     { t: "Mode", b: mode, s: blurb, c: "box-meta tile-meta", path: null, kind: "meta", tags: ["summary"] },
-    { t: "On-disk size", b: `${formatBytes(disk)} · ${formatTokens(disk)}`, s: "Everything in this baseline file.", c: "box-ro tile-rules", path: null, kind: "rules", tags: ["summary", "size"] },
+    {
+      t: "BASE",
+      b: baseId || "—",
+      s: baseId
+        ? "Lineage pin from _lineage.base_id (increments when catalogs republish)."
+        : "No base_id on this file.",
+      c: "box-meta tile-meta",
+      path: null,
+      kind: "meta",
+      tags: ["summary", "lineage", "base"],
+    },
+    {
+      t: "Zeus API base",
+      b: `${formatBytes(disk)} · ${formatTokens(disk)}`,
+      s: "Baseline catalog size used when assembling Zeus API requests.",
+      c: "box-ro tile-rules",
+      path: null,
+      kind: "rules",
+      tags: ["summary", "size"],
+    },
     {
       t: "Standard terminate schema",
       b: ok ? "OK" : "Gaps",
@@ -2871,7 +3398,7 @@ function renderWire(doc) {
           </div>
         </div>
         <p class="text-xs opacity-80">Why: teaches tool use + standard terminate schema.</p>
-        <pre class="bg-base-200 p-2 rounded text-[11px] max-h-36 overflow-auto txt-ro">${escapeHtml(sys.slice(0, 900))}${sys.length > 900 ? "\n…" : ""}</pre>
+        <pre class="wire-prompt bg-base-200 p-2 rounded text-[11px] max-h-36 txt-ro">${escapeHtml(sys.slice(0, 900))}${sys.length > 900 ? "\n…" : ""}</pre>
       </div>
     </div>
     <div class="card bg-base-100 shadow card-click box-ro tile-rules mt-2" ${tileAttrs("rules", ["verbs", "tools"])} data-path="verbs" title="Click to open verbs list">
@@ -2884,10 +3411,10 @@ function renderWire(doc) {
           </div>
         </div>
         <p class="text-xs opacity-80">Why: allowed Zeus API surface.</p>
-        <ul class="text-xs max-h-36 overflow-auto space-y-0.5">${verbs
+        <ul class="text-xs max-h-36 overflow-y-auto space-y-0.5 min-w-0">${verbs
           .map((v) => {
             const fn = v.function || v;
-            return `<li class="txt-ro"><code>${escapeHtml(fn.name)}</code> <span class="opacity-60">${jsonBytes(v)} B</span></li>`;
+            return `<li class="txt-ro break-words"><code class="break-all">${escapeHtml(fn.name)}</code> <span class="opacity-60">${jsonBytes(v)} B</span></li>`;
           })
           .join("")}</ul>
       </div>
@@ -3158,7 +3685,7 @@ function renderEvidence(doc) {
 
 function renderJson(doc, mode) {
   const titleEl = document.getElementById("json-title");
-  if (titleEl) titleEl.textContent = `v2/min/chat_request_${mode}_v2_min.json`;
+  if (titleEl) titleEl.textContent = state.catalogFile || `chat_request_${mode}_*.json`;
   const plain = JSON.stringify(doc, null, 2);
   const pre = document.getElementById("json-pre");
   if (pre) pre.textContent = plain;
@@ -3779,15 +4306,22 @@ function buildWireTree(doc, includeInject) {
   }
   return children;
 }
-function treemapOption(data, title) {
+function treemapOption(data, title, viewTotal) {
+  const total = Number(viewTotal) || 0;
   return {
     backgroundColor: "transparent",
     title: { text: title, left: 8, top: 4, textStyle: { color: "#e5e7eb", fontSize: 12, fontWeight: 600 } },
     tooltip: {
       formatter(info) {
         const d = info.data || {};
-        const v = info.value || 0;
-        return `<b>${(info.name || "").split("\n")[0]}</b><br/>${formatBytes(v)} · ${formatTokens(v)} · ${classLabel(
+        const v = d.bytes != null ? d.bytes : info.value || 0;
+        const pct =
+          d.pctOfView != null && total
+            ? formatPct(v, total)
+            : total
+              ? formatPct(v, total)
+              : "—";
+        return `<b>${(info.name || "").split("\n")[0]}</b><br/>${formatBytes(v)} · ${formatTokens(v)} · <b>${pct}</b> of view · ${classLabel(
           d.cls || ""
         )}<br/><span style="opacity:.85">click → content panel</span>${d.note ? "<br/>" + d.note : ""}${
           d.estimate ? "<br/><i>estimate</i>" : ""
@@ -3802,6 +4336,7 @@ function treemapOption(data, title) {
         roam: false,
         nodeClick: false,
         breadcrumb: { show: true, bottom: 4, itemStyle: { color: "#374151", textStyle: { color: "#e5e7eb" } } },
+        // {b} already includes name + bytes + ~tok + % (from annotateTreePcts)
         label: { show: true, formatter: "{b}", fontSize: 11, lineHeight: 14 },
         upperLabel: { show: true, height: 28, color: "#f9fafb" },
         itemStyle: { borderColor: "#111827", borderWidth: 1, gapWidth: 2 },
@@ -3816,44 +4351,133 @@ function treemapOption(data, title) {
   };
 }
 function ensureCharts() {
-  if (!state.chartMain) state.chartMain = echarts.init(document.getElementById("treemap-chart"));
-  if (!state.chartWire) state.chartWire = echarts.init(document.getElementById("treemap-wire"));
+  const el = document.getElementById("treemap-chart");
+  if (!el) return;
+  if (!state.chartMain) state.chartMain = echarts.init(el);
 }
 function bindChartClick(chart) {
+  if (!chart) return;
   chart.off("click");
   chart.on("click", (params) => {
     const d = params.data || {};
     if (d.path) openPath(d.path, params.value, d.cls);
   });
 }
+
+function setSizeMode(mode) {
+  const m = mode === "wire" ? "wire" : "catalog";
+  state.sizeMode = m;
+  const btnCat = document.getElementById("btn-size-mode-catalog");
+  const btnWire = document.getElementById("btn-size-mode-wire");
+  if (btnCat) {
+    btnCat.classList.toggle("btn-primary", m === "catalog");
+    btnCat.classList.toggle("btn-ghost", m !== "catalog");
+  }
+  if (btnWire) {
+    btnWire.classList.toggle("btn-primary", m === "wire");
+    btnWire.classList.toggle("btn-ghost", m !== "wire");
+  }
+  const blurb = document.getElementById("size-map-blurb");
+  if (blurb) {
+    blurb.innerHTML =
+      m === "wire"
+        ? "Area ∝ bytes for the <b>wire</b> payload Zeus API sees: system prompt + tools/verbs" +
+          " (+ blue inject estimates if toggled). Each tile shows <b>% of view</b>. Meta keys omitted. <b>Click</b> → content panel."
+        : "Area ∝ bytes for the <b>full Zeus API base</b> catalog. Labels: <b>bytes</b>, <b>~tokens</b>, and <b>% of view</b>." +
+          " <b>Click any tile</b> → content panel above (same as cards).";
+  }
+  if (state.catalog) renderSizeMaps(state.catalog);
+}
+
+/** Wire mode table: system + verbs (+ injects) — aligned with buildWireTree. */
+function buildWireTableRows(doc, includeInject) {
+  const rows = [];
+  const sys = systemContent(doc);
+  rows.push({ path: "system prompt", open: "messages[0]", cls: "rules", bytes: jsonBytes(sys) });
+  for (const verb of doc.verbs || []) {
+    const fn = verb.function || verb;
+    const name = fn.name || "?";
+    rows.push({ path: `verbs.${name}`, open: `verbs.${name}`, cls: "rules", bytes: jsonBytes(verb) });
+  }
+  if (includeInject) {
+    for (const x of INJECT_ESTIMATES) {
+      rows.push({ path: `[inject] ${x.name}`, open: `inject:${x.name}`, cls: "inject", bytes: x.bytes });
+    }
+  }
+  rows.sort((a, b) => b.bytes - a.bytes);
+  return rows;
+}
+
 function renderSizeMaps(doc) {
   ensureCharts();
-  const includeInject = document.getElementById("chk-inject").checked;
-  const { children, tableRows } = buildSizeTree(doc, includeInject);
-  const diskBytes = tableRows.filter((r) => r.cls !== "inject").reduce((s, r) => s + r.bytes, 0);
+  if (!state.chartMain) return;
+  const includeInject = document.getElementById("chk-inject")?.checked;
+  const mode = state.sizeMode === "wire" ? "wire" : "catalog";
+  const { children: catalogChildren, tableRows: catalogRows } = buildSizeTree(doc, !!includeInject);
+  const tableRows = mode === "wire" ? buildWireTableRows(doc, !!includeInject) : catalogRows;
+  const treeData = mode === "wire" ? buildWireTree(doc, !!includeInject) : catalogChildren;
+
+  // Zeus API base = catalog bytes that ship with the request template (not "on-disk")
+  const baseBytes = tableRows.filter((r) => r.cls !== "inject").reduce((s, r) => s + r.bytes, 0);
   const injBytes = tableRows.filter((r) => r.cls === "inject").reduce((s, r) => s + r.bytes, 0);
-  const viewTotal = includeInject ? diskBytes + injBytes : diskBytes;
-  document.getElementById("size-totals").textContent = includeInject
-    ? `on-disk ${formatBytes(diskBytes)} (${formatTokens(diskBytes)}) · inject ${formatBytes(injBytes)} (${formatTokens(
-        injBytes
-      )}) · view ${formatBytes(viewTotal)} (${formatTokens(viewTotal)})`
-    : `on-disk ${formatBytes(diskBytes)} (${formatTokens(diskBytes)})`;
-  state.chartMain.setOption(treemapOption(children, "Catalog file (area = bytes)"), true);
-  state.chartWire.setOption(treemapOption(buildWireTree(doc, includeInject), "Wire-ish payload"), true);
+  const viewTotal = includeInject ? baseBytes + injBytes : baseBytes;
+  annotateTreePcts(treeData, viewTotal);
+
+  const totalsEl = document.getElementById("size-totals");
+  if (totalsEl) {
+    const modeLabel = mode === "wire" ? "Wire payload" : "Full catalog";
+    const modeHint =
+      mode === "wire"
+        ? "System + tools (+ injects if on) for Zeus API"
+        : "Entire chat_request baseline for Zeus API";
+    const stat = (kind, label, valueHtml, subHtml) =>
+      `<div class="size-stat is-${kind}">
+        <span class="size-stat-label">${escapeHtml(label)}</span>
+        <span class="size-stat-value">${valueHtml}</span>
+        ${subHtml ? `<span class="size-stat-sub">${subHtml}</span>` : ""}
+      </div>`;
+    const bytesVal = (n) => escapeHtml(formatBytes(n));
+    const tokAndPct = (n) =>
+      escapeHtml(`${formatTokens(n)} · ${formatPct(n, viewTotal)} of view`);
+    let html = stat("mode", "Viewing", escapeHtml(modeLabel), escapeHtml(modeHint));
+    html += stat(
+      "disk",
+      "Zeus API base",
+      bytesVal(baseBytes),
+      tokAndPct(baseBytes)
+    );
+    if (includeInject) {
+      html += stat("inject", "Inject (est.)", bytesVal(injBytes), tokAndPct(injBytes));
+      html += stat(
+        "view",
+        "Total in view",
+        bytesVal(viewTotal),
+        escapeHtml(`${formatTokens(viewTotal)} · 100% of view`)
+      );
+    }
+    totalsEl.innerHTML = html;
+  }
+  const chartTitle =
+    mode === "wire"
+      ? `Wire payload · Zeus API (+ injects) · area = bytes · % of ${formatBytes(viewTotal)}`
+      : `Full catalog · Zeus API base · area = bytes · % of ${formatBytes(viewTotal)}`;
+  state.chartMain.setOption(treemapOption(treeData, chartTitle, viewTotal), true);
   bindChartClick(state.chartMain);
-  bindChartClick(state.chartWire);
+  requestAnimationFrame(() => state.chartMain?.resize());
+
   const tbody = document.querySelector("#size-table tbody");
+  if (!tbody) return;
   tbody.innerHTML = tableRows
     .map((r) => {
-      const denom = r.cls === "inject" ? viewTotal : diskBytes;
-      const pct = denom ? ((100 * r.bytes) / denom).toFixed(1) : "0";
+      // Always % of current view total (same basis as treemap tiles)
+      const pct = formatPct(r.bytes, viewTotal);
       const cls = r.cls === "rules" ? "txt-ro" : r.cls === "guidance" ? "txt-ed" : r.cls === "inject" ? "txt-inj" : "txt-meta";
       return `<tr class="hover cursor-pointer" data-path="${escapeHtml(r.open)}" data-bytes="${r.bytes}" data-cls="${r.cls}">
         <td class="font-mono text-[11px] ${cls}">${escapeHtml(r.path)}</td>
         <td class="${cls}">${escapeHtml(classLabel(r.cls))}</td>
         <td class="text-right font-mono">${r.bytes.toLocaleString()}</td>
         <td class="text-right font-mono">${approxTokens(r.bytes).toLocaleString()}</td>
-        <td class="text-right font-mono">${pct}%</td>
+        <td class="text-right font-mono font-semibold">${escapeHtml(pct)}</td>
       </tr>`;
     })
     .join("");
@@ -3966,7 +4590,6 @@ function setView(view) {
     setTimeout(() => {
       renderSizeMaps(state.catalog);
       state.chartMain?.resize();
-      state.chartWire?.resize();
     }, 40);
   }
 }
@@ -3976,43 +4599,157 @@ async function loadManifest() {
   if (!res.ok) throw new Error("manifest.json " + res.status);
   return res.json();
 }
-async function loadCatalog(mode) {
-  if (state.catalogs[mode]) return state.catalogs[mode];
-  const res = await fetch(`v2/min/chat_request_${mode}_v2_min.json`, { cache: "no-store" });
-  if (!res.ok) throw new Error(res.status + " " + mode);
+
+/** Normalize any index shape into dropdown entries with file paths. */
+function normalizeCatalogEntries(index) {
+  const list = (index && index.catalogs) || [];
+  return list
+    .map((c) => {
+      const file = c.file || (c.mode ? `v2/min/chat_request_${c.mode}_v2_min.json` : null);
+      if (!file) return null;
+      const folder = c.folder || file.replace(/\/[^/]+$/, "");
+      const folderLabel =
+        c.folder_label ||
+        folder.replace(/^v2\//, "") ||
+        folder;
+      const mode = c.mode || "unknown";
+      return {
+        file,
+        mode,
+        folder,
+        folder_label: folderLabel,
+        base_id: c.base_id ?? null,
+        bytes: c.bytes,
+        verb_count: c.verb_count,
+        contract: c.contract,
+        sha256: c.sha256,
+        profile: c.profile,
+      };
+    })
+    .filter(Boolean);
+}
+
+/**
+ * Prefer catalog-index.json (full v2/** scan). Fall back to manifest.json
+ * (latest v2/min only) so older checkouts still work.
+ */
+async function loadCatalogIndex() {
+  try {
+    const res = await fetch("catalog-index.json", { cache: "no-store" });
+    if (res.ok) {
+      const idx = await res.json();
+      if ((idx.catalogs || []).length) {
+        idx._source = "catalog-index.json";
+        return idx;
+      }
+    }
+  } catch (_) {
+    /* ignore — try manifest */
+  }
+  const man = await loadManifest();
+  man._source = "manifest.json";
+  return man;
+}
+
+async function loadCatalog(file) {
+  if (state.catalogs[file]) return state.catalogs[file];
+  const res = await fetch(file, { cache: "no-store" });
+  if (!res.ok) throw new Error(res.status + " " + file);
   const doc = await res.json();
-  state.catalogs[mode] = doc;
+  state.catalogs[file] = doc;
   return doc;
 }
-function fillModes(manifest) {
-  const sel = document.getElementById("mode-select");
-  const modes = (manifest.catalogs || []).map((c) => c.mode);
-  sel.innerHTML = modes
-    .map((m) => `<option value="${m}">${m}${MODE_BLURBS[m] ? " — " + MODE_BLURBS[m].slice(0, 28) : ""}</option>`)
-    .join("");
-  state.mode = modes[0] || "analytics";
-  sel.value = state.mode;
+
+function optionLabel(entry) {
+  const blurb = MODE_BLURBS[entry.mode];
+  const short = blurb ? " — " + blurb.slice(0, 22) : "";
+  // folder · mode so min vs base-1/min are distinguishable
+  return `${entry.folder_label} · ${entry.mode}${short}`;
 }
-async function selectMode(mode) {
+
+function fillModes(index) {
+  const sel = document.getElementById("mode-select");
+  const entries = normalizeCatalogEntries(index);
+  state.catalogEntries = entries;
+  if (!entries.length) {
+    sel.innerHTML = `<option value="">(no chat_request*.json under v2/)</option>`;
+    state.mode = null;
+    state.catalogFile = null;
+    return;
+  }
+  // optgroups by folder when more than one location exists
+  const byFolder = new Map();
+  for (const e of entries) {
+    const key = e.folder_label || e.folder;
+    if (!byFolder.has(key)) byFolder.set(key, []);
+    byFolder.get(key).push(e);
+  }
+  if (byFolder.size > 1) {
+    sel.innerHTML = [...byFolder.entries()]
+      .map(([folder, items]) => {
+        const opts = items
+          .map(
+            (e) =>
+              `<option value="${escapeHtml(e.file)}">${escapeHtml(e.mode)}${
+                MODE_BLURBS[e.mode] ? " — " + escapeHtml(MODE_BLURBS[e.mode].slice(0, 28)) : ""
+              }</option>`
+          )
+          .join("");
+        return `<optgroup label="${escapeHtml(folder)} (${items.length})">${opts}</optgroup>`;
+      })
+      .join("");
+  } else {
+    sel.innerHTML = entries
+      .map((e) => `<option value="${escapeHtml(e.file)}">${escapeHtml(optionLabel(e))}</option>`)
+      .join("");
+  }
+  state.catalogFile = entries[0].file;
+  state.mode = entries[0].mode;
+  sel.value = state.catalogFile;
+}
+
+async function selectMode(fileOrMode) {
+  // Dropdown value is file path; tolerate legacy mode-only values.
+  let entry =
+    state.catalogEntries.find((e) => e.file === fileOrMode) ||
+    state.catalogEntries.find((e) => e.mode === fileOrMode);
+  if (!entry && fileOrMode && String(fileOrMode).includes("/")) {
+    entry = { file: fileOrMode, mode: "unknown", folder_label: fileOrMode.replace(/\/[^/]+$/, "") };
+  }
+  if (!entry) {
+    document.getElementById("status").textContent = "No catalog selected";
+    return;
+  }
+  const file = entry.file;
+  const mode = entry.mode;
+  state.catalogFile = file;
   state.mode = mode;
-  document.getElementById("status").textContent = `Loading ${mode}…`;
+  document.getElementById("status").textContent = `Loading ${file}…`;
   try {
-    const doc = await loadCatalog(mode);
+    const doc = await loadCatalog(file);
+    // Prefer lineage mode from the document when present
+    const linMode = doc && doc._lineage && doc._lineage.mode;
+    if (linMode) state.mode = linMode;
+    const modeNow = state.mode || mode;
     state.catalog = doc;
-    const entry = (state.manifest.catalogs || []).find((c) => c.mode === mode);
-    renderSummary(doc, mode, entry);
+    const metaEntry =
+      state.catalogEntries.find((e) => e.file === file) ||
+      (state.manifest.catalogs || []).find((c) => c.file === file || c.mode === modeNow);
+    updateBaseBadge(doc, metaEntry);
+    renderSummary(doc, modeNow, metaEntry);
     renderSections(doc);
     renderWire(doc);
     renderEvidence(doc);
-    renderJson(doc, mode);
+    renderJson(doc, modeNow);
     if (state.view === "size") renderSizeMaps(doc);
     // evidence panel rebuilds A/B anchors — re-observe for TOC
     ["out-layer-a", "out-layer-b", "out-wip"].forEach((id) => {
       const el = document.getElementById(id);
       if (el && cardsTocObserver) cardsTocObserver.observe(el);
     });
-    document.getElementById("status").textContent = `Mode ${mode}: ${MODE_BLURBS[mode] || ""} · ${
-      entry ? entry.bytes + " B" : jsonBytes(doc) + " B"
+    const where = entry.folder_label || entry.folder || file;
+    document.getElementById("status").textContent = `${where} · ${modeNow}: ${MODE_BLURBS[modeNow] || ""} · ${
+      metaEntry && metaEntry.bytes != null ? metaEntry.bytes + " B" : jsonBytes(doc) + " B"
     }. Search the whole page (prompt, verbs, help…); Open → cards open content.`;
     // Refresh global search index if user has a query open
     const sq = document.getElementById("site-search")?.value;
@@ -4053,7 +4790,10 @@ document.getElementById("btn-copy-content").addEventListener("click", async () =
 });
 document.getElementById("btn-close-content")?.addEventListener("click", () => closeContentPanel());
 document.getElementById("btn-close-content-bottom")?.addEventListener("click", () => closeContentPanel());
-document.getElementById("chk-inject").addEventListener("change", () => state.catalog && renderSizeMaps(state.catalog));
+document.getElementById("chk-inject")?.addEventListener("change", () => state.catalog && renderSizeMaps(state.catalog));
+document.querySelectorAll("[data-size-mode]").forEach((btn) => {
+  btn.addEventListener("click", () => setSizeMode(btn.getAttribute("data-size-mode")));
+});
 document.getElementById("btn-catalog-mode")?.addEventListener("click", () => {
   setCatalogMode(state.catalogMode === "json" ? "tiles" : "json");
 });
@@ -4095,7 +4835,6 @@ document.addEventListener("keydown", (e) => {
 });
 window.addEventListener("resize", () => {
   state.chartMain?.resize();
-  state.chartWire?.resize();
 });
 
 (async function init() {
@@ -4104,13 +4843,18 @@ window.addEventListener("resize", () => {
     initSiteSearch();
     initTileFilters();
     initCardsToc();
-    const man = await loadManifest();
-    state.manifest = man;
-    document.getElementById("manifest-line").textContent = `${man.repo || "zeus_chat_request"} · ${(man.catalogs || []).length} modes · ${
-      man.profile || "v2_min"
-    }`;
-    fillModes(man);
-    await selectMode(state.mode);
+    const index = await loadCatalogIndex();
+    state.manifest = index;
+    const n = (index.catalogs || []).length;
+    const src = index._source || "index";
+    const folders = new Set(
+      normalizeCatalogEntries(index).map((e) => e.folder_label || e.folder)
+    );
+    document.getElementById("manifest-line").textContent = `${
+      index.repo || "zeus_chat_request"
+    } · ${n} file${n === 1 ? "" : "s"} in ${folders.size} folder${folders.size === 1 ? "" : "s"} · ${src}`;
+    fillModes(index);
+    await selectMode(state.catalogFile || state.mode);
     // deep-link #chapter-… after first paint
     if (location.hash) {
       const el = document.getElementById(location.hash.slice(1));
@@ -4118,7 +4862,7 @@ window.addEventListener("resize", () => {
     }
   } catch (e) {
     document.getElementById("status").textContent =
-      "Serve this folder over HTTP: python3 -m http.server 8766  — " + e;
+      "Serve this folder over HTTP: docker compose up  or  python3 scripts/scan_catalogs.py && python3 -m http.server 8766  — " + e;
   }
 })();
   </script>

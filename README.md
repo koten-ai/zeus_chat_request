@@ -48,6 +48,25 @@ python3 -m http.server 8766 --bind 127.0.0.1
 # open http://127.0.0.1:8766/index.html
 ```
 
+### Docker Compose (port 3333)
+
+```bash
+docker compose up
+# open http://localhost:3333/   (or /index.html)
+```
+
+On start, `scripts/scan_catalogs.py` rebuilds **`catalog-index.json`** from every
+`v2/**/chat_request*.json` so the mode dropdown lists **all** folders (e.g. `min`
+and `base/base-1/min`), not only the latest alias. Then a static server serves the
+repo root on port **3333**.
+
+Without Docker:
+
+```bash
+python3 scripts/scan_catalogs.py
+python3 -m http.server 3333 --bind 127.0.0.1
+```
+
 ## Learn the format
 
 **[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.

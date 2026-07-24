@@ -2,6 +2,13 @@
 
 **Published Zeus V2 chat_request catalogs** for clients, demos, and integrators.
 
+## Helios (insights wishlist)
+
+Helios Motions read terminating-turn facets from Analytics. Fields we want catalogs + Zeus to emit (geo_norm, price_norm, outcome quality, …) live in:
+
+**→ [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)**  
+Branch: `helios-beta` until merged. Not a committed schema change — design input for guidance / BASE bumps.
+
 ## Current pin
 
 | Field | Value |

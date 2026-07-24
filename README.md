@@ -67,6 +67,24 @@ python3 scripts/scan_catalogs.py
 python3 -m http.server 3333 --bind 127.0.0.1
 ```
 
+### Inspector views (`index.html`)
+
+| View | Purpose |
+| --- | --- |
+| **Structure** | Anatomy, stamp health, assembly storyboard, prompt outline, tiles / full JSON, wire vs inject, output scheme |
+| **Size map** | One treemap: Full catalog vs Wire payload · Zeus API base % |
+| **Diff** | Compare two catalogs (mode/BASE dropdowns, paste, or upload) · section + prompt line diff · API impact notes |
+| **Matrix** | Fingerprint table across all scanned files (hash, prompt σ, terminate, sizes) |
+| **Export brief** | Download a Markdown integrator brief for the selected catalog |
+
+Deep links (examples):
+
+```text
+#view=diff&a=v2/min/chat_request_auto_v2_min.json&b=v2/min/chat_request_analytics_v2_min.json
+#view=matrix
+#view=size&sizeMode=wire&file=v2/min/chat_request_auto_v2_min.json
+```
+
 ## Learn the format
 
 **[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.

@@ -710,6 +710,59 @@
       background: #f0fdf4;
       border-color: #22c55e;
     }
+    /* Anatomy / health / storyboard cards */
+    .anatomy-card, .health-card, .story-card {
+      border-radius: 0.75rem;
+      border: 2px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      padding: 0.75rem 0.85rem;
+      background: color-mix(in oklab, oklch(var(--b1)) 85%, transparent);
+      min-height: 5.5rem;
+    }
+    .anatomy-card h4, .health-card h4, .story-card h4 {
+      margin: 0 0 0.35rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .anatomy-card p, .health-card p, .story-card p {
+      margin: 0;
+      font-size: 0.75rem;
+      line-height: 1.35;
+      opacity: 0.9;
+    }
+    .health-ok { border-color: color-mix(in oklab, var(--c-edit) 55%, transparent); }
+    .health-warn { border-color: color-mix(in oklab, var(--c-miss) 60%, transparent); }
+    .health-bad { border-color: color-mix(in oklab, var(--c-rules) 60%, transparent); }
+    .story-card .story-step {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.65;
+      margin-bottom: 0.25rem;
+    }
+    .prompt-outline-list {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    .prompt-outline-list li { margin: 0.2rem 0; }
+    .diff-prompt .diff-add { color: #86efac; background: rgba(22, 101, 52, 0.25); display: block; }
+    .diff-prompt .diff-del { color: #fca5a5; background: rgba(127, 29, 29, 0.25); display: block; }
+    .diff-prompt .diff-same { opacity: 0.55; display: block; }
+    [data-theme="light"] .diff-prompt .diff-add { color: #14532d; background: #dcfce7; }
+    [data-theme="light"] .diff-prompt .diff-del { color: #7f1d1d; background: #fee2e2; }
+    [data-theme="light"] .diff-prompt .diff-same { color: var(--ink-muted); opacity: 0.75; }
+    #matrix-table tbody tr { cursor: pointer; }
+    #matrix-table tbody tr:hover { background: color-mix(in oklab, oklch(var(--bc)) 6%, transparent); }
+    .diff-sum-card {
+      border-radius: 0.75rem;
+      border: 2px solid color-mix(in oklab, oklch(var(--bc)) 14%, transparent);
+      padding: 0.75rem 0.9rem;
+      background: color-mix(in oklab, oklch(var(--b1)) 90%, transparent);
+    }
+    .diff-sum-card .k { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.7; }
+    .diff-sum-card .v { font-family: ui-monospace, monospace; font-size: 1.05rem; font-weight: 750; margin-top: 0.2rem; }
     .help h3 { margin-top: 1.25rem; font-size: 1rem; font-weight: 700; color: oklch(var(--bc)); }
     .help h4 { margin-top: 0.75rem; font-size: 0.9rem; font-weight: 600; color: oklch(var(--bc)); }
     .help p, .help li {
@@ -1209,8 +1262,11 @@
       <div class="join">
         <button type="button" class="btn btn-sm join-item btn-primary" data-view="boxes" title="Structure: tiles + expandable JSON">Structure</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="size">Size map</button>
+        <button type="button" class="btn btn-sm join-item btn-ghost" data-view="diff" title="Compare two chat_request catalogs">Diff</button>
+        <button type="button" class="btn btn-sm join-item btn-ghost" data-view="matrix" title="Fingerprint matrix across all modes/bases">Matrix</button>
         <button type="button" class="btn btn-sm join-item btn-ghost" data-view="help">Help / FAQ</button>
       </div>
+      <button type="button" class="btn btn-sm btn-outline btn-neutral" id="btn-export-brief" title="Download Markdown integrator brief for the selected catalog">Export brief</button>
       <!-- daisyUI theme-controller: sun/moon toggle; default follows system -->
       <div class="theme-toggle-wrap" title="Theme: follows system until you change it">
         <label class="flex cursor-pointer items-center gap-1.5" for="theme-toggle">
@@ -1296,6 +1352,10 @@
           <div class="cards-toc-title">On this page</div>
           <ul class="cards-toc-list">
             <li><a href="#chapter-snapshot" data-toc="chapter-snapshot"><span class="toc-num">1</span><span>Snapshot</span></a></li>
+            <li class="toc-sub"><a href="#anatomy-recipe" data-toc="anatomy-recipe">Anatomy</a></li>
+            <li class="toc-sub"><a href="#stamp-health" data-toc="stamp-health">Stamp health</a></li>
+            <li class="toc-sub"><a href="#assembly-storyboard" data-toc="assembly-storyboard">Assembly</a></li>
+            <li class="toc-sub"><a href="#prompt-outline" data-toc="prompt-outline">Prompt outline</a></li>
             <li><a href="#chapter-catalog" data-toc="chapter-catalog"><span class="toc-num">2</span><span>chat_request JSON</span></a></li>
             <li><a href="#chapter-wire" data-toc="chapter-wire"><span class="toc-num">3</span><span>Wire vs inject</span></a></li>
             <li><a href="#chapter-output" data-toc="chapter-output"><span class="toc-num">4</span><span>Output scheme</span></a></li>
@@ -1318,9 +1378,29 @@
             </div>
             <span class="badge badge-ghost badge-sm">info strip</span>
           </header>
-          <div class="chapter-body">
+          <div class="chapter-body space-y-4">
             <div class="zone-label">Mode · size · terminate health</div>
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 summary-strip" id="summary-row"></div>
+
+            <div id="anatomy-recipe" class="scroll-mt-28">
+              <div class="zone-label">Anatomy · what a chat_request is made of</div>
+              <div id="anatomy-recipe-body" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2"></div>
+            </div>
+
+            <div id="stamp-health" class="scroll-mt-28">
+              <div class="zone-label">Stamp / contract health</div>
+              <div id="stamp-health-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"></div>
+            </div>
+
+            <div id="assembly-storyboard" class="scroll-mt-28">
+              <div class="zone-label">Live request assembly (storyboard)</div>
+              <div id="assembly-storyboard-body" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2"></div>
+            </div>
+
+            <div id="prompt-outline" class="scroll-mt-28">
+              <div class="zone-label">System prompt outline (topics, not full text)</div>
+              <div id="prompt-outline-body" class="rounded-lg border border-base-content/15 bg-base-200/50 p-3"></div>
+            </div>
           </div>
         </article>
 
@@ -1526,6 +1606,101 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
       </div>
     </section>
 
+    <!-- DIFF: compare two catalogs -->
+    <section id="view-diff" class="hidden space-y-4">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4 gap-3">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h2 class="card-title text-base">chat_request DIFF</h2>
+              <p class="text-xs opacity-70 max-w-3xl">
+                Compare two baselines (modes, BASE pins, or a pasted/uploaded JSON). Summary first, then sections, then system-prompt lines.
+              </p>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-run-diff">Run diff</button>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="label py-0"><span class="label-text font-semibold">A · left / before</span></label>
+              <select id="diff-select-a" class="select select-bordered select-sm w-full"></select>
+              <label class="label py-0"><span class="label-text text-xs">Or paste JSON as A</span></label>
+              <textarea id="diff-paste-a" class="textarea textarea-bordered textarea-sm w-full font-mono text-[11px] min-h-[5rem]" placeholder='{"_format":"zeus.chat_request.v2", ...}'></textarea>
+              <input type="file" id="diff-file-a" accept="application/json,.json" class="file-input file-input-bordered file-input-xs w-full" />
+            </div>
+            <div class="space-y-2">
+              <label class="label py-0"><span class="label-text font-semibold">B · right / after</span></label>
+              <select id="diff-select-b" class="select select-bordered select-sm w-full"></select>
+              <label class="label py-0"><span class="label-text text-xs">Or paste JSON as B</span></label>
+              <textarea id="diff-paste-b" class="textarea textarea-bordered textarea-sm w-full font-mono text-[11px] min-h-[5rem]" placeholder="Paste a stamped or custom catalog to compare…"></textarea>
+              <input type="file" id="diff-file-b" accept="application/json,.json" class="file-input file-input-bordered file-input-xs w-full" />
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn btn-ghost btn-xs" id="btn-diff-swap" title="Swap A and B">Swap A ↔ B</button>
+            <button type="button" class="btn btn-ghost btn-xs" id="btn-diff-use-current-a">Use selected as A</button>
+            <button type="button" class="btn btn-ghost btn-xs" id="btn-diff-use-current-b">Use selected as B</button>
+            <button type="button" class="btn btn-ghost btn-xs" id="btn-diff-clear-paste">Clear pastes</button>
+          </div>
+        </div>
+      </div>
+      <div id="diff-summary" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2"></div>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4">
+          <h3 class="font-semibold text-sm mb-2">Section changes</h3>
+          <div id="diff-sections" class="overflow-x-auto"></div>
+        </div>
+      </div>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4">
+          <h3 class="font-semibold text-sm mb-2">System prompt line diff</h3>
+          <p class="text-[11px] opacity-70 mb-2"><span class="text-error font-semibold">− removed (in A only)</span> · <span class="text-success font-semibold">+ added (in B only)</span> · unchanged dimmed</p>
+          <pre id="diff-prompt" class="diff-prompt bg-base-200 p-3 rounded-lg text-[11px] max-h-[28rem] overflow-auto font-mono whitespace-pre-wrap break-words"></pre>
+        </div>
+      </div>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4">
+          <h3 class="font-semibold text-sm mb-2">Impact for Zeus API</h3>
+          <ul id="diff-impact" class="text-sm space-y-1 list-disc list-inside"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MATRIX: fingerprints across catalogs -->
+    <section id="view-matrix" class="hidden space-y-4">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-4 gap-3">
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h2 class="card-title text-base">Mode fingerprint matrix</h2>
+              <p class="text-xs opacity-70 max-w-3xl">
+                Scan every <code>v2/**/chat_request*.json</code> in the index. Click a row to open that catalog in Structure.
+              </p>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary" id="btn-matrix-refresh">Refresh matrix</button>
+          </div>
+          <div id="matrix-status" class="text-xs text-muted">Loading…</div>
+          <div class="overflow-x-auto max-h-[70vh] overflow-y-auto">
+            <table class="table table-xs table-pin-rows" id="matrix-table">
+              <thead>
+                <tr>
+                  <th>folder</th>
+                  <th>mode</th>
+                  <th>base</th>
+                  <th>profile</th>
+                  <th class="text-right">bytes</th>
+                  <th class="text-right">~tok</th>
+                  <th class="text-right">verbs</th>
+                  <th>contract</th>
+                  <th>prompt σ</th>
+                  <th>terminate</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- HELP / FAQ / GLOSSARY -->
     <section id="view-help" class="hidden space-y-4 help">
@@ -2809,6 +2984,10 @@ let state = {
   /** Size map treemap: catalog (full file) | wire (system + verbs + injects) */
   sizeMode: "catalog",
   selectedPath: null,
+  /** Diff paste overrides (parsed JSON) keyed a|b */
+  diffPaste: { a: null, b: null },
+  diffPasteLabel: { a: null, b: null },
+  matrixRows: null,
 };
 let lastContentText = "";
 
@@ -4387,6 +4566,7 @@ function setSizeMode(mode) {
           " <b>Click any tile</b> → content panel above (same as cards).";
   }
   if (state.catalog) renderSizeMaps(state.catalog);
+  if (typeof syncUrlHash === "function") syncUrlHash();
 }
 
 /** Wire mode table: system + verbs (+ injects) — aligned with buildWireTree. */
@@ -4515,6 +4695,10 @@ function initCardsToc() {
 
   const ids = [
     "chapter-snapshot",
+    "anatomy-recipe",
+    "stamp-health",
+    "assembly-storyboard",
+    "prompt-outline",
     "chapter-catalog",
     "chapter-wire",
     "chapter-output",
@@ -4544,11 +4728,12 @@ function initCardsToc() {
   targets.forEach((el) => cardsTocObserver.observe(el));
 }
 
-function setView(view) {
+function setView(view, opts) {
   // JSON tab merged into Structure (boxes)
   if (view === "json") view = "boxes";
+  const skipHash = opts && opts.skipHash;
   state.view = view;
-  ["boxes", "size", "help"].forEach((v) => {
+  ["boxes", "size", "diff", "matrix", "help"].forEach((v) => {
     const el = document.getElementById("view-" + v);
     if (el) el.classList.toggle("hidden", view !== v);
   });
@@ -4559,12 +4744,16 @@ function setView(view) {
     btn.classList.toggle("btn-primary", on);
     btn.classList.toggle("btn-ghost", !on);
   });
-  document.getElementById("content-panel").classList.toggle("hidden", view === "help");
+  const hidePanel = view === "help" || view === "diff" || view === "matrix";
+  document.getElementById("content-panel")?.classList.toggle("hidden", hidePanel);
   const tocWrap = document.querySelector(".cards-toc-wrap");
   if (tocWrap) tocWrap.classList.toggle("opacity-40", view !== "boxes");
   const filterBar = document.getElementById("tile-filter-bar");
   const legendLabel = document.getElementById("legend-label");
-  if (legendLabel) legendLabel.textContent = view === "boxes" ? "Filter tiles / blocks:" : "Same colors everywhere:";
+  if (legendLabel) {
+    legendLabel.textContent =
+      view === "boxes" ? "Filter tiles / blocks:" : view === "diff" ? "Diff colors:" : "Same colors everywhere:";
+  }
   if (filterBar) {
     filterBar.title =
       view === "boxes"
@@ -4576,10 +4765,21 @@ function setView(view) {
     if (state.catalog) {
       applyJsonViewMode();
       applyJsonOutputViewMode();
+      renderCatalogExtras(state.catalog);
     }
     setTimeout(() => {
       if (cardsTocObserver) {
-        ["out-layer-a", "out-layer-b", "out-wip", "chapter-catalog", "chapter-output"].forEach((id) => {
+        [
+          "anatomy-recipe",
+          "stamp-health",
+          "assembly-storyboard",
+          "prompt-outline",
+          "out-layer-a",
+          "out-layer-b",
+          "out-wip",
+          "chapter-catalog",
+          "chapter-output",
+        ].forEach((id) => {
           const el = document.getElementById(id);
           if (el) cardsTocObserver.observe(el);
         });
@@ -4592,6 +4792,15 @@ function setView(view) {
       state.chartMain?.resize();
     }, 40);
   }
+  if (view === "diff") {
+    fillDiffSelects();
+    // auto-run when both sides resolvable
+    setTimeout(() => runCatalogDiff().catch((e) => console.warn(e)), 30);
+  }
+  if (view === "matrix") {
+    setTimeout(() => renderFingerprintMatrix(false).catch((e) => console.warn(e)), 30);
+  }
+  if (!skipHash) syncUrlHash();
 }
 
 async function loadManifest() {
@@ -4737,11 +4946,14 @@ async function selectMode(fileOrMode) {
       (state.manifest.catalogs || []).find((c) => c.file === file || c.mode === modeNow);
     updateBaseBadge(doc, metaEntry);
     renderSummary(doc, modeNow, metaEntry);
+    renderCatalogExtras(doc);
     renderSections(doc);
     renderWire(doc);
     renderEvidence(doc);
     renderJson(doc, modeNow);
     if (state.view === "size") renderSizeMaps(doc);
+    if (state.view === "diff") fillDiffSelects();
+    syncUrlHash();
     // evidence panel rebuilds A/B anchors — re-observe for TOC
     ["out-layer-a", "out-layer-b", "out-wip"].forEach((id) => {
       const el = document.getElementById(id);
@@ -4837,12 +5049,834 @@ window.addEventListener("resize", () => {
   state.chartMain?.resize();
 });
 
+/* ═══════════════════════════════════════════════════════════════
+ * Anatomy · stamp health · storyboard · prompt outline
+ * Diff · Matrix · export brief · deep links
+ * ═══════════════════════════════════════════════════════════════ */
+
+function shortHash(h) {
+  if (!h) return "—";
+  const s = String(h).replace(/^md5:/i, "");
+  return s.length > 12 ? s.slice(0, 12) + "…" : s;
+}
+
+function stableStringify(v) {
+  if (v === null || typeof v !== "object") return JSON.stringify(v);
+  if (Array.isArray(v)) return "[" + v.map(stableStringify).join(",") + "]";
+  const keys = Object.keys(v).sort();
+  return "{" + keys.map((k) => JSON.stringify(k) + ":" + stableStringify(v[k])).join(",") + "}";
+}
+
+async function sha12(text) {
+  try {
+    const buf = new TextEncoder().encode(String(text || ""));
+    const dig = await crypto.subtle.digest("SHA-256", buf);
+    return Array.from(new Uint8Array(dig))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+      .slice(0, 12);
+  } catch {
+    // fallback non-crypto fingerprint
+    let h = 0;
+    const s = String(text || "");
+    for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+    return ("00000000" + (h >>> 0).toString(16)).slice(-8);
+  }
+}
+
+function terminateHealth(doc) {
+  const ret = findReturnVerb(doc);
+  const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
+  const props = (ret && ret.parameters && ret.parameters.properties) || {};
+  const sysOk = /query_decomposition/i.test(systemContent(doc));
+  const need = ["summary", "query_decomposition", "decomposition", "confidence"];
+  const missing = need.filter((k) => !req.has(k) || !Object.prototype.hasOwnProperty.call(props, k));
+  return { ok: sysOk && missing.length === 0, sysOk, missing, req, props };
+}
+
+function renderCatalogExtras(doc) {
+  if (!doc) return;
+  renderAnatomyRecipe(doc);
+  renderStampHealth(doc);
+  renderAssemblyStoryboard(doc);
+  renderPromptOutline(doc);
+}
+
+function renderAnatomyRecipe(doc) {
+  const el = document.getElementById("anatomy-recipe-body");
+  if (!el) return;
+  const sysB = jsonBytes(systemContent(doc));
+  const verbB = jsonBytes(doc.verbs || []);
+  const guideB = jsonBytes(doc.guidance || null);
+  const cards = [
+    {
+      title: "RED · Rules",
+      cls: "box-ro",
+      body: `System prompt + verbs ship in the baseline. ${formatBytes(sysB + verbB)} · ${formatTokens(sysB + verbB)}. Changing them usually changes the contract hash.`,
+    },
+    {
+      title: "GREEN · Guidance",
+      cls: "box-ed",
+      body: doc.guidance
+        ? `Editable soft instructions present (${formatBytes(guideB)}). Often refined in Hub Workbench without rewriting tools.`
+        : "No guidance object on this min file — full profiles may add it. Behavior still comes from the system prompt.",
+    },
+    {
+      title: "BLUE · Inject",
+      cls: "box-wire",
+      body: "Not stored in this JSON. Zeus Client / Hub injects scope brief, MINI-SCHEMA, business rules, and the user turn at assemble time — competes for tokens.",
+    },
+    {
+      title: "Output contract",
+      cls: "box-meta",
+      body: "Every terminating turn should emit summary + query_decomposition + decomposition + confidence (Layer A). Server stores the turn report (Layer B).",
+    },
+  ];
+  el.innerHTML = cards
+    .map(
+      (c) => `<div class="anatomy-card ${c.cls}"><h4>${escapeHtml(c.title)}</h4><p>${escapeHtml(c.body)}</p></div>`
+    )
+    .join("");
+}
+
+function renderStampHealth(doc) {
+  const el = document.getElementById("stamp-health-body");
+  if (!el) return;
+  const lin = doc._lineage || {};
+  const th = terminateHealth(doc);
+  const rootHash = doc._hash || null;
+  const contractHash = (doc.contract && doc.contract.hash) || null;
+  const hashMatch = rootHash && contractHash ? rootHash === contractHash : null;
+  const items = [
+    {
+      title: "Lineage base_id",
+      ok: !!lin.base_id,
+      detail: lin.base_id ? `${lin.base_id} · kind=${lin.kind || "?"} · mode=${lin.mode || "?"}` : "Missing _lineage.base_id",
+    },
+    {
+      title: "Profile / format",
+      ok: !!(lin.profile || doc._format),
+      detail: `${lin.profile || "—"} · ${doc._format || "—"}`,
+    },
+    {
+      title: "Contract hash",
+      ok: !!contractHash,
+      detail: contractHash ? shortHash(contractHash) : "No contract.hash",
+    },
+    {
+      title: "_hash vs contract",
+      ok: hashMatch !== false,
+      detail:
+        hashMatch === null
+          ? "One side missing — cannot compare"
+          : hashMatch
+            ? "Match (good for stamp checks)"
+            : "Mismatch — investigate before stamp",
+    },
+    {
+      title: "Terminate schema",
+      ok: th.ok,
+      detail: th.ok
+        ? "Required fields on return + QD in system prompt"
+        : `Gaps: ${th.missing.join(", ") || "—"}${th.sysOk ? "" : "; system prompt missing query_decomposition"}`,
+    },
+    {
+      title: "Verb surface",
+      ok: (doc.verbs || []).length > 0,
+      detail: `${(doc.verbs || []).length} verbs · ${formatBytes(jsonBytes(doc.verbs))} Zeus API tools`,
+    },
+  ];
+  el.innerHTML = items
+    .map((it) => {
+      const cls = it.ok ? "health-ok" : "health-bad";
+      return `<div class="health-card ${cls}"><h4>${escapeHtml(it.title)}</h4><p>${escapeHtml(it.detail)}</p></div>`;
+    })
+    .join("");
+}
+
+function renderAssemblyStoryboard(doc) {
+  const el = document.getElementById("assembly-storyboard-body");
+  if (!el) return;
+  const base = resolveBaseId(doc, null) || "base-?";
+  const mode = (doc._lineage && doc._lineage.mode) || state.mode || "?";
+  const steps = [
+    {
+      n: "1 · BASE catalog",
+      title: `${base} · ${mode}`,
+      body: "Load this chat_request baseline (rules + tools).",
+      cls: "box-ro",
+    },
+    {
+      n: "2 · Bind scope",
+      title: "Auth + boundary",
+      body: "Zeus binds bucket/scope; model cannot cross tenants.",
+      cls: "box-meta",
+    },
+    {
+      n: "3 · Inject BLUE",
+      title: "MINI-SCHEMA + brief",
+      body: "Client/Hub adds live schema, policies, user message.",
+      cls: "box-wire",
+    },
+    {
+      n: "4 · Model + tools",
+      title: "Call Zeus API verbs",
+      body: "LLM picks verbs, then terminates with Layer A fields.",
+      cls: "box-ed",
+    },
+  ];
+  el.innerHTML = steps
+    .map(
+      (s) =>
+        `<div class="story-card ${s.cls}"><div class="story-step">${escapeHtml(s.n)}</div><h4>${escapeHtml(
+          s.title
+        )}</h4><p>${escapeHtml(s.body)}</p></div>`
+    )
+    .join("");
+}
+
+function extractPromptOutline(sys) {
+  const text = String(sys || "");
+  const lines = text.split(/\n/).map((l) => l.trim()).filter(Boolean);
+  const topics = [];
+  const seen = new Set();
+  const push = (t) => {
+    const k = t.toLowerCase();
+    if (seen.has(k)) return;
+    seen.add(k);
+    topics.push(t);
+  };
+  // Markdown-ish headings
+  for (const l of lines) {
+    if (/^#{1,3}\s+/.test(l)) push(l.replace(/^#{1,3}\s+/, "").slice(0, 80));
+    else if (/^##\s*/.test(l)) push(l.replace(/^#+\s*/, "").slice(0, 80));
+  }
+  // Heuristic topic detectors
+  const heuristics = [
+    [/evidence\s*loop|query_decomposition|hot-path/i, "Evidence loop / terminate contract"],
+    [/pipeline|steps\[\]|@as\.ids/i, "Pipeline / @as.ids chaining"],
+    [/scope\s*(is\s*)?(a\s*)?hard|boundary|tenant/i, "Scope boundary"],
+    [/confidence|high\s*\|\s*med\s*\|\s*low/i, "Confidence (high|med|low)"],
+    [/cheap|masq|expensive|mod=/i, "Verb cost tiers (masq)"],
+    [/never|MUST|CRITICAL|Hard cap/i, "Hard constraints"],
+    [/search|find|traverse|project/i, "Tool usage patterns"],
+  ];
+  for (const [re, label] of heuristics) {
+    if (re.test(text)) push(label);
+  }
+  if (!topics.length) {
+    // fallback: first few sentences as pseudo-outline
+    const chunks = text.split(/(?<=\.)\s+/).slice(0, 5);
+    chunks.forEach((c) => push(c.slice(0, 90) + (c.length > 90 ? "…" : "")));
+  }
+  return topics.slice(0, 14);
+}
+
+function renderPromptOutline(doc) {
+  const el = document.getElementById("prompt-outline-body");
+  if (!el) return;
+  const topics = extractPromptOutline(systemContent(doc));
+  if (!topics.length) {
+    el.innerHTML = `<p class="text-sm opacity-70">No system prompt on this catalog.</p>`;
+    return;
+  }
+  el.innerHTML =
+    `<ul class="prompt-outline-list">` +
+    topics.map((t) => `<li>${escapeHtml(t)}</li>`).join("") +
+    `</ul>` +
+    `<p class="text-[11px] opacity-60 mt-2 mb-0">Open Structure → messages[0] for full text. Use <b>Diff</b> to compare outlines/prompts across modes or BASE pins.</p>`;
+}
+
+/* —— Diff —— */
+
+function fillDiffSelects() {
+  const entries = state.catalogEntries || [];
+  const makeOpts = (selId, prefer) => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const cur = prefer || sel.value || "";
+    if (entries.length && sel.options.length === 0 || sel.dataset.filled !== String(entries.length)) {
+      const byFolder = new Map();
+      for (const e of entries) {
+        const k = e.folder_label || e.folder;
+        if (!byFolder.has(k)) byFolder.set(k, []);
+        byFolder.get(k).push(e);
+      }
+      if (byFolder.size > 1) {
+        sel.innerHTML = [...byFolder.entries()]
+          .map(([folder, items]) => {
+            const opts = items
+              .map((e) => `<option value="${escapeHtml(e.file)}">${escapeHtml(e.mode)} · ${escapeHtml(e.file)}</option>`)
+              .join("");
+            return `<optgroup label="${escapeHtml(folder)}">${opts}</optgroup>`;
+          })
+          .join("");
+      } else {
+        sel.innerHTML = entries
+          .map((e) => `<option value="${escapeHtml(e.file)}">${escapeHtml(optionLabel(e))}</option>`)
+          .join("");
+      }
+      sel.dataset.filled = String(entries.length);
+    }
+    if (cur && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
+    else if (state.catalogFile && selId === "diff-select-a") sel.value = state.catalogFile;
+    else if (entries[1] && selId === "diff-select-b") sel.value = entries[1].file;
+    else if (entries[0]) sel.value = entries[0].file;
+  };
+  makeOpts("diff-select-a");
+  makeOpts("diff-select-b");
+  // Prefer current as A and a different mode as B
+  const a = document.getElementById("diff-select-a");
+  const b = document.getElementById("diff-select-b");
+  if (a && state.catalogFile) a.value = state.catalogFile;
+  if (b && a && b.value === a.value) {
+    const other = entries.find((e) => e.file !== a.value);
+    if (other) b.value = other.file;
+  }
+}
+
+async function resolveDiffSide(side) {
+  const paste = state.diffPaste[side];
+  if (paste) {
+    return {
+      label: state.diffPasteLabel[side] || `pasted-${side}`,
+      file: null,
+      doc: paste,
+    };
+  }
+  const ta = document.getElementById(side === "a" ? "diff-paste-a" : "diff-paste-b");
+  const raw = (ta && ta.value || "").trim();
+  if (raw) {
+    try {
+      const doc = JSON.parse(raw);
+      state.diffPaste[side] = doc;
+      state.diffPasteLabel[side] = `paste-${side}`;
+      return { label: `paste-${side}`, file: null, doc };
+    } catch (e) {
+      throw new Error(`Side ${side.toUpperCase()}: invalid JSON paste — ${e.message}`);
+    }
+  }
+  const sel = document.getElementById(side === "a" ? "diff-select-a" : "diff-select-b");
+  const file = sel && sel.value;
+  if (!file) throw new Error(`Side ${side.toUpperCase()}: pick a catalog or paste JSON`);
+  const doc = await loadCatalog(file);
+  return { label: file, file, doc };
+}
+
+function verbNames(doc) {
+  return (doc.verbs || []).map((v) => (v.function || v).name).filter(Boolean);
+}
+
+function sectionSnapshot(doc) {
+  return {
+    messages: doc.messages ?? null,
+    verbs: doc.verbs ?? null,
+    guidance: doc.guidance ?? null,
+    contract: doc.contract ?? null,
+    _hash: doc._hash ?? null,
+    _lineage: doc._lineage ?? null,
+    _format: doc._format ?? null,
+    _version: doc._version ?? null,
+    _note: doc._note ?? null,
+    masq: doc.masq ?? null,
+    metadata: doc.metadata ?? null,
+  };
+}
+
+function jsonEqual(a, b) {
+  return stableStringify(a) === stableStringify(b);
+}
+
+/** Line LCS diff → list of {type: same|add|del, text} */
+function diffLines(textA, textB) {
+  const A = String(textA || "").split("\n");
+  const B = String(textB || "").split("\n");
+  const m = A.length;
+  const n = B.length;
+  if (m * n > 400000) {
+    // coarse fallback for huge prompts
+    if (textA === textB) return A.map((t) => ({ type: "same", text: t }));
+    return [
+      ...A.map((t) => ({ type: "del", text: t })),
+      ...B.map((t) => ({ type: "add", text: t })),
+    ];
+  }
+  const dp = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1));
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = A[i] === B[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  const out = [];
+  let i = 0;
+  let j = 0;
+  while (i < m && j < n) {
+    if (A[i] === B[j]) {
+      out.push({ type: "same", text: A[i] });
+      i++;
+      j++;
+    } else if (dp[i + 1][j] >= dp[i][j + 1]) {
+      out.push({ type: "del", text: A[i] });
+      i++;
+    } else {
+      out.push({ type: "add", text: B[j] });
+      j++;
+    }
+  }
+  while (i < m) out.push({ type: "del", text: A[i++] });
+  while (j < n) out.push({ type: "add", text: B[j++] });
+  return out;
+}
+
+async function runCatalogDiff() {
+  const sumEl = document.getElementById("diff-summary");
+  const secEl = document.getElementById("diff-sections");
+  const promptEl = document.getElementById("diff-prompt");
+  const impactEl = document.getElementById("diff-impact");
+  if (!sumEl) return;
+  sumEl.innerHTML = `<div class="diff-sum-card"><div class="k">Status</div><div class="v">Comparing…</div></div>`;
+  try {
+    const sideA = await resolveDiffSide("a");
+    const sideB = await resolveDiffSide("b");
+    const a = sideA.doc;
+    const b = sideB.doc;
+    const sysA = systemContent(a);
+    const sysB = systemContent(b);
+    const verbsA = new Set(verbNames(a));
+    const verbsB = new Set(verbNames(b));
+    const added = [...verbsB].filter((x) => !verbsA.has(x));
+    const removed = [...verbsA].filter((x) => !verbsB.has(x));
+    const shared = [...verbsA].filter((x) => verbsB.has(x));
+    const verbSchemaChanged = shared.filter((name) => {
+      const va = (a.verbs || []).find((v) => (v.function || v).name === name);
+      const vb = (b.verbs || []).find((v) => (v.function || v).name === name);
+      return !jsonEqual(va, vb);
+    });
+    const bytesA = jsonBytes(a);
+    const bytesB = jsonBytes(b);
+    const hashA = (a.contract && a.contract.hash) || a._hash || "";
+    const hashB = (b.contract && b.contract.hash) || b._hash || "";
+    const hashChanged = hashA !== hashB;
+    const promptChanged = sysA !== sysB;
+    const promptDelta = jsonBytes(sysB) - jsonBytes(sysA);
+    const thA = terminateHealth(a);
+    const thB = terminateHealth(b);
+
+    const cards = [
+      { k: "A", v: sideA.label },
+      { k: "B", v: sideB.label },
+      { k: "Contract hash", v: hashChanged ? "CHANGED" : "same", sub: `${shortHash(hashA)} → ${shortHash(hashB)}` },
+      { k: "System prompt", v: promptChanged ? "CHANGED" : "same", sub: `${promptDelta >= 0 ? "+" : ""}${promptDelta} B` },
+      {
+        k: "Verbs",
+        v: `+${added.length} / −${removed.length}`,
+        sub: verbSchemaChanged.length ? `${verbSchemaChanged.length} schema edits` : "no schema edits on shared",
+      },
+      {
+        k: "Zeus API base size",
+        v: `${formatBytes(bytesA)} → ${formatBytes(bytesB)}`,
+        sub: `${bytesB - bytesA >= 0 ? "+" : ""}${(bytesB - bytesA).toLocaleString()} B · ${formatTokens(bytesB)}`,
+      },
+      { k: "Terminate A", v: thA.ok ? "OK" : "gaps" },
+      { k: "Terminate B", v: thB.ok ? "OK" : "gaps" },
+    ];
+    sumEl.innerHTML = cards
+      .map(
+        (c) =>
+          `<div class="diff-sum-card"><div class="k">${escapeHtml(c.k)}</div><div class="v">${escapeHtml(c.v)}</div>${
+            c.sub ? `<div class="text-[11px] opacity-70 mt-1 font-mono">${escapeHtml(c.sub)}</div>` : ""
+          }</div>`
+      )
+      .join("");
+
+    const snapA = sectionSnapshot(a);
+    const snapB = sectionSnapshot(b);
+    const keys = Array.from(new Set([...Object.keys(snapA), ...Object.keys(snapB)])).sort();
+    const rows = keys.map((k) => {
+      const va = snapA[k];
+      const vb = snapB[k];
+      const presentA = va != null;
+      const presentB = vb != null;
+      let status = "same";
+      if (!presentA && presentB) status = "added in B";
+      else if (presentA && !presentB) status = "removed in B";
+      else if (!jsonEqual(va, vb)) status = "changed";
+      const ba = presentA ? jsonBytes(va) : 0;
+      const bb = presentB ? jsonBytes(vb) : 0;
+      return { k, status, ba, bb };
+    });
+    secEl.innerHTML = `<table class="table table-xs">
+      <thead><tr><th>section</th><th>status</th><th class="text-right">A bytes</th><th class="text-right">B bytes</th><th class="text-right">Δ</th></tr></thead>
+      <tbody>${rows
+        .map((r) => {
+          const cls =
+            r.status === "same" ? "opacity-60" : r.status.includes("added") ? "txt-ed" : r.status.includes("removed") ? "txt-ro" : "txt-miss";
+          return `<tr class="${cls}"><td class="font-mono text-[11px]">${escapeHtml(r.k)}</td><td>${escapeHtml(
+            r.status
+          )}</td><td class="text-right font-mono">${r.ba.toLocaleString()}</td><td class="text-right font-mono">${r.bb.toLocaleString()}</td><td class="text-right font-mono">${
+            r.bb - r.ba >= 0 ? "+" : ""
+          }${(r.bb - r.ba).toLocaleString()}</td></tr>`;
+        })
+        .join("")}</tbody></table>
+      <p class="text-[11px] mt-2 opacity-70">Verbs added: <code>${escapeHtml(added.join(", ") || "—")}</code> · removed: <code>${escapeHtml(
+      removed.join(", ") || "—"
+    )}</code> · schema changed: <code>${escapeHtml(verbSchemaChanged.join(", ") || "—")}</code></p>`;
+
+    const lineDiff = diffLines(sysA, sysB);
+    const maxLines = 800;
+    const shown = lineDiff.slice(0, maxLines);
+    promptEl.innerHTML =
+      shown
+        .map((row) => {
+          const cls = row.type === "add" ? "diff-add" : row.type === "del" ? "diff-del" : "diff-same";
+          const prefix = row.type === "add" ? "+ " : row.type === "del" ? "− " : "  ";
+          return `<span class="${cls}">${escapeHtml(prefix + row.text)}</span>`;
+        })
+        .join("\n") +
+      (lineDiff.length > maxLines
+        ? `\n<span class="diff-same">… ${lineDiff.length - maxLines} more lines truncated</span>`
+        : "");
+
+    const impact = [];
+    if (hashChanged) impact.push("Contract hash changed → re-verify/stamp on Zeus before production; clients should pin the new BASE.");
+    else impact.push("Contract hash unchanged (or both empty) → structural/tool surface may still differ; check verb and prompt sections.");
+    if (promptChanged) impact.push("System prompt changed → model behavior/guidance shifted even if tools look similar.");
+    if (added.length) impact.push(`New verbs on B (${added.join(", ")}) → extra Zeus API surface for the model.`);
+    if (removed.length) impact.push(`Verbs removed on B (${removed.join(", ")}) → capability loss vs A.`);
+    if (verbSchemaChanged.length) impact.push(`Shared verb schemas changed (${verbSchemaChanged.join(", ")}) → argument contracts may break old prompts.`);
+    if (thA.ok !== thB.ok) {
+      impact.push(
+        thB.ok
+          ? "Terminate health improved on B."
+          : "Terminate health regressed on B — fix return required fields / evidence-loop language."
+      );
+    }
+    if (!promptChanged && !hashChanged && !added.length && !removed.length && !verbSchemaChanged.length) {
+      impact.push("No material wire/tool delta detected in compared sections (may still differ in meta-only fields).");
+    }
+    impact.push("BLUE injects are never in these files — Diff cannot show scope brief / MINI-SCHEMA changes.");
+    impactEl.innerHTML = impact.map((t) => `<li>${escapeHtml(t)}</li>`).join("");
+    syncUrlHash();
+  } catch (e) {
+    sumEl.innerHTML = `<div class="diff-sum-card health-bad"><div class="k">Error</div><div class="v text-sm">${escapeHtml(
+      String(e.message || e)
+    )}</div></div>`;
+    if (secEl) secEl.innerHTML = "";
+    if (promptEl) promptEl.textContent = "";
+    if (impactEl) impactEl.innerHTML = "";
+  }
+}
+
+function initDiffUi() {
+  document.getElementById("btn-run-diff")?.addEventListener("click", () => runCatalogDiff());
+  document.getElementById("btn-diff-swap")?.addEventListener("click", () => {
+    const a = document.getElementById("diff-select-a");
+    const b = document.getElementById("diff-select-b");
+    if (a && b) {
+      const tmp = a.value;
+      a.value = b.value;
+      b.value = tmp;
+    }
+    const pa = document.getElementById("diff-paste-a");
+    const pb = document.getElementById("diff-paste-b");
+    if (pa && pb) {
+      const t = pa.value;
+      pa.value = pb.value;
+      pb.value = t;
+    }
+    const dp = state.diffPaste;
+    state.diffPaste = { a: dp.b, b: dp.a };
+    const dl = state.diffPasteLabel;
+    state.diffPasteLabel = { a: dl.b, b: dl.a };
+    runCatalogDiff();
+  });
+  document.getElementById("btn-diff-use-current-a")?.addEventListener("click", () => {
+    const a = document.getElementById("diff-select-a");
+    if (a && state.catalogFile) {
+      a.value = state.catalogFile;
+      state.diffPaste.a = null;
+      const ta = document.getElementById("diff-paste-a");
+      if (ta) ta.value = "";
+    }
+  });
+  document.getElementById("btn-diff-use-current-b")?.addEventListener("click", () => {
+    const b = document.getElementById("diff-select-b");
+    if (b && state.catalogFile) {
+      b.value = state.catalogFile;
+      state.diffPaste.b = null;
+      const tb = document.getElementById("diff-paste-b");
+      if (tb) tb.value = "";
+    }
+  });
+  document.getElementById("btn-diff-clear-paste")?.addEventListener("click", () => {
+    state.diffPaste = { a: null, b: null };
+    state.diffPasteLabel = { a: null, b: null };
+    const pa = document.getElementById("diff-paste-a");
+    const pb = document.getElementById("diff-paste-b");
+    if (pa) pa.value = "";
+    if (pb) pb.value = "";
+    const fa = document.getElementById("diff-file-a");
+    const fb = document.getElementById("diff-file-b");
+    if (fa) fa.value = "";
+    if (fb) fb.value = "";
+  });
+  const bindFile = (id, side) => {
+    document.getElementById(id)?.addEventListener("change", async (ev) => {
+      const f = ev.target.files && ev.target.files[0];
+      if (!f) return;
+      try {
+        const text = await f.text();
+        const doc = JSON.parse(text);
+        state.diffPaste[side] = doc;
+        state.diffPasteLabel[side] = f.name;
+        const ta = document.getElementById(side === "a" ? "diff-paste-a" : "diff-paste-b");
+        if (ta) ta.value = text.slice(0, 2000) + (text.length > 2000 ? "\n/* … truncated in textarea; full file used for diff */" : "");
+        toast(`Loaded ${f.name} as ${side.toUpperCase()}`);
+      } catch (e) {
+        toast("Invalid JSON file: " + (e.message || e));
+      }
+    });
+  };
+  bindFile("diff-file-a", "a");
+  bindFile("diff-file-b", "b");
+}
+
+/* —— Matrix —— */
+
+async function fingerprintRow(entry) {
+  const doc = await loadCatalog(entry.file);
+  const sys = systemContent(doc);
+  const th = terminateHealth(doc);
+  const bytes = entry.bytes != null ? entry.bytes : jsonBytes(doc);
+  const contract = (doc.contract && doc.contract.hash) || doc._hash || "";
+  const promptSig = await sha12(sys);
+  const lin = doc._lineage || {};
+  return {
+    file: entry.file,
+    folder: entry.folder_label || entry.folder,
+    mode: lin.mode || entry.mode,
+    base_id: lin.base_id || entry.base_id || "—",
+    profile: lin.profile || entry.profile || "—",
+    bytes,
+    tokens: approxTokens(bytes),
+    verbs: (doc.verbs || []).length,
+    contract: shortHash(contract),
+    promptSig,
+    terminate: th.ok ? "OK" : "gaps",
+    terminateOk: th.ok,
+  };
+}
+
+async function renderFingerprintMatrix(force) {
+  const status = document.getElementById("matrix-status");
+  const tbody = document.querySelector("#matrix-table tbody");
+  if (!tbody) return;
+  const entries = state.catalogEntries || [];
+  if (!entries.length) {
+    if (status) status.textContent = "No catalogs in index.";
+    tbody.innerHTML = "";
+    return;
+  }
+  if (status) status.textContent = `Scanning ${entries.length} catalogs…`;
+  if (!force && state.matrixRows && state.matrixRows.length === entries.length) {
+    paintMatrix(state.matrixRows);
+    if (status) status.textContent = `${state.matrixRows.length} catalogs · cached`;
+    return;
+  }
+  const rows = [];
+  for (const e of entries) {
+    try {
+      rows.push(await fingerprintRow(e));
+    } catch (err) {
+      rows.push({
+        file: e.file,
+        folder: e.folder_label || e.folder,
+        mode: e.mode,
+        base_id: e.base_id || "—",
+        profile: e.profile || "—",
+        bytes: e.bytes || 0,
+        tokens: approxTokens(e.bytes || 0),
+        verbs: e.verb_count || 0,
+        contract: "error",
+        promptSig: "—",
+        terminate: "err",
+        terminateOk: false,
+      });
+    }
+  }
+  state.matrixRows = rows;
+  paintMatrix(rows);
+  if (status) status.textContent = `${rows.length} catalogs · click a row to open in Structure`;
+}
+
+function paintMatrix(rows) {
+  const tbody = document.querySelector("#matrix-table tbody");
+  if (!tbody) return;
+  tbody.innerHTML = rows
+    .map((r) => {
+      const termCls = r.terminateOk ? "txt-ed" : "txt-ro";
+      return `<tr data-file="${escapeHtml(r.file)}" title="${escapeHtml(r.file)}">
+        <td class="font-mono text-[11px]">${escapeHtml(r.folder)}</td>
+        <td class="font-semibold">${escapeHtml(r.mode)}</td>
+        <td class="font-mono text-[11px]">${escapeHtml(String(r.base_id))}</td>
+        <td class="text-[11px]">${escapeHtml(String(r.profile))}</td>
+        <td class="text-right font-mono">${Number(r.bytes).toLocaleString()}</td>
+        <td class="text-right font-mono">${Number(r.tokens).toLocaleString()}</td>
+        <td class="text-right font-mono">${r.verbs}</td>
+        <td class="font-mono text-[11px]">${escapeHtml(r.contract)}</td>
+        <td class="font-mono text-[11px]">${escapeHtml(r.promptSig)}</td>
+        <td class="${termCls} font-semibold">${escapeHtml(r.terminate)}</td>
+      </tr>`;
+    })
+    .join("");
+  tbody.querySelectorAll("tr[data-file]").forEach((tr) => {
+    tr.addEventListener("click", async () => {
+      const file = tr.getAttribute("data-file");
+      setView("boxes");
+      const sel = document.getElementById("mode-select");
+      if (sel) sel.value = file;
+      await selectMode(file);
+    });
+  });
+}
+
+/* —— Export brief —— */
+
+async function exportIntegratorBrief() {
+  const doc = state.catalog;
+  if (!doc) {
+    toast("Load a catalog first");
+    return;
+  }
+  const file = state.catalogFile || "chat_request.json";
+  const mode = state.mode || (doc._lineage && doc._lineage.mode) || "?";
+  const lin = doc._lineage || {};
+  const th = terminateHealth(doc);
+  const verbs = verbNames(doc);
+  const sys = systemContent(doc);
+  const outline = extractPromptOutline(sys);
+  const bytes = jsonBytes(doc);
+  const md = [
+    `# chat_request integrator brief`,
+    ``,
+    `- **File:** \`${file}\``,
+    `- **Mode:** ${mode}`,
+    `- **BASE:** ${lin.base_id || resolveBaseId(doc, null) || "—"}`,
+    `- **Profile:** ${lin.profile || "—"} · kind=${lin.kind || "—"}`,
+    `- **Format:** ${doc._format || "—"} · version ${doc._version ?? "—"}`,
+    `- **Contract:** \`${(doc.contract && doc.contract.hash) || doc._hash || "—"}\``,
+    `- **Zeus API base size:** ${formatBytes(bytes)} · ${formatTokens(bytes)}`,
+    `- **Verbs (${verbs.length}):** ${verbs.join(", ") || "—"}`,
+    `- **Terminate health:** ${th.ok ? "OK" : "GAPS — " + (th.missing.join(", ") || "see system prompt")}`,
+    ``,
+    `## Anatomy`,
+    `- RED rules: system prompt + verbs (contract-sensitive)`,
+    `- GREEN guidance: ${doc.guidance ? "present" : "absent on this file"}`,
+    `- BLUE injects: not in repo; added at Zeus Client/Hub assemble time`,
+    `- Output Layer A: summary, query_decomposition, decomposition, confidence`,
+    ``,
+    `## System prompt outline`,
+    ...outline.map((t) => `- ${t}`),
+    ``,
+    `## Stamp notes`,
+    `- Always verify/stamp on your Zeus before production.`,
+    `- Pin \`base_id\` from Zeus status when syncing clients.`,
+    `- Generated from zeus_chat_request inspector · ${new Date().toISOString()}`,
+    ``,
+  ].join("\n");
+  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+  const a = document.createElement("a");
+  const safeMode = String(mode).replace(/[^\w.-]+/g, "_");
+  a.href = URL.createObjectURL(blob);
+  a.download = `chat_request_brief_${safeMode}.md`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Downloaded integrator brief");
+}
+
+/* —— Deep links —— */
+
+function syncUrlHash() {
+  try {
+    const params = new URLSearchParams();
+    if (state.view && state.view !== "boxes") params.set("view", state.view);
+    if (state.catalogFile) params.set("file", state.catalogFile);
+    if (state.view === "size" && state.sizeMode && state.sizeMode !== "catalog") params.set("sizeMode", state.sizeMode);
+    if (state.view === "diff") {
+      const a = document.getElementById("diff-select-a")?.value;
+      const b = document.getElementById("diff-select-b")?.value;
+      if (a) params.set("a", a);
+      if (b) params.set("b", b);
+    }
+    const q = params.toString();
+    const next = q ? "#" + q : (location.hash.startsWith("#chapter") ? location.hash : "");
+    if (next) {
+      if (location.hash !== next) history.replaceState(null, "", next);
+    } else if (location.hash && location.hash.includes("=")) {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+async function applyUrlHash() {
+  const raw = (location.hash || "").replace(/^#/, "");
+  if (!raw) return;
+  // legacy chapter anchors
+  if (!raw.includes("=") && document.getElementById(raw)) {
+    setView("boxes", { skipHash: true });
+    setTimeout(() => document.getElementById(raw)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    return;
+  }
+  const params = new URLSearchParams(raw);
+  const view = params.get("view");
+  const file = params.get("file");
+  if (file) {
+    const sel = document.getElementById("mode-select");
+    if (sel && [...sel.options].some((o) => o.value === file)) sel.value = file;
+    await selectMode(file);
+  }
+  if (view === "size") {
+    const sm = params.get("sizeMode");
+    if (sm === "wire" || sm === "catalog") setSizeMode(sm);
+    setView("size", { skipHash: true });
+  } else if (view === "diff") {
+    fillDiffSelects();
+    const a = params.get("a");
+    const b = params.get("b");
+    if (a) {
+      const sa = document.getElementById("diff-select-a");
+      if (sa) sa.value = a;
+    }
+    if (b) {
+      const sb = document.getElementById("diff-select-b");
+      if (sb) sb.value = b;
+    }
+    setView("diff", { skipHash: true });
+  } else if (view === "matrix") {
+    setView("matrix", { skipHash: true });
+  } else if (view === "help") {
+    setView("help", { skipHash: true });
+  }
+}
+
+function initExplorerExtras() {
+  initDiffUi();
+  document.getElementById("btn-export-brief")?.addEventListener("click", () => exportIntegratorBrief());
+  document.getElementById("btn-matrix-refresh")?.addEventListener("click", () => renderFingerprintMatrix(true));
+  window.addEventListener("hashchange", () => {
+    applyUrlHash().catch((e) => console.warn(e));
+  });
+}
+
 (async function init() {
   try {
     initThemeController();
     initSiteSearch();
     initTileFilters();
     initCardsToc();
+    initExplorerExtras();
     const index = await loadCatalogIndex();
     state.manifest = index;
     const n = (index.catalogs || []).length;
@@ -4854,10 +5888,13 @@ window.addEventListener("resize", () => {
       index.repo || "zeus_chat_request"
     } · ${n} file${n === 1 ? "" : "s"} in ${folders.size} folder${folders.size === 1 ? "" : "s"} · ${src}`;
     fillModes(index);
+    fillDiffSelects();
     await selectMode(state.catalogFile || state.mode);
-    // deep-link #chapter-… after first paint
-    if (location.hash) {
-      const el = document.getElementById(location.hash.slice(1));
+    await applyUrlHash();
+    // chapter deep-link without query form
+    if (location.hash && !location.hash.includes("=")) {
+      const id = location.hash.slice(1);
+      const el = document.getElementById(id);
       if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
     }
   } catch (e) {

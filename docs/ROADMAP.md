@@ -3,14 +3,16 @@
 > **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · **candidate pack base-5** (`v2/base/base-5/`) · last breaking train · version matrix: [COMPAT.md](../COMPAT.md)
 
 
-**Status:** living plan after base-1 → base-4  
-**Normative (base-4):** [BIBLE.md](BIBLE.md) · **Lessons:** [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md)  
-**Helios requests (source of truth for analytics emits):** [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)  
+**Status:** living plan after base-1 → base-4 → **base-5 candidate pack**  
+**Normative (base-4 era docs, base-5 wire freeze):** [BIBLE.md](BIBLE.md) · **Lessons:** [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md) · [migration/base-4_to_base-5/lessons-learned.md](migration/base-4_to_base-5/lessons-learned.md)  
+**Helios requests (analytics emits):** [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)  
+**zeus_client backlog (implement floor):** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) (`ZC-WISH-*`)  
 **base-5 inject / Layer A deltas:** [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) — **rules + triggers as objects**; Client **`output_request` → `app_output`** (each app field = **`type` + `description`**; type-only is not enough)  
 **base-5 control plane:** [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) — **settings bag** · **rule pack merge/freeze** · **Client policy table** · cache zones · security · observability  
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
-**Agent procedure:** [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
+**Agent procedure:** [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)  
+**Jira board:** [CR board 48](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48) · tracking table **§ CR board map** below
 
 This is **what we want next and why**, not a commitment calendar.  
 **Exception to “small bumps”:** **base-5 is intentionally the big wire/control-plane break** while nothing is in production on this line — then **base-6+ stay additive/optional**.
@@ -39,19 +41,26 @@ No production traffic on the **base-4/5 line** yet. Use that:
 | BASE | Allowed change type | Examples |
 | --- | --- | --- |
 | **base-5** | **BREAKING OK** — freeze the contract | Object rules/triggers · settings bag · policy table · `output_request` · company+jailbreak in prompt |
+| **base-5.1** | **Content patch on base-5 wire** — **not** a new wire break | Restore **mode overlays** in system prompt (`messages[].content`); core+overlay; no Layer A rename |
 | **base-6+** | **ADDITIVE / OPTIONAL only** | Soft hints/A/B · optional_when fields · Workbench UX · Helios norms as cheap emits · pin when green |
 | **Helios wishlist** | **Nice-to-have** (cheap provider first) | Pri-1 Zeus/Client report scalars — **never** required AI Layer A tax |
 
 ```text
-base-5  = last wire/control-plane break before real adoption of this line
-          Prefer one clean object contract over dual-read forever.
+base-5    = last wire/control-plane break before real adoption of this line
+            Prefer one clean object contract over dual-read forever.
 
-base-6+ = additive / optional_when / hash-excluded soft injects / productization
-          No rename/remove of base-5 wire keys without a new major BASE + migration hop.
+base-5.1  = content/diet train ON the base-5 wire (mode personas in prompts)
+            Same schema objects / required four / app_output — packs stop being
+            “analytics × rename”. See docs/MODE.md · work/RECREATE_MODE.md
 
-Helios  = analytics spine on Zeus/Client; optional_when if AI ever needed
-          Never block pin on Pri-2/3/4/5 AI fields
+base-6+   = additive / optional_when / hash-excluded soft injects / productization
+            No rename/remove of base-5 wire keys without a new major BASE + migration hop.
+
+Helios    = analytics spine on Zeus/Client; optional_when if AI ever needed
+            Never block pin on Pri-2/3/4/5 AI fields
 ```
+
+**Naming note:** `base-5.1` is a **roadmap train id** (content patch). On disk the pack may still live under `v2/base/base-5/` with `_lineage.base_id=base-5` until an explicit pack folder/lineage policy is chosen in the work plan (D1). It is **not** a semver of Zeus or zeus_client.
 
 **Dual-read** of base-4 `rules[]` / `boolean[]` triggers: **≤ one Client release** while migrating, then **drop**. base-5 catalogs and docs are **object-only**. Prefer **zero** dual-read if no external consumers.
 
@@ -75,24 +84,64 @@ Helios Motions read Analytics over **scalars** first; nested arrays are for dril
 
 ## Where we are
 
-| Done | Why it mattered |
-| --- | --- |
-| base-4 pack + Terminate table + Layer A G1/G2/G3 | Candidate foundation |
-| **base-5 pack on disk** (`v2/base/base-5/`) | **Last breaking freeze**: object triggers, `app_output`, inject contracts in Terminate prose |
-| Docs: playbook, migration hops, RELEASE_CHECKLIST, COMPAT triple matrix | Agent-friendly BASE bumps |
-| `scripts/new_base.py` | Repeatable pack scaffold |
+| Done | Why it mattered | CR |
+| --- | --- | --- |
+| base-4 pack + Terminate table + Layer A G1/G2/G3 | Candidate foundation | **CR-2** Done |
+| Multi-BASE inspector (`index.html`) | Diff packs | **CR-7** Done |
+| Policy docs + RELEASE_NOTES + ROADMAP on main | Train language | **CR-8** Done |
+| Multi-round Client **docs** | Bags A–D | **CR-17** Done |
+| **base-5 pack on disk** (`v2/base/base-5/`) | **Last breaking freeze**: object triggers, `app_output`, inject contracts | **CR-3** / **CR-22** |
+| Docs: playbook, migration hops, RELEASE_CHECKLIST, COMPAT | Agent-friendly BASE bumps | PR #4–#5 |
+| Process: `verify_base_pack.py` + phased checklist + Jira §9 | Scaffold ≠ ship | **CR-19** (PR #6) |
+| `scripts/new_base.py` | Repeatable pack scaffold | — |
+| zeus_client **wishlist** (`ZC-WISH-*`) | Prioritized Client backlog | [ZEUS_CLIENT_WISHLIST…](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) |
 
-| Still open | Risk |
-| --- | --- |
-| zeus_client implements object triggers + settings/policy/`output_request` | Catalogs ready; Client floor TBD |
-| Zeus stamp + Detective for base-5 | Can’t pin |
-| Required four incomplete in the wild | Detective / soft-require levers |
-| Helios Pri-1 report emits | Not catalog tax — Zeus/Client work |
-| CURRENT still base-1 | Expected until green |
+| Still open | Risk | CR |
+| --- | --- | --- |
+| zeus_client implements object triggers + settings/policy/`output_request` | Catalogs ready; Client floor TBD | **CR-20** (+ CR-9/10/11) |
+| Zeus loaders / return schema / Detective for base-5 | Can’t pin | **CR-21** |
+| **base-5.1 mode overlays** — catalogs ≈ analytics×rename | LLM ignores DESIGN mode intent | **CR-23** (plan) |
+| Helios Pri-1 report emits (cheap spine) | Not catalog tax | **CR-12** |
+| Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
+| CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
+| base-6 soft injects | After Client floor | **CR-4** |
+| base-7 Workbench / stamp product | Later | **CR-5** |
 
-**Pack SoT for new work:** **base-5** ([v2/base/base-5/](../v2/base/base-5/)).  
+**Pack SoT for new work:** **base-5** wire ([v2/base/base-5/](../v2/base/base-5/)) · next **content** train **base-5.1** (modes).  
 **Production pin:** **base-1**.  
-**Hop:** [migration/base-4_to_base-5/](migration/base-4_to_base-5/).
+**Hop:** [migration/base-4_to_base-5/](migration/base-4_to_base-5/).  
+**Modes:** [MODE.md](MODE.md) · plan [work/RECREATE_MODE.md](../work/RECREATE_MODE.md).  
+**Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4.
+
+---
+
+## CR board map (project CR)
+
+Board: https://kotenai.atlassian.net/jira/software/projects/CR/boards/48  
+Last status pass: **2026-07-26**.
+
+| Key | Role | Board status (intent) | ROADMAP home |
+| --- | --- | --- | --- |
+| **CR-1** | Epic — repo SoT / BASE sequence / COMPAT | In Progress | This repo strategy (ongoing) |
+| **CR-2** | Epic — base-4 ship | **Done** | § Where we are (base-4) |
+| **CR-3** | Epic — base-5 pack + residual | In Progress | § base-5 |
+| **CR-4** | Epic — base-6 additive | To Do | § base-6 |
+| **CR-5** | Epic — base-7 Workbench | To Do | § base-7 |
+| **CR-6…8, CR-17** | base-4 stories | **Done** | base-4 train |
+| **CR-9** | company_context inject (Client) | In Progress (spec/pack done) | base-5 · ZC-WISH-006 |
+| **CR-10** | jailbreak rules{} + hooks | In Progress (spec/pack done) | base-5 · ZC-WISH-002/013 |
+| **CR-11** | object triggers + policy table | In Progress (pack done) | base-5 · ZC-WISH-004/010 |
+| **CR-12** | Helios Pri-1 cheap spine | To Do | Helios Pri-1 · ZC-WISH-030… |
+| **CR-13…14** | base-6 stories | To Do | § base-6 |
+| **CR-15…16** | base-7 stories | To Do | § base-7 |
+| **CR-18** | Pin promote CURRENT | To Do (blocked) | § base-8+ |
+| **CR-19** | Process verify + checklist | In Review (PR #6) | Process / CREATE_BASE |
+| **CR-20** | zeus_client base-5 floor | To Do | § base-5 · full wishlist |
+| **CR-21** | Zeus base-5 loaders/Detective | To Do | § base-5 external |
+| **CR-22** | Pack docs completion tracker | In Review | § base-5 pack |
+| **CR-23** | **base-5.1** mode overlays in system prompt | To Do | § base-5.1 · [MODE.md](MODE.md) · [RECREATE_MODE.md](../work/RECREATE_MODE.md) |
+
+When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 
 ---
 
@@ -316,8 +365,16 @@ Client → type-check values (descriptions not re-emitted)
 
 ### Success signals
 
-- [ ] Diff base-4 → base-5 documents **all breaking wire** (array→object, app_output, control plane)  
-- [ ] base-5 catalogs: **object rules/triggers only** (no array as SoT)  
+**Pack / docs (this repo) — largely green after PR #5:**
+
+- [x] Diff base-4 → base-5 documents **all breaking wire** (array→object, app_output, control plane) — RELEASE_NOTES + hop GUIDE  
+- [x] base-5 catalogs: **object rules/triggers only** (no array as SoT)  
+- [x] COMPAT: base-5 **candidate** row (object-only Client floor noted; package TBD)  
+- [x] Playbook + migration hop describe base-5 as **last breaking** train  
+- [x] Pack verified: `python3 scripts/verify_base_pack.py --base 5`  
+
+**Client / Zeus residual — still open (CR-20 / CR-21):**
+
 - [ ] Client: object triggers; dual-read arrays **≤1 release** then removed  
 - [ ] Client injects **company_context** + **merged frozen jailbreak `rules` object**  
 - [ ] Client spike: `triggers.get("coupon_presented")` + sticky flags + `policy_action` + `message_jailbreak_soft`  
@@ -328,21 +385,80 @@ Client → type-check values (descriptions not re-emitted)
 - [ ] Tool JSON untrusted; G2 never in chat UI  
 - [ ] Cheap emit: `ruleset_id` / zone sizes (ops, not Layer A tax)  
 - [ ] Refuse path works on [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) examples  
-- [ ] Helios Pri-1 path on **Zeus report** (003 or 014) — not new required AI fields  
-- [ ] COMPAT: base-5 candidate with **object-only** Client floor  
-- [ ] Playbook + migration hop describe base-5 as **last breaking** train  
+- [ ] Helios Pri-1 path on **Zeus report** (003 or 014) — not new required AI fields (**CR-12**)  
+- [ ] COMPAT: Client package version row when floor ships  
 - [ ] Catalog bytes ≤ base-4 or justified  
+
+**Track Client work as `ZC-WISH-*`:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) · umbrella **CR-20**.
 
 ### Why this order
 
-**Break the wire once (base-5)** while no one is prod on this line, then **only additive/optional** changes. Soft A/B and Helios norms must not force a second contract rewrite. Helios Pri-1 remains **report/session emit**.
+**Break the wire once (base-5)** while no one is prod on this line, then **content patches (base-5.1)** and **only additive/optional** (base-6+) changes. Soft A/B and Helios norms must not force a second contract rewrite. Helios Pri-1 remains **report/session emit**.
+
+---
+
+## base-5.1 — “Mode overlays restored” (content on base-5 wire)
+
+**Jira:** **[CR-23](https://kotenai.atlassian.net/browse/CR-23)** · parent epic **CR-3** · status To Do  
+**SoT:** [MODE.md](MODE.md) · **Plan:** [work/RECREATE_MODE.md](../work/RECREATE_MODE.md)  
+**Design:** [zeus_design_docs DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) · Zeus `internal/modes/`
+
+**Theme:** base-5 **froze the wire** but left **10 mode packs nearly identical** (analytics system essay × rename; only `auto` shorter). **base-5.1** restores DESIGN mode intent into the **stamped system prompt** (`messages[].content` = shared CORE + per-mode **MODE_OVERLAY**). **Not** a Layer A / object break.
+
+| | |
+| --- | --- |
+| **Wire** | Unchanged base-5 (object triggers, `app_output`, required four, settings/policy contracts) |
+| **Content** | Mode personas: entities, join/noise posture, edges, don’ts, example pipelines |
+| **On disk** | Prefer keep `v2/base/base-5/` + document train as **5.1** until D1 says otherwise |
+| **Generator** | Fill Zeus `ai/V2/prompt/core/modes/<mode>.md` (hook already exists, empty today) |
+
+### Goals
+
+1. Core + thin overlay architecture (not 10 full forked essays).  
+2. Overlays for all 10 modes (priority: analytics → fraud → research → code → regulated → tenant/private/open → auto → custom).  
+3. Clean clone leftovers (`[exp] analytics job`, etc.).  
+4. `diff_modes` / clone gate so `new_base` cannot re-ship analytics×rename.  
+5. Port overlays into Zeus snapshot path.  
+6. Inspector Diff analytics vs fraud/research/code is human-meaningful.
+
+### Explicit non-goals for base-5.1
+
+- Rename/remove base-5 wire keys or required four  
+- Soft HINTS/A/B (**base-6**)  
+- Pin promote (**CR-18**)  
+- Client policy-table implement (**CR-20**) — orthogonal; can parallel  
+- Full Zeus `AppliesTo` tool matrix rewrite (optional later)
+
+### Success signals
+
+- [ ] [MODE.md](MODE.md) + [RECREATE_MODE.md](../work/RECREATE_MODE.md) on main  
+- [ ] CORE extracted; analytics rebuild from CORE + overlay  
+- [ ] fraud / research / code / regulated overlays land in packs  
+- [ ] All 10 modes pass §6.1 keyword/entity smoke in MODE.md  
+- [ ] Neutralize-mode Diff ≠ empty vs analytics (except intentional shared CORE)  
+- [ ] `verify_base_pack.py --base 5` OK  
+- [ ] Zeus `modes/<mode>.md` ported or dual-home documented  
+- [ ] RELEASE_NOTES notes base-5.1 content train  
+- [ ] CR-23 Done  
+
+### Sequencing vs other work
+
+```text
+base-5 pack (wire)     ──done──►  base-5.1 (mode prompts)  ──►  base-6 soft injects
+        │                              │
+        └── Client CR-20 / Zeus CR-21 ─┴── can parallel; pin still last
+```
+
+Prefer **base-5.1 before or in parallel with Client spike** so trials exercise real mode personas, not 10 analytics clones.
 
 ---
 
 ## base-6 — “Additive soft inject + optional Helios norms”
 
+**Jira:** epic **[CR-4](https://kotenai.atlassian.net/browse/CR-4)** · stories **CR-13**, **CR-14** · status To Do (correct until base-5 Client residual prefers green).
+
 **Theme:** **No breaking wire changes vs base-5.** Soft hints/A/B (hash-excluded); optional budget metrics; optional Helios norms as **cheap Zeus/Client** work — same spirit as Helios “nice to have.”  
-**Depends on base-5:** frozen objects + company_context + settings/policy already ship.
+**Depends on base-5:** frozen objects + company_context + settings/policy already ship (pack done; Client CR-20).
 
 ### Catalog / Client goals (all additive or optional)
 
@@ -387,6 +503,8 @@ Client → type-check values (descriptions not re-emitted)
 
 ## base-7 — “Workbench + stamp + product events” (additive product)
 
+**Jira:** epic **[CR-5](https://kotenai.atlassian.net/browse/CR-5)** · stories **CR-15**, **CR-16** · status To Do (future).
+
 **Theme:** Productize authoring and ops; **no Layer A wire break** vs base-5. Helios product-path events remain optional/nice.
 
 | Goal | Why | Breaking? |
@@ -404,6 +522,8 @@ Client → type-check values (descriptions not re-emitted)
 ---
 
 ## base-8+ — “Pin + optional compression / AI-heavy”
+
+**Jira:** epic **[CR-18](https://kotenai.atlassian.net/browse/CR-18)** — pin promote · **blocked by CR-20 + CR-21** · do not start until green.
 
 | Idea | Why | Breaking wire? |
 | --- | --- | --- |
@@ -432,6 +552,11 @@ base-5  ★ LAST BREAKING WIRE / CONTROL-PLANE FREEZE
         ★ settings bag + merge/freeze + policy table + hooks
         ★ inject security + multi-turn flags + cheap ops metrics
         ★ Helios Pri-1 = Zeus/Client emits only (nice spine, not Layer A tax)
+           │
+base-5.1 CONTENT on base-5 wire (not a wire break)
+         ★ mode overlays in messages[].content (CORE + MODE_OVERLAY)
+         ★ stop analytics×rename packs · DESIGN §14 personas
+         ★ diff_modes / clone gate · Zeus modes/*.md port
            │
 base-6+ ADDITIVE / OPTIONAL only
         soft hints/A/B · optional norms · Workbench · pin when green

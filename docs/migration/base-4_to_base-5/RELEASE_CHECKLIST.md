@@ -24,6 +24,7 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 - [x] ROADMAP § base-5 (breaking freeze + frozen surfaces)  
 - [x] [README.md](README.md) hop status  
 - [x] Do **not** flip `CURRENT.json` in this hop  
+- [x] CR epic exists for base-5 (**CR-3**)  
 
 ---
 
@@ -45,13 +46,14 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 
 ---
 
-## 2. Scripts / regenerate
+## 2. Scripts / regenerate (Phase D)
 
 - [x] `python3 scripts/new_base.py --from v2/base/base-4 --base 5`  
 - [x] Diet min JSON (objects, Terminate, schema-linked tool params)  
 - [x] `export_base_text.py --from v2/base/base-5/min --base 5 --out v2/base/base-5 --no-set-base-id`  
 - [x] `new_base.py --refresh-manifest --base 5`  
 - [x] `scan_catalogs.py`  
+- [x] **`python3 scripts/verify_base_pack.py --base 5` → OK**  
 - [ ] Root manifest/index if applicable  
 
 ---
@@ -137,12 +139,13 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 
 ---
 
-## 7. Verify (Client trial)
+## 7. Verify (Client trial) (Phase D + trial)
 
-- [ ] schema validates example  
-- [ ] scan_catalogs clean  
+- [x] **`python3 scripts/verify_base_pack.py --base 5` OK**  
+- [ ] schema validates example (structural gate done; full jsonschema optional)  
+- [x] scan_catalogs clean  
 - [ ] Diff base-4 vs base-5  
-- [ ] No invent hash  
+- [x] No invent hash  
 - [ ] Refuse / coupon-style policy path smoke (docs examples)  
 
 ---
@@ -153,6 +156,26 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 - [ ] Client spike green  
 - [ ] Detective green  
 - [ ] CURRENT → base-5 only with explicit promote  
+- [ ] Pin epic **CR-18** prerequisites only (not same as pack ship)  
+
+---
+
+## 9. Jira / CR board (Phase J — after pack ship)
+
+**Board:** [CR board 48](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48)
+
+- [x] Update epic **CR-3** — pack shipped, PR #5/#6, residual open, pin still base-1  
+- [x] Transition **CR-3** → In Progress  
+- [x] Comment on **CR-3** with ship notes + PR links  
+- [x] Update children **CR-9…CR-12** — pack/docs vs Client/Zeus split; links → `main`  
+- [x] Create residual under CR-3:  
+  - [x] **CR-19** process verify + phased checklist (PR #6)  
+  - [x] **CR-20** zeus_client base-5 implement  
+  - [x] **CR-21** Zeus loaders / Detective / return schema  
+  - [x] **CR-22** pack docs completion tracker  
+- [x] Link **CR-20** + **CR-21** **blocks** **CR-18** (pin)  
+- [x] Update **CR-4** (base-6) depends-on + additive-only  
+- [x] Update **CR-18** pin prerequisites  
 
 ---
 
@@ -163,3 +186,4 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 | Catalog / docs | | |
 | Zeus | | |
 | zeus_client | | |
+| CR board hygiene | 2026-07-26 | |

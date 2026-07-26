@@ -1,10 +1,10 @@
-# Lessons: base-5 → base-5.2 + first Zeus 0.6 / Helios 0.6 pin
+# Lessons: base-5 → base-5.2 + Zeus 0.6 / Helios 0.6 pin
 
-**Audience:** agents/humans pinning Zeus (or Client) onto **base-5.2**; next BASE authors.  
-**Captured:** 2026-07-26 after Zeus **0.6.0 → 0.6.5** Beelink lab (Detective → chat Layer A → report rollup).  
+**Audience:** agents/humans pinning Zeus (or Client) onto **base-5.2**; next BASE authors; Helios 0.6 Analytics.  
+**Captured:** 2026-07-26 after Zeus **0.6.0 → 0.6.10** Beelink lab (Detective → chat → report → Vault → Contract → Wizard → Hot Paths → docs).  
 **Related:** [README.md](README.md) · [WISH_I_KNEW_DUAL.md](../../WISH_I_KNEW_DUAL.md) · [base-4→5 lessons](../base-4_to_base-5/lessons-learned.md) · [COMPAT.md](../../../COMPAT.md)
 
-This is **experience**, not a second BIBLE. Prefer pack schema + BIBLE for wire; use this to avoid re-breaking engines.
+This is **experience**, not a second BIBLE. Prefer pack schema + BIBLE for wire; use this to avoid re-breaking engines and Analytics.
 
 ---
 
@@ -17,6 +17,8 @@ This is **experience**, not a second BIBLE. Prefer pack schema + BIBLE for wire;
 | Zeus pin (this train) | candidate | candidate | **vendored on Zeus 0.6** (breaking vs 0.5 / base-1) |
 
 **Policy that worked:** Zeus **0.6.x is not dual-compatible** with 0.5.x / base-1 Layer A shapes. Helios jumps **0.2.x → 0.6.x** in lockstep. Sparse optional fields still OK (missing ≠ error); **wrong shapes when present** are fail.
+
+**Zeus ship record (lab):** `0.6.0` pin+Detective → `0.6.10` COMPAT/openapi. Residual surfaces landed in **order** (see §13); do not reshuffle for the next hop.
 
 ---
 
@@ -73,7 +75,7 @@ summary · query_decomposition · decomposition · confidence
 | --- | --- |
 | Synthetic terminate fills **full required four** + `synthetic:true` (and optional `policy_action=error`) | Only inject QD “for Helios” |
 | Use assistant prose as `summary` when present; honest placeholder if empty | Leave summary empty and expect checklist pass |
-| Helios / Analytics: `WHERE synthetic IS MISSING` (or `WHERE query_decomposition.synthetic IS MISSING`) | Treat synthetic QD as real demand |
+| Helios / Analytics: `WHERE t.report.synthetic IS MISSING` (or QD.synthetic) | Treat synthetic QD as real demand |
 | Detective: note “terminate is synthetic” in diagnosis | Pretend `has_terminate=true` means model obeyed Layer A |
 | Report root promotes `synthetic` + `layer_a_via` | Only bury synthetic on nested tool status |
 
@@ -131,7 +133,7 @@ From base-5 wire + base-5.2 dual gaps:
 1. **Detective + pin** (ZE-259) — see the bag  
 2. **Chat G1 + light chips** (ZE-260) — summary fills empty bubble; chips only  
 3. **Report rollup** (ZE-265) — Helios root fields  
-4. Then Prompt Vault / Contract / Wizard / docs
+4. Then Prompt Vault / Contract / Wizard / Hot Paths / docs
 
 Do **not** start with Vault or Ingress polish before Detective can show a real `return`.
 
@@ -201,10 +203,95 @@ Analytics must **not** UNNEST `detail.ai.calls[].args` for every chart. Zeus **0
 | No HEL tickets until Zeus ships | Open **HEL epic 0.6** with Zeus epic same day |
 | Query only `report.query_decomposition` | Plan `data_gaps`, structured wish, object triggers, `synthetic` on report root |
 | Same Helios VERSION as 0.2 motions train | Jump **0.6** with Zeus to signal break |
+| Unbounded Analytics scans | **Always** filter `t.ts` + `t.scope` (see §11) |
 
 ---
 
-## 11. Recommended Zeus pin shell block
+## 11. Helios Analytics — always WHERE `ts` and `scope` (index law)
+
+Lab index (Analytics secondary, **not** GSI):
+
+```sql
+CREATE ANALYTICS INDEX idx_traces_ts_scope
+ON `zeus_sessions`.`session`.`traces` (
+  ts: STRING,
+  scope: STRING
+)
+EXCLUDE UNKNOWN KEY;
+```
+
+Helios Motions top-bar is **Time + Scope**. The index key order is **`ts` first, `scope` second**. Analytics only uses a secondary index when predicates form a **prefix** of that key with equality/range ops.
+
+### Non-negotiable predicates on every board / pack / probe query
+
+```sql
+FROM `zeus_sessions`.`session`.`traces` AS t
+WHERE 1 = 1
+  {{TIME_FILTER}}     -- AND t.ts >= DATE_ADD_STR(NOW_STR(), -N, "day"|"hour")
+                      -- or absolute: AND t.ts >= "ISO" AND t.ts <= "ISO"
+  {{SCOPE_FILTER}}    -- empty when All scopes; else AND t.scope = "bucket/_default"
+  AND t.scope IS NOT MISSING   -- product scopes only (drop orphan rows)
+  -- then feature filters (report.*, synthetic, …)
+```
+
+| Rule | Why |
+| --- | --- |
+| **Always** `t.ts` range (or absolute bounds) | Index **prefix**; without it full scan |
+| **Always** touch `t.scope` | Equality when Scope set; `IS NOT MISSING` when All (hygiene + second key ready) |
+| Never wrap `t.ts` in a function in **WHERE** | `DATE_TRUNC_STR(t.ts, …)` belongs in GROUP BY, not the window predicate |
+| Never query `scope = …` alone | Wrong prefix — index unused |
+| Prefer BFF `exploreTimeScopeFilters` | One helper; every motion reuses it |
+
+### Placeholder contract (SQL packs + Go)
+
+| Placeholder | Expands to |
+| --- | --- |
+| `{{TIME_FILTER}}` | `AND t.ts >= DATE_ADD_STR(NOW_STR(), -N, "unit")` (or absolute range) |
+| `{{SCOPE_FILTER}}` | `AND t.scope = "…"` or empty |
+
+**Smoke / STARTER queries** must include the same predicates — not only live Motions SQL. Lab “COUNT(*) with no WHERE” is fine for connectivity once; **do not** copy it into boards, probes, or HEL-20 packs.
+
+### Helios Layer A filters (on top of ts/scope)
+
+```sql
+AND (t.report.synthetic IS MISSING OR t.report.synthetic = false)
+-- dual gaps / structured Layer A (Zeus ≥ 0.6.5 report root):
+-- t.report.data_gaps, t.report.data_gaps_present
+-- t.report.wish_i_knew_items, t.report.wish_i_knew
+-- t.report.business_rules_triggers, t.report.business_rules_triggers_present
+-- t.report.policy_action, t.report.confidence
+```
+
+**Docs:** Helios `docs/analytics/INDEXES.md` · `SCHEMA_AND_SPARSE_DATA.md` · H6 schema (HEL-19).
+
+---
+
+## 12. Residual surfaces after report (what actually shipped)
+
+After ZE-265 report root, the rest of ZE-258 residual was **not** optional fluff — but none of it unblocks Helios SQL the way report does. Actual Zeus train:
+
+| Ver | Ticket | Surface | Lesson for next hop |
+| --- | --- | --- | --- |
+| 0.6.0–0.6.3 | ZE-259 | Pin + Detective + synthetic bag + evidence wording | Pin day 1 |
+| 0.6.4 | ZE-260 | Chat G1 summary + G2 light chips | No full G2 in bubble |
+| 0.6.5 | ZE-265 | Report root Layer A G2 | **Helios contract** |
+| 0.6.6 | ZE-261 | Prompt Vault BASE lineage | Catalog UX after report |
+| 0.6.7 | ZE-262 | Contract Verify pin + hash_policy | Empty verify = pin catalog |
+| 0.6.8 | ZE-263 | Wizard dry-run pin + Layer A teach | Ingress polish late |
+| 0.6.9 | ZE-266 | Hot Paths / Path Finder Layer A | Skip synthetic; hash-excluded paths |
+| 0.6.10 | ZE-264 | COMPAT + openapi pin notes | Cut docs last |
+
+**Anti-pattern reconfirmed:** Vault / Wizard / Hot Paths before report root → Helios still blocked.
+
+**Hub JS:** Nested backticks inside template literals still break `:9091/hub` (ZE-80). After any `app.js` change: `make check-admin-js`.
+
+**Catalog vs Contract:** Contract Verify must use pin catalog / `CatalogForContract` (or equivalent), not a generator that diverges from Detective.
+
+**Deploy:** Compose image pin (`zeus:X.Y.Z`) must match tar; only push branch **`5TH`** (ticket branches stay local).
+
+---
+
+## 13. Recommended Zeus pin shell block
 
 ```bash
 # From Zeus repo; sibling clone of this repo recommended
@@ -234,10 +321,11 @@ go test ./internal/chatrequest/ ./internal/admin/ ./internal/tracebundle/ -count
 | Image load OK but assert fails | Local `docker-compose.frontend.yml` must pin `zeus:X.Y.Z` before deploy script |
 | Tar served from Mac | `python3 -m http.server 8765` in `__dev_only/env`; Dockhand pulls Mac IP not localhost |
 | Only push `5TH` | Ticket branches stay local (`Agents.md`); never open PR ticket → main |
+| Double `base-` in filenames | Vendor/export scripts; mode parse strips one `_base-<id>` only |
 
 ---
 
-## 12. Detective soak definition of done (first pin)
+## 14. Detective soak definition of done (first pin)
 
 Do **not** mark engine pin green until:
 
@@ -249,36 +337,39 @@ Do **not** mark engine pin green until:
 6. One known-bad chat (synthetic or empty graph) still **explains** itself in diagnosis  
 7. Chat bubble shows **summary** when content empty; chips optional; no full G2 dump  
 
+Helios 0.6 green is separate: SQL packs + BFF parsers on report root with **ts/scope** predicates (HEL-17…HEL-23).
+
 ---
 
-## 13. Ordered Zeus residual (ZE-258 surfaces) — do not reshuffle casually
+## 15. Ordered Zeus residual (ZE-258) — do not reshuffle casually
 
-| Order | Surface | Why |
-| --- | --- | --- |
-| 1 | Detective + pin | Fast feedback on real terminate |
-| 2 | Chat Layer A (G1 + light chips) | Operator-visible without Helios |
-| 3 | **Report rollup** | Unblocks Helios SQL/BFF |
-| 4 | Prompt Vault / Vault+ | Catalog UX; not on critical Helios path |
-| 5 | Contract hash + Verify | Stamp authority vs new `_hash_policy` |
-| 6 | Wizard + Ingress | Optimize paths / app_output |
-| 7 | Docs COMPAT / openapi | End of train cut |
+| Order | Surface | Ticket (this train) | Why |
+| --- | --- | --- | --- |
+| 1 | Detective + pin | ZE-259 | Fast feedback on real terminate |
+| 2 | Chat Layer A (G1 + light chips) | ZE-260 | Operator-visible without Helios |
+| 3 | **Report rollup** | ZE-265 | Unblocks Helios SQL/BFF |
+| 4 | Prompt Vault / Vault+ | ZE-261 | Catalog UX; not on critical Helios path |
+| 5 | Contract hash + Verify | ZE-262 | Stamp authority vs new `_hash_policy` |
+| 6 | Wizard + Ingress | ZE-263 | Optimize paths / app_output |
+| 7 | Hot Paths / Path Finder | ZE-266 | Layer A on workbench paths |
+| 8 | Docs COMPAT / openapi | ZE-264 | End of train cut |
 
 **Anti-pattern:** polish Prompt Vault or Wizard before report root fields exist — Helios sits idle while Hub chrome moves.
 
 ---
 
-## 14. Jira pairing (what worked)
+## 16. Jira pairing (what worked)
 
 | Project | Epic (example) | First stories |
 | --- | --- | --- |
-| ZE | 0.6 base-5.2 adoption | Detective + pin → chat chips → **report rollup** |
-| HEL | 0.6 Layer A / dual gaps | ROADMAP/VERSION docs → schema → SQL on report root |
+| ZE | 0.6 base-5.2 adoption (ZE-258) | Detective + pin → chat chips → **report rollup** → residual Hub → docs |
+| HEL | 0.6 Layer A / dual gaps (HEL-17) | ROADMAP → schema → SQL on report root (**ts+scope**) → BFF → boards → cut 0.6.0 |
 
-Open Helios tickets when Zeus residual is named — not after SQL breaks in production charts.
+Open Helios tickets when Zeus residual is named — not after SQL breaks in production charts. Helios **does not** dual-compat 0.2.x field assumptions with 0.6 report shapes.
 
 ---
 
-## 15. One-line takeaways
+## 17. One-line takeaways
 
 | Topic | Takeaway |
 | --- | --- |
@@ -290,12 +381,14 @@ Open Helios tickets when Zeus residual is named — not after SQL breaks in prod
 | Empty bags | Presence flags when `omitempty` would hide `{}` / `[]` |
 | Lab | Empty graph ≠ bad catalog; freezes often graph UI |
 | Helios | Same minor jump; **report root** is the contract |
-| UI order | Detective → chat G1 → report → Vault/Contract/Wizard |
-| Done | Real return on healthy scope + report JSON keys + green CI |
+| **Analytics** | **Every query: WHERE `t.ts` + `t.scope` for `idx_traces_ts_scope`** |
+| UI order | Detective → chat G1 → report → Vault/Contract/Wizard/Hot Paths → docs |
+| Done (Zeus) | Real return + report JSON keys + residual Hub + COMPAT + green CI |
+| Done (Helios) | Packs/BFF on Layer A root fields; no dual-read; index-safe SQL |
 
 ---
 
-## 16. Pointers
+## 18. Pointers
 
 | Doc | Use |
 | --- | --- |
@@ -304,8 +397,28 @@ Open Helios tickets when Zeus residual is named — not after SQL breaks in prod
 | [base-4_to_base-5/lessons-learned.md](../base-4_to_base-5/lessons-learned.md) | Pack diet + residual #10.1 |
 | [COMPAT.md](../../../COMPAT.md) | Supported triples |
 | Pack | `v2/base/base-5.2/response_output_schema.json` + `min/` |
-| Zeus | `internal/tracebundle/report.go` (`BuildReport` / `extractLayerAFromSnap`) |
+| Zeus | `internal/tracebundle/report.go` (`BuildReport` / Layer A extract) |
 | Zeus | `web/static/admin/app.js` (`extractLayerATerminate` / chips) |
+| Zeus | `docs/ops/COMPAT.md` — 0.6.x surface table |
+| Helios | `docs/analytics/INDEXES.md` — `idx_traces_ts_scope` |
+| Helios | H6 tickets HEL-17…HEL-23 · Zeus pair ZE-258 / ZE-265 |
+
+---
+
+## 19. For the *next* migration (base-5.2 → N)
+
+Carry these forward as default law:
+
+1. **Three pins** named in the migration README before any code.  
+2. **Filename / mode strip** unit-tested on day 0 of the engine pin.  
+3. **Synthetic terminate** fills full required Layer A + flags report root.  
+4. **Report rollup ticket** opened same day as pin; Helios epic same day.  
+5. **UI residual order** fixed: Detective → chat G1 → report → everything else.  
+6. **Helios SQL:** never ship a board or pack query without `t.ts` + `t.scope` predicates.  
+7. **No dual-read** of obsolete shapes once the engine minor jumps.  
+8. **Hub JS syntax gate** after every admin UI change.  
+9. **Only integration branch** pushed remote (Zeus: `5TH`).  
+10. Update **this** lessons file before starting Helios / Client residual on the next hop.
 
 ---
 

@@ -102,7 +102,7 @@ Execute in order. Skip only if the hop folder says “design only” and you are
 4. Apply Y deltas (Terminate table, Layer A schema, verb params, inject contracts)
 5. Re-export text; refresh MANIFEST; scan_catalogs
 6. Zeus engine: snapshot / PIN / Detective / loaders / return schema (see §5)
-7. zeus_client: parse/validate new fields; dual-read if breaking; redaction; policy table
+7. zeus_client: parse/validate new fields; dual-read only if X→Y break and ≤1 release; redaction; policy table
 8. Update COMPAT.md triples + feature table
 9. Ensure hop folder exists:
      docs/migration/base-X_to_base-Y/GUIDE.md (+ lessons-learned.md)
@@ -139,13 +139,15 @@ Execute in order. Skip only if the hop folder says “design only” and you are
 
 **Detail:** [migration/base-1_to_base-4/GUIDE.md](migration/base-1_to_base-4/GUIDE.md) · [lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md)
 
-### 4.2 base-4 → base-5 (summary — design)
+### 4.2 base-4 → base-5 (summary — **breaking**; take all wire pain here)
 
 | Area | Delta |
 | --- | --- |
-| Catalog | Named `rules{}`; object triggers; company_context; output_request |
-| Zeus | Prefer not to grow always-on AI fields; Detective warn policy TBD |
-| Client | Merge/freeze rules; settings bag; type+description → prompt; policy table |
+| Catalog | Named `rules{}`; object triggers **only**; company_context; output_request |
+| Zeus | Prefer not to grow always-on AI fields; Detective soft-require policy TBD |
+| Client | Merge/freeze; settings bag; type+description → prompt; policy table; drop array dual-read ASAP |
+
+**After this hop:** only additive/optional BASE changes until a new major is justified.
 
 **Detail:** [ROADMAP.md](ROADMAP.md) · [RULES_OBJECT…](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
 

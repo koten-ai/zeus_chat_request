@@ -32,9 +32,10 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | Zeus engine | chat_request BASE | zeus_client | Status | Notes |
 | --- | --- | --- | --- | --- |
 | `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | **supported** | Production pin; required four Layer A |
-| `0.5.x` (current line) | **`base-4`** | `≥ 0.1.0` + optional Layer A G2/G3 | **candidate / opt-in** | Pack on disk; not `CURRENT`; Client should accept extra terminate fields |
-| *future* | **`base-5`** | *TBD* (settings bag, object rules, `output_request`) | **design only** | Docs in [`docs/ROADMAP.md`](docs/ROADMAP.md); no pin |
-| *future* | `base-2`+ promoted pin | *TBD* | — | Only after stamp + Client + Detective green |
+| `0.5.x` (current line) | **`base-4`** | `≥ 0.1.0` + optional Layer A G2/G3 | **candidate / opt-in** | Pack on disk; not `CURRENT`; array triggers if used |
+| *future* | **`base-5`** | *TBD* — **object rules/triggers only**; settings; `output_request` | **design / last breaking train** | No prod on this line yet — take wire breaks here; dual-read ≤1 Client release · [ROADMAP](docs/ROADMAP.md) |
+| *future* | **`base-6+`** | base-5 floor + optional soft injects | **additive only** | No rename/remove of base-5 wire without new major |
+| *future* | promoted pin (`CURRENT`) | matching Client floor | — | Only after stamp + Client + Detective green |
 
 **Status legend**
 
@@ -61,8 +62,8 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | Filename `*_v2_min.json` | **yes** (legacy pin) | no (uses `*_base-4.json`) | `*_base-5.json` |
 | Filename `*_base-N.json` | lineage only | **yes** | **yes** |
 | Recommended Layer A (`policy_action`, scores, `wish_i_knew`) | informal / absent | **recommended** | **recommended** + soft-require paths |
-| `business_rules_triggers` | — | `boolean[]` (index-aligned) | **`{ id: bool }` object** (sparse) |
-| Inject `rules` | free text / informal | design: array | **named object** + merge/freeze |
+| `business_rules_triggers` | — | `boolean[]` (legacy) | **`{ id: bool }` object only** (sparse; dual-read ≤1 release) |
+| Inject `rules` | free text / informal | array prototype | **named object only** + merge/freeze |
 | `company_context` + jailbreak rule pack in prompt | no | score field only | **yes** (design) |
 | `output_request` → `app_output` | informal `structured` | informal | **`type` + `description` per field** |
 | Settings bag (max_rounds, locale, redaction, …) | ad hoc config | ad hoc | **formal** ([PROMPT_SETTINGS](docs/PROMPT_SETTINGS.md)) |

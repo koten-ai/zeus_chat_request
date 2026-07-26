@@ -6,10 +6,11 @@
 | | |
 | --- | --- |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
-| **Candidate pack** | **base-4** — `v2/base/base-4/` (not pin) |
-| **Design only** | **base-5** — `docs/ROADMAP.md` (no pack until scaffold) |
+| **Candidate pack (breaking freeze)** | **base-5** — `v2/base/base-5/` (not pin) |
+| **Prior candidate** | **base-4** — `v2/base/base-4/` (Diff / history) |
 | **Versions** | [COMPAT.md](COMPAT.md) — Zeus × BASE × zeus_client |
 | **Full AI procedure** | [docs/BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) |
+| **base-5 release checklist** | [docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md](docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md) |
 
 ---
 

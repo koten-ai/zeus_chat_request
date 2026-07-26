@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** · **base-5 = last breaking train** (design; no prod on this line yet) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · **candidate pack base-5** (`v2/base/base-5/`) · last breaking train · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4  
@@ -73,30 +73,26 @@ Helios Motions read Analytics over **scalars** first; nested arrays are for dril
 
 ---
 
-## Where we are (base-4)
+## Where we are
 
 | Done | Why it mattered |
 | --- | --- |
-| Layer A G1/G2/G3 design | User / admin / client without Detective pollution |
-| Single Terminate table + example | Clarity > second essay |
-| base-N naming + customs pattern | Lineage on disk |
-| Text export + `export_base_text.py` | Repeatable diet loops |
-| Bible, mapping, lessons, multi-round docs | Onboarding |
-| One `index.html` multi-BASE Diff | Migration without forking UI |
+| base-4 pack + Terminate table + Layer A G1/G2/G3 | Candidate foundation |
+| **base-5 pack on disk** (`v2/base/base-5/`) | **Last breaking freeze**: object triggers, `app_output`, inject contracts in Terminate prose |
+| Docs: playbook, migration hops, RELEASE_CHECKLIST, COMPAT triple matrix | Agent-friendly BASE bumps |
+| `scripts/new_base.py` | Repeatable pack scaffold |
 
 | Still open | Risk |
 | --- | --- |
-| Required four often incomplete in the wild | Detective fail · weak Helios QD |
-| Recommended Layer A easy to drop | No Client control / admin telemetry |
-| **No formal `company_context` or jailbreak `rules[]` in the prompt** | Score without policy ([JAILBREAK_POLICY.md](JAILBREAK_POLICY.md)) |
-| Most HEL-WISH items not in Layer A (by design) | Helios still on proxies until Zeus/Client emit |
-| Production stamp path for base-4 | Can’t pin safely |
-| Text → JSON re-encode | Manual drift |
+| zeus_client implements object triggers + settings/policy/`output_request` | Catalogs ready; Client floor TBD |
+| Zeus stamp + Detective for base-5 | Can’t pin |
+| Required four incomplete in the wild | Detective / soft-require levers |
+| Helios Pri-1 report emits | Not catalog tax — Zeus/Client work |
+| CURRENT still base-1 | Expected until green |
 
-**base-4 Layer A already useful for Helios (when emitted):**  
-`query_decomposition` (intent/entity/geo/price strings), `decomposition`, `confidence`, plus recommended `subject_confidence`, `jail_break_attempt`, `wish_i_knew`, `policy_action`, `business_rules_triggers`.
-
-**base-4 does *not* yet put in the prompt:** tenant **company/service content** or a default **jailbreak rule pack**. That is **base-5**.
+**Pack SoT for new work:** **base-5** ([v2/base/base-5/](../v2/base/base-5/)).  
+**Production pin:** **base-1**.  
+**Hop:** [migration/base-4_to_base-5/](migration/base-4_to_base-5/).
 
 ---
 
@@ -188,7 +184,8 @@ Canonical detail: [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT
 | [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) | Score + hard rules + hooks |
 | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order + budgets |
 | [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) | Agent comply/upgrade checklists |
-| [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | Hop stub (breaking) |
+| [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | Hop + GUIDE + RELEASE_CHECKLIST |
+| Pack | [`v2/base/base-5/`](../v2/base/base-5/) | Candidate on disk |
 
 ### Headline deliverables (must ship in base-5)
 

@@ -27,7 +27,7 @@ See [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) · root [AGENTS.md](../.
 | Jump | Path | Status |
 | --- | --- | --- |
 | base-1 → base-4 | [base-1_to_base-4/](base-1_to_base-4/) | Candidate pack on disk (`v2/base/base-4/`); pin still base-1 |
-| base-4 → base-5 | [base-4_to_base-5/](base-4_to_base-5/) | **Design only** — no base-5 pack yet; see ROADMAP |
+| base-4 → base-5 | [base-4_to_base-5/](base-4_to_base-5/) | **Candidate pack** `v2/base/base-5/` (breaking freeze; pin still base-1) |
 
 ## When you finish a new hop
 

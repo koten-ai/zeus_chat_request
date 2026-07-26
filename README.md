@@ -2,7 +2,7 @@
 
 **Published Zeus V2 chat_request catalogs** for Zeus Client, Developer Helper MCP, demos, and coding agents.
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · **[COMPAT.md](COMPAT.md)** = Zeus × BASE × zeus_client matrix
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate pack **base-5** · **[COMPAT.md](COMPAT.md)** = Zeus × BASE × zeus_client matrix
 
 ![Assembled prompt flow](images/assembled_prompt.svg)
 
@@ -31,7 +31,8 @@
 | Field | Value |
 | --- | --- |
 | **Production BASE** | **base-1** (`CURRENT.json` · [`v2/min/`](v2/min/)) |
-| **Candidate pack** | **base-4** ([`v2/base/base-4/`](v2/base/base-4/)) — not the pin |
+| **Candidate pack** | **base-5** ([`v2/base/base-5/`](v2/base/base-5/)) — last breaking freeze; not the pin |
+| **Prior candidate** | **base-4** ([`v2/base/base-4/`](v2/base/base-4/)) — Diff / history |
 | **Zeus engine (example)** | `0.5.x` (e.g. `0.5.107`) — see [COMPAT.md](COMPAT.md) |
 | **zeus_client (Python)** | `0.1.0` (`kotenai-zeus-client`) — see [COMPAT.md](COMPAT.md) |
 | **Profile** | `v2_min` |

@@ -222,4 +222,8 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
 
 ---
 
-*Captured after the first base-1 → base-4 migration pass (catalog diet, Client model, inspector dual-BASE). Update this file when base-5 lands with anything that surprised you.*
+*Captured after the first base-1 → base-4 migration pass (catalog diet, Client model, inspector dual-BASE).*
+
+**Later:** base-5 wire freeze lessons → [base-4_to_base-5/lessons-learned.md](../base-4_to_base-5/lessons-learned.md).  
+**Zeus 0.6 pin of base-5.2 (filenames, synthetic return, Detective, Helios):**  
+[base-5_to_base-5.2/lessons-learned.md](../base-5_to_base-5.2/lessons-learned.md) — do not re-learn filename/mode parse or Layer A vs Detective here.

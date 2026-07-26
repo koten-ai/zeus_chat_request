@@ -18,26 +18,29 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 
 | Field | Value |
 | --- | --- |
-| **Zeus engine (example latest)** | `0.5.107` (line `0.5.x`) |
-| **chat_request production pin** | **`base-1`** — [`CURRENT.json`](CURRENT.json) · [`v2/min/`](v2/min/) |
-| **chat_request candidate (breaking freeze)** | **`base-5`** — [`v2/base/base-5/`](v2/base/base-5/) (opt-in, **not** pin) |
-| **chat_request prior candidate** | **`base-4`** — [`v2/base/base-4/`](v2/base/base-4/) (history / Diff) |
-| **zeus_client (Python)** | **`0.1.0`** — package `kotenai-zeus-client` (object floor TBD until Client ships) |
+| **Zeus engine 0.5.x line** | e.g. `0.5.107` — still **base-1** runtime for that train |
+| **Zeus engine 0.6.x line** | **`0.6.x`** — **vendors base-5.2** in-engine (`ai/chat_request/PIN.json` + `pinned/min`) — **breaking** vs 0.5 |
+| **chat_request production pin (CURRENT)** | **`base-1`** — [`CURRENT.json`](CURRENT.json) · [`v2/min/`](v2/min/) until stamp + Client + Detective green on CURRENT flip |
+| **chat_request Zeus 0.6 vendor pin** | **`base-5.2`** — pack [`v2/base/base-5.2/`](v2/base/base-5.2/); Zeus may ship this **before** CURRENT flips |
+| **chat_request candidates** | base-5 / base-5.1 / base-5.2 snapshots under `v2/base/` |
+| **zeus_client (Python)** | **`0.1.0`** — object floor TBD until Client ships base-5 wire |
+| **Helios** | **0.6.x** pairs Zeus **0.6.x** (HEL-17); do not run Helios 0.2 Analytics against base-5.2 report shapes |
 | **Envelope** | `_format: "zeus.chat_request.v2"` |
+
+Zeus operator matrix (surface checklist): Zeus repo [`docs/ops/COMPAT.md`](https://github.com/koten-ai/Zeus/blob/5TH/docs/ops/COMPAT.md).
 
 ---
 
 ## 2. Supported triples
 
-| Zeus engine | chat_request BASE | zeus_client | Status | Notes |
-| --- | --- | --- | --- | --- |
-| `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | **supported** | Production pin; required four Layer A |
-| `0.5.x` (current line) | **`base-4`** | `≥ 0.1.0` + optional Layer A G2/G3 | **candidate / history** | Pack on disk; array triggers in schema |
-| `0.5.x` (current line) | **`base-5`** | *TBD* — object rules/triggers; settings; `output_request` | **candidate / wire freeze** | Pack [`v2/base/base-5/`](v2/base/base-5/); no mode overlays; dual-read arrays ≤1 Client release |
-| `0.5.x` (current line) | **`base-5.1`** | *TBD* — base-5 wire + mode overlays | **candidate snapshot** | Pack [`v2/base/base-5.1/`](v2/base/base-5.1/); parent base-5; Diff vs base-5 |
-| `0.5.x` (current line) | **`base-5.2`** | *TBD* — base-5.1 + optional `data_gaps` | **candidate snapshot** | Pack [`v2/base/base-5.2/`](v2/base/base-5.2/); dual gaps design [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md) |
-| *future* | **`base-6+`** | base-5 floor + optional soft injects | **additive only** | No rename/remove of base-5 wire without new major |
-| *future* | promoted pin (`CURRENT`) | matching Client floor | — | Only after stamp + Client + Detective green |
+| Zeus engine | chat_request BASE | zeus_client | Helios | Status | Notes |
+| --- | --- | --- | --- | --- | --- |
+| **`0.6.0` – `0.6.x`** | **`base-5.2`** (vendor) | *TBD* object floor; no dual-read string wish / array triggers | **0.6.x** | **supported (Zeus 0.6 train)** | No dual-compat with base-1 Layer A; report root for Analytics |
+| `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | 0.2.x | **supported (prior)** | Production CURRENT pin path |
+| `0.5.x` | base-4 / base-5 / base-5.1 / base-5.2 packs | *TBD* | — | **candidate / history** | On disk; not 0.5 default pin |
+| `0.6.x` | base-1 | any | any | **unsupported** | Wrong wire for 0.6 Detective/report |
+| *future* | **`base-6+`** | base-5 floor + optional soft injects | matching | **additive only** | No rename/remove of base-5 wire without new major |
+| *future* | promoted pin (`CURRENT` → base-5.2+) | matching Client floor | matching | — | Only after stamp + Client + Detective green |
 
 **Status legend**
 

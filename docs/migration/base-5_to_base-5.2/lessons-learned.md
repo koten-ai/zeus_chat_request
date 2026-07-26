@@ -1,7 +1,7 @@
 # Lessons: base-5 → base-5.2 + Zeus 0.6 / Helios 0.6 pin
 
 **Audience:** agents/humans pinning Zeus (or Client) onto **base-5.2**; next BASE authors; Helios 0.6 Analytics.  
-**Captured:** 2026-07-26 after Zeus **0.6.0 → 0.6.10** Beelink lab (Detective → chat → report → Vault → Contract → Wizard → Hot Paths → docs).  
+**Captured:** 2026-07-26 after Zeus **0.6.0 → 0.6.10** Beelink lab (Detective → chat → report → Vault → Contract → Wizard → Hot Paths → docs) and Helios **0.6.0** H6 cut (Layer A boards + Motions UI).  
 **Related:** [README.md](README.md) · [WISH_I_KNEW_DUAL.md](../../WISH_I_KNEW_DUAL.md) · [base-4→5 lessons](../base-4_to_base-5/lessons-learned.md) · [COMPAT.md](../../../COMPAT.md)
 
 This is **experience**, not a second BIBLE. Prefer pack schema + BIBLE for wire; use this to avoid re-breaking engines and Analytics.
@@ -337,7 +337,7 @@ Do **not** mark engine pin green until:
 6. One known-bad chat (synthetic or empty graph) still **explains** itself in diagnosis  
 7. Chat bubble shows **summary** when content empty; chips optional; no full G2 dump  
 
-Helios 0.6 green is separate: SQL packs + BFF parsers on report root with **ts/scope** predicates (HEL-17…HEL-23).
+Helios **0.6.0** (HEL-17…HEL-23) **shipped** lab: SQL packs + BFF boards + Motions chrome on report root with **ts/scope** predicates. Item-level wish UNNEST remains post-0.6 backlog.
 
 ---
 

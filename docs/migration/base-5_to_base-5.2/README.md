@@ -11,7 +11,7 @@
 
 Production pin (`CURRENT.json`) may still be base-1 while engines **vendor** base-5.2 independently. Do not confuse pack candidate with `CURRENT` flip.
 
-**Zeus lab:** **0.6.0–0.6.10** residual complete (Detective → report → Vault → Contract → Wizard → Hot Paths → COMPAT). **Helios:** H6 / 0.6 next — always WHERE **`t.ts` + `t.scope`** on Analytics (`idx_traces_ts_scope`).
+**Zeus lab:** **0.6.0–0.6.10** residual complete (Detective → report → Vault → Contract → Wizard → Hot Paths → COMPAT). **Helios lab:** **0.6.0** H6 cut (Layer A / dual gaps) — always WHERE **`t.ts` + `t.scope`** on Analytics (`idx_traces_ts_scope`).
 
 ## Docs
 

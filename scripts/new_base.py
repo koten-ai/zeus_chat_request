@@ -460,8 +460,9 @@ def main(argv: list[str] | None = None) -> int:
     print("  2. re-export text + refresh MANIFEST + scan_catalogs")
     print("  3. python3 scripts/verify_base_pack.py --base", base_n, "  # must OK before PR")
     print("  4. fill docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md")
-    print("     (template: docs/migration/RELEASE_CHECKLIST_TEMPLATE.md — phases A–G)")
-    print("  5. see docs/CREATE_BASE.md + docs/BASE_AGENT_PLAYBOOK.md")
+    print("     (template: docs/migration/RELEASE_CHECKLIST_TEMPLATE.md — phases A–G + Jira §9)")
+    print("  5. after pack ships: update/create CR board tickets (checklist §9)")
+    print("  6. see docs/CREATE_BASE.md + docs/BASE_AGENT_PLAYBOOK.md")
     return 0
 
 

@@ -75,3 +75,13 @@ These stay open until green — do **not** flip `CURRENT.json`:
 1. **zeus_client** — object rules/triggers, settings bag, output_request type+description, policy table, app_output validate, dual-read ≤1 release.  
 2. **Zeus** — loaders `*_base-5.json`, return/Detective allow object triggers + optional app_output, lineage stamp path.  
 3. **Pin** — only after stamp + Client + Detective (see CR pin epic / checklist §8).
+
+## 11. Jira is part of the ship (Phase J)
+
+Pack on `main` without a board update leaves CR epics stuck on “To Do / design only.” After every BASE pack:
+
+1. Rewrite the base-Y **epic** (status, PR links, residual).  
+2. **Create** Client + Zeus residual stories if missing; **blocks** pin epic.  
+3. Refresh next-BASE and pin-promote epics.  
+
+Checklist: [RELEASE_CHECKLIST §9](RELEASE_CHECKLIST.md) · Board: [CR board 48](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48) · base-5 example: **CR-3** + **CR-19…CR-22**.

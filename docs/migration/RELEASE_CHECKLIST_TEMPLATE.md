@@ -32,6 +32,9 @@ python3 scripts/verify_base_pack.py --base Y
 | **E — Docs ship** | Same PR as pack | RELEASE_NOTES + COMPAT + hop checklist + playbook |
 | **F — External** | Separate tickets | Zeus + zeus_client green (may lag pack) |
 | **G — Pin** | Later | Stamp + Client + Detective → only then `CURRENT.json` |
+| **J — Jira / CR board** | After pack lands (and when scope changes) | Epic + residual stories accurate; PR links; pin gate not confused with pack ship |
+
+**Board:** [CR board](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48) · project **CR** (`chat_request`)
 
 **P0 process rules (from base-5 ship):**
 
@@ -39,7 +42,8 @@ python3 scripts/verify_base_pack.py --base Y
 2. **Schema + return tool params together** — Detective/Client drift if only one side moves.  
 3. **Re-export text after every min JSON edit.**  
 4. **No invented production `contract_hash`.**  
-5. **Pin last** — candidate pack on main is fine; pin flip is a separate gate.
+5. **Pin last** — candidate pack on main is fine; pin flip is a separate gate.  
+6. **Jira after pack** — update/create CR tickets so residual Client/Zeus work is not invisible (see §9).
 
 ---
 
@@ -50,7 +54,7 @@ python3 scripts/verify_base_pack.py --base Y
 - [ ] Confirm **breaking vs additive** (base-5 = last break; base-6+ additive only)  
 - [ ] Read hop notes if any: `docs/migration/base-X_to_base-Y/`  
 - [ ] Know production pin still (`CURRENT.json`) — do **not** flip until §8 / Phase G  
-- [ ] Open or update CR board tickets for pack + Zeus + Client residual work  
+- [ ] Confirm CR epic exists for this BASE (create if missing); link ROADMAP theme  
 
 ---
 
@@ -178,6 +182,47 @@ _Fill for this hop — see hop-specific RELEASE_CHECKLIST for base-5._
 - [ ] Client spike green  
 - [ ] Detective green  
 - [ ] `CURRENT.json` + `v2/min` only after explicit promote  
+- [ ] Pin epic/story (e.g. CR-18 style) prerequisites checked; not the same ticket as pack ship  
+
+---
+
+## 9. Jira / CR board (Phase J — required after pack ship)
+
+**When:** same day the pack PR merges (or is open for review), and again when Client/Zeus land.  
+**Where:** [CR board 48](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48) · project key **`CR`**.
+
+Do **not** leave the board saying “To Do / design only” when the pack is already on `main`.
+
+### After pack candidate ships (or pack PR is ready)
+
+- [ ] **Update** the base-Y **epic** summary + description: pack path, PR link(s), pin still base-?, residual open  
+- [ ] **Transition** epic to a status that matches reality (e.g. In Progress while Client/Zeus open; not left as pure To Do)  
+- [ ] **Comment** on the epic with ship date + PR numbers + “pin not flipped”  
+- [ ] **Update** existing child stories: mark pack/docs acceptance done; leave Client/Zeus boxes open; fix stale branch links → `main`  
+- [ ] **Create** residual stories under the epic if missing (typical split):  
+  - [ ] Process / verify gate (if process PR separate)  
+  - [ ] Pack/docs completion tracker (optional)  
+  - [ ] **zeus_client** implement base-Y (inject/parse/validate)  
+  - [ ] **Zeus** loaders / return schema / Detective  
+- [ ] **Link** Client + Zeus stories as **blocks** pin-promote epic (so pin cannot look “ready” early)  
+- [ ] **Update next BASE epic** (e.g. base-Y+1): depends-on note + additive-only law if applicable  
+- [ ] **Update pin-promote epic** prerequisites checklist (pack done / Client open / Zeus open / stamp)
+
+### Suggested ticket shape
+
+| Kind | Example summary | Parent |
+| --- | --- | --- |
+| Epic | `[base-Y] Candidate pack shipped — Client + Zeus residual` | — |
+| Story | `[base-Y] zeus_client: …` | base-Y epic |
+| Story | `[base-Y] Zeus: loaders / Detective / return schema` | base-Y epic |
+| Story | `[base-Y] Process: verify_base_pack + checklist` | base-Y epic |
+| Epic (later) | Pin promote CURRENT | separate; blocked by Client+Zeus |
+
+### What not to do
+
+- Do not close the base-Y epic when only the **pack** landed if Client/Zeus residual is real work.  
+- Do not flip pin tickets to Done without stamp + green.  
+- Do not invent contract hashes in ticket descriptions as if production-stamped.
 
 ---
 
@@ -188,3 +233,4 @@ _Fill for this hop — see hop-specific RELEASE_CHECKLIST for base-5._
 | Catalog / docs | | |
 | Zeus | | |
 | zeus_client | | |
+| CR board hygiene | | |

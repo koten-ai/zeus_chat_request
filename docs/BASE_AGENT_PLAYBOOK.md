@@ -114,7 +114,10 @@ Execute in order. Skip only if the hop folder says “design only” and you are
      GUIDE.md + lessons-learned.md + RELEASE_CHECKLIST.md
 11. Update this playbook: §2 card for Y + §4 jump row
 12. Inspector Diff: same mode base-X vs base-Y
-13. Client spike + Hub stamp BEFORE CURRENT.json pin flip
+13. Jira / CR board (Phase J): update base-Y epic, create residual
+    zeus_client + Zeus stories, blocks pin epic — checklist §9
+    Board: https://kotenai.atlassian.net/jira/software/projects/CR/boards/48
+14. Client spike + Hub stamp BEFORE CURRENT.json pin flip
 ```
 
 **Master checklist:** [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-5: [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md)

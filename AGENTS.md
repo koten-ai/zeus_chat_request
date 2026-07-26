@@ -33,6 +33,7 @@
 | **Comply with a given `base-X`** (catalog + Zeus + Client) | [BASE_AGENT_PLAYBOOK.md §2](docs/BASE_AGENT_PLAYBOOK.md) |
 | **Upgrade `base-X` → `base-Y`** | [BASE_AGENT_PLAYBOOK.md §3–4](docs/BASE_AGENT_PLAYBOOK.md) + `docs/migration/base-X_to_base-Y/` |
 | **BASE bump release checklist** | [RELEASE_CHECKLIST_TEMPLATE.md](docs/migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-5: [base-4_to_base-5/RELEASE_CHECKLIST.md](docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md) |
+| **After pack: Jira / CR board** | Checklist **§9** — update epic + create Client/Zeus residual · [CR board](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48) |
 | **Scaffold a new pack on disk** | [docs/CREATE_BASE.md](docs/CREATE_BASE.md) · `scripts/new_base.py` |
 | **Normative Layer A / ownership** | [docs/BIBLE.md](docs/BIBLE.md) |
 | **What is planned next** | [docs/ROADMAP.md](docs/ROADMAP.md) |

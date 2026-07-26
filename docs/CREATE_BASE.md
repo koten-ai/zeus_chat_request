@@ -92,7 +92,9 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
 7. Fill hop RELEASE_CHECKLIST + GUIDE (+ lessons)
 8. Update ROADMAP + RELEASE_NOTES + COMPAT + BASE_AGENT_PLAYBOOK
 9. Diff in index.html (parent mode vs new mode)
-10. Open CR tickets for Zeus + Client residual work (pack can land first)
+10. Jira / CR board (Phase J — required after pack ship):
+     update base-N epic + create residual Client/Zeus stories;
+     link blockers to pin epic; see RELEASE_CHECKLIST §9
 11. Client spike + stamp path before CURRENT pin
 ```
 

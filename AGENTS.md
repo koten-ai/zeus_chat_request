@@ -7,6 +7,7 @@
 | --- | --- |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
 | **Candidate pack (breaking freeze)** | **base-5** — `v2/base/base-5/` (not pin) |
+| **Next content train** | **base-5.1** — mode overlays in system prompt ([docs/MODE.md](docs/MODE.md) · [work/RECREATE_MODE.md](work/RECREATE_MODE.md) · **CR-23**) |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` (Diff / history) |
 | **Versions** | [COMPAT.md](COMPAT.md) — Zeus × BASE × zeus_client |
 | **Full AI procedure** | [docs/BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) |
@@ -34,6 +35,8 @@
 | **Upgrade `base-X` → `base-Y`** | [BASE_AGENT_PLAYBOOK.md §3–4](docs/BASE_AGENT_PLAYBOOK.md) + `docs/migration/base-X_to_base-Y/` |
 | **BASE bump release checklist** | [RELEASE_CHECKLIST_TEMPLATE.md](docs/migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-5: [base-4_to_base-5/RELEASE_CHECKLIST.md](docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md) |
 | **After pack: Jira / CR board** | Checklist **§9** — update epic + create Client/Zeus residual · [CR board](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48) |
+| **zeus_client backlog** | [docs/ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](docs/ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) (ZC-WISH · base-5 floor) |
+| **Modes (engine vs catalog)** | [docs/MODE.md](docs/MODE.md) · restore plan [work/RECREATE_MODE.md](work/RECREATE_MODE.md) |
 | **Scaffold a new pack on disk** | [docs/CREATE_BASE.md](docs/CREATE_BASE.md) · `scripts/new_base.py` |
 | **Normative Layer A / ownership** | [docs/BIBLE.md](docs/BIBLE.md) |
 | **What is planned next** | [docs/ROADMAP.md](docs/ROADMAP.md) |

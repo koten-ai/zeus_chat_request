@@ -195,6 +195,8 @@ Do **not** invent Zeus Version bumps solely for docs; bump engine when behavior/
 | Policy table | base-5: triggers → flags → message_* |
 | Package version | Bump only when behavior ships; update COMPAT Client column |
 
+**Prioritized backlog (Requests):** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) (`ZC-WISH-*`, base-5 floor first).
+
 ---
 
 ## 7. Agent reading order

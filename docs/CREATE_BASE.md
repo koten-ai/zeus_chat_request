@@ -148,5 +148,6 @@ Use the hop **[RELEASE_CHECKLIST](migration/RELEASE_CHECKLIST_TEMPLATE.md)** (fu
 | [ROADMAP.md](ROADMAP.md) | What base-5+ should contain |
 | [migration/](migration/) | All hops (`base-X_to_base-Y`) |
 | [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) | AI comply / upgrade procedures |
+| [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) | Client implement backlog after pack lands |
 | [../AGENTS.md](../AGENTS.md) | Repo AI entry |
 | [../v2/base/base-4/](../v2/base/base-4/) | Reference pack layout |

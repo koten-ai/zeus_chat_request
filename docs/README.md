@@ -1,6 +1,6 @@
 # Documentation
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate pack **base-5** · prior candidate **base-4** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 Educational and design docs for **zeus_chat_request**.  
@@ -52,6 +52,9 @@ COMPAT.md                      ← Zeus × BASE × zeus_client
 | [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Middleman multi-round |
 | [INSPECTOR.md](INSPECTOR.md) | One `index.html` for multi-BASE |
 | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Helios emit requests (cost-aware) |
+| [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) | **zeus_client** backlog (base-5 floor → base-6+) |
+| [MODE.md](MODE.md) | **Modes** — engine vs catalog; why packs converged; overlay model |
+| [../work/RECREATE_MODE.md](../work/RECREATE_MODE.md) | **Plan** — restore mode overlays into system prompt (`messages[].content`) |
 | [../images/assembled_prompt.svg](../images/assembled_prompt.svg) | Diagram |
 
 ## Migration hops
@@ -60,7 +63,7 @@ COMPAT.md                      ← Zeus × BASE × zeus_client
 | --- | --- |
 | Index | [migration/README.md](migration/README.md) |
 | base-1 → base-4 | [migration/base-1_to_base-4/](migration/base-1_to_base-4/) |
-| base-4 → base-5 | [migration/base-4_to_base-5/](migration/base-4_to_base-5/) (design stub) |
+| base-4 → base-5 | [migration/base-4_to_base-5/](migration/base-4_to_base-5/) (candidate pack on disk; pin still base-1) |
 
 ## Pack on disk (base-4 catalogs)
 

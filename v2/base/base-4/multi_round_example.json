@@ -1,0 +1,119 @@
+{
+  "_note": "Illustrative two-round zeus_client session (not a live trace). messages[] is append-only.",
+  "session_id": "sess_001",
+  "catalog": {
+    "mode": "analytics",
+    "base_id": "base-4",
+    "file": "chat_request_analytics_base-4.json"
+  },
+  "injects": {
+    "scope": "beer-sample/_default",
+    "business_injection": {
+      "rules": ["", "if they mention a coupon, note coupon applicable"]
+    }
+  },
+  "control": {
+    "zeus_round": 2,
+    "max_rounds": 8,
+    "flags": {}
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "<base-4 system + SCOPE BRIEF + MINI-SCHEMA + rules — truncated in this example>"
+    },
+    {
+      "role": "user",
+      "content": "Top 5 highest ABV beers with name and abv"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "call_1",
+          "type": "function",
+          "function": {
+            "name": "pipeline",
+            "arguments": "{\"steps\":[{\"as\":\"cands\",\"verb\":\"find\",\"entity_type\":\"Beer\",\"limit\":100},{\"as\":\"ord\",\"verb\":\"order\",\"ids\":\"@cands.ids\",\"by\":\"abv\",\"direction\":\"desc\"},{\"as\":\"top\",\"verb\":\"project\",\"ids\":\"@ord.ids\",\"fields\":[\"name\",\"abv\"],\"limit\":5}]}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call_1",
+      "content": "{\"top\":{\"rows\":[{\"id\":\"beer:1\",\"name\":\"Skull Crusher\",\"abv\":12.5},{\"id\":\"beer:2\",\"name\":\"Barley Monster\",\"abv\":11.8},{\"id\":\"beer:3\",\"name\":\"Night Oil\",\"abv\":11.2},{\"id\":\"beer:4\",\"name\":\"Iron Bock\",\"abv\":10.9},{\"id\":\"beer:5\",\"name\":\"Forge Ale\",\"abv\":10.5}]}}"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "call_2",
+          "type": "function",
+          "function": {
+            "name": "return",
+            "arguments": {
+              "summary": "Top 5 highest ABV beers: Skull Crusher 12.5%, Barley Monster 11.8%, Night Oil 11.2%, Iron Bock 10.9%, Forge Ale 10.5%.",
+              "confidence": "high",
+              "query_decomposition": {
+                "intent": "Top",
+                "entity": "Beer",
+                "attribute": "abv"
+              },
+              "decomposition": {
+                "targets": [{ "entity_type": "Beer", "focus": ["name", "abv"] }],
+                "predicates": {},
+                "output": "rows"
+              },
+              "policy_action": "answer",
+              "subject_confidence": 0.93,
+              "jail_break_attempt": 0.0,
+              "wish_i_knew": [],
+              "business_rules_triggers": [false, false],
+              "node_refs": ["beer:1", "beer:2", "beer:3", "beer:4", "beer:5"],
+              "entity_refs": [],
+              "provenance": [{ "step": "pipeline", "as": "top" }]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "tool_log": [
+      { "round": 1, "tool_call_id": "call_1", "verb": "pipeline", "status": "ok", "latency_ms": 12 }
+    ],
+    "tables": [
+      {
+        "source": "call_1",
+        "columns": ["name", "abv"],
+        "rows": [
+          { "id": "beer:1", "name": "Skull Crusher", "abv": 12.5 },
+          { "id": "beer:2", "name": "Barley Monster", "abv": 11.8 },
+          { "id": "beer:3", "name": "Night Oil", "abv": 11.2 },
+          { "id": "beer:4", "name": "Iron Bock", "abv": 10.9 },
+          { "id": "beer:5", "name": "Forge Ale", "abv": 10.5 }
+        ]
+      }
+    ],
+    "entities": {
+      "beer:1": { "name": "Skull Crusher", "abv": 12.5 },
+      "beer:2": { "name": "Barley Monster", "abv": 11.8 },
+      "beer:3": { "name": "Night Oil", "abv": 11.2 },
+      "beer:4": { "name": "Iron Bock", "abv": 10.9 },
+      "beer:5": { "name": "Forge Ale", "abv": 10.5 }
+    },
+    "last_terminate": {
+      "summary": "Top 5 highest ABV beers: Skull Crusher 12.5%, Barley Monster 11.8%, Night Oil 11.2%, Iron Bock 10.9%, Forge Ale 10.5%.",
+      "confidence": "high",
+      "policy_action": "answer",
+      "subject_confidence": 0.93,
+      "jail_break_attempt": 0.0,
+      "wish_i_knew": [],
+      "business_rules_triggers": [false, false],
+      "node_refs": ["beer:1", "beer:2", "beer:3", "beer:4", "beer:5"]
+    }
+  }
+}

@@ -6,7 +6,10 @@
 
 | Related | |
 | --- | --- |
-| Catalogs | [`v2/min/`](v2/min/) · [`v2/base/`](v2/base/) · [CHAT_REQUEST.md](CHAT_REQUEST.md) |
+| Catalogs | [`v2/min/`](../v2/min/) · [`v2/base/`](../v2/base/) · [CHAT_REQUEST.md](CHAT_REQUEST.md) |
+| Prompt assembly | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [simple_layout.txt](simple_layout.txt) (admin terminate fields vs user summary; keep emits cheap) |
+| BASE roadmap | [ROADMAP.md](ROADMAP.md) — which HEL-WISH lands in base-5/6/7 (cheap Zeus/Client first) |
+| Release notes | [RELEASE_NOTES.md](../RELEASE_NOTES.md) — breaking changes when opting into base-4 |
 | Helios today | `QUERY_DECOMPOSITION` on report · Explore live charts |
 | Process | Each item is a **Request** — not a committed schema until accepted into a BASE / Zeus emit |
 

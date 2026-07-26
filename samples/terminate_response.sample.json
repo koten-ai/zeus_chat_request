@@ -1,0 +1,69 @@
+{
+  "_format": "zeus.terminate.v0",
+  "_note": "Authoring sample for zeus_client — not a stamped production schema yet. Flat object on the wire; Client splits audiences.",
+
+  "round": 1,
+  "policy_action": "clarify",
+
+  "summary": "I can help you find rooms and check offers we actually have. I see you mentioned coupon SAVE20 — if it matches a valid offer for your stay, we can apply it after we know city and dates. What city and check-in/check-out are you looking at?",
+
+  "confidence": "med",
+
+  "query_decomposition": {
+    "intent": "Book",
+    "entity": "Hotel",
+    "geo": null,
+    "theme": null,
+    "price": null,
+    "audience": null,
+    "occasion": null,
+    "parts": null,
+    "other": {
+      "coupon_code_mentioned": "SAVE20"
+    }
+  },
+
+  "decomposition": {
+    "intent": "find rooms / apply coupon if valid",
+    "targets": [
+      { "entity_type": "Hotel", "focus": ["city", "dates", "price"] }
+    ],
+    "predicates": {},
+    "output": "rows",
+    "context": {
+      "needs": ["city", "check_in", "check_out"]
+    }
+  },
+
+  "node_refs": [],
+  "entity_refs": [],
+  "provenance": [],
+
+  "admin": {
+    "subject_confidence": 0.72,
+    "jail_break_attempt": 0.55,
+    "wish_i_knew": [
+      {
+        "what": "city and stay dates",
+        "kind": "message",
+        "why": "cannot search inventory or validate coupon without a stay window",
+        "severity": "med"
+      },
+      {
+        "what": "whether free-night giveaways are an authorized promo in catalog",
+        "kind": "rules",
+        "why": "user asked for a free-night sequence; no allowlisted promo rule present",
+        "severity": "low"
+      }
+    ],
+    "refusal_reason_code": null
+  },
+
+  "client": {
+    "business_rules_triggers": [false, true, true],
+    "business_rules_detail": [
+      { "index": 1, "triggered": true, "note": "SAVE20 mentioned" },
+      { "index": 2, "triggered": true, "note": "free-night roleplay / invent-promo pressure" }
+    ]
+  }
+}

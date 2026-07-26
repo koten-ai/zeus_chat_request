@@ -16,14 +16,24 @@ ROOT = Path(__file__).resolve().parents[1]
 V2 = ROOT / "v2"
 OUT = ROOT / "catalog-index.json"
 
-# chat_request_auto_v2_min.json → auto
-# chat_request_auto.json → auto
-_MODE_RE = re.compile(r"^chat_request_(.+?)(?:_v\d+(?:_min)?)?\.json$", re.I)
+# Filename → mode when _lineage.mode is absent:
+#   chat_request_auto_v2_min.json              → auto
+#   chat_request_analytics_base-4.json         → analytics
+#   chat_request_analytics_base-2-prototype.json → analytics
+#   chat_request_analytics_base-4_cus_travel-sample_default-1.json → analytics
+# Prefer data["_lineage"]["mode"] when present (see main()).
 
 
 def mode_from_name(name: str) -> str:
-    m = _MODE_RE.match(name)
-    return m.group(1) if m else Path(name).stem
+    stem = Path(name).stem
+    if not stem.startswith("chat_request_"):
+        return stem
+    rest = stem[len("chat_request_") :]
+    # strip custom + base suffixes first (…_base-4_cus_bucket_scope-1)
+    rest = re.sub(r"_cus_.*$", "", rest, flags=re.I)
+    rest = re.sub(r"_base-\d+(?:-prototype)?$", "", rest, flags=re.I)
+    rest = re.sub(r"_v\d+(?:_min)?$", "", rest, flags=re.I)
+    return rest or stem
 
 
 def folder_label(rel: Path) -> str:
@@ -35,16 +45,21 @@ def folder_label(rel: Path) -> str:
 
 
 def sort_key(entry: dict) -> tuple:
-    """Prefer latest alias v2/min first, then BASE pins, then mode name."""
-    folder = entry.get("folder") or ""
+    """Newest / highest BASE first (base-4 → base-1 → v2/min pin), then mode.
+
+    Inspector dropdown + Matrix both rely on this order.
+    """
+    folder = (entry.get("folder") or "").replace("\\", "/")
     mode = entry.get("mode") or ""
-    if folder == "v2/min":
-        group = 0
-    elif "/base/" in folder:
-        group = 1
-    else:
-        group = 2
-    return (group, folder, mode)
+    base_id = str(entry.get("base_id") or "")
+    hay = f"{base_id} {folder}"
+    m = re.search(r"base-(\d+)", hay, flags=re.I)
+    n = int(m.group(1)) if m else 0
+    proto = 1 if re.search(r"prototype", hay, flags=re.I) else 0
+    # Production pin last within the same generation
+    is_v2_min = 1 if folder == "v2/min" else 0
+    # Higher n first: negate. Formal pack before prototype. base/base-N before v2/min.
+    return (-n, proto, is_v2_min, folder, mode)
 
 
 def main() -> None:
@@ -75,6 +90,7 @@ def main() -> None:
                 "profile": lin.get("profile") or data.get("_format"),
                 "format": data.get("_format"),
                 "version": data.get("_version"),
+                "prototype": bool(lin.get("prototype")),
                 "verb_count": len(data.get("verbs") or []),
                 "contract": data.get("contract") or {},
                 "sha256": hashlib.sha256(raw).hexdigest(),

@@ -1,112 +1,137 @@
 # zeus_chat_request
 
-**Published Zeus V2 chat_request catalogs** for clients, demos, and integrators.
+**Published Zeus V2 chat_request catalogs** for Zeus Client, Developer Helper MCP, demos, and coding agents.
 
-## Helios (insights wishlist)
+![Assembled prompt flow](images/assembled_prompt.svg)
 
-Helios Motions read terminating-turn facets from Analytics. Fields we want catalogs + Zeus to emit (geo_norm, price_norm, outcome quality, …) live in:
+*One model round: **PROMPT** = rules **+** client inject **+** messages (one request) → LLM ↔ Zeus → **OUTPUT** = Layer A terminate (G1/G2/G3). See [docs/PROMPT_ASSEMBLY.md](docs/PROMPT_ASSEMBLY.md).*
 
-**→ [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)**  
-Branch: `helios-beta` until merged. Not a committed schema change — design input for guidance / BASE bumps.
+---
+
+## Documentation
+
+| Doc | Topic |
+| --- | --- |
+| **[docs/](docs/)** | All education / design docs |
+| [docs/PROMPT_ASSEMBLY.md](docs/PROMPT_ASSEMBLY.md) | Assembled prompt wire order (base-4 design) |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | base-5 / base-6+ + Helios |
+| [docs/JAILBREAK_POLICY.md](docs/JAILBREAK_POLICY.md) | Score + rules[] + hooks + examples |
+| [docs/CHAT_REQUEST.md](docs/CHAT_REQUEST.md) | What a catalog is, contracts, Client vs Hub |
+| [docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Helios emit wishlist |
+| [v2/base/base-4/BIBLE.md](v2/base/base-4/BIBLE.md) | Full base-4 requirements |
+| [RELEASE_NOTES.md](RELEASE_NOTES.md) | Releases + **breaking changes** |
+| [COMPAT.md](COMPAT.md) | Zeus semver ↔ BASE |
+
+---
 
 ## Current pin
 
 | Field | Value |
 | --- | --- |
-| **BASE** | `base-1` (see `CURRENT.json`) |
+| **Production BASE** | **base-1** (`CURRENT.json` · [`v2/min/`](v2/min/)) |
+| **New BASE line** | **base-4** ([`v2/base/base-4/`](v2/base/base-4/)) — not yet production pin |
 | **Profile** | `v2_min` |
-| **Paths** | `v2/base/base-1/min/` (immutable) · `v2/min/` (latest alias) |
+| **Format** | `zeus.chat_request.v2` |
 
-Each catalog JSON includes `_lineage.base_id`. Customs (Workbench) will set `custom_id` + parent BASE (ZE-223).
+Each catalog JSON includes `_lineage.base_id`. Customs (Workbench):  
+`chat_request_<mode>_base-<N>_cus_<bucket>_<scope>-<rev>.json`.
 
-See **COMPAT.md** for Zeus version ↔ BASE ranges. Process: CR-1 / ZE-222.
+See [COMPAT.md](COMPAT.md) · process CR-1 / board [CR](https://kotenai.atlassian.net/jira/software/projects/CR/boards/48).
 
----
-
-
-# zeus_chat_request
-
-**Published Zeus V2 chat_request catalogs** for:
-
-- [Zeus Client](https://github.com/koten-ai/zeus_client_python) (`kotenai-zeus-client`)
-- Developer Helper MCP ([ZDH](https://kotenai.atlassian.net/jira/software/projects/ZDH/boards/45))
-- Demos and coding agents
-
-These are the **min** profile snapshots (`*_v2_min.json`) — currently the best default for integrators (smaller wire payload, full verb surface).
+### base-4 (new chat_request line)
 
 | | |
 | --- | --- |
-| **Profile** | `v2_min` |
-| **Format** | `zeus.chat_request.v2` |
-| **Layout** | [`v2/min/`](v2/min/) |
-| **Index** | [`manifest.json`](manifest.json) |
-
-## Catalog structure map (Hub-style)
-
-**[index.html](index.html)** — visual AI Catalog layout for published `v2/min` files:
-
-- **Don’t edit (Rules)** vs **Editable (guidance)** vs **On the wire**
-- What min is **missing** vs full engine profile
-- Evidence-loop terminate contract checklist
-- **JSON only** view + org plan
+| **JSON** | `v2/base/base-4/min/chat_request_<mode>_base-4.json` |
+| **Text** | `v2/base/base-4/text/chat_request_<mode>_base-4.txt` |
+| **Bible** | [BIBLE.md](v2/base/base-4/BIBLE.md) |
+| **base-1 → base-4** | [BASE_1_TO_BASE_4_GUIDE.md](v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md) |
+| **Multi-round Client** | [MULTI_ROUND_CLIENT.md](v2/base/base-4/MULTI_ROUND_CLIENT.md) |
+| **Inspector notes** | [INSPECTOR.md](v2/base/base-4/INSPECTOR.md) |
 
 ```bash
-python3 -m http.server 8766 --bind 127.0.0.1
-# open http://127.0.0.1:8766/index.html
+python3 scripts/export_base_text.py --from v2/base/base-4/min --base 4 --out v2/base/base-4 --no-set-base-id
 ```
 
-### Docker Compose (port 3333)
+### Other packs
+
+| Pack | Role |
+| --- | --- |
+| `v2/base/base-1/` + `v2/min/` | Production pin (legacy `*_v2_min.json`) |
+| `v2/base/base-2-prototype/` | Earlier Layer A design fork (history / Diff) |
+| `v2/base/base-3-prototype/` | Text-export experiment |
+
+---
+
+## Catalog inspector (`index.html`)
+
+Raw chat_request JSON is large and easy to get lost in. **[index.html](index.html)** is a local web UI that maps one catalog into **colored parts** so you can see what ships in the BASE, what the Client injects at runtime, and how terminate / output is shaped — without scrolling a 15KB+ blob.
+
+Open it after a catalog scan (static site; no backend):
 
 ```bash
 docker compose up
-# open http://localhost:3333/   (or /index.html)
-```
+# http://localhost:3333/
 
-On start, `scripts/scan_catalogs.py` rebuilds **`catalog-index.json`** from every
-`v2/**/chat_request*.json` so the mode dropdown lists **all** folders (e.g. `min`
-and `base/base-1/min`), not only the latest alias. Then a static server serves the
-repo root on port **3333**.
-
-Without Docker:
-
-```bash
-python3 scripts/scan_catalogs.py
+# or without Docker:
+python3 scripts/scan_catalogs.py          # builds catalog-index.json
 python3 -m http.server 3333 --bind 127.0.0.1
+# http://127.0.0.1:3333/
 ```
 
-### Inspector views (`index.html`)
+### What it shows
 
-| View | Purpose |
+| View | Use it for |
 | --- | --- |
-| **Structure** | Anatomy, stamp health, assembly storyboard, prompt outline, tiles / full JSON, wire vs inject, output scheme |
-| **Size map** | One treemap: Full catalog vs Wire payload · Zeus API base % |
-| **Diff** | Compare two catalogs (mode/BASE dropdowns, paste, or upload) · section + prompt line diff · API impact notes |
-| **Matrix** | Fingerprint table across all scanned files (hash, prompt σ, terminate, sizes) |
-| **Export brief** | Download a Markdown integrator brief for the selected catalog |
+| **Structure** | Five tabs (full width): **Overview** · **Assembly** (wire order) · **Catalog** (tiles/JSON) · **Wire** · **Output**. |
+| **Size map** | Byte/token-ish weight of sections — **Full catalog** vs **Wire payload** (what tends to hit the model). |
+| **Diff** | Side-by-side two catalogs (e.g. base-1 pin vs base-4 same mode). |
+| **Matrix** | Fingerprints across every `v2/**/chat_request*.json` — click a row to open it in Structure. |
+| **Export brief** | Download a Markdown integrator brief for the selected file. |
 
-Deep links (examples):
+**Mode dropdown** lists every scanned file as `folder · mode · base_id` (and prototype flags when present). The badge shows `_lineage.base_id`.
+
+### Color legend (same palette as the diagram above)
+
+These chips match the Structure map and [images/assembled_prompt.svg](images/assembled_prompt.svg):
+
+| Color | Meaning |
+| --- | --- |
+| **RED · Rules** | In the catalog / Contract — changing it changes the **hashed** stamp. |
+| **GREEN · Editable / transcript** | Messages and output-shaped areas the Client grows over rounds. |
+| **BLUE · Inject** | Client / Zeus runtime inject (scope brief, business rules, session) — **not** hashed with the BASE. |
+| **PURPLE · Meta** | Lineage, envelope, Layer A–related meta. |
+
+In-app **Help** explains the chapters in more detail. Deeper notes: [v2/base/base-4/INSPECTOR.md](v2/base/base-4/INSPECTOR.md).
+
+### Deep links
 
 ```text
-#view=diff&a=v2/min/chat_request_auto_v2_min.json&b=v2/min/chat_request_analytics_v2_min.json
+#view=diff&a=v2/min/chat_request_analytics_v2_min.json&b=v2/base/base-4/min/chat_request_analytics_base-4.json
 #view=matrix
-#view=size&sizeMode=wire&file=v2/min/chat_request_auto_v2_min.json
+#view=size
+#struct=assembly
+#struct=catalog
+#struct=output
 ```
 
-## Learn the format
+Tip: first migration check is **Diff** the same mode from `v2/min` (base-1) against `v2/base/base-4/min` (base-4).
 
-**[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.
+---
 
 ## Why this repo exists
 
-Historically catalogs lived only inside the Zeus engine tree (`Zeus/ai/V2/…`). Clients and helpers should **not** need a full Zeus source checkout to obtain mode templates.
+Historically catalogs lived only inside the Zeus engine tree. Clients should **not** need a full Zeus checkout for mode templates.
 
 | Role | Location |
 | --- | --- |
-| **Generator / engine embed** | [koten-ai/Zeus](https://github.com/koten-ai/Zeus) `ai/V2/` (prompts + `ai-snapshot`) |
-| **Distribution (this repo)** | `v2/min/*.json` for Client / MCP / docs |
-| **Live / production** | **Stamp on your Zeus** (Hub verify/stamp) then sync to the client |
+| Generator / engine | [koten-ai/Zeus](https://github.com/koten-ai/Zeus) `ai/V2/` |
+| Distribution (this repo) | `v2/min/` (pin) · `v2/base/base-N/` |
+| Production | **Stamp on your Zeus** then Client sync |
 
-## Catalogs (modes)
+---
+
+## Catalogs (production pin — base-1)
 
 | Mode | File |
 | --- | --- |
@@ -121,14 +146,32 @@ Historically catalogs lived only inside the Zeus engine tree (`Zeus/ai/V2/…`).
 | research | `v2/min/chat_request_research_v2_min.json` |
 | tenant | `v2/min/chat_request_tenant_v2_min.json` |
 
-Machine index: `manifest.json` (`mode`, `sha256`, `verb_count`, embedded `contract` metadata from generation).
+Machine index: `manifest.json`. Full scan: `catalog-index.json` (`scripts/scan_catalogs.py`).
+
+---
+
+## File naming
+
+| Kind | Pattern | Example |
+| --- | --- | --- |
+| **BASE** | `chat_request_<mode>_base-<N>.json` | `chat_request_analytics_base-4.json` |
+| **Custom** | `…_base-<N>_cus_<bucket>_<scope>-<rev>.json` | `…_cus_travel-sample_default-1.json` |
+| **Legacy pin** | `chat_request_<mode>_v2_min.json` | base-1 / `v2/min` |
+
+`_format: "zeus.chat_request.v2"` is the **envelope**, not the file stem.
+
+---
 
 ## Critical rules
 
-1. **Do not invent production `contract_hash` values.** Templates here may include a generation-time hash; **your** Zeus stamp is authoritative after verify/stamp.
-2. Prefer **`sync_chat_requests`** from a live Zeus after ops stamps for that scope.
-3. Use this repo for **bootstrapping demos**, offline scaffolds, Dev Helper MCP `fetch_chat_request` fallbacks, and docs examples.
-4. Full (non-min) engine snapshots still regenerate inside Zeus (`ai/V2/chat_request_*_v2.json`) for Hub A/B; integrators should start with **min**.
+1. **Do not invent production `contract_hash` values.** Hub stamp is authoritative.  
+2. Prefer **`sync_chat_requests`** from live Zeus after stamp.  
+3. Use this repo for demos, scaffolds, MCP fallbacks, docs.  
+4. Full (non-min) engine snapshots stay under Zeus `ai/V2/` for Hub A/B.  
+5. **Do not over-stuff prompts** — short indexed `rules[]`; company_context ≤150/250 words; see PROMPT_ASSEMBLY budget.  
+6. Opt-in **base-4** has **breaking** filename/schema deltas — see [RELEASE_NOTES.md](RELEASE_NOTES.md).
+
+---
 
 ## Use with Zeus Client (Python)
 
@@ -136,55 +179,24 @@ Machine index: `manifest.json` (`mode`, `sha256`, `verb_count`, embedded `contra
 git clone https://github.com/koten-ai/zeus_chat_request.git
 export ZEUS_CLIENT_CONFIG_DIR=~/.config/zeus_client
 mkdir -p "$ZEUS_CLIENT_CONFIG_DIR/chat_requests"
-# After stamping on your Zeus (recommended), place stamped files under
-# chat_requests/{bucket}__{scope}/ — or copy a template mode for local demos:
+# After stamping on your Zeus (recommended):
+# or for local demo of base-1 pin:
 cp zeus_chat_request/v2/min/chat_request_analytics_v2_min.json \
   "$ZEUS_CLIENT_CONFIG_DIR/chat_requests/analytics.json"
 ```
 
-Better production path:
+Production path: `sync_chat_requests(cfg)` after Hub stamp.
 
-```python
-from zeus_client import ZeusClient, load_config, sync_chat_requests
+---
 
-async with ZeusClient():
-    cfg = await load_config()
-    await sync_chat_requests(cfg)  # pulls stamped catalogs from live Zeus
-```
-
-**Published docs:** [docs.koten.ai](https://docs.koten.ai/) · [Using Zeus Client](https://docs.koten.ai/zeus-client/using-zeus-client) · [Contracts & catalog](https://docs.koten.ai/zeus-client/contracts-and-catalog)
-
-## Use with Developer Helper MCP
-
-Helper tools should:
-
-1. Prefer **live** Zeus: bootstrap + stamped catalog endpoints.
-2. Fall back to **this repo** for mode templates / offline scaffold (`fetch_chat_request` / `use_sample`).
-3. Read `manifest.json` for mode list + file paths.
-4. Never tell the coding agent to hand-edit hashes.
-
-See [docs.koten.ai](https://docs.koten.ai/) · [Dev Helper MCP](https://docs.koten.ai/zeus-client/dev-helper-mcp) · machine index in source repo `agent-index.yaml`.
-
-## Refresh from a Zeus checkout
+## Refresh from Zeus (base-1 pin)
 
 ```bash
-# In Zeus engine:
-go run . ai-snapshot --mode=all --api-version=v2 --min
-
-# Publish into this repo:
+go run . ai-snapshot --mode=all --api-version=v2 --min   # in Zeus
 ./scripts/sync-from-zeus.sh /path/to/Zeus
 python3 scripts/refresh_manifest.py
-git add v2/min manifest.json && git commit -m "chore: refresh v2_min catalogs from Zeus"
+python3 scripts/scan_catalogs.py
 ```
-
-## Related repos
-
-| Repo | Role |
-| --- | --- |
-| [Zeus](https://github.com/koten-ai/Zeus) | Engine; generates catalogs |
-| [zeus_client_python](https://github.com/koten-ai/zeus_client_python) | Client library |
-| [**docs.koten.ai**](https://docs.koten.ai/) | **Published platform docs** (GitBook; source: [koten_docs](https://github.com/koten-ai/koten_docs)) |
-| ZDH board | Developer Helper MCP |
 
 ## License
 
@@ -192,4 +204,4 @@ Same product family as Zeus / Koten unless otherwise noted.
 
 ## Release notes
 
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for version history and refresh procedure.
+See [RELEASE_NOTES.md](RELEASE_NOTES.md).

@@ -586,17 +586,316 @@
       font-size: 11px;
       line-height: 1.4;
     }
-    #content-panel.is-empty #content-body-wrap { display: none; }
-    #content-panel.is-empty { opacity: 0.92; }
-    #content-panel:not(.is-empty) {
-      border-color: color-mix(in oklab, oklch(var(--bc)) 28%, transparent);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    /* Selected content · lightbox (dark scrim + centered window + X) */
+    #content-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      padding-top: max(1rem, env(safe-area-inset-top));
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
     }
-    [data-theme="dark"] #content-panel:not(.is-empty) {
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    #content-lightbox.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
-    #content-panel .btn-close-content {
-      min-width: 2.25rem;
+    #content-lightbox.is-closing {
+      opacity: 0;
+      visibility: visible;
+      pointer-events: none;
+    }
+    .content-lightbox-scrim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      cursor: pointer;
+      border: 0;
+      padding: 0;
+      margin: 0;
+    }
+    #content-lightbox.is-open .content-lightbox-scrim {
+      animation: lightbox-scrim-in 0.22s ease both;
+    }
+    @keyframes lightbox-scrim-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #content-panel {
+      position: relative;
+      z-index: 1;
+      width: min(56rem, 100%);
+      max-height: min(88vh, 56rem);
+      display: flex;
+      flex-direction: column;
+      border-radius: 1rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 18%, transparent);
+      background: oklch(var(--b1));
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 28px 80px rgba(0, 0, 0, 0.45);
+      transform: translateY(12px) scale(0.97);
+      opacity: 0;
+      transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.22s ease;
+      overflow: hidden;
+    }
+    /* X sits on the centered dialog — not the browser viewport corner */
+    #content-panel .content-lightbox-close {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      z-index: 3;
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 20%, transparent);
+      background: color-mix(in oklab, oklch(var(--b2)) 92%, transparent);
+      color: oklch(var(--bc));
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    #content-panel .content-lightbox-close:hover {
+      background: color-mix(in oklab, oklch(var(--b3, var(--b2))) 100%, transparent);
+      transform: scale(1.06);
+    }
+    #content-panel .content-lightbox-close:focus-visible {
+      outline: 2px solid #6366f1;
+      outline-offset: 2px;
+    }
+    #content-lightbox.is-open #content-panel {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    #content-lightbox.is-closing #content-panel {
+      transform: translateY(8px) scale(0.98);
+      opacity: 0;
+    }
+    #content-panel .card-body {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      max-height: min(88vh, 56rem);
+      overflow: hidden;
+    }
+    #content-body-wrap {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      margin-top: 0.35rem;
+    }
+    #content-body-wrap > .content-body-inner {
+      min-height: 0;
+    }
+    #content-panel .content-panel-chrome {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      flex-shrink: 0;
+    }
+
+    /* Output tab · Organized (clean) vs JSON */
+    .output-mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .output-mode-bar .join { border-radius: 0.65rem; overflow: hidden; }
+    .output-intro {
+      border-radius: 0.75rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      background: color-mix(in oklab, oklch(var(--b2)) 55%, transparent);
+      padding: 0.75rem 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      margin-bottom: 0.85rem;
+    }
+    .output-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+    }
+    .output-status .os-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 14%, transparent);
+      background: oklch(var(--b1));
+    }
+    .output-status .os-chip.ok { border-color: color-mix(in oklab, var(--c-edit) 50%, transparent); color: var(--txt-ed); }
+    .output-status .os-chip.bad { border-color: color-mix(in oklab, var(--c-miss) 55%, transparent); color: var(--txt-miss); }
+    .output-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .output-group {
+      border-radius: 0.9rem;
+      border: 2px solid;
+      overflow: hidden;
+      background: oklch(var(--b1));
+    }
+    .output-group.is-g1 { border-color: color-mix(in oklab, var(--c-edit) 55%, transparent); }
+    .output-group.is-g2 { border-color: color-mix(in oklab, var(--c-rules) 50%, transparent); }
+    .output-group.is-g3 { border-color: color-mix(in oklab, var(--c-inj) 50%, transparent); }
+    .output-group-head {
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.35rem 0.75rem;
+    }
+    .output-group.is-g1 .output-group-head { background: var(--json-ed-bg); }
+    .output-group.is-g2 .output-group-head { background: var(--json-ro-bg); }
+    .output-group.is-g3 .output-group-head { background: var(--json-inj-bg); }
+    .output-group-head h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+    .output-group-head .og-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.12rem 0.4rem;
+      border-radius: 0.3rem;
+      border: 1px solid;
+    }
+    .output-group.is-g1 .og-badge { color: var(--chip-ed-fg); background: var(--chip-ed-bg); border-color: var(--c-edit); }
+    .output-group.is-g2 .og-badge { color: var(--chip-ro-fg); background: var(--chip-ro-bg); border-color: var(--c-rules); }
+    .output-group.is-g3 .og-badge { color: var(--chip-inj-fg); background: var(--chip-inj-bg); border-color: var(--c-inj); }
+    .output-group-head p {
+      margin: 0;
+      flex: 1 1 12rem;
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+    .output-field-grid {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid color-mix(in oklab, oklch(var(--bc)) 10%, transparent);
+    }
+    .output-field {
+      display: grid;
+      grid-template-columns: minmax(7rem, 11rem) 1fr auto;
+      gap: 0.5rem 0.75rem;
+      padding: 0.55rem 0.85rem;
+      border-bottom: 1px solid color-mix(in oklab, oklch(var(--bc)) 8%, transparent);
+      align-items: start;
+      font-size: 0.8rem;
+    }
+    .output-field:last-child { border-bottom: 0; }
+    .output-field .of-name {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+    .output-field .of-desc { opacity: 0.85; line-height: 1.35; }
+    .output-field .of-flags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      justify-content: flex-end;
+    }
+    .output-field .of-flag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.25rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 14%, transparent);
+      white-space: nowrap;
+    }
+    .output-field .of-flag.req { color: var(--txt-miss); border-color: color-mix(in oklab, var(--c-miss) 45%, transparent); }
+    .output-field .of-flag.ok { color: var(--txt-ed); border-color: color-mix(in oklab, var(--c-edit) 45%, transparent); }
+    .output-field .of-flag.miss { color: var(--txt-ro); border-color: color-mix(in oklab, var(--c-rules) 45%, transparent); }
+    .output-field .of-flag.ui { opacity: 0.7; }
+    .output-field .of-flag.never { color: var(--txt-ro); opacity: 0.9; }
+    @media (max-width: 700px) {
+      .output-field {
+        grid-template-columns: 1fr;
+      }
+      .output-field .of-flags { justify-content: flex-start; }
+    }
+    .output-example {
+      border-radius: 0.85rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      overflow: hidden;
+      background: oklch(var(--b1));
+    }
+    .output-example-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.55rem 0.85rem;
+      background: color-mix(in oklab, oklch(var(--b2)) 60%, transparent);
+      border-bottom: 1px solid color-mix(in oklab, oklch(var(--bc)) 10%, transparent);
+    }
+    .output-example-head h4 {
+      margin: 0;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    .output-example pre {
+      margin: 0;
+      padding: 0.85rem;
+      max-height: 22rem;
+      overflow: auto;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      background: var(--json-pre-bg);
+    }
+    .output-footnote {
+      font-size: 0.75rem;
+      opacity: 0.75;
+      margin-top: 0.75rem;
+      line-height: 1.4;
+    }
+    #json-output-pre.output-json-full {
+      max-height: min(70vh, 40rem);
+      overflow: auto;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      border-radius: 0.75rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      padding: 0.85rem 1rem;
+    }
+
+    body.lightbox-open {
+      overflow: hidden;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #content-lightbox,
+      #content-panel,
+      .content-lightbox-scrim {
+        transition: none !important;
+        animation: none !important;
+      }
     }
     .glossary-grid { display: grid; gap: 0.65rem; }
     @media (min-width: 768px) { .glossary-grid { grid-template-columns: 1fr 1fr; } }
@@ -740,6 +1039,210 @@
       opacity: 0.65;
       margin-bottom: 0.25rem;
     }
+    /* Assembled-prompt: PROMPT shell (rules+inject+messages) → LLM → OUTPUT shell */
+    .assembly-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+    .assembly-shell {
+      border-radius: 0.9rem;
+      border: 2.5px solid;
+      overflow: hidden;
+      background: oklch(var(--b1));
+    }
+    .assembly-shell.is-prompt {
+      border-color: #0f172a;
+    }
+    .assembly-shell.is-output {
+      border-color: var(--c-meta);
+    }
+    .assembly-shell-head {
+      padding: 0.55rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .assembly-shell.is-prompt .assembly-shell-head {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    .assembly-shell.is-output .assembly-shell-head {
+      background: var(--c-meta);
+      color: #f8fafc;
+    }
+    .assembly-shell-body {
+      padding: 0.65rem 0.7rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .assembly-shell-foot {
+      padding: 0.35rem 0.85rem 0.55rem;
+      font-size: 0.72rem;
+      opacity: 0.7;
+      text-align: center;
+    }
+    .assembly-plus {
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #475569;
+      user-select: none;
+    }
+    .assembly-plus span {
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-left: 0.35rem;
+      opacity: 0.75;
+      vertical-align: middle;
+    }
+    .assembly-mid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem 0.75rem;
+      padding: 0.35rem 0;
+    }
+    .assembly-llm-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 5.5rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      background: #4f46e5;
+      border: 2px solid #4338ca;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+    .assembly-mid-note {
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+    .assembly-flow-step {
+      border-radius: 0.75rem;
+      border: 2px solid;
+      padding: 0.7rem 0.85rem 0.75rem;
+      position: relative;
+    }
+    .assembly-flow-step .af-num {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+    .assembly-flow-step h4 {
+      margin: 0 0 0.25rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    .assembly-flow-step p {
+      margin: 0;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      opacity: 0.92;
+    }
+    .assembly-flow-step ul {
+      margin: 0.35rem 0 0;
+      padding-left: 1.1rem;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      opacity: 0.9;
+    }
+    .assembly-flow-step .af-chip {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 0.15rem 0.45rem;
+      border-radius: 0.35rem;
+      border: 1px solid;
+    }
+    .assembly-flow-step.is-rules {
+      border-color: var(--c-rules);
+      background: var(--json-ro-bg);
+    }
+    .assembly-flow-step.is-rules .af-num,
+    .assembly-flow-step.is-rules h4 { color: var(--txt-ro); }
+    .assembly-flow-step.is-rules .af-chip {
+      color: var(--chip-ro-fg);
+      background: var(--chip-ro-bg);
+      border-color: var(--c-rules);
+    }
+    .assembly-flow-step.is-inject {
+      border-color: var(--c-inj);
+      background: var(--json-inj-bg);
+    }
+    .assembly-flow-step.is-inject .af-num,
+    .assembly-flow-step.is-inject h4 { color: var(--txt-inj); }
+    .assembly-flow-step.is-inject .af-chip {
+      color: var(--chip-inj-fg);
+      background: var(--chip-inj-bg);
+      border-color: var(--c-inj);
+    }
+    .assembly-flow-step.is-transcript {
+      border-color: var(--c-edit);
+      background: var(--json-ed-bg);
+    }
+    .assembly-flow-step.is-transcript .af-num,
+    .assembly-flow-step.is-transcript h4 { color: var(--txt-ed); }
+    .assembly-flow-step.is-transcript .af-chip {
+      color: var(--chip-ed-fg);
+      background: var(--chip-ed-bg);
+      border-color: var(--c-edit);
+    }
+    .assembly-flow-step.is-llm {
+      border-color: #4f46e5;
+      background: color-mix(in oklab, #4f46e5 12%, oklch(var(--b1)));
+    }
+    .assembly-flow-step.is-llm .af-num,
+    .assembly-flow-step.is-llm h4 { color: #4338ca; }
+    [data-theme="dark"] .assembly-flow-step.is-llm .af-num,
+    [data-theme="dark"] .assembly-flow-step.is-llm h4 { color: #c7d2fe; }
+    .assembly-flow-step.is-llm .af-chip {
+      color: #ffffff;
+      background: #4f46e5;
+      border-color: #4338ca;
+    }
+    .assembly-flow-step.is-layera {
+      border-color: var(--c-meta);
+      background: var(--json-meta-bg);
+    }
+    .assembly-flow-step.is-layera .af-num,
+    .assembly-flow-step.is-layera h4 { color: var(--txt-meta); }
+    .assembly-flow-step.is-layera .af-chip {
+      color: var(--chip-meta-fg);
+      background: var(--chip-meta-bg);
+      border-color: var(--c-meta);
+    }
+    .assembly-flow-arrow {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      opacity: 0.45;
+      line-height: 1;
+      user-select: none;
+    }
+    .assembly-flow-arrow .af-label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      opacity: 0.85;
+      margin-top: 0.1rem;
+    }
+    .assembly-flow-note {
+      font-size: 0.72rem;
+      opacity: 0.75;
+      margin-top: 0.35rem;
+    }
     .prompt-outline-list {
       margin: 0;
       padding-left: 1.1rem;
@@ -770,123 +1273,48 @@
       color: color-mix(in oklab, oklch(var(--bc)) 92%, transparent);
     }
     .help code { font-size: 0.8rem; }
-    /* Cards page: chapter layout + sticky TOC */
+    /* Structure page: full-width tabs (no side TOC) */
     .cards-layout {
-      display: grid;
-      gap: 1rem;
-      align-items: start;
+      display: block;
+      width: 100%;
+      min-width: 0;
     }
-    @media (min-width: 1100px) {
-      .cards-layout {
-        grid-template-columns: 11.5rem minmax(0, 1fr);
-        gap: 1.25rem;
-      }
-    }
-    .cards-toc-wrap {
-      position: sticky;
-      top: 5.5rem;
-      z-index: 25;
-      align-self: start;
-    }
-    @media (min-width: 1100px) {
-      .cards-toc-wrap {
-        /* float near vertical middle of the viewport while scrolling */
-        top: max(5.5rem, calc(50vh - 11rem));
-      }
-    }
-    .cards-toc {
-      border-radius: 0.85rem;
-      border: 1px solid color-mix(in oklab, var(--fallback-bc, oklch(var(--bc))) 12%, transparent);
-      background: color-mix(in oklab, var(--fallback-b1, oklch(var(--b1))) 92%, transparent);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
-      padding: 0.65rem 0.55rem;
-    }
-    .theme-toggle-wrap {
-      display: inline-flex;
-      align-items: center;
+    .cards-main { min-width: 0; width: 100%; }
+    .structure-tabs {
+      display: flex;
+      flex-wrap: wrap;
       gap: 0.35rem;
-      border-radius: 999px;
-      border: 1px solid color-mix(in oklab, var(--fallback-bc, oklch(var(--bc))) 15%, transparent);
-      padding: 0.2rem 0.45rem;
-      background: color-mix(in oklab, var(--fallback-b2, oklch(var(--b2))) 80%, transparent);
+      margin-bottom: 0.85rem;
+      padding: 0.35rem;
+      border-radius: 0.85rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      background: color-mix(in oklab, oklch(var(--b2)) 70%, transparent);
     }
-    .theme-toggle-wrap .theme-icon {
-      opacity: 0.75;
-      flex-shrink: 0;
-    }
-    .cards-toc-title {
-      font-size: 10px;
+    .structure-tabs .struct-tab {
+      flex: 1 1 auto;
+      min-width: 5.5rem;
+      border-radius: 0.55rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      line-height: 1.2;
+      padding: 0.45rem 0.55rem;
+    }
+    .structure-tabs .struct-tab .st-num {
+      display: inline-block;
       opacity: 0.55;
-      padding: 0 0.4rem 0.4rem;
+      font-size: 0.68rem;
+      margin-right: 0.25rem;
     }
-    .cards-toc-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
+    .structure-panel { display: none; }
+    .structure-panel.is-active { display: block; }
+    /* keep legacy chapter chrome but lighter headers in tab panels */
+    .structure-panel > .chapter { margin: 0; }
+    .structure-panel > .chapter > .chapter-head {
+      padding: 0.55rem 0.85rem;
     }
-    @media (max-width: 1099px) {
-      .cards-toc-list {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-      }
-    }
-    .cards-toc a {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      border-radius: 0.5rem;
-      padding: 0.4rem 0.45rem;
-      font-size: 12px;
-      line-height: 1.25;
-      color: inherit;
-      text-decoration: none;
-      border: 1px solid transparent;
-      opacity: 0.78;
-      transition: background .12s ease, opacity .12s ease, border-color .12s ease;
-    }
-    .cards-toc a:hover {
-      opacity: 1;
-      background: color-mix(in oklab, oklch(var(--bc)) 8%, transparent);
-    }
-    .cards-toc a.is-active {
-      opacity: 1;
-      background: color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
-      border-color: color-mix(in oklab, oklch(var(--bc)) 20%, transparent);
-      font-weight: 600;
-    }
-    .cards-toc .toc-num {
-      flex-shrink: 0;
-      width: 1.35rem;
-      height: 1.35rem;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 800;
-      background: color-mix(in oklab, oklch(var(--bc)) 10%, transparent);
-    }
-    .cards-toc a.is-active .toc-num {
-      background: oklch(var(--bc));
-      color: oklch(var(--b1));
-    }
-    .cards-toc .toc-sub {
-      margin-left: 1.1rem;
-      font-size: 11px;
-      opacity: 0.7;
-    }
-    @media (max-width: 1099px) {
-      .cards-toc .toc-sub { display: none; }
-    }
-    .cards-main { min-width: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+    .structure-panel > .chapter > .chapter-head h2 { font-size: 0.95rem; }
+    .structure-panel > .chapter > .chapter-head p { font-size: 0.75rem; }
+
     .chapter {
       scroll-margin-top: 5.5rem;
       border-radius: 1rem;
@@ -1023,6 +1451,255 @@
       align-items: center;
       gap: 0.4rem;
     }
+
+    /* Overview + Catalog: plain-language layout */
+    .overview-hero {
+      border-radius: 0.85rem;
+      border: 2px solid color-mix(in oklab, #4f46e5 35%, transparent);
+      background: color-mix(in oklab, #4f46e5 8%, oklch(var(--b1)));
+      padding: 1rem 1.1rem;
+    }
+    .overview-hero h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+    .overview-hero p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      opacity: 0.92;
+    }
+    .overview-hero .oh-meta {
+      margin-top: 0.65rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .overview-hero .oh-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 15%, transparent);
+      background: oklch(var(--b1));
+    }
+    .overview-qa {
+      display: grid;
+      gap: 0.65rem;
+    }
+    @media (min-width: 900px) {
+      .overview-qa { grid-template-columns: 1fr 1fr; }
+    }
+    .overview-qa-card {
+      border-radius: 0.75rem;
+      border: 2px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      padding: 0.85rem 0.95rem;
+      background: oklch(var(--b1));
+      min-height: 5.5rem;
+    }
+    .overview-qa-card .q {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      opacity: 0.55;
+      margin-bottom: 0.3rem;
+    }
+    .overview-qa-card .a {
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.35rem;
+    }
+    .overview-qa-card .why {
+      font-size: 0.8rem;
+      line-height: 1.4;
+      opacity: 0.85;
+    }
+    .overview-qa-card.is-ok { border-color: color-mix(in oklab, var(--c-edit) 50%, transparent); }
+    .overview-qa-card.is-bad { border-color: color-mix(in oklab, var(--c-miss) 55%, transparent); }
+    .overview-qa-card.is-rules { border-color: color-mix(in oklab, var(--c-rules) 45%, transparent); }
+    .overview-checklist {
+      border-radius: 0.75rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      background: color-mix(in oklab, oklch(var(--b2)) 55%, transparent);
+      padding: 0.75rem 0.9rem;
+    }
+    .overview-checklist h4 {
+      margin: 0 0 0.45rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .overview-checklist ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.35rem;
+    }
+    @media (min-width: 700px) {
+      .overview-checklist ul { grid-template-columns: 1fr 1fr; }
+    }
+    .overview-checklist li {
+      font-size: 0.8rem;
+      line-height: 1.35;
+      display: flex;
+      gap: 0.45rem;
+      align-items: flex-start;
+    }
+    .overview-checklist .mark {
+      font-weight: 800;
+      flex-shrink: 0;
+      width: 1.1rem;
+    }
+    .overview-checklist .mark.ok { color: var(--txt-ed); }
+    .overview-checklist .mark.bad { color: var(--txt-ro); }
+    .overview-next {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.25rem;
+    }
+    .catalog-intro {
+      border-radius: 0.75rem;
+      border: 1px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      background: color-mix(in oklab, oklch(var(--b2)) 50%, transparent);
+      padding: 0.75rem 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+    .catalog-group {
+      margin-top: 0.85rem;
+    }
+    .catalog-group-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem 0.75rem;
+      margin-bottom: 0.55rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 2px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+    }
+    .catalog-group-head h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+    .catalog-group-head p {
+      margin: 0;
+      font-size: 0.78rem;
+      opacity: 0.75;
+      flex: 1 1 12rem;
+    }
+    .catalog-group-head .cg-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 0.35rem;
+      border: 1px solid;
+    }
+    .catalog-group.is-guts .cg-badge {
+      color: var(--chip-ro-fg);
+      background: var(--chip-ro-bg);
+      border-color: var(--c-rules);
+    }
+    .catalog-group.is-soft .cg-badge {
+      color: var(--chip-ed-fg);
+      background: var(--chip-ed-bg);
+      border-color: var(--c-edit);
+    }
+    .catalog-group.is-ops .cg-badge {
+      color: var(--chip-meta-fg);
+      background: var(--chip-meta-bg);
+      border-color: var(--c-meta);
+    }
+    .catalog-card {
+      border-radius: 0.85rem;
+      border: 2px solid color-mix(in oklab, oklch(var(--bc)) 12%, transparent);
+      background: oklch(var(--b1));
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
+      min-height: 7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .catalog-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .catalog-card.is-guts {
+      border-color: color-mix(in oklab, var(--c-rules) 55%, transparent);
+      background: var(--json-ro-bg);
+    }
+    .catalog-card.is-soft {
+      border-color: color-mix(in oklab, var(--c-edit) 45%, transparent);
+      background: var(--json-ed-bg);
+    }
+    .catalog-card.is-ops {
+      border-color: color-mix(in oklab, var(--c-meta) 40%, transparent);
+      background: var(--json-meta-bg);
+    }
+    .catalog-card.is-miss {
+      border-style: dashed;
+      opacity: 0.92;
+      background: var(--json-miss-bg);
+      border-color: color-mix(in oklab, var(--c-miss) 50%, transparent);
+    }
+    .catalog-card .cc-kicker {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      opacity: 0.55;
+    }
+    .catalog-card h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .catalog-card .cc-plain {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.4;
+      flex: 1 1 auto;
+    }
+    .catalog-card .cc-foot {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.35rem;
+      padding-top: 0.4rem;
+      border-top: 1px solid color-mix(in oklab, oklch(var(--bc)) 10%, transparent);
+      font-size: 0.75rem;
+    }
+    .catalog-card .cc-key {
+      font-family: ui-monospace, monospace;
+      font-size: 0.7rem;
+      opacity: 0.55;
+    }
+    .catalog-grid-guts {
+      display: grid;
+      gap: 0.75rem;
+    }
+    @media (min-width: 800px) {
+      .catalog-grid-guts { grid-template-columns: 1fr 1fr; }
+    }
+    .catalog-grid-other {
+      display: grid;
+      gap: 0.65rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 700px) {
+      .catalog-grid-other { grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 1100px) {
+      .catalog-grid-other { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
     .summary-strip .card { min-height: auto; }
     .summary-strip .card-body { padding: 0.75rem 0.9rem; }
     #section-grid .card-click::before {
@@ -1332,208 +2009,220 @@
 
     <div id="status" class="text-sm text-muted"></div>
 
-    <!-- SHARED content drawer (cards + treemap + JSON + table) -->
-    <div id="content-panel" class="card bg-base-100 shadow-lg sticky top-16 z-30 border-2 border-base-content/20 is-empty">
-      <div class="card-body p-3 sm:p-4 gap-2">
-        <div class="flex flex-wrap items-start justify-between gap-2">
-          <div class="min-w-0 flex-1">
-            <div class="text-[10px] uppercase tracking-wide text-muted">Selected content · Esc or ✕ to close</div>
-            <h3 class="font-semibold text-base break-all" id="content-title">Nothing selected</h3>
-            <p class="text-xs text-muted" id="content-sub">Click a card, size tile, table row, or JSON block to inspect it here.</p>
+    <!-- Lightbox: dark backdrop + centered content window + X on the dialog -->
+    <div id="content-lightbox" class="content-lightbox" hidden aria-hidden="true">
+      <button type="button" class="content-lightbox-scrim" data-lightbox-close title="Close" aria-label="Close overlay"></button>
+      <div id="content-panel" class="card bg-base-100" role="dialog" aria-modal="true" aria-labelledby="content-title">
+        <button type="button" class="content-lightbox-close" id="btn-close-content" data-lightbox-close title="Close (Esc)" aria-label="Close">✕</button>
+        <div class="card-body p-4 sm:p-5 gap-2">
+          <div class="content-panel-chrome pr-10">
+            <div class="min-w-0 flex-1">
+              <div class="text-[10px] uppercase tracking-wide text-muted">Selected content · Esc, backdrop, or ✕ to close</div>
+              <h3 class="font-semibold text-base break-all" id="content-title">Nothing selected</h3>
+              <p class="text-xs text-muted" id="content-sub">Click a card, size tile, table row, or JSON block to inspect it here.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center shrink-0">
+              <span class="badge badge-ghost badge-sm font-mono" id="content-bytes">— B</span>
+              <span class="badge badge-ghost badge-sm font-mono" id="content-tokens">— ~tok</span>
+              <span class="badge badge-outline badge-sm" id="content-class">—</span>
+              <button type="button" class="btn btn-xs" id="btn-copy-content" disabled title="Copy body">Copy</button>
+            </div>
           </div>
-          <div class="flex flex-wrap gap-2 items-center shrink-0">
-            <span class="badge badge-ghost badge-sm font-mono" id="content-bytes">— B</span>
-            <span class="badge badge-ghost badge-sm font-mono" id="content-tokens">— ~tok</span>
-            <span class="badge badge-outline badge-sm" id="content-class">—</span>
-            <button type="button" class="btn btn-xs" id="btn-copy-content" disabled title="Copy body">Copy</button>
-            <button type="button" class="btn btn-sm btn-error btn-outline btn-close-content gap-1" id="btn-close-content" title="Close content panel (Esc)" aria-label="Close content panel">
-              <span aria-hidden="true">✕</span><span class="hidden sm:inline">Close</span>
-            </button>
-          </div>
-        </div>
-        <div id="content-body-wrap" class="space-y-2">
-          <div id="content-why" class="text-sm rounded-lg p-3 bg-base-200 border border-base-content/10 hidden"></div>
-          <div id="content-body" class="bg-base-200 rounded-lg min-h-[4rem] p-3 text-sm"></div>
-          <div class="flex justify-end">
-            <button type="button" class="btn btn-xs btn-ghost" id="btn-close-content-bottom" title="Close content panel (Esc)">✕ Close panel</button>
+          <div id="content-body-wrap">
+            <div class="content-body-inner space-y-2">
+              <div id="content-why" class="text-sm rounded-lg p-3 bg-base-200 border border-base-content/10 hidden"></div>
+              <div id="content-body" class="bg-base-200 rounded-lg min-h-[4rem] p-3 text-sm"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- STRUCTURE: combined tiles + expandable JSON (was Cards + JSON) -->
+    <!-- STRUCTURE: 5 tabs (no side TOC) -->
     <section id="view-boxes" class="cards-layout">
-      <aside class="cards-toc-wrap" aria-label="Structure page table of contents">
-        <nav class="cards-toc" id="cards-toc">
-          <div class="cards-toc-title">On this page</div>
-          <ul class="cards-toc-list">
-            <li><a href="#chapter-snapshot" data-toc="chapter-snapshot"><span class="toc-num">1</span><span>Snapshot</span></a></li>
-            <li class="toc-sub"><a href="#anatomy-recipe" data-toc="anatomy-recipe">Anatomy</a></li>
-            <li class="toc-sub"><a href="#stamp-health" data-toc="stamp-health">Stamp health</a></li>
-            <li class="toc-sub"><a href="#assembly-storyboard" data-toc="assembly-storyboard">Assembly</a></li>
-            <li class="toc-sub"><a href="#prompt-outline" data-toc="prompt-outline">Prompt outline</a></li>
-            <li><a href="#chapter-catalog" data-toc="chapter-catalog"><span class="toc-num">2</span><span>chat_request JSON</span></a></li>
-            <li><a href="#chapter-wire" data-toc="chapter-wire"><span class="toc-num">3</span><span>Wire vs inject</span></a></li>
-            <li><a href="#chapter-output" data-toc="chapter-output"><span class="toc-num">4</span><span>Output scheme</span></a></li>
-            <li class="toc-sub"><a href="#out-layer-a" data-toc="out-layer-a">A · Model terminate</a></li>
-            <li class="toc-sub"><a href="#out-layer-b" data-toc="out-layer-b">B · Server report</a></li>
-            <li class="toc-sub"><a href="#out-wip" data-toc="out-wip">WIP checklist</a></li>
-          </ul>
-          <p class="text-[10px] opacity-50 px-1 pt-2 leading-snug hidden lg:block">Tiles + JSON in one place. Sticky while you scroll.</p>
-        </nav>
-      </aside>
+      <div class="structure-tabs" id="structure-tabs" role="tablist" aria-label="Structure sections">
+        <button type="button" class="btn btn-sm struct-tab btn-primary" role="tab" data-struct-tab="overview" aria-selected="true" title="Mode summary + stamp health">
+          <span class="st-num">1</span>Overview
+        </button>
+        <button type="button" class="btn btn-sm struct-tab btn-ghost" role="tab" data-struct-tab="assembly" aria-selected="false" title="How the prompt is built (wire order)">
+          <span class="st-num">2</span>Assembly
+        </button>
+        <button type="button" class="btn btn-sm struct-tab btn-ghost" role="tab" data-struct-tab="catalog" aria-selected="false" title="chat_request file tiles / JSON">
+          <span class="st-num">3</span>Catalog
+        </button>
+        <button type="button" class="btn btn-sm struct-tab btn-ghost" role="tab" data-struct-tab="wire" aria-selected="false" title="What ships in the file vs runtime inject">
+          <span class="st-num">4</span>Wire
+        </button>
+        <button type="button" class="btn btn-sm struct-tab btn-ghost" role="tab" data-struct-tab="output" aria-selected="false" title="Layer A terminate + Layer B report">
+          <span class="st-num">5</span>Output
+        </button>
+      </div>
 
       <div class="cards-main">
-        <!-- 1 Snapshot -->
-        <article class="chapter chapter-snapshot" id="chapter-snapshot">
-          <header class="chapter-head">
-            <span class="ch-num" aria-hidden="true">1</span>
-            <div class="min-w-0 flex-1">
-              <h2>Snapshot · this mode at a glance</h2>
-              <p>Quick health strip. Only the terminate tile is clickable. Use filter badges above for Rules / Verbs / …</p>
-            </div>
-            <span class="badge badge-ghost badge-sm">info strip</span>
-          </header>
-          <div class="chapter-body space-y-4">
-            <div class="zone-label">Mode · size · terminate health</div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 summary-strip" id="summary-row"></div>
-
-            <div id="anatomy-recipe" class="scroll-mt-28">
-              <div class="zone-label">Anatomy · what a chat_request is made of</div>
-              <div id="anatomy-recipe-body" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2"></div>
-            </div>
-
-            <div id="stamp-health" class="scroll-mt-28">
-              <div class="zone-label">Stamp / contract health</div>
-              <div id="stamp-health-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"></div>
-            </div>
-
-            <div id="assembly-storyboard" class="scroll-mt-28">
-              <div class="zone-label">Live request assembly (storyboard)</div>
-              <div id="assembly-storyboard-body" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2"></div>
-            </div>
-
-            <div id="prompt-outline" class="scroll-mt-28">
-              <div class="zone-label">System prompt outline (topics, not full text)</div>
-              <div id="prompt-outline-body" class="rounded-lg border border-base-content/15 bg-base-200/50 p-3"></div>
-            </div>
-          </div>
-        </article>
-
-        <!-- 2 Catalog: TILES or FULL JSON (toggle — not both at once) -->
-        <article class="chapter chapter-catalog" id="chapter-catalog">
-          <header class="chapter-head">
-            <span class="ch-num" aria-hidden="true">2</span>
-            <div class="min-w-0 flex-1">
-              <h2>chat_request structure</h2>
-              <p id="catalog-mode-blurb">
-                <b>Tiles</b> = purpose cards (why each key exists). Switch to <b>Full JSON</b> for colored expand/collapse blocks of the real file.
-              </p>
-              <p class="text-[11px] font-mono text-muted mt-1" id="json-title">v2/min/…</p>
-            </div>
-            <button type="button" class="btn btn-primary btn-sm sm:btn-md gap-2 shrink-0" id="btn-catalog-mode" title="Toggle tiles vs full JSON">
-              Show Full JSON
-            </button>
-          </header>
-          <div class="chapter-body space-y-3">
-            <div class="flex flex-wrap gap-2 text-[11px]">
-              <span class="badge chip-ro">RED · Rules</span>
-              <span class="badge chip-ed">GREEN · Guidance</span>
-              <span class="badge chip-inj">BLUE · Inject</span>
-              <span class="badge chip-meta">PURPLE · Meta</span>
-            </div>
-
-            <!-- TILE MODE (default) -->
-            <div id="catalog-tiles-panel">
-              <div class="zone-label">Purpose tiles · click Open → for content · filter with badges above</div>
-              <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="section-grid"></div>
-            </div>
-
-            <!-- JSON MODE (hidden until toggled) -->
-            <div id="catalog-json-panel" class="hidden space-y-3">
-              <div class="flex flex-wrap gap-2 items-center justify-between">
-                <div class="zone-label m-0">Full JSON · ▾ expands a section · header opens content panel</div>
-                <div class="flex flex-wrap gap-2 items-center" id="json-catalog-toolbar">
-                  <div class="join border border-base-content/20 rounded-lg overflow-hidden">
-                    <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-expand-all" title="Expand all sections">Expand all</button>
-                    <button type="button" class="btn btn-sm join-item" id="btn-json-collapse-all" title="Collapse all sections">Collapse all</button>
-                  </div>
-                  <label class="label cursor-pointer gap-2 py-0">
-                    <span class="label-text text-xs">Plain raw</span>
-                    <input type="checkbox" id="chk-json-plain" class="toggle toggle-sm" />
-                  </label>
-                  <label class="label cursor-pointer gap-2 py-0">
-                    <span class="label-text text-xs">Blue inject stubs</span>
-                    <input type="checkbox" id="chk-json-inject" class="toggle toggle-sm toggle-info" checked />
-                  </label>
-                  <button type="button" class="btn btn-xs" id="btn-copy-json">Copy full JSON</button>
-                </div>
+        <!-- 1 Overview -->
+        <div class="structure-panel is-active" id="panel-overview" data-struct-panel="overview" role="tabpanel">
+          <article class="chapter chapter-snapshot" id="chapter-snapshot">
+            <header class="chapter-head">
+              <span class="ch-num" aria-hidden="true">1</span>
+              <div class="min-w-0 flex-1">
+                <h2>What am I looking at?</h2>
+                <p>A <b>chat_request</b> is the recipe for one agent: house rules + tools. Plain answers first — jargon lives in smaller text.</p>
               </div>
-              <div id="json-annotated"></div>
-              <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-pre"></pre>
-            </div>
-          </div>
-        </article>
-
-        <!-- 3 Wire vs inject -->
-        <article class="chapter chapter-wire" id="chapter-wire">
-          <header class="chapter-head">
-            <span class="ch-num" aria-hidden="true">3</span>
-            <div class="min-w-0 flex-1">
-              <h2>On the wire vs injected at runtime</h2>
-              <p><span class="txt-ro font-semibold">Left / red</span> ships in this baseline file. <span class="txt-inj font-semibold">Right / blue</span> is added by Zeus Client or Hub when talking to the model — not stored here.</p>
-            </div>
-          </header>
-          <div class="chapter-body">
-            <div class="wire-zones" id="wire-grid"></div>
-          </div>
-        </article>
-
-        <!-- 4 Output: tables (default) or full JSON -->
-        <article class="chapter chapter-output" id="chapter-output">
-          <header class="chapter-head">
-            <span class="ch-num" aria-hidden="true">4</span>
-            <div class="min-w-0 flex-1">
-              <h2>Output scheme · model terminate + server report</h2>
-              <p id="output-mode-blurb">
-                <span class="txt-ed font-semibold">Layer A</span> terminate +
-                <span class="txt-meta font-semibold">Layer B</span> report.
-                Default = tables / checklist. Switch to <b>Full JSON</b> for expandable scheme blocks.
-              </p>
-            </div>
-            <button type="button" class="btn btn-primary btn-sm sm:btn-md gap-2 shrink-0" id="btn-output-mode" title="Toggle tables vs full Output JSON">
-              Show Full JSON
-            </button>
-          </header>
-          <div class="chapter-body space-y-4">
-            <div id="output-tables-panel">
-              <div id="evidence-panel" class="space-y-3"></div>
-            </div>
-            <div id="output-json-panel" class="hidden space-y-3">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="flex flex-wrap gap-2 text-[11px]">
-                  <span class="badge chip-ed">GREEN · Layer A</span>
-                  <span class="badge chip-meta">PURPLE · Layer B</span>
-                  <span class="badge chip-miss">YELLOW · WIP</span>
-                  <span class="badge chip-ro">RED · from catalog</span>
-                </div>
-                <div class="flex flex-wrap gap-2 items-center">
-                  <div class="join border border-base-content/20 rounded-lg overflow-hidden">
-                    <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-out-expand-all">Expand all</button>
-                    <button type="button" class="btn btn-sm join-item" id="btn-json-out-collapse-all">Collapse all</button>
-                  </div>
-                  <label class="label cursor-pointer gap-2 py-0">
-                    <span class="label-text text-xs">Plain raw</span>
-                    <input type="checkbox" id="chk-json-out-plain" class="toggle toggle-sm" />
-                  </label>
-                  <button type="button" class="btn btn-xs" id="btn-copy-json-output">Copy Output JSON</button>
-                </div>
+            </header>
+            <div class="chapter-body space-y-4">
+              <div id="overview-hero"></div>
+              <div id="summary-row" class="overview-qa"></div>
+              <div id="stamp-health" class="overview-checklist">
+                <h4>Quick checks (is this catalog healthy?)</h4>
+                <div id="stamp-health-body"></div>
               </div>
-              <div id="json-output-annotated"></div>
-              <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-output-pre"></pre>
+              <div class="overview-next" id="overview-next">
+                <button type="button" class="btn btn-sm btn-primary" data-jump-struct="assembly">Next: how the prompt is built →</button>
+                <button type="button" class="btn btn-sm btn-outline" data-jump-struct="catalog">Browse file parts →</button>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
+        </div>
+
+        <!-- 2 Assembly (prompt construction) -->
+        <div class="structure-panel" id="panel-assembly" data-struct-panel="assembly" role="tabpanel" hidden>
+          <article class="chapter chapter-snapshot" id="chapter-assembly">
+            <header class="chapter-head">
+              <span class="ch-num" aria-hidden="true">2</span>
+              <div class="min-w-0 flex-1">
+                <h2>PROMPT in · OUTPUT out (one model round)</h2>
+                <p>
+                  <b>PROMPT</b> =
+                  <span class="txt-ro font-semibold">RULES</span>
+                  <b>+</b>
+                  <span class="txt-inj font-semibold">INJECT</span>
+                  <b>+</b>
+                  <span class="txt-ed font-semibold">MESSAGES</span>
+                  (one request, not three sends) → LLM ↔ Zeus →
+                  <b class="txt-meta">OUTPUT</b> = Layer A terminate
+                  · <code class="text-[10px]">docs/PROMPT_ASSEMBLY.md</code>
+                </p>
+              </div>
+            </header>
+            <div class="chapter-body space-y-4">
+              <div id="assembly-storyboard">
+                <div id="assembly-storyboard-body" class="assembly-flow"></div>
+              </div>
+              <div id="prompt-outline">
+                <div class="zone-label">System prompt outline (topics only)</div>
+                <div id="prompt-outline-body" class="rounded-lg border border-base-content/15 bg-base-200/50 p-3"></div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- 3 Catalog -->
+        <div class="structure-panel" id="panel-catalog" data-struct-panel="catalog" role="tabpanel" hidden>
+          <article class="chapter chapter-catalog" id="chapter-catalog">
+            <header class="chapter-head">
+              <span class="ch-num" aria-hidden="true">3</span>
+              <div class="min-w-0 flex-1">
+                <h2>What’s in this file?</h2>
+                <p id="catalog-mode-blurb">
+                  Grouped by what matters for the AI. Click a card to read the real content in the side panel.
+                  Switch to <b>Full JSON</b> only if you want the raw tree.
+                </p>
+                <p class="text-[11px] font-mono text-muted mt-1" id="json-title">v2/min/…</p>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm sm:btn-md gap-2 shrink-0" id="btn-catalog-mode" title="Toggle tiles vs full JSON">
+                Show Full JSON
+              </button>
+            </header>
+            <div class="chapter-body space-y-3">
+              <div id="catalog-tiles-panel">
+                <div class="catalog-intro" id="catalog-intro">
+                  This tab shows <b>what is inside the JSON file</b>. Start with the two big red cards —
+                  those are what the model actually reads. Purple cards are labels for ops/stamping, not the chat text.
+                </div>
+                <div id="section-grid"></div>
+              </div>
+              <div id="catalog-json-panel" class="hidden space-y-3">
+                <div class="flex flex-wrap gap-2 items-center justify-between">
+                  <div class="zone-label m-0">Full JSON · ▾ expands · header opens content panel</div>
+                  <div class="flex flex-wrap gap-2 items-center" id="json-catalog-toolbar">
+                    <div class="join border border-base-content/20 rounded-lg overflow-hidden">
+                      <button type="button" class="btn btn-sm join-item btn-primary" id="btn-json-expand-all" title="Expand all sections">Expand all</button>
+                      <button type="button" class="btn btn-sm join-item" id="btn-json-collapse-all" title="Collapse all sections">Collapse all</button>
+                    </div>
+                    <label class="label cursor-pointer gap-2 py-0">
+                      <span class="label-text text-xs">Plain raw</span>
+                      <input type="checkbox" id="chk-json-plain" class="toggle toggle-sm" />
+                    </label>
+                    <label class="label cursor-pointer gap-2 py-0">
+                      <span class="label-text text-xs">Blue inject stubs</span>
+                      <input type="checkbox" id="chk-json-inject" class="toggle toggle-sm toggle-info" checked />
+                    </label>
+                    <button type="button" class="btn btn-xs" id="btn-copy-json">Copy full JSON</button>
+                  </div>
+                </div>
+                <div id="json-annotated"></div>
+                <pre class="json bg-base-200 p-3 rounded-lg hidden" id="json-pre"></pre>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- 4 Wire -->
+        <div class="structure-panel" id="panel-wire" data-struct-panel="wire" role="tabpanel" hidden>
+          <article class="chapter chapter-wire" id="chapter-wire">
+            <header class="chapter-head">
+              <span class="ch-num" aria-hidden="true">4</span>
+              <div class="min-w-0 flex-1">
+                <h2>In file vs runtime inject</h2>
+                <p>
+                  <span class="txt-ro font-semibold">Left / red</span> is in this baseline.
+                  <span class="txt-inj font-semibold">Right / blue</span> is added by Client/Hub (not stored here).
+                </p>
+              </div>
+            </header>
+            <div class="chapter-body">
+              <div class="wire-zones" id="wire-grid"></div>
+            </div>
+          </article>
+        </div>
+
+        <!-- 5 Output · Layer A terminate (base-4) -->
+        <div class="structure-panel" id="panel-output" data-struct-panel="output" role="tabpanel" hidden>
+          <article class="chapter chapter-output" id="chapter-output">
+            <header class="chapter-head">
+              <span class="ch-num" aria-hidden="true">5</span>
+              <div class="min-w-0 flex-1">
+                <h2>Output · what the model returns</h2>
+                <p id="output-mode-blurb">
+                  Flat <b>JSON</b> on <code>return</code> / terminating <code>pipeline</code> (Layer A). Not the server Detective store.
+                </p>
+              </div>
+            </header>
+            <div class="chapter-body">
+              <div class="output-mode-bar">
+                <div class="join border border-base-content/20" role="group" aria-label="Output view mode">
+                  <button type="button" class="btn btn-sm join-item btn-primary" id="btn-output-mode-organized" data-output-mode="organized" title="Clean field groups G1/G2/G3">
+                    Organized
+                  </button>
+                  <button type="button" class="btn btn-sm join-item" id="btn-output-mode-json" data-output-mode="json" title="Full terminate JSON example">
+                    JSON
+                  </button>
+                </div>
+                <button type="button" class="btn btn-xs btn-ghost ml-auto" id="btn-copy-json-output" title="Copy Layer A example JSON">Copy JSON</button>
+              </div>
+              <div id="output-tables-panel">
+                <div id="evidence-panel"></div>
+              </div>
+              <div id="output-json-panel" class="hidden space-y-3">
+                <div class="output-intro">
+                  Full Layer A terminate payload (base-4 shape). This is what the model should emit — not chat prose, not Layer B server reports.
+                </div>
+                <pre class="json bg-base-200 output-json-full" id="json-output-pre"></pre>
+                <div id="json-output-annotated" class="hidden"></div>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -1730,6 +2419,7 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
           <p class="help-toc not-prose text-sm flex flex-wrap gap-x-3 gap-y-1">
             Jump:
             <a href="#help-picture">How it fits</a>
+            <a href="#help-assembly">Assembled prompt</a>
             <a href="#help-colors">Colors</a>
             <a href="#help-ui">This UI</a>
             <a href="#glossary">Glossary</a>
@@ -1738,20 +2428,47 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
             <a href="#help-troubleshoot">Troubleshooting</a>
           </p>
 
-          <div class="help-block" data-help-block id="help-picture" data-search="flow client inject terminate stamp baseline">
+          <div class="help-block" data-help-block id="help-picture" data-search="flow client inject terminate stamp baseline assembly wire order">
             <h2 class="!mt-4">Simple picture: how it fits together</h2>
             <pre class="bg-base-200 p-3 rounded text-xs not-prose overflow-x-auto">You ask a question
         │
         ▼
-  Zeus Client (or Hub chat)
-        │  1) load chat_request_*.json  (this file = menu + house rules)
-        │  2) inject BLUE pieces: scope brief, mini-schema, business rules, your message
-        │  3) call the LLM with tools (verbs)
-        │  4) LLM calls Zeus APIs (find / search / pipeline / …)
-        │  5) LLM terminates with STANDARD output fields (Layer A)
+  Zeus Client builds ONE model round:
+
+  ┌─ PROMPT (one request — not three sends) ─────────────┐
+  │  RULES (RED, hashed)  +  INJECT (BLUE)  +  MESSAGES  │
+  └───────────────────────────┬──────────────────────────┘
+                              ▼
+                      LLM  ↔  Zeus tools
+                              │ returns
+                              ▼
+  ┌─ OUTPUT ─────────────────────────────────────────────┐
+  │  Layer A terminate (flat JSON)                       │
+  │  G1 user · G2 admin · G3 client                      │
+  └──────────────────────────────────────────────────────┘
+        │
         ▼
-  Answer + query_decomposition  →  Zeus stores a turn report (Layer B)</pre>
-            <p><b>This repo</b> holds <b>baseline templates</b> (by mode). Production catalogs are refined in Hub Workbench and <b>stamped</b> on your Zeus so the hash matches what you deploy.</p>
+  Zeus stores turn report (Layer B — not model-emitted)</pre>
+            <p><b>This repo</b> holds <b>baseline templates</b> (by mode). Production catalogs are refined in Hub Workbench and <b>stamped</b> on your Zeus so the hash matches what you deploy. Full wire-order doc: <code>docs/PROMPT_ASSEMBLY.md</code> · diagram: <code>images/assembled_prompt.svg</code>.</p>
+          </div>
+
+          <div class="help-block" data-help-block id="help-assembly" data-search="assembled prompt wire order hashed company_context rules hints messages layer a g1 g2 g3 base-4">
+            <h2>Assembled prompt (PROMPT vs OUTPUT)</h2>
+            <p>One model round has two big shells — not five separate “sends.” The Structure <b>Assembly</b> tab and README SVG match this.</p>
+            <ol>
+              <li><b>PROMPT</b> (one request) =
+                <span class="txt-ro font-bold">RULES</span> <b>+</b>
+                <span class="txt-inj font-bold">INJECT</span> <b>+</b>
+                <span class="txt-ed font-bold">MESSAGES[]</span>.
+                Rules = hashed catalog system prompt + tools.
+                Inject = not hashed (MINI-SCHEMA, company_context, rules[], hints…).
+                Messages = the chat transcript. They are <b>combined</b>, not three sequential API calls.</li>
+              <li><b>LLM ↔ Zeus</b> — model may call tools; results land back in messages for later rounds.</li>
+              <li><b>OUTPUT</b> =
+                <span class="txt-meta font-bold">Layer A terminate</span> — one flat JSON object on <code>return</code> / terminating <code>pipeline</code>
+                (G1 user · G2 admin · G3 client). Detective / spans = server Layer B after the model.</li>
+            </ol>
+            <p class="text-sm">See Structure → <b>Assembly</b> tab, or Size map → <b>Wire payload</b> (catalog system+tools + optional blue estimates).</p>
           </div>
 
           <div class="help-block" data-help-block id="help-colors" data-search="red green blue purple yellow rules guidance inject meta missing">
@@ -1772,17 +2489,18 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
                 Scope with a prefix: <code class="text-xs">/help mini-schema</code>, <code class="text-xs">/output *ecomposition</code>, <code class="text-xs">/prompt pipeline</code>.
                 Use <code class="text-xs">*</code> as a wildcard. Free text still searches everything. Press <kbd class="kbd kbd-xs">/</kbd> to focus, <kbd class="kbd kbd-xs">Esc</kbd> clears.</li>
               <li><b>Theme</b> — sun/moon toggle locks light/dark; <b>Auto</b> follows the OS (default).</li>
-              <li><b>Structure</b> — sticky left TOC, four chapters. <b>Show Full JSON</b> toggles tile map ↔ full JSON (not both at once):
+              <li><b>Structure</b> — five tabs (full width, no side TOC):
                 <ol>
-                  <li><b>Snapshot</b> — mode / size / terminate health</li>
-                  <li><b>chat_request</b> — purpose tiles (default) or Full JSON blocks</li>
-                  <li><b>Wire vs inject</b> — RED in-file vs BLUE runtime zones</li>
-                  <li><b>Output scheme</b> — tables (default) or Full JSON scheme blocks</li>
+                  <li><b>Overview</b> — size + stamp / terminate health</li>
+                  <li><b>Assembly</b> — assembled prompt wire order + system outline</li>
+                  <li><b>Catalog</b> — purpose tiles or Full JSON</li>
+                  <li><b>Wire</b> — RED in-file vs BLUE runtime zones</li>
+                  <li><b>Output</b> — Layer A terminate: <b>Organized</b> (G1/G2/G3) or <b>JSON</b></li>
                 </ol>
               </li>
               <li><b>Size map</b> — one treemap (area ∝ bytes). Switch <b>Full catalog</b> vs <b>Wire payload</b>; click a tile → content panel.</li>
               <li><b>Filter badges</b> (top) — Rules / Verbs / Guidance / Inject / Meta / Missing filter visible tiles/blocks.</li>
-              <li><b>Content panel</b> — sticky inspector. Close with <b>✕ Close</b>, bottom link, or <b>Esc</b>.</li>
+              <li><b>Content lightbox</b> — dark full-screen overlay. Close with <b>✕</b> (top right), click the dimmed backdrop, or <b>Esc</b>.</li>
               <li><b>Mode dropdown</b> — every <code>v2/**/chat_request*.json</code> found by the scan (grouped by folder: min, base-N, …). Inspect only; does not change production until you stamp on Zeus.</li>
             </ul>
           </div>
@@ -1792,17 +2510,21 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
           <div class="not-prose glossary-grid text-sm" id="glossary-grid"></div>
           <p id="glossary-empty" class="hidden not-prose text-sm text-muted">No glossary terms match. Clear search or try another word.</p>
 
-          <div class="help-block" data-help-block id="help-injects" data-search="inject blue mini-schema scope brief business prompt_override contract">
+          <div class="help-block" data-help-block id="help-injects" data-search="inject blue mini-schema scope brief business prompt_override contract company_context rules hints order">
             <h2>What Zeus Client injects (BLUE) and why</h2>
+            <p class="text-sm">Inject order (after RED catalog system+tools), matching <code>docs/PROMPT_ASSEMBLY.md</code>:</p>
             <table class="table table-sm not-prose">
-              <thead><tr><th>Injected piece</th><th>Why</th><th>Who sets it</th></tr></thead>
+              <thead><tr><th>Order</th><th>Injected piece</th><th>Why</th><th>Who sets it</th></tr></thead>
               <tbody>
-                <tr><td>User message(s)</td><td>The actual question / conversation</td><td>End user / client app</td></tr>
-                <tr><td>Scope binding</td><td>Which bucket/scope is allowed</td><td>Client session / Hub</td></tr>
-                <tr><td>SCOPE BRIEF + MINI-SCHEMA</td><td>Live entity types &amp; fields so the model doesn’t invent schema</td><td>Zeus for bound scope</td></tr>
-                <tr><td>Business logic / prompt_override</td><td>Your domain language &amp; policies</td><td>Hub Workbench / scope config</td></tr>
-                <tr><td>Contract id + hash</td><td>Prove rules didn’t drift mid-session</td><td>Stamp on Zeus, client binds</td></tr>
-                <tr><td>Tool results each round</td><td>Facts after Zeus runs find/search/…</td><td>Zeus API responses</td></tr>
+                <tr><td>1</td><td>SCOPE BRIEF + MINI-SCHEMA</td><td>Live entity types &amp; fields so the model doesn’t invent schema</td><td>Zeus for bound scope</td></tr>
+                <tr><td>2</td><td><code>company_context</code> / service brief</td><td>“What this business is” + out-of-scope (word-budgeted; base-5+)</td><td>Hub Workbench / scope config</td></tr>
+                <tr><td>3</td><td>message templates</td><td>failure / clarify / out_of_scope / jailbreak soft copy</td><td>Hub / Client</td></tr>
+                <tr><td>4</td><td>indexed <code>rules[]</code></td><td>Hard policy + jailbreak pack (stable indexes in-session)</td><td>Hub / defaults</td></tr>
+                <tr><td>5</td><td><code>hints</code> / hot_path / A/B paste</td><td>After rules; Workbench copy-paste (base-6+)</td><td>Hub A/B / Prompt Helper</td></tr>
+                <tr><td>—</td><td>session / overrides / hooks</td><td><code>zeus_session_id</code>, round clock, denied verbs, AgentHooks</td><td>Client</td></tr>
+                <tr><td>later</td><td>User message(s) in <code>messages[]</code></td><td>Transcript stage (GREEN), not part of the RED hash</td><td>End user / client app</td></tr>
+                <tr><td>later</td><td>Tool results each round</td><td>Appended to <code>messages[]</code> after Zeus runs verbs</td><td>Zeus API responses</td></tr>
+                <tr><td>meta</td><td>Contract id + hash</td><td>Prove RED rules didn’t drift mid-session</td><td>Stamp on Zeus, client binds</td></tr>
               </tbody>
             </table>
             <p>Baselines in GitHub intentionally <b>omit</b> blue content—your live cluster fills it in. BLUE tiles on the Size map are estimates.</p>
@@ -1844,10 +2566,19 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
             </ol>
           </div>
 
-          <div class="help-block" data-help-block data-search="output scheme layer a layer b terminate report query_decomposition">
+          <div class="help-block" data-help-block data-search="output scheme layer a layer b terminate report query_decomposition base-4">
             <h3>What is the output scheme (Layer A vs B)?</h3>
-            <p><b>Layer A — model terminate</b> (same every mode): <code>summary</code>, <code>query_decomposition</code>, <code>decomposition</code>, <code>confidence</code> on <code>return</code> or terminating <code>pipeline</code>.</p>
-            <p><b>Layer B — server report</b>: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, <code>detail.ai.calls</code>, FTS/N1QL, <code>spans</code>) + <code>stored_at</code>. See Cards → chapter 4.</p>
+            <p><b>Layer A — model terminate</b> on <code>return</code> / terminating <code>pipeline</code>.</p>
+            <ul class="list-disc ml-5 mt-1 space-y-1">
+              <li><b>Required (base-1 and base-4):</b> <code>summary</code>, <code>query_decomposition</code>, <code>decomposition</code>, <code>confidence</code> (<code>high|med|low</code>).</li>
+              <li><b>Recommended (base-4+):</b> <code>policy_action</code>, <code>subject_confidence</code>, <code>jail_break_attempt</code> (0.0–1.0), <code>wish_i_knew</code>, <code>business_rules_triggers</code>, refs — see <code>v2/base/base-4/BIBLE.md</code>.</li>
+            </ul>
+            <p class="mt-2"><b>Layer B — server report</b>: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, spans, …) + <code>stored_at</code>. Model does not emit Layer B. See Structure → chapter 4.</p>
+          </div>
+
+          <div class="help-block" data-help-block data-search="base-1 base-4 multiple bases dropdown migration diff">
+            <h3>base-1 and base-4 in this inspector?</h3>
+            <p><b>One <code>index.html</code></b> lists every <code>v2/**/chat_request*.json</code> (rescan with <code>scripts/scan_catalogs.py</code>). Use the mode dropdown (folder · mode · base_id) and <b>Diff</b> / <b>Matrix</b> to compare base-1 vs base-4. Do not maintain a separate index-base-4.html for catalog mapping. Migration map: <code>v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md</code>.</p>
           </div>
 
           <div class="help-block" data-help-block data-search="guidance yellow missing min">
@@ -1869,8 +2600,8 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
             <h3>Expand/collapse and the content panel?</h3>
             <ul>
               <li>JSON <b>▾</b> toggles one section; <b>Expand all / Collapse all</b> for everything.</li>
-              <li>Cards / tiles / JSON headers open the sticky panel (<b>Open →</b>).</li>
-              <li>Close with <b>✕ Close</b>, bottom link, or <b>Esc</b>.</li>
+              <li>Cards / tiles / JSON headers open a full-screen lightbox (<b>Open →</b>).</li>
+              <li>Close with <b>✕</b>, backdrop click, or <b>Esc</b>.</li>
             </ul>
           </div>
 
@@ -1982,7 +2713,7 @@ const GLOSSARY = [
   { term: "Boundary / scope", kind: "inject", def: "Hard wall: the model may only touch data in the bound bucket/scope. Stops cross-tenant leaks." },
   { term: "Bucket", kind: "meta", def: "Couchbase data container. Zeus scopes sit on buckets; chat never invents a bucket outside the bound session." },
   { term: "Business logic / prompt_override", kind: "inject", def: "Your company language & policies. Injected (BLUE) from Hub/Workbench—not hard-coded into public baselines." },
-  { term: "Cards chapters", kind: "meta", def: "Cards page is split into 1 Snapshot · 2 Catalog parts · 3 Wire vs inject · 4 Output scheme, with a sticky On-this-page TOC." },
+  { term: "Cards chapters", kind: "meta", def: "Structure page is five tabs: Overview · Assembly · Catalog · Wire · Output (full width; no side TOC)." },
   { term: "chat_request*.json", kind: "rules", def: "The menu + house rules the AI sees: tools it may call + how to answer. One file per mode." },
   { term: "Cheap vs expensive verbs", kind: "rules", def: "find/get are cheap; search/analyze cost more. Prompt steers cheapest first so chats stay fast and affordable." },
   { term: "confidence", kind: "guidance", def: "Required terminate field: only the strings high, med, or low (not a float). Used for analytics and UX badges." },
@@ -2020,7 +2751,8 @@ const GLOSSARY = [
   { term: "query_decomposition", kind: "guidance", def: "Required terminate object: business intent facets (intent+entity…). Powers hot-path analytics." },
   { term: "report.detail.ai.calls", kind: "meta", def: "Ordered tool invocations with args + results in the server report. Where pipeline steps and terminate fields land as JSON." },
   { term: "report.spans", kind: "meta", def: "Timeline slices (dispatch, ai.round, pipeline step, fts, tool) with duration_ns for performance forensics." },
-  { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence)." },
+  { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits Layer A (required: summary + decompositions + confidence; base-4+ also recommends policy_action, admin scores, wish_i_knew, business_rules_triggers)." },
+  { term: "base-1 vs base-4", kind: "meta", def: "Same inspector: pick catalogs from the dropdown by folder/BASE. base-1 is production pin (v2/min); base-4 is prototype diet with richer Layer A. Diff/Matrix compare them." },
   { term: "Rules (hashed)", kind: "rules", def: "What production promised: messages, verbs, masq, etc. Change ⇒ new hash." },
   { term: "ScopeConfig", kind: "inject", def: "Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production." },
   { term: "Search (this UI)", kind: "meta", def: "Top-bar search across the whole page. Scope with /help /glossary /prompt /catalog /tools /inject /output (e.g. /help mini-schema). Use * as wildcard (e.g. /output *ecomposition). Yellow mark shows matches; click a hit to jump." },
@@ -2032,8 +2764,11 @@ const GLOSSARY = [
   { term: "Tool result / multi-round", kind: "rules", def: "After each verb, Zeus returns facts into the conversation; the model may call more tools or terminate." },
   { term: "turn_complete", kind: "guidance", def: "Pipeline/return flag: server can short-circuit without another LLM round when terminate fields were supplied with the tool call." },
   { term: "verbs / tools", kind: "rules", def: "Allowed Zeus API functions for the model. No verb ⇒ no safe access to that capability." },
+  { term: "Assembled prompt / wire order", kind: "meta", def: "One model round: PROMPT = RULES + INJECT + MESSAGES (one request, not three sends) → LLM↔Zeus → OUTPUT = Layer A terminate (G1/G2/G3). Structure → Assembly · docs/PROMPT_ASSEMBLY.md · images/assembled_prompt.svg." },
+  { term: "company_context / service_brief", kind: "inject", def: "Short “what this business is” inject after MINI-SCHEMA and before rules[]. Word-budgeted (soft ~150 / hard ~250 words). Not hashed with the BASE." },
+  { term: "G1 / G2 / G3 (Layer A)", kind: "rules", def: "Terminate field groups: G1 user-facing (summary, confidence, decompositions); G2 admin-only (subject_confidence, wish_i_knew, jail_break_attempt); G3 client control-plane (business_rules_triggers, policy_action). Never put G2/G3 in chat UI." },
   { term: "Wire payload", kind: "inject", def: "What actually goes to the LLM: catalog system+tools plus BLUE injects and conversation—not the whole pretty JSON file." },
-  { term: "Wire vs inject (chapter 3)", kind: "meta", def: "Cards chapter that splits RED in-file pieces from BLUE runtime inject estimates side by side." },
+  { term: "Wire vs inject (chapter 3)", kind: "meta", def: "Cards chapter that splits RED in-file pieces from BLUE runtime inject estimates side by side. Fits after Assembly wire-order storyboard." },
   { term: "WIP checklist", kind: "miss", def: "Cards output chapter list of what a real Hub turn had vs still missing (e.g. query_decomposition, tokens, project missing:true)." },
   { term: "zeus_chat_request repo", kind: "meta", def: "Published baselines for clients without cloning the engine. This UI maps that structure." },
   { term: "Zeus Client", kind: "meta", def: "Middleman: loads catalog, injects blue context, calls LLM, executes verbs on Zeus, returns answers." },
@@ -2755,95 +3490,125 @@ const COLORS = {
 /** Unified section definitions: cards + tree + content “why” */
 const STRUCTURE = [
   {
-    key: "_format",
-    title: "_format / _version",
-    edit: "meta",
-    minTypical: true,
-    path: "_format",
-    why: "Tells Zeus/Client “this is a V2 catalog.” Without it, tools don’t know how to parse the envelope.",
-    aiNeeds: "Low direct use by the model; required for loaders and stamping.",
-  },
-  {
-    key: "_hash_policy",
-    title: "_hash_policy",
-    edit: "rules",
-    minTypical: true,
-    path: "_hash_policy",
-    why: "Defines what counts as Rules when computing the contract hash (so guidance can change without breaking every client).",
-    aiNeeds: "Not sent as prose; protects production binding.",
-  },
-  {
-    key: "contract",
-    title: "contract (stamp)",
-    edit: "meta",
-    minTypical: true,
-    path: "contract",
-    why: "Holds id/hash after verify. Clients bind this so every turn uses the same approved ruleset.",
-    aiNeeds: "Not model prose; required for drift detection.",
-  },
-  {
     key: "messages",
-    title: "messages · system prompt",
+    title: "System prompt (the house rules)",
+    plain: "The main written instructions the model reads: how to behave, when to stop, and how to answer.",
+    group: "guts",
+    kicker: "What the AI reads",
     edit: "rules",
     wire: true,
     minTypical: true,
     path: "messages",
-    why: "The AI’s operating instructions: how to call tools, when to stop, evidence-loop terminate fields.",
-    aiNeeds: "This is the main RED prose the model reads from the file.",
+    why: "The AI’s operating instructions: how to call tools, when to stop, terminate fields.",
+    aiNeeds: "This is the main prose the model reads from the file.",
   },
   {
     key: "verbs",
-    title: "verbs · tools",
+    title: "Tools the AI may call",
+    plain: "The allowed Zeus API functions (search, find, pipeline, return, …). No tool here ⇒ the model cannot call it.",
+    group: "guts",
+    kicker: "What the AI can do",
     edit: "rules",
     wire: true,
     minTypical: true,
     path: "verbs",
-    why: "The only functions the model is allowed to call against Zeus (find, search, pipeline, return, …).",
+    why: "The only functions the model is allowed to call against Zeus.",
     aiNeeds: "Without verbs the model cannot legally fetch your data.",
   },
   {
     key: "masq",
-    title: "masq · cost tiers",
+    title: "Tool cost hints",
+    plain: "Optional ranking so the model prefers cheap tools before expensive ones. Often missing on min catalogs.",
+    group: "soft",
+    kicker: "Optional",
     edit: "rules",
     minTypical: false,
     path: "masq",
-    why: "Ranks tools by cost so the model prefers cheap lookups before expensive search.",
+    why: "Ranks tools by cost so the model prefers cheap lookups first.",
     aiNeeds: "Guides tool choice; often only on full profiles.",
   },
   {
     key: "instructions",
-    title: "instructions",
+    title: "Extra structured rules",
+    plain: "Optional block for response expectations / verb order. On min profiles this is usually folded into the system prompt.",
+    group: "soft",
+    kicker: "Optional",
     edit: "rules",
     minTypical: false,
     path: "instructions",
-    why: "Structured rules block: response_expectations, verb order. Full profiles; min folds essentials into messages.",
-    aiNeeds: "response_expectations define the standard terminate schema.",
+    why: "Structured rules block; full profiles only.",
+    aiNeeds: "Often empty on min — essentials live in messages.",
   },
   {
     key: "guidance",
-    title: "guidance · business hints",
+    title: "Soft business hints",
+    plain: "Optional green guidance (paths, facets). Not the hard contract — often tuned in Hub without re-stamping.",
+    group: "soft",
+    kicker: "Optional",
     edit: "guidance",
     minTypical: false,
     path: "guidance",
-    why: "GREEN place for optimal paths and facet docs. Hash-excluded so you can tune without rebinding every client.",
-    aiNeeds: "Soft steering; missing on min (use Hub injects instead).",
+    why: "Soft steering; missing on min (use Hub injects instead).",
+    aiNeeds: "Soft steering; missing on min.",
+  },
+  {
+    key: "_format",
+    title: "File format label",
+    plain: "Says “this is a Zeus V2 chat_request.” Loaders need it; the model almost never cares.",
+    group: "ops",
+    kicker: "Ops / packaging",
+    edit: "meta",
+    minTypical: true,
+    path: "_format",
+    why: "Tells Zeus/Client this is a V2 catalog envelope.",
+    aiNeeds: "Low direct use by the model.",
+  },
+  {
+    key: "contract",
+    title: "Stamp / contract id",
+    plain: "After Hub verifies the catalog, this holds the approved fingerprint so clients don’t drift mid-session.",
+    group: "ops",
+    kicker: "Ops / packaging",
+    edit: "meta",
+    minTypical: true,
+    path: "contract",
+    why: "Holds id/hash after verify for production binding.",
+    aiNeeds: "Not model prose; drift detection.",
+  },
+  {
+    key: "_hash_policy",
+    title: "What counts toward the stamp",
+    plain: "Defines which parts of the file change the contract fingerprint (so soft guidance can move without a new stamp).",
+    group: "ops",
+    kicker: "Ops / packaging",
+    edit: "rules",
+    minTypical: true,
+    path: "_hash_policy",
+    why: "Defines what counts as Rules for the contract hash.",
+    aiNeeds: "Not sent as prose.",
   },
   {
     key: "metadata",
-    title: "metadata",
+    title: "Bookkeeping labels",
+    plain: "Human/ops notes (mode label, generator flags). Not shown to the model as instructions.",
+    group: "ops",
+    kicker: "Ops / packaging",
     edit: "meta",
     minTypical: false,
     path: "metadata",
-    why: "Bookkeeping (mode label, generated flags). Not model-facing.",
+    why: "Bookkeeping only.",
     aiNeeds: "Humans/ops only.",
   },
   {
     key: "_note",
-    title: "_note",
+    title: "Human sticky note",
+    plain: "A short reminder for people reading the file (e.g. “min profile”). Ignored by the model.",
+    group: "ops",
+    kicker: "Ops / packaging",
     edit: "meta",
     minTypical: true,
     path: "_note",
-    why: "Human reminder (e.g. min profile, evidence-loop).",
+    why: "Human reminder.",
     aiNeeds: "Not used by the model.",
   },
 ];
@@ -2855,15 +3620,21 @@ const INJECT_ESTIMATES = [
   { name: "tool results (round 1)", bytes: 4000, note: "Facts returned after Zeus executes verbs." },
 ];
 
-/** Model terminate fields (return verb / top-level pipeline terminate). */
+/** Layer A terminate fields (base-4) — flat JSON on return / terminating pipeline. */
 const EVIDENCE_FIELDS = [
-  { name: "summary", required: true, layer: "answer", note: "Human-readable facts (string). Not a step narrative." },
-  { name: "query_decomposition", required: true, layer: "intent", note: "Business intent facets object — hot-path / evidence-loop primary key." },
-  { name: "decomposition", required: true, layer: "data", note: "Data plan: targets, predicates, output type (grounded in MINI-SCHEMA)." },
-  { name: "confidence", required: true, layer: "answer", note: "STRING only: high | med | low (never a number/object)." },
-  { name: "node_refs", required: false, layer: "ground", note: "Node ids that support the answer." },
-  { name: "entity_refs", required: false, layer: "ground", note: "Entity refs for grounding." },
-  { name: "provenance", required: false, layer: "ground", note: "Where facts came from (tool steps / bags)." },
+  { name: "summary", required: true, group: "g1", ui: "chat", note: "Human-readable answer for the end user (string). No admin scores here." },
+  { name: "confidence", required: true, group: "g1", ui: "chat", note: "Overall answer confidence: high | med | low (string only)." },
+  { name: "query_decomposition", required: true, group: "g1", ui: "analytics", note: "Business intent facets object (intent, entity, …). Evidence-loop key." },
+  { name: "decomposition", required: true, group: "g1", ui: "analytics", note: "Data plan: targets, predicates, output type (grounded in MINI-SCHEMA)." },
+  { name: "node_refs", required: false, group: "g1", ui: "optional", note: "Node ids that support the answer." },
+  { name: "entity_refs", required: false, group: "g1", ui: "optional", note: "Entity refs for grounding." },
+  { name: "provenance", required: false, group: "g1", ui: "optional", note: "Where facts came from (tool steps / bags)." },
+  { name: "subject_confidence", required: false, group: "g2", ui: "never", note: "0.0–1.0 how sure we are about the subject. Admin only — never chat UI." },
+  { name: "wish_i_knew", required: false, group: "g2", ui: "never", note: "Up to 3 things that would have helped (admin learning). Never chat UI." },
+  { name: "jail_break_attempt", required: false, group: "g2", ui: "never", note: "0.0–1.0 subjective jailbreak score. Never chat UI." },
+  { name: "business_rules_triggers", required: false, group: "g3", ui: "never", note: "Bool array parallel to Client rules[] indexes. Client control-plane." },
+  { name: "policy_action", required: false, group: "g3", ui: "never", note: "answer | clarify | refuse | error — Client control-plane." },
+  { name: "round", required: false, group: "g3", ui: "optional", note: "Optional round index when multi-round Client is used." },
 ];
 
 /** Facets inside query_decomposition (ideal; WIP models often only emit intent). */
@@ -2979,11 +3750,13 @@ const MODE_BLURBS = {
 
 let state = {
   view: "boxes",
-  jsonTab: "catalog", // catalog | output (scroll focus)
-  /** Structure ch.2: tiles (default) | json */
+  /** Structure sub-tab: overview | assembly | catalog | wire | output */
+  structureTab: "overview",
+  jsonTab: "catalog", // catalog | output focus
+  /** Catalog panel: tiles (default) | json */
   catalogMode: "tiles",
-  /** Structure ch.4: tables (default) | json */
-  outputMode: "tables",
+  /** Output panel: organized (default) | json */
+  outputMode: "organized",
   /** Active Cards filters: empty / has "all" = show everything. Else Set of rules|verbs|guidance|inject|meta|miss */
   tileFilters: new Set(["all"]),
   /** Full scan index (catalog-index.json) or manifest fallback */
@@ -3235,11 +4008,14 @@ function resolvePathContent(doc, path) {
   return { value: null, note: path, why: "" };
 }
 
-function closeContentPanel() {
-  state.selectedPath = null;
-  lastContentText = "";
-  const panel = document.getElementById("content-panel");
-  panel.classList.add("is-empty");
+let contentPanelCloseTimer = null;
+const CONTENT_LIGHTBOX_MS = 240;
+
+function getContentLightbox() {
+  return document.getElementById("content-lightbox");
+}
+
+function resetContentPanelChrome() {
   document.getElementById("content-title").textContent = "Nothing selected";
   document.getElementById("content-sub").textContent =
     "Click a card, size tile, table row, or JSON block to inspect it here.";
@@ -3248,19 +4024,75 @@ function closeContentPanel() {
   document.getElementById("content-class").textContent = "—";
   document.getElementById("content-class").className = "badge badge-outline badge-sm";
   document.getElementById("btn-copy-content").disabled = true;
-  document.getElementById("content-why").classList.add("hidden");
-  document.getElementById("content-why").innerHTML = "";
-  document.getElementById("content-body").innerHTML = "";
+  document.getElementById("content-why")?.classList.add("hidden");
+  const why = document.getElementById("content-why");
+  if (why) why.innerHTML = "";
+  const body = document.getElementById("content-body");
+  if (body) body.innerHTML = "";
+}
+
+function clearContentSelection() {
   document.querySelectorAll(".card-click.selected").forEach((el) => el.classList.remove("selected"));
-  document.querySelectorAll("#json-annotated .json-block.selected").forEach((b) => b.classList.remove("selected"));
+  document
+    .querySelectorAll("#json-annotated .json-block.selected, #json-output-annotated .json-block.selected")
+    .forEach((b) => b.classList.remove("selected"));
+}
+
+function closeContentPanel() {
+  state.selectedPath = null;
+  lastContentText = "";
+  const lb = getContentLightbox();
+  if (!lb) return;
+
+  if (contentPanelCloseTimer) {
+    clearTimeout(contentPanelCloseTimer);
+    contentPanelCloseTimer = null;
+  }
+
+  clearContentSelection();
   document.getElementById("status").textContent =
-    (state.mode ? `Mode ${state.mode}. ` : "") + "Content panel closed.";
+    (state.mode ? `Mode ${state.mode}. ` : "") + "Content closed.";
+
+  // Already closed
+  if (lb.hidden || (!lb.classList.contains("is-open") && !lb.classList.contains("is-closing"))) {
+    lb.hidden = true;
+    lb.classList.remove("is-open", "is-closing");
+    lb.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("lightbox-open");
+    resetContentPanelChrome();
+    return;
+  }
+
+  lb.classList.remove("is-open");
+  lb.classList.add("is-closing");
+  lb.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("lightbox-open");
+
+  const finish = () => {
+    contentPanelCloseTimer = null;
+    lb.classList.remove("is-closing", "is-open");
+    lb.hidden = true;
+    resetContentPanelChrome();
+  };
+
+  const reduce =
+    typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) finish();
+  else contentPanelCloseTimer = setTimeout(finish, CONTENT_LIGHTBOX_MS);
 }
 
 function showContentPanel({ path, bytes, cls, value, note, why }) {
   state.selectedPath = path;
+  const lb = getContentLightbox();
   const panel = document.getElementById("content-panel");
-  panel.classList.remove("is-empty");
+  if (!lb || !panel) return;
+
+  if (contentPanelCloseTimer) {
+    clearTimeout(contentPanelCloseTimer);
+    contentPanelCloseTimer = null;
+  }
+
+  // Populate first, then open overlay
   document.querySelectorAll(".card-click").forEach((el) => {
     el.classList.toggle("selected", el.getAttribute("data-path") === path);
   });
@@ -3293,12 +4125,10 @@ function showContentPanel({ path, bytes, cls, value, note, why }) {
 
   document.getElementById("status").textContent = `Selected: ${path} · ${formatBytes(bytes)} · ${formatTokens(bytes)} · ${classLabel(cls || "")}`;
 
-  // Sync selection on JSON colored blocks (catalog + output tabs)
   document.querySelectorAll("#json-annotated .json-block, #json-output-annotated .json-block").forEach((b) => {
     b.classList.toggle("selected", b.getAttribute("data-path") === path);
   });
 
-  // Auto-expand the matching JSON block when selecting from cards/tree
   const jb = document.querySelector(
     `#json-annotated .json-block[data-path="${CSS.escape(path)}"], #json-output-annotated .json-block[data-path="${CSS.escape(path)}"]`
   );
@@ -3308,9 +4138,17 @@ function showContentPanel({ path, bytes, cls, value, note, why }) {
     if (t) t.textContent = "▾";
   }
 
-  // Keep the sticky panel in view (especially after scrolling deep into JSON)
+  // Open lightbox
+  lb.hidden = false;
+  lb.classList.remove("is-closing");
+  void lb.offsetWidth; // reflow for enter animation
+  lb.classList.add("is-open");
+  lb.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lightbox-open");
+
+  // Focus close for keyboard users
   try {
-    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    document.getElementById("btn-close-content")?.focus({ preventScroll: true });
   } catch (_) {
     /* ignore */
   }
@@ -3325,6 +4163,19 @@ function openPath(path, bytes, cls) {
   let c = cls || resolved.cls || classForKey(path.split(/[.[]/)[0] || path);
   if (resolved.missing) c = "miss";
   if (resolved.estimate) c = "inject";
+  // Show the Structure tab that owns this path (tabs replace long scroll chapters)
+  if (state.view === "boxes" || state.view === "size") {
+    if (state.view !== "boxes") setView("boxes", { skipHash: true });
+    let tab = "catalog";
+    if (p.startsWith("inject") || p.startsWith("inject:") || c === "inject") tab = "wire";
+    else if (
+      p.startsWith("output.") ||
+      p.startsWith("verbs.return") ||
+      p.startsWith("query_decomposition")
+    )
+      tab = "output";
+    setStructureTab(tab, { skipHash: true });
+  }
   showContentPanel({
     path,
     bytes: b,
@@ -3436,8 +4287,8 @@ function applyCardFilters() {
     ch.classList.toggle("is-filter-empty", !any && !showAll);
   });
 
-  // Hide snapshot sub-blocks that have no remaining tiles (anatomy etc.)
-  ["anatomy-recipe", "stamp-health", "assembly-storyboard", "prompt-outline"].forEach((id) => {
+  // Hide overview/assembly sub-blocks that have no remaining tiles
+  ["stamp-health", "assembly-storyboard", "prompt-outline"].forEach((id) => {
     const block = document.getElementById(id);
     if (!block) return;
     const tiles = block.querySelectorAll("[data-tile]");
@@ -3556,102 +4407,187 @@ function updateBaseBadge(doc, entry) {
 
 function renderSummary(doc, mode, entry) {
   const disk = jsonBytes(doc);
-  const ret = findReturnVerb(doc);
-  const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
-  const ok = /query_decomposition/i.test(systemContent(doc)) && req.has("query_decomposition");
-  const blurb = MODE_BLURBS[mode] || "Mode profile for tools + behavior.";
+  const th = terminateHealth(doc);
+  const blurb = MODE_BLURBS[mode] || "A ready-made agent style (tools + house rules).";
   const baseId = resolveBaseId(doc, entry);
-  document.getElementById("summary-row").innerHTML = [
-    { t: "Mode", b: mode, s: blurb, c: "box-meta tile-meta", path: null, kind: "meta", tags: ["summary"] },
+  const nVerbs = (doc.verbs || []).length;
+  const sysB = jsonBytes(systemContent(doc));
+  const fileLabel = (entry && entry.file) || state.catalogFile || "";
+
+  const hero = document.getElementById("overview-hero");
+  if (hero) {
+    const basePlain = !baseId
+      ? "version not labeled"
+      : baseId === "base-1"
+        ? "production pin (base-1)"
+        : baseId.startsWith("base-")
+          ? "catalog generation " + baseId
+          : baseId;
+    hero.innerHTML = `
+      <h3>You’re inspecting a <em>chat_request</em> catalog</h3>
+      <p>
+        Think of it as the <b>recipe card for one AI agent</b>: written house rules plus the tools it’s allowed to use.
+        Pick another file in the dropdown to switch agent style (analytics, fraud, …).
+        Nothing here is the live customer chat yet — that is assembled at runtime (see the <b>Assembly</b> tab).
+      </p>
+      <div class="oh-meta">
+        <span class="oh-chip">Agent style: <b>${escapeHtml(mode || "—")}</b></span>
+        <span class="oh-chip">Catalog gen: <b>${escapeHtml(basePlain)}</b></span>
+        <span class="oh-chip">File size: <b>${escapeHtml(formatBytes(disk))}</b> (~${escapeHtml(String(approxTokens(disk)))} tok)</span>
+        <span class="oh-chip">${nVerbs} tools · system prompt ${escapeHtml(formatBytes(sysB))}</span>
+      </div>
+      ${fileLabel ? `<p class="text-[11px] font-mono opacity-60 mt-2 m-0 break-all">${escapeHtml(fileLabel)}</p>` : ""}
+    `;
+  }
+
+  const cards = [
     {
-      t: "BASE",
-      b: baseId || "—",
-      s: baseId
-        ? "Lineage pin from _lineage.base_id (increments when catalogs republish)."
-        : "No base_id on this file.",
-      c: "box-meta tile-meta",
+      q: "What kind of agent is this?",
+      a: mode || "unknown",
+      why: blurb,
+      cls: "",
+      path: null,
+      kind: "meta",
+      tags: ["summary"],
+    },
+    {
+      q: "Which catalog generation?",
+      a: baseId || "not labeled",
+      why: baseId
+        ? baseId === "base-1"
+          ? "base-1 is the production pin in this repo (v2/min). Newer lines (base-4, …) are experimental until promoted."
+          : "Generation label from _lineage.base_id — used when comparing catalogs (Diff / Matrix)."
+        : "This file has no _lineage.base_id. Still readable; lineage helps Diff and stamps.",
+      cls: "",
       path: null,
       kind: "meta",
       tags: ["summary", "lineage", "base"],
     },
     {
-      t: "Zeus API base",
-      b: `${formatBytes(disk)} · ${formatTokens(disk)}`,
-      s: "Baseline catalog size used when assembling Zeus API requests.",
-      c: "box-ro tile-rules",
-      path: null,
+      q: "How big are the house rules + tools?",
+      a: `${formatBytes(disk)}  ·  ~${approxTokens(disk)} tokens`,
+      why: "Size of this JSON file. Most of it is the system prompt and the tool list the model may call.",
+      cls: "is-rules",
+      path: "messages",
       kind: "rules",
-      tags: ["summary", "size"],
+      tags: ["summary", "size", "prompt"],
     },
     {
-      t: "Standard terminate schema",
-      b: ok ? "OK" : "Gaps",
-      s: "summary + query_decomposition + decomposition + confidence",
-      c: ok ? "box-ed tile-edit" : "box-miss tile-miss",
+      q: "Can the AI end a turn correctly?",
+      a: th.ok ? "Yes — end-of-turn fields look complete" : "Needs attention — end-of-turn fields incomplete",
+      why: th.ok
+        ? "The catalog asks the model to finish with summary, query_decomposition, decomposition, and confidence."
+        : "Missing pieces: " +
+          ((th.missing && th.missing.length ? th.missing.join(", ") : "check system prompt for query_decomposition") +
+            ". Open the Output tab for the full checklist."),
+      cls: th.ok ? "is-ok" : "is-bad",
       path: "verbs.return",
-      kind: ok ? "guidance" : "miss",
-      // terminate health — not a verb-list tile (path verbs.return still matches Verbs via path rule)
+      kind: th.ok ? "guidance" : "miss",
       tags: ["summary", "output", "return", "terminate"],
     },
-  ]
+  ];
+
+  document.getElementById("summary-row").innerHTML = cards
     .map(
-      (x) => `<div class="card bg-base-100 shadow section-card ${x.c} ${x.path ? "card-click" : "card-static"}" ${tileAttrs(x.kind, x.tags)} ${x.path ? `data-path="${x.path}"` : ""}>
-      <div class="card-body p-4 gap-1">
-        <div class="flex items-start justify-between gap-2">
-          <div class="text-xs uppercase opacity-60">${escapeHtml(x.t)}</div>
-          ${x.path ? clickHintHtml("Open") : `<span class="text-[10px] uppercase opacity-40">info only</span>`}
-        </div>
-        <div class="font-mono text-sm">${escapeHtml(x.b)}</div>
-        <div class="text-xs opacity-70">${escapeHtml(x.s)}</div>
-      </div></div>`
+      (x) => `<div class="overview-qa-card ${x.cls} ${x.path ? "card-click" : ""}" ${tileAttrs(x.kind, x.tags)} ${
+        x.path ? `data-path="${escapeHtml(x.path)}"` : ""
+      }>
+        <div class="q">${escapeHtml(x.q)}</div>
+        <div class="a">${escapeHtml(x.a)}</div>
+        <div class="why">${escapeHtml(x.why)}</div>
+      </div>`
     )
     .join("");
-  wireCardClick(document.getElementById("summary-row"), (el) => openPath(el.getAttribute("data-path")));
+  wireCardClick(document.getElementById("summary-row"), (el) => {
+    const p = el.getAttribute("data-path");
+    if (p) openPath(p);
+  });
   applyCardFilters();
 }
 
 function renderSections(doc) {
   const grid = document.getElementById("section-grid");
-  grid.innerHTML = STRUCTURE.map((s, idx) => {
+  if (!grid) return;
+
+  const groups = [
+    {
+      id: "guts",
+      cls: "is-guts",
+      badge: "Read this first",
+      title: "What the AI actually gets from this file",
+      blurb: "These two blocks are the guts of the chat prompt in the catalog. Click to open the real text / tool list.",
+    },
+    {
+      id: "soft",
+      cls: "is-soft",
+      badge: "Optional",
+      title: "Soft extras (often empty on min catalogs)",
+      blurb: "Nice-to-have steering. Missing here is normal for min files — Hub injects fill business language at runtime.",
+    },
+    {
+      id: "ops",
+      cls: "is-ops",
+      badge: "Not the prompt",
+      title: "Packaging & ops labels",
+      blurb: "Format tags, stamp fingerprint, sticky notes. Needed by Zeus/Client — not house-rule prose for the model.",
+    },
+  ];
+
+  const cardHtml = (s) => {
     const present = hasKey(doc, s.key);
     const missing = !present;
     const val = present ? doc[s.key] : null;
     const b = present ? jsonBytes(val) : 0;
-    const expected =
-      !present && !s.minTypical ? "Expected missing on min — use full profile or Hub injects." : !present && s.minTypical ? "Unexpected missing." : "";
-    const keyColor =
-      s.edit === "rules" ? "txt-ro" : s.edit === "guidance" ? "txt-ed" : "txt-meta";
     const kind = missing ? "miss" : s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta";
-    const tags = [s.key];
-    if (s.key === "verbs" || s.path === "verbs") tags.push("tools", "verb-list");
+    const tags = [s.key, s.group || "ops"];
+    if (s.key === "verbs") tags.push("tools", "verb-list");
     if (s.key === "messages") tags.push("prompt", "messages");
-    return `<div class="card bg-base-100 shadow section-card card-click ${boxClass(s.edit, missing)}" ${tileAttrs(kind, tags)} data-path="${escapeHtml(s.path)}" title="Click to open ${escapeHtml(s.path)}">
-      <div class="card-body p-4 gap-2">
-        <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            <div class="text-[10px] font-mono opacity-50 mb-0.5">${String(idx + 1).padStart(2, "0")} · <span class="${keyColor}">${escapeHtml(s.key)}</span></div>
-            <h3 class="font-semibold text-sm ${keyColor}">${escapeHtml(s.title)}</h3>
-          </div>
-          <div class="flex flex-wrap items-center gap-1 justify-end shrink-0">
-            ${editBadge(s.edit, missing)}
-            ${clickHintHtml("Open")}
-          </div>
-        </div>
-        <p class="text-xs"><span class="font-semibold opacity-70">Why AI needs it:</span> ${escapeHtml(s.why)}</p>
-        <p class="text-xs opacity-70">${escapeHtml(s.aiNeeds || "")}</p>
-        <div class="flex flex-wrap items-center justify-between gap-2 mt-auto pt-1 border-t border-base-content/10">
-          <div class="text-[11px] font-mono opacity-80">${present ? formatBytes(b) + " · " + formatTokens(b) : "—"}</div>
-          <span class="text-[11px] opacity-70">Open full content</span>
-        </div>
-        ${expected ? `<div class="text-[11px] text-warning">${escapeHtml(expected)}</div>` : ""}
+    const status = present
+      ? formatBytes(b) + " · " + formatTokens(b)
+      : s.minTypical
+        ? "Missing (unexpected)"
+        : "Not in this min file";
+    const groupCls = missing ? "is-miss" : s.group === "guts" ? "is-guts" : s.group === "soft" ? "is-soft" : "is-ops";
+    return `<div class="catalog-card card-click ${groupCls}" ${tileAttrs(kind, tags)} data-path="${escapeHtml(
+      s.path
+    )}" title="Open ${escapeHtml(s.path)}">
+      <div class="cc-kicker">${escapeHtml(s.kicker || s.group || "")}</div>
+      <h4>${escapeHtml(s.title)}</h4>
+      <p class="cc-plain">${escapeHtml(s.plain || s.why || "")}</p>
+      <div class="cc-foot">
+        <span>${escapeHtml(status)}</span>
+        <span class="cc-key">${escapeHtml(s.key)}</span>
+        ${clickHintHtml("Read")}
       </div>
     </div>`;
-  }).join("");
+  };
+
+  grid.innerHTML = groups
+    .map((g) => {
+      const items = STRUCTURE.filter((s) => (s.group || "ops") === g.id);
+      if (!items.length) return "";
+      const gridCls = g.id === "guts" ? "catalog-grid-guts" : "catalog-grid-other";
+      return `<section class="catalog-group ${g.cls}" data-catalog-group="${g.id}">
+        <div class="catalog-group-head">
+          <span class="cg-badge">${escapeHtml(g.badge)}</span>
+          <h3>${escapeHtml(g.title)}</h3>
+          <p>${escapeHtml(g.blurb)}</p>
+        </div>
+        <div class="${gridCls}">${items.map(cardHtml).join("")}</div>
+      </section>`;
+    })
+    .join("");
+
   wireCardClick(grid, (el) => {
     const path = el.getAttribute("data-path");
     const s = STRUCTURE.find((x) => x.path === path);
+    if (!s) return openPath(path);
     const present = hasKey(doc, s.key);
-    openPath(path, present ? jsonBytes(doc[s.key]) : 0, present ? s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta" : "miss");
+    openPath(
+      path,
+      present ? jsonBytes(doc[s.key]) : 0,
+      present ? (s.edit === "guidance" ? "guidance" : s.edit === "rules" ? "rules" : "meta") : "miss"
+    );
   });
   applyCardFilters();
 }
@@ -3726,233 +4662,173 @@ function renderWire(doc) {
   applyCardFilters();
 }
 
-function renderEvidence(doc) {
+function base4TerminateExample() {
+  return {
+    summary:
+      "I can help you find rooms and check offers we actually have. What city and check-in/check-out are you looking at?",
+    confidence: "med",
+    query_decomposition: {
+      intent: "Book",
+      entity: "Hotel",
+      geo: null,
+      theme: null,
+      attribute: null,
+      parts: null,
+      other: { coupon_code_mentioned: "SAVE20" },
+    },
+    decomposition: {
+      intent: "find rooms / apply coupon if valid",
+      targets: [{ entity_type: "Hotel", focus: ["city", "dates", "price"] }],
+      predicates: {},
+      output: "rows",
+      context: { needs: ["city", "check_in", "check_out"] },
+    },
+    node_refs: [],
+    entity_refs: [],
+    provenance: [],
+    policy_action: "clarify",
+    subject_confidence: 0.72,
+    jail_break_attempt: 0.05,
+    wish_i_knew: [
+      {
+        what: "city and stay dates",
+        kind: "message",
+        why: "cannot search inventory without a stay window",
+        severity: "med",
+      },
+    ],
+    business_rules_triggers: [false, true, false],
+    round: 1,
+  };
+}
+
+function catalogTerminateCoverage(doc) {
   const ret = findReturnVerb(doc);
   const pipe = (doc.verbs || []).map((v) => v.function || v).find((fn) => fn.name === "pipeline");
   const req = new Set((ret && ret.parameters && ret.parameters.required) || []);
   const props = (ret && ret.parameters && ret.parameters.properties) || {};
   const pipeProps = (pipe && pipe.parameters && pipe.parameters.properties) || {};
   const sysOk = /query_decomposition/i.test(systemContent(doc));
-  const catalogOk = sysOk && req.has("query_decomposition") && Object.prototype.hasOwnProperty.call(props, "query_decomposition");
+  return { ret, pipe, req, props, pipeProps, sysOk };
+}
 
-  const termRows = EVIDENCE_FIELDS.map((f) => {
+function renderEvidence(doc) {
+  const el = document.getElementById("evidence-panel");
+  if (!el) return;
+  const cov = catalogTerminateCoverage(doc);
+  const { req, props, pipeProps, sysOk } = cov;
+  const core = ["summary", "query_decomposition", "decomposition", "confidence"];
+  const missingCore = core.filter((k) => !req.has(k) || !Object.prototype.hasOwnProperty.call(props, k));
+  const catalogOk = sysOk && missingCore.length === 0;
+  const baseId = resolveBaseId(doc, null) || "—";
+  const mode = (doc._lineage && doc._lineage.mode) || state.mode || "—";
+
+  const groups = [
+    {
+      id: "g1",
+      cls: "is-g1",
+      badge: "G1 · User",
+      title: "What the chat UI can show",
+      blurb: "Answer text + confidence + intent breakdown. Safe for end users.",
+    },
+    {
+      id: "g2",
+      cls: "is-g2",
+      badge: "G2 · Admin",
+      title: "Admin-only scores (never chat UI)",
+      blurb: "Telemetry for operators — do not render these to customers.",
+    },
+    {
+      id: "g3",
+      cls: "is-g3",
+      badge: "G3 · Client",
+      title: "Client control-plane",
+      blurb: "Flags for Zeus Client / middleman (policy, rule triggers). Not chat chrome.",
+    },
+  ];
+
+  const fieldRow = (f) => {
     const inReq = req.has(f.name);
     const inProps = Object.prototype.hasOwnProperty.call(props, f.name);
     const inPipe = Object.prototype.hasOwnProperty.call(pipeProps, f.name);
-    const ok = !f.required || (inReq && inProps);
-    return `<tr class="${ok ? "" : "bg-warning/10"}">
-      <td class="font-mono text-xs">${escapeHtml(f.name)}</td>
-      <td><span class="badge badge-ghost badge-xs">${escapeHtml(f.layer || "")}</span></td>
-      <td>${f.required ? '<span class="text-warning font-semibold">required</span>' : "optional"}</td>
-      <td>${inReq ? "✅" : "—"}</td>
-      <td>${inProps ? "✅" : "—"}</td>
-      <td>${inPipe ? "✅" : "—"}</td>
-      <td class="text-xs opacity-80">${escapeHtml(f.note || "")}</td>
-    </tr>`;
-  }).join("");
-
-  const facetRows = QD_FACETS.map(
-    (f) => `<tr>
-      <td class="font-mono text-xs">${escapeHtml(f.name)}</td>
-      <td>${f.required ? "core" : "when signaled"}</td>
-      <td class="text-xs opacity-80">${escapeHtml(f.note)}</td>
-    </tr>`
-  ).join("");
-
-  const reportBlocks = REPORT_TREE.map((block) => {
-    const kids = (block.kids || [])
-      .map(
-        (k) => `<li class="flex flex-wrap gap-x-2 gap-y-0.5">
-        <code class="text-[11px] text-success/90">${escapeHtml(k.path)}</code>
-        <span class="text-[11px] opacity-70">${escapeHtml(k.note)}</span>
-      </li>`
-      )
-      .join("");
-    return `<div class="rounded-lg bg-base-200/80 border border-base-content/10 p-3">
-      <div class="font-mono text-xs font-bold txt-meta">${escapeHtml(block.title)}</div>
-      <p class="text-[11px] opacity-80 mt-0.5 mb-1.5">${escapeHtml(block.note)}</p>
-      ${kids ? `<ul class="space-y-1 pl-0 list-none">${kids}</ul>` : ""}
+    const present = inProps || inPipe;
+    const flags = [];
+    if (f.required) flags.push('<span class="of-flag req">required</span>');
+    else flags.push('<span class="of-flag">optional</span>');
+    if (present) flags.push('<span class="of-flag ok">on catalog</span>');
+    else if (f.required) flags.push('<span class="of-flag miss">not on return</span>');
+    else flags.push('<span class="of-flag">not declared</span>');
+    if (f.ui === "never") flags.push('<span class="of-flag never">never chat UI</span>');
+    else if (f.ui === "chat") flags.push('<span class="of-flag ui">chat OK</span>');
+    return `<div class="output-field" ${tileAttrs(f.group === "g1" ? "guidance" : f.group === "g2" ? "rules" : "inject", ["output", f.name, f.group])}>
+      <div class="of-name">${escapeHtml(f.name)}</div>
+      <div class="of-desc">${escapeHtml(f.note || "")}</div>
+      <div class="of-flags">${flags.join("")}</div>
     </div>`;
-  }).join("");
+  };
 
-  const gapRows = REAL_TURN_GAPS.map(
-    (g) => `<tr class="${g.have ? "" : "bg-warning/10"}">
-      <td class="text-center">${g.have ? "✅" : "⬜"}</td>
-      <td class="text-xs font-medium">${escapeHtml(g.item)}</td>
-      <td class="text-[11px] opacity-70">${escapeHtml(g.note)}</td>
-    </tr>`
-  ).join("");
+  const groupsHtml = groups
+    .map((g) => {
+      const fields = EVIDENCE_FIELDS.filter((f) => f.group === g.id);
+      return `<section class="output-group ${g.cls}" id="out-${g.id}">
+        <div class="output-group-head">
+          <span class="og-badge">${escapeHtml(g.badge)}</span>
+          <h3>${escapeHtml(g.title)}</h3>
+          <p>${escapeHtml(g.blurb)}</p>
+        </div>
+        <div class="output-field-grid">${fields.map(fieldRow).join("")}</div>
+      </section>`;
+    })
+    .join("");
 
-  const idealExample = `{
-  "summary": "Hotels in Paris: … (facts after tools, or planned facts on 1-call pipeline)",
-  "query_decomposition": {
-    "intent": "list hotels in a city",
-    "entity": "Hotel",
-    "attribute": ["name", "city", "address"],
-    "geo": "Paris"
-  },
-  "decomposition": {
-    "targets": ["Hotel"],
-    "predicates": [{ "field": "city", "op": "eq", "value": "Paris" }],
-    "output": "rows"
-  },
-  "confidence": "med",
-  "node_refs": ["hotel_…"],
-  "entity_refs": [],
-  "provenance": [{ "via": "pipeline", "as": "hotels" }]
-}`;
+  const example = base4TerminateExample();
+  const exampleStr = JSON.stringify(example, null, 2);
 
-  const reportSkeleton = `{
-  "attribution": { "verdict": "ok", "trace_status": "ok" },
-  "decision": { "Keep": true, "Rule": "slow", "Rate": 1 },
-  "report": {
-    "req_id": "…", "chat_id": "…", "turn_id": "…",
-    "source": "admin", "scope": "bucket/scope", "mode": "auto",
-    "status": "ok", "duration_ms": 2704, "model": "grok-…",
-    "tool_usage": [{ "name": "pipeline", "count": 1, "ms": 4 }],
-    "detail": {
-      "envelope": { "scope": "…", "mode": "auto" },
-      "edge": { "method": "POST", "path": "/admin/api/chat", "status": 200 },
-      "storage": { "queries": [/* N1QL */], "fts_queries": [/* FTS */] },
-      "ai": {
-        "tool_calls": ["pipeline", "find"],
-        "calls": [{ "name": "pipeline", "args": { "steps": […], "summary": "…" }, "result": {…} }],
-        "requests": [{ "messages": [/* system+user */], "tools": [/* catalog */] }],
-        "finish": "tool_calls"
+  el.innerHTML = `
+    <div class="output-intro">
+      The model finishes a turn by emitting <b>one flat JSON object</b> (Layer A) on
+      <code>return</code> or a terminating <code>pipeline</code>.
+      base-4 keeps this simple: required answer fields + optional admin/client control fields.
+      Server Detective store (Layer B) is separate — Zeus writes that after the model.
+    </div>
+    <div class="output-status">
+      <span class="os-chip">mode <b>${escapeHtml(String(mode))}</b></span>
+      <span class="os-chip">BASE <b>${escapeHtml(String(baseId))}</b></span>
+      <span class="os-chip ${catalogOk ? "ok" : "bad"}">${
+        catalogOk ? "✓ terminate fields look complete on this catalog" : "⚠ catalog gaps vs required terminate fields"
+      }</span>
+      ${
+        missingCore.length
+          ? `<span class="os-chip bad">missing: ${escapeHtml(missingCore.join(", "))}</span>`
+          : ""
       }
-    },
-    "spans": [{ "subsystem": "ai|pipeline|fts|tool", "phase": "…", "duration_ns": … }]
-  },
-  "stored_at": "2026-…"
-}`;
-
-  document.getElementById("evidence-panel").innerHTML = `
-    <!-- Layer legend -->
-    <div class="card bg-base-100 shadow ${catalogOk ? "box-ed tile-edit" : "box-miss tile-miss"}" id="out-overview">
-      <div class="card-body p-4 gap-3">
-        <div class="flex flex-wrap justify-between gap-2 items-start">
-          <div>
-            <h3 class="font-semibold text-base">Two-layer output scheme</h3>
-            <p class="text-xs opacity-80 max-w-3xl">
-              <b>Layer A</b> = what the model emits to <i>finish</i> (return verb or terminating pipeline fields).
-              <b>Layer B</b> = what Zeus <i>stores</i> for operators (attribution + decision + report + spans).
-              Catalog mode <code class="text-xs">${escapeHtml(state.mode || "")}</code>
-              ${catalogOk ? "declares the required terminate fields." : "still has gaps vs the evidence-loop contract."}
-            </p>
-          </div>
-          <div class="flex flex-wrap gap-1">
-            <button type="button" class="btn btn-xs btn-outline" id="btn-open-return">Open return verb</button>
-            <button type="button" class="btn btn-xs btn-outline" id="btn-open-pipeline">Open pipeline verb</button>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-          <div class="rounded-lg p-3 bg-base-200 border-l-4 border-green-500">
-            <div class="font-bold txt-ed">A · Model terminate</div>
-            <p class="opacity-80 mt-1">On final answer: <code>summary</code> + <code>query_decomposition</code> + <code>decomposition</code> + <code>confidence</code>.
-            May ride on <code>return</code> or top-level of <code>pipeline</code> (1-call short-circuit with <code>turn_complete</code>).</p>
-          </div>
-          <div class="rounded-lg p-3 bg-base-200 border-l-4 border-purple-400">
-            <div class="font-bold txt-meta">B · Server report</div>
-            <p class="opacity-80 mt-1">Persisted after the HTTP chat turn: ids, timings, tool_usage, detail.ai.calls, storage FTS/N1QL, spans.
-            This is the document you open in Hub debug / session store — not the chat_request JSON itself.</p>
-          </div>
-        </div>
-      </div>
+      <button type="button" class="btn btn-xs btn-outline" id="btn-open-return">Open return verb</button>
+      <button type="button" class="btn btn-xs btn-outline" id="btn-open-pipeline">Open pipeline verb</button>
     </div>
-
-    <!-- Layer A: terminate fields -->
-    <div class="card bg-base-100 shadow box-ed tile-edit" id="out-layer-a" style="scroll-margin-top: 5.5rem">
-      <div class="card-body p-4 gap-3">
-        <div>
-          <h3 class="font-semibold">A · Model terminate fields (same every mode)</h3>
-          <p class="text-xs opacity-80">Checked against this catalog’s <code>return</code> required/properties and whether <code>pipeline</code> also accepts them at top level.</p>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="table table-xs">
-            <thead><tr>
-              <th>field</th><th>layer</th><th>role</th><th>return required[]</th><th>return props</th><th>pipeline props</th><th>meaning</th>
-            </tr></thead>
-            <tbody>${termRows}</tbody>
-          </table>
-        </div>
-        <div>
-          <h4 class="text-sm font-semibold mb-1">Inside <code>query_decomposition</code></h4>
-          <p class="text-xs opacity-70 mb-2">Business facets for clustering. At minimum <b>intent</b> + <b>entity</b>.</p>
-          <div class="overflow-x-auto">
-            <table class="table table-xs">
-              <thead><tr><th>facet</th><th>when</th><th>meaning</th></tr></thead>
-              <tbody>${facetRows}</tbody>
-            </table>
-          </div>
-        </div>
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <h4 class="text-sm font-semibold m-0">Ideal terminate example</h4>
-            <button type="button" class="btn btn-xs" id="btn-copy-ideal-term">Copy</button>
-          </div>
-          <pre class="bg-base-200 p-3 rounded-lg text-[11px] max-h-56 overflow-auto font-mono" id="ideal-term-pre">${escapeHtml(idealExample)}</pre>
-        </div>
+    <div class="output-groups">${groupsHtml}</div>
+    <div class="output-example mt-4" id="out-layer-a">
+      <div class="output-example-head">
+        <h4>Example terminate JSON (base-4 shape)</h4>
+        <button type="button" class="btn btn-xs" id="btn-copy-ideal-term">Copy example</button>
       </div>
+      <pre id="ideal-term-pre" class="font-mono">${escapeHtml(exampleStr)}</pre>
     </div>
-
-    <!-- Layer B: server report -->
-    <div class="card bg-base-100 shadow box-meta tile-meta" id="out-layer-b" style="scroll-margin-top: 5.5rem">
-      <div class="card-body p-4 gap-3">
-        <div>
-          <h3 class="font-semibold txt-meta">B · Server report document (Hub turn store)</h3>
-          <p class="text-xs opacity-80">Shape of a real Grok→Zeus conversation report (work-in-progress traces look like this). Outer keys: <code>attribution</code>, <code>decision</code>, <code>report</code>, <code>stored_at</code>.</p>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 not-prose">${reportBlocks}</div>
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-            <h4 class="text-sm font-semibold m-0">Compact skeleton</h4>
-            <button type="button" class="btn btn-xs" id="btn-copy-report-skel">Copy</button>
-          </div>
-          <pre class="bg-base-200 p-3 rounded-lg text-[11px] max-h-64 overflow-auto font-mono" id="report-skel-pre">${escapeHtml(reportSkeleton)}</pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- WIP gap checklist from real turn -->
-    <div class="card bg-base-100 shadow box-miss tile-miss" id="out-wip" style="scroll-margin-top: 5.5rem">
-      <div class="card-body p-4 gap-2">
-        <div>
-          <h3 class="font-semibold">WIP checklist · real Hub turn (hotels in Paris)</h3>
-          <p class="text-xs opacity-80 max-w-3xl">
-            Example: user <i>“What hotels are in Paris?”</i> · mode <code>auto</code> · model grok · 1 round · pipeline(search+project) + planned find.
-            Not everything required for the evidence loop was present — that’s expected while catalogs and projection catch up.
-          </p>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="table table-xs">
-            <thead><tr><th></th><th>piece</th><th>note</th></tr></thead>
-            <tbody>${gapRows}</tbody>
-          </table>
-        </div>
-        <p class="text-[11px] opacity-70">
-          Goal: every production terminate fills <b>A</b> fully so <b>B.detail.ai.calls</b> carries parseable <code>query_decomposition</code> for N1QL/analytics — not only a free-text summary.
-        </p>
-      </div>
-    </div>`;
+    <p class="output-footnote">
+      Layer B (attribution, spans, inject_inspect) is <b>not</b> in this JSON — Zeus builds it server-side.
+      Schema: <code>v2/base/base-4/response_output_schema.json</code>.
+    </p>`;
 
   document.getElementById("btn-open-return")?.addEventListener("click", () => openPath("verbs.return"));
   document.getElementById("btn-open-pipeline")?.addEventListener("click", () => openPath("verbs.pipeline"));
   document.getElementById("btn-copy-ideal-term")?.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(document.getElementById("ideal-term-pre").textContent);
-      toast("Copied ideal terminate example");
+      toast("Copied terminate example");
     } catch {
       toast("Copy failed");
     }
   });
-  document.getElementById("btn-copy-report-skel")?.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(document.getElementById("report-skel-pre").textContent);
-      toast("Copied report skeleton");
-    } catch {
-      toast("Copy failed");
-    }
-  });
+  applyCardFilters();
 }
 
 function renderJson(doc, mode) {
@@ -3971,7 +4847,7 @@ function renderJson(doc, mode) {
     applyJsonOutputViewMode();
   }
   setCatalogMode(state.catalogMode || "tiles");
-  setOutputMode(state.outputMode || "tables");
+  setOutputMode(state.outputMode || "organized");
   applyCardFilters();
 }
 
@@ -3982,19 +4858,20 @@ function applyJsonViewMode() {
 }
 
 function applyJsonOutputViewMode() {
-  const plain = document.getElementById("chk-json-out-plain")?.checked;
-  document.getElementById("json-output-pre")?.classList.toggle("hidden", !plain);
-  document.getElementById("json-output-annotated")?.classList.toggle("hidden", !!plain);
+  // JSON mode is always the full pretty pre; annotated blocks removed for base-4 simplicity
+  const pre = document.getElementById("json-output-pre");
+  const ann = document.getElementById("json-output-annotated");
+  if (pre) pre.classList.remove("hidden");
+  if (ann) ann.classList.add("hidden");
 }
 
-/** Focus Structure chapters (catalog vs output). Replaces old JSON tabs. */
+/** Focus Structure catalog vs output tabs (and optional JSON mode). */
 function setJsonTab(tab) {
   const t = tab === "output" ? "output" : "catalog";
   state.jsonTab = t;
   if (state.view !== "boxes") setView("boxes");
-  const id = t === "output" ? "chapter-output" : "chapter-catalog";
+  setStructureTab(t, { skipHash: true });
   setTimeout(() => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
     if (t === "output") {
       setOutputMode("json");
       if (state.catalog) {
@@ -4004,7 +4881,7 @@ function setJsonTab(tab) {
     } else {
       setCatalogMode("json");
     }
-  }, 40);
+  }, 20);
 }
 
 function setCatalogMode(mode) {
@@ -4035,149 +4912,69 @@ function setCatalogMode(mode) {
 }
 
 function setOutputMode(mode) {
-  const m = mode === "json" ? "json" : "tables";
+  // organized (default HTML) | json — accept legacy "tables" as organized
+  let m = mode === "json" ? "json" : "organized";
+  if (mode === "tables") m = "organized";
   state.outputMode = m;
-  const tables = document.getElementById("output-tables-panel");
+  const organized = document.getElementById("output-tables-panel");
   const json = document.getElementById("output-json-panel");
-  const btn = document.getElementById("btn-output-mode");
   const blurb = document.getElementById("output-mode-blurb");
-  tables?.classList.toggle("hidden", m !== "tables");
+  organized?.classList.toggle("hidden", m !== "organized");
   json?.classList.toggle("hidden", m !== "json");
-  if (btn) {
-    btn.textContent = m === "tables" ? "Show Full JSON" : "Show Tables";
-    btn.classList.toggle("btn-primary", m === "tables");
-    btn.classList.toggle("btn-outline", m === "json");
-  }
+
+  document.querySelectorAll("[data-output-mode]").forEach((btn) => {
+    const on = btn.getAttribute("data-output-mode") === m;
+    btn.classList.toggle("btn-primary", on);
+    btn.classList.toggle("btn-ghost", !on);
+  });
+
   if (blurb) {
     blurb.innerHTML =
-      m === "tables"
-        ? '<span class="txt-ed font-semibold">Layer A</span> terminate + <span class="txt-meta font-semibold">Layer B</span> report. Default = tables / checklist. Switch to <b>Full JSON</b> for expandable scheme blocks.'
-        : "Expandable Output scheme JSON. Use <b>Show Tables</b> for the checklist / field tables.";
+      m === "organized"
+        ? "Layer A terminate fields grouped as <b>G1 user</b> · <b>G2 admin</b> · <b>G3 client</b>. Switch to <b>JSON</b> for the full example payload."
+        : "Full Layer A terminate <b>JSON</b> example. Switch to <b>Organized</b> for the clean field guide.";
   }
   if (m === "json" && state.catalog) {
     renderJsonOutput(state.catalog, state.mode);
-    applyJsonOutputViewMode();
+  }
+  if (m === "organized" && state.catalog) {
+    renderEvidence(state.catalog);
   }
 }
 
-/** Ideal Layer A / B shapes for Output tab (not the catalog file). */
+/** Layer A terminate JSON for Output tab (base-4). */
 function buildOutputJsonDoc(doc) {
-  const ret = findReturnVerb(doc || {});
-  const pipe = (doc?.verbs || []).map((v) => v.function || v).find((fn) => fn.name === "pipeline");
-  const retReq = (ret && ret.parameters && ret.parameters.required) || [];
-  const retProps = (ret && ret.parameters && ret.parameters.properties) || {};
-  const pipeProps = (pipe && pipe.parameters && pipe.parameters.properties) || {};
-
-  const idealTerminate = {
-    summary: "Hotels in Paris: … (facts after tools, or planned facts on 1-call pipeline)",
-    query_decomposition: {
-      intent: "list hotels in a city",
-      entity: "Hotel",
-      attribute: ["name", "city", "address"],
-      geo: "Paris",
-    },
-    decomposition: {
-      targets: ["Hotel"],
-      predicates: [{ field: "city", op: "eq", value: "Paris" }],
-      output: "rows",
-    },
-    confidence: "med",
-    node_refs: ["hotel_…"],
-    entity_refs: [],
-    provenance: [{ via: "pipeline", as: "hotels" }],
-  };
-
-  const facets = {};
-  (QD_FACETS || []).forEach((f) => {
-    facets[f.name] = {
-      when: f.required ? "core" : "when signaled",
-      note: f.note,
-    };
-  });
-
-  const catalogReturn = {
-    verb: "return",
-    required: retReq,
-    properties: retProps,
-    present_on_catalog: !!ret,
-  };
-
-  const catalogPipelineTerminate = {
-    verb: "pipeline",
-    top_level_terminate_props: Object.keys(pipeProps).filter((k) =>
-      ["summary", "query_decomposition", "decomposition", "confidence", "node_refs", "entity_refs", "provenance", "return"].includes(k)
-    ),
-    note: "Terminating fields may ride on pipeline top-level for 1-call short-circuit (turn_complete).",
-  };
-
-  const reportSkeleton = {
-    attribution: { verdict: "ok", trace_status: "ok" },
-    decision: { Keep: true, Rule: "slow", Rate: 1 },
-    report: {
-      req_id: "…",
-      chat_id: "…",
-      turn_id: "…",
-      source: "admin",
-      scope: "bucket/scope",
-      mode: state.mode || "auto",
-      status: "ok",
-      duration_ms: 2704,
-      model: "grok-…",
-      tool_usage: [{ name: "pipeline", count: 1, ms: 4, bytes: 2154 }],
-      detail: {
-        envelope: { scope: "…", mode: state.mode || "auto" },
-        edge: { method: "POST", path: "/admin/api/chat", status: 200 },
-        storage: { queries: ["/* N1QL */"], fts_queries: ["/* FTS */"] },
-        ai: {
-          tool_calls: ["pipeline", "find"],
-          calls: [
-            {
-              name: "pipeline",
-              args: { steps: [], summary: "…", query_decomposition: { intent: "…", entity: "…" } },
-              result: { data: {}, summary: "…", turn_complete: true },
-            },
-          ],
-          requests: [{ messages: ["/* system+user */"], tools: ["/* catalog */"] }],
-          finish: "tool_calls",
-          tokens: {},
-        },
-      },
-      spans: [{ subsystem: "ai|pipeline|fts|tool", phase: "…", duration_ns: 0 }],
-    },
-    stored_at: "2026-…",
-  };
-
-  const reportTree = {};
-  (REPORT_TREE || []).forEach((b) => {
-    reportTree[b.path] = {
-      title: b.title,
-      note: b.note,
-      kids: (b.kids || []).map((k) => ({ path: k.path, note: k.note })),
-    };
-  });
-
-  const wip = {
-    example: "What hotels are in Paris? · mode auto · grok · 1 round",
-    present: (REAL_TURN_GAPS || []).filter((g) => g.have).map((g) => g.item),
-    missing: (REAL_TURN_GAPS || []).filter((g) => !g.have).map((g) => ({ item: g.item, note: g.note })),
-  };
-
+  const cov = catalogTerminateCoverage(doc || {});
+  const example = base4TerminateExample();
   return {
-    _format: "zeus.output_scheme.v1",
-    _note: "Not the chat_request catalog — Layer A (model terminate) + Layer B (server report).",
-    layer_a_model_terminate: {
-      ideal_example: idealTerminate,
-      query_decomposition_facets: facets,
-      from_this_catalog: {
-        return: catalogReturn,
-        pipeline: catalogPipelineTerminate,
-      },
+    _format: "zeus.layer_a.terminate",
+    _note: "Model terminate payload on return / terminating pipeline. Not Layer B server report.",
+    base_id: resolveBaseId(doc, null),
+    mode: (doc && doc._lineage && doc._lineage.mode) || state.mode || null,
+    required: ["summary", "query_decomposition", "decomposition", "confidence"],
+    groups: {
+      g1_user: ["summary", "confidence", "query_decomposition", "decomposition", "node_refs", "entity_refs", "provenance"],
+      g2_admin: ["subject_confidence", "wish_i_knew", "jail_break_attempt"],
+      g3_client: ["business_rules_triggers", "policy_action", "round"],
     },
-    layer_b_server_report: {
-      compact_skeleton: reportSkeleton,
-      tree: reportTree,
+    from_this_catalog: {
+      return_required: [...(cov.req || [])],
+      return_properties: Object.keys(cov.props || {}),
+      pipeline_has_terminate_props: Object.keys(cov.pipeProps || {}).filter((k) =>
+        [
+          "summary",
+          "query_decomposition",
+          "decomposition",
+          "confidence",
+          "policy_action",
+          "subject_confidence",
+          "jail_break_attempt",
+          "wish_i_knew",
+          "business_rules_triggers",
+        ].includes(k)
+      ),
     },
-    wip_checklist: wip,
+    example,
   };
 }
 
@@ -4211,100 +5008,26 @@ function wireJsonBlocks(root) {
 }
 
 function renderJsonOutput(doc, mode) {
-  const root = document.getElementById("json-output-annotated");
   const pre = document.getElementById("json-output-pre");
-  if (!root) return;
+  const root = document.getElementById("json-output-annotated");
+  if (root) root.innerHTML = ""; // organized blocks unused in clean JSON mode
   const outDoc = buildOutputJsonDoc(doc);
-  if (pre) pre.textContent = JSON.stringify(outDoc, null, 2);
-
-  const blocks = [
-    {
-      path: "output.layer_a.ideal",
-      keyLabel: "layer_a.ideal_example",
-      title: "Layer A · ideal terminate (return / pipeline top-level)",
-      cls: "guidance",
-      body: outDoc.layer_a_model_terminate.ideal_example,
-      why: "Required machine-parseable fields every mode/deploy: summary, query_decomposition, decomposition, confidence.",
-      nested: false,
+  // Prefer pure Layer A example for readability; meta is in _fields via full object
+  const payload = {
+    ...outDoc.example,
+    _meta: {
+      format: outDoc._format,
+      mode: outDoc.mode,
+      base_id: outDoc.base_id,
+      note: outDoc._note,
+      required: outDoc.required,
+      from_this_catalog: outDoc.from_this_catalog,
     },
-    {
-      path: "output.layer_a.facets",
-      keyLabel: "layer_a.query_decomposition_facets",
-      title: "Layer A · query_decomposition facets",
-      cls: "guidance",
-      body: outDoc.layer_a_model_terminate.query_decomposition_facets,
-      why: "Business intent slots for hot-path clustering. Core: intent + entity.",
-      nested: false,
-    },
-    {
-      path: "output.layer_a.catalog_return",
-      keyLabel: "layer_a.from_catalog.return",
-      title: "Layer A · return verb on this catalog",
-      cls: "rules",
-      body: outDoc.layer_a_model_terminate.from_this_catalog.return,
-      why: "What this mode’s return tool actually declares (required + properties).",
-      nested: false,
-    },
-    {
-      path: "output.layer_a.catalog_pipeline",
-      keyLabel: "layer_a.from_catalog.pipeline",
-      title: "Layer A · pipeline top-level terminate props",
-      cls: "rules",
-      body: outDoc.layer_a_model_terminate.from_this_catalog.pipeline,
-      why: "1-call path: put terminate fields on pipeline so the server can short-circuit.",
-      nested: false,
-    },
-    {
-      path: "output.layer_b.skeleton",
-      keyLabel: "layer_b.compact_skeleton",
-      title: "Layer B · server report skeleton (Hub turn store)",
-      cls: "meta",
-      body: outDoc.layer_b_server_report.compact_skeleton,
-      why: "Outer store envelope: attribution + decision + report + stored_at. Ops telemetry, not chat_request.",
-      nested: false,
-    },
-    {
-      path: "output.layer_b.tree",
-      keyLabel: "layer_b.tree",
-      title: "Layer B · report field tree (docs)",
-      cls: "meta",
-      body: outDoc.layer_b_server_report.tree,
-      why: "Human map of report.detail.ai, storage, spans, …",
-      nested: true,
-    },
-    {
-      path: "output.wip",
-      keyLabel: "wip_checklist",
-      title: "WIP checklist · real Hub turn gaps",
-      cls: "miss",
-      body: outDoc.wip_checklist,
-      why: "What a real Grok→Zeus Paris-hotels turn had vs still missing for the evidence loop.",
-      nested: true,
-    },
-  ];
-
-  root.innerHTML =
-    `<div class="text-[11px] opacity-70 mb-2 font-mono">// Output scheme for mode <b>${escapeHtml(mode || "")}</b> — not chat_request_*.json</div>` +
-    blocks
-      .map((b) => {
-        const bodyStr = JSON.stringify(b.body, null, 2);
-        const bytes = jsonBytes(b.body);
-        return jsonBlockHtml({
-          path: b.path,
-          keyLabel: b.keyLabel,
-          title: b.title,
-          cls: b.cls,
-          bytes,
-          why: b.why,
-          body: bodyStr,
-          present: true,
-          nested: !!b.nested,
-        });
-      })
-      .join("");
-
-  wireJsonBlocks(root);
-  applyCardFilters();
+  };
+  if (pre) {
+    pre.textContent = JSON.stringify(payload, null, 2);
+    pre.classList.remove("hidden");
+  }
 }
 
 function renderAnnotatedJson(doc) {
@@ -4759,66 +5482,62 @@ function renderSizeMaps(doc) {
   });
 }
 
-let cardsTocObserver = null;
+const STRUCTURE_TABS = ["overview", "assembly", "catalog", "wire", "output"];
 
-function setCardsTocActive(id) {
-  document.querySelectorAll("#cards-toc a[data-toc]").forEach((a) => {
-    a.classList.toggle("is-active", a.getAttribute("data-toc") === id);
+function setStructureTab(tab, opts) {
+  const skipHash = opts && opts.skipHash;
+  let t = String(tab || "overview").toLowerCase();
+  // legacy chapter ids / anchors
+  if (t === "chapter-snapshot" || t === "snapshot" || t === "stamp-health") t = "overview";
+  if (t === "chapter-assembly" || t === "assembly-storyboard" || t === "prompt-outline" || t === "anatomy-recipe") t = "assembly";
+  if (t === "chapter-catalog" || t === "json") t = "catalog";
+  if (t === "chapter-wire") t = "wire";
+  if (t === "chapter-output" || t === "out-layer-a" || t === "out-layer-b" || t === "out-wip") t = "output";
+  if (!STRUCTURE_TABS.includes(t)) t = "overview";
+  state.structureTab = t;
+  if (t === "catalog" || t === "output") state.jsonTab = t;
+
+  document.querySelectorAll("#structure-tabs .struct-tab").forEach((btn) => {
+    const on = btn.getAttribute("data-struct-tab") === t;
+    btn.classList.toggle("btn-primary", on);
+    btn.classList.toggle("btn-ghost", !on);
+    btn.setAttribute("aria-selected", on ? "true" : "false");
   });
+  document.querySelectorAll("[data-struct-panel]").forEach((panel) => {
+    const on = panel.getAttribute("data-struct-panel") === t;
+    panel.classList.toggle("is-active", on);
+    panel.toggleAttribute("hidden", !on);
+  });
+
+  if (t === "catalog" && state.catalogMode === "json" && state.catalog) {
+    renderAnnotatedJson(state.catalog);
+    applyJsonViewMode();
+  }
+  if (t === "output" && state.outputMode === "json" && state.catalog) {
+    renderJsonOutput(state.catalog, state.mode);
+    applyJsonOutputViewMode();
+  }
+  applyCardFilters();
+  if (!skipHash) syncUrlHash();
 }
 
-function initCardsToc() {
-  const toc = document.getElementById("cards-toc");
-  if (!toc || toc.dataset.ready === "1") return;
-  toc.dataset.ready = "1";
-
-  toc.querySelectorAll("a[href^='#']").forEach((a) => {
-    a.addEventListener("click", (e) => {
-      const id = (a.getAttribute("href") || "").slice(1);
-      const target = document.getElementById(id);
-      if (!target) return;
-      e.preventDefault();
-      // Ensure Cards view is visible
-      if (state.view !== "boxes") setView("boxes");
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      setCardsTocActive(id);
-      history.replaceState(null, "", "#" + id);
+function initStructureTabs() {
+  const bar = document.getElementById("structure-tabs");
+  if (!bar || bar.dataset.ready === "1") return;
+  bar.dataset.ready = "1";
+  bar.querySelectorAll("[data-struct-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (state.view !== "boxes") setView("boxes", { skipHash: true });
+      setStructureTab(btn.getAttribute("data-struct-tab"));
     });
   });
-
-  const ids = [
-    "chapter-snapshot",
-    "anatomy-recipe",
-    "stamp-health",
-    "assembly-storyboard",
-    "prompt-outline",
-    "chapter-catalog",
-    "chapter-wire",
-    "chapter-output",
-    "out-layer-a",
-    "out-layer-b",
-    "out-wip",
-  ];
-  const targets = ids.map((id) => document.getElementById(id)).filter(Boolean);
-  if (!targets.length || !("IntersectionObserver" in window)) return;
-
-  cardsTocObserver = new IntersectionObserver(
-    (entries) => {
-      if (state.view !== "boxes") return;
-      // Pick the top-most visible section
-      const visible = entries
-        .filter((en) => en.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-      if (visible[0]?.target?.id) setCardsTocActive(visible[0].target.id);
-    },
-    {
-      root: null,
-      // highlight when section is in the middle band of the viewport
-      rootMargin: "-35% 0px -45% 0px",
-      threshold: [0, 0.1, 0.25],
-    }
-  );
-  targets.forEach((el) => cardsTocObserver.observe(el));
+  document.querySelectorAll("[data-jump-struct]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (state.view !== "boxes") setView("boxes", { skipHash: true });
+      setStructureTab(btn.getAttribute("data-jump-struct"));
+    });
+  });
+  setStructureTab(state.structureTab || "overview", { skipHash: true });
 }
 
 function setView(view, opts) {
@@ -4838,9 +5557,8 @@ function setView(view, opts) {
     btn.classList.toggle("btn-ghost", !on);
   });
   const hidePanel = view === "help" || view === "diff" || view === "matrix";
-  document.getElementById("content-panel")?.classList.toggle("hidden", hidePanel);
-  const tocWrap = document.querySelector(".cards-toc-wrap");
-  if (tocWrap) tocWrap.classList.toggle("opacity-40", view !== "boxes");
+  // Lightbox is closed by default; hide only forces close on Help/Diff/Matrix
+  if (hidePanel) closeContentPanel();
   const filterBar = document.getElementById("tile-filter-bar");
   const legendLabel = document.getElementById("legend-label");
   if (legendLabel) {
@@ -4860,24 +5578,7 @@ function setView(view, opts) {
       applyJsonOutputViewMode();
       renderCatalogExtras(state.catalog);
     }
-    setTimeout(() => {
-      if (cardsTocObserver) {
-        [
-          "anatomy-recipe",
-          "stamp-health",
-          "assembly-storyboard",
-          "prompt-outline",
-          "out-layer-a",
-          "out-layer-b",
-          "out-wip",
-          "chapter-catalog",
-          "chapter-output",
-        ].forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) cardsTocObserver.observe(el);
-        });
-      }
-    }, 50);
+    setStructureTab(state.structureTab || "overview", { skipHash: true });
   }
   if (view === "size" && state.catalog) {
     setTimeout(() => {
@@ -4902,10 +5603,37 @@ async function loadManifest() {
   return res.json();
 }
 
-/** Normalize any index shape into dropdown entries with file paths. */
+/** Sort key: highest/newest BASE first (base-4 → … → base-1 → v2/min). */
+function catalogSortTuple(e) {
+  const folder = String(e.folder || e.folder_label || "").replace(/\\/g, "/");
+  const mode = String(e.mode || "");
+  const baseId = String(e.base_id || "");
+  const hay = baseId + " " + folder;
+  const m = hay.match(/base-(\d+)/i);
+  const n = m ? parseInt(m[1], 10) : 0;
+  const proto = /prototype/i.test(hay) ? 1 : 0;
+  const isV2Min = folder === "v2/min" ? 1 : 0;
+  return [-n, proto, isV2Min, folder, mode];
+}
+
+function compareCatalogEntries(a, b) {
+  const ka = catalogSortTuple(a);
+  const kb = catalogSortTuple(b);
+  for (let i = 0; i < ka.length; i++) {
+    if (ka[i] < kb[i]) return -1;
+    if (ka[i] > kb[i]) return 1;
+  }
+  return String(a.file || "").localeCompare(String(b.file || ""));
+}
+
+function sortCatalogEntries(list) {
+  return (list || []).slice().sort(compareCatalogEntries);
+}
+
+/** Normalize any index shape into dropdown entries with file paths (newest BASE first). */
 function normalizeCatalogEntries(index) {
   const list = (index && index.catalogs) || [];
-  return list
+  const mapped = list
     .map((c) => {
       const file = c.file || (c.mode ? `v2/min/chat_request_${c.mode}_v2_min.json` : null);
       if (!file) return null;
@@ -4926,9 +5654,11 @@ function normalizeCatalogEntries(index) {
         contract: c.contract,
         sha256: c.sha256,
         profile: c.profile,
+        prototype: c.prototype,
       };
     })
     .filter(Boolean);
+  return sortCatalogEntries(mapped);
 }
 
 /**
@@ -4965,12 +5695,15 @@ async function loadCatalog(file) {
 function optionLabel(entry) {
   const blurb = MODE_BLURBS[entry.mode];
   const short = blurb ? " — " + blurb.slice(0, 22) : "";
-  // folder · mode so min vs base-1/min are distinguishable
-  return `${entry.folder_label} · ${entry.mode}${short}`;
+  // folder · mode · base_id so min vs base-1 vs base-4 are distinguishable
+  const base = entry.base_id ? ` · ${entry.base_id}` : "";
+  const proto = entry.prototype ? " · proto" : "";
+  return `${entry.folder_label} · ${entry.mode}${base}${proto}${short}`;
 }
 
 function fillModes(index) {
   const sel = document.getElementById("mode-select");
+  // Already newest/highest BASE first via normalizeCatalogEntries
   const entries = normalizeCatalogEntries(index);
   state.catalogEntries = entries;
   if (!entries.length) {
@@ -4979,7 +5712,7 @@ function fillModes(index) {
     state.catalogFile = null;
     return;
   }
-  // optgroups by folder when more than one location exists
+  // optgroups by folder — insertion order follows sorted entries (newest packs first)
   const byFolder = new Map();
   for (const e of entries) {
     const key = e.folder_label || e.folder;
@@ -4993,8 +5726,8 @@ function fillModes(index) {
           .map(
             (e) =>
               `<option value="${escapeHtml(e.file)}">${escapeHtml(e.mode)}${
-                MODE_BLURBS[e.mode] ? " — " + escapeHtml(MODE_BLURBS[e.mode].slice(0, 28)) : ""
-              }</option>`
+                e.base_id ? " · " + escapeHtml(String(e.base_id)) : ""
+              }${MODE_BLURBS[e.mode] ? " — " + escapeHtml(MODE_BLURBS[e.mode].slice(0, 28)) : ""}</option>`
           )
           .join("");
         return `<optgroup label="${escapeHtml(folder)} (${items.length})">${opts}</optgroup>`;
@@ -5005,6 +5738,7 @@ function fillModes(index) {
       .map((e) => `<option value="${escapeHtml(e.file)}">${escapeHtml(optionLabel(e))}</option>`)
       .join("");
   }
+  // Default selection = top of list = newest / highest BASE
   state.catalogFile = entries[0].file;
   state.mode = entries[0].mode;
   sel.value = state.catalogFile;
@@ -5076,8 +5810,16 @@ document.getElementById("btn-copy-json").addEventListener("click", async () => {
 });
 document.getElementById("btn-copy-json-output")?.addEventListener("click", async () => {
   try {
-    await navigator.clipboard.writeText(document.getElementById("json-output-pre").textContent || "");
-    toast("Copied Output scheme JSON");
+    // Prefer full JSON pre; fall back to organized example pre
+    if (state.catalog && state.outputMode !== "json") {
+      renderJsonOutput(state.catalog, state.mode);
+    }
+    const text =
+      document.getElementById("json-output-pre")?.textContent ||
+      document.getElementById("ideal-term-pre")?.textContent ||
+      "";
+    await navigator.clipboard.writeText(text);
+    toast("Copied Layer A terminate JSON");
   } catch {
     toast("Copy failed");
   }
@@ -5094,7 +5836,12 @@ document.getElementById("btn-copy-content").addEventListener("click", async () =
   }
 });
 document.getElementById("btn-close-content")?.addEventListener("click", () => closeContentPanel());
-document.getElementById("btn-close-content-bottom")?.addEventListener("click", () => closeContentPanel());
+document.getElementById("content-lightbox")?.addEventListener("click", (e) => {
+  const t = e.target;
+  if (t && t.closest && t.closest("[data-lightbox-close]")) closeContentPanel();
+});
+// Don't close when clicking inside the dialog itself
+document.getElementById("content-panel")?.addEventListener("click", (e) => e.stopPropagation());
 document.getElementById("chk-inject")?.addEventListener("change", () => state.catalog && renderSizeMaps(state.catalog));
 document.querySelectorAll("[data-size-mode]").forEach((btn) => {
   btn.addEventListener("click", () => setSizeMode(btn.getAttribute("data-size-mode")));
@@ -5102,8 +5849,8 @@ document.querySelectorAll("[data-size-mode]").forEach((btn) => {
 document.getElementById("btn-catalog-mode")?.addEventListener("click", () => {
   setCatalogMode(state.catalogMode === "json" ? "tiles" : "json");
 });
-document.getElementById("btn-output-mode")?.addEventListener("click", () => {
-  setOutputMode(state.outputMode === "json" ? "tables" : "json");
+document.querySelectorAll("[data-output-mode]").forEach((btn) => {
+  btn.addEventListener("click", () => setOutputMode(btn.getAttribute("data-output-mode")));
 });
 document.getElementById("chk-json-plain")?.addEventListener("change", () => applyJsonViewMode());
 document.getElementById("chk-json-out-plain")?.addEventListener("change", () => applyJsonOutputViewMode());
@@ -5189,11 +5936,9 @@ function terminateHealth(doc) {
 
 function renderCatalogExtras(doc) {
   if (!doc) return;
-  renderAnatomyRecipe(doc);
   renderStampHealth(doc);
   renderAssemblyStoryboard(doc);
   renderPromptOutline(doc);
-  // one final pass after all snapshot tiles exist
   applyCardFilters();
 }
 
@@ -5225,14 +5970,14 @@ function renderAnatomyRecipe(doc) {
       cls: "box-wire",
       kind: "inject",
       tags: ["inject"],
-      body: "Not stored in this JSON. Zeus Client / Hub injects scope brief, MINI-SCHEMA, business rules, and the user turn at assemble time — competes for tokens.",
+      body: "Not in this JSON (not hashed). Wire order after RED: MINI-SCHEMA → company_context → rules[] → hints. Competes for tokens with system + tools.",
     },
     {
-      title: "Output contract",
+      title: "Output · Layer A",
       cls: "box-meta",
       kind: "meta",
       tags: ["meta", "output"],
-      body: "Every terminating turn should emit summary + query_decomposition + decomposition + confidence (Layer A). Server stores the turn report (Layer B).",
+      body: "Terminate with G1 user fields (summary + decompositions + confidence) + optional G2 admin / G3 client (base-4+). Server stores Layer B report separately.",
     },
   ];
   el.innerHTML = cards
@@ -5254,61 +5999,65 @@ function renderStampHealth(doc) {
   const rootHash = doc._hash || null;
   const contractHash = (doc.contract && doc.contract.hash) || null;
   const hashMatch = rootHash && contractHash ? rootHash === contractHash : null;
+  const nVerbs = (doc.verbs || []).length;
   const items = [
     {
-      title: "Lineage base_id",
-      ok: !!lin.base_id,
-      kind: "meta",
-      detail: lin.base_id ? `${lin.base_id} · kind=${lin.kind || "?"} · mode=${lin.mode || "?"}` : "Missing _lineage.base_id",
+      ok: !!systemContent(doc),
+      kind: "rules",
+      tags: ["health", "prompt"],
+      label: "Has a system prompt (house rules text)",
+      detail: systemContent(doc) ? formatBytes(jsonBytes(systemContent(doc))) : "empty",
     },
     {
-      title: "Profile / format",
-      ok: !!(lin.profile || doc._format),
-      kind: "meta",
-      detail: `${lin.profile || "—"} · ${doc._format || "—"}`,
+      ok: nVerbs > 0,
+      kind: "rules",
+      tags: ["health", "tools", "verb-list"],
+      label: "Has tools the AI may call",
+      detail: nVerbs ? nVerbs + " tools · " + formatBytes(jsonBytes(doc.verbs)) : "none",
     },
     {
-      title: "Contract hash",
-      ok: !!contractHash,
-      kind: "meta",
-      detail: contractHash ? shortHash(contractHash) : "No contract.hash",
-    },
-    {
-      title: "_hash vs contract",
-      ok: hashMatch !== false,
-      kind: "meta",
-      detail:
-        hashMatch === null
-          ? "One side missing — cannot compare"
-          : hashMatch
-            ? "Match (good for stamp checks)"
-            : "Mismatch — investigate before stamp",
-    },
-    {
-      title: "Terminate schema",
       ok: th.ok,
       kind: th.ok ? "guidance" : "miss",
-      detail: th.ok
-        ? "Required fields on return + QD in system prompt"
-        : `Gaps: ${th.missing.join(", ") || "—"}${th.sysOk ? "" : "; system prompt missing query_decomposition"}`,
+      tags: ["health", "output", "terminate"],
+      label: "Knows how to end a turn (summary + intent breakdown + confidence)",
+      detail: th.ok ? "looks complete" : "gaps: " + (th.missing.join(", ") || "system prompt"),
     },
     {
-      title: "Verb surface",
-      ok: (doc.verbs || []).length > 0,
-      kind: "rules",
-      tags: ["tools", "verb-list"],
-      detail: `${(doc.verbs || []).length} verbs · ${formatBytes(jsonBytes(doc.verbs))} Zeus API tools`,
+      ok: !!lin.base_id,
+      kind: "meta",
+      tags: ["health", "lineage"],
+      label: "Labeled with a catalog generation (base-1, base-4, …)",
+      detail: lin.base_id || "missing — still usable",
+    },
+    {
+      ok: !!(lin.profile || doc._format),
+      kind: "meta",
+      tags: ["health"],
+      label: "Has a file format / profile label",
+      detail: (lin.profile || "—") + " · " + (doc._format || "—"),
+    },
+    {
+      ok: hashMatch !== false,
+      kind: "meta",
+      tags: ["health"],
+      label: "Stamp fingerprint consistent (if present)",
+      detail:
+        hashMatch === null
+          ? "no stamp on this baseline yet (normal for templates)"
+          : hashMatch
+            ? "hashes match"
+            : "mismatch — investigate before production",
     },
   ];
-  el.innerHTML = items
+  el.innerHTML = "<ul>" + items
     .map((it) => {
-      const cls = it.ok ? "health-ok" : "health-bad";
-      const tags = it.tags || [it.kind, "health"];
-      return `<div class="health-card ${cls}" ${tileAttrs(it.kind, tags)}><h4>${escapeHtml(it.title)}</h4><p>${escapeHtml(
-        it.detail
-      )}</p></div>`;
+      const mark = it.ok ? "✓" : "!";
+      const mcls = it.ok ? "ok" : "bad";
+      return `<li ${tileAttrs(it.kind, it.tags)}><span class="mark ${mcls}" aria-hidden="true">${mark}</span><span><b>${escapeHtml(
+        it.label
+      )}</b><br/><span class="opacity-70 text-[12px]">${escapeHtml(it.detail)}</span></span></li>`;
     })
-    .join("");
+    .join("") + "</ul>";
   applyCardFilters();
 }
 
@@ -5317,48 +6066,101 @@ function renderAssemblyStoryboard(doc) {
   if (!el) return;
   const base = resolveBaseId(doc, null) || "base-?";
   const mode = (doc._lineage && doc._lineage.mode) || state.mode || "?";
-  const steps = [
-    {
-      n: "1 · BASE catalog",
-      title: `${base} · ${mode}`,
-      body: "Load this chat_request baseline (rules + tools).",
-      cls: "box-ro",
+  const nVerbs = (doc.verbs || []).length;
+  const th = terminateHealth(doc);
+
+  const step = (s) => {
+    const bullets = (s.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("");
+    return `<div class="assembly-flow-step ${s.tone}" ${tileAttrs(s.kind, s.tags)}>
+        <span class="af-chip">${escapeHtml(s.chip)}</span>
+        <div class="af-num">${escapeHtml(s.n)}</div>
+        <h4>${escapeHtml(s.title)}</h4>
+        <p>${escapeHtml(s.body)}</p>
+        ${bullets ? `<ul>${bullets}</ul>` : ""}
+      </div>`;
+  };
+
+  const plus = `<div class="assembly-plus" aria-hidden="true">+<span>combined into same request</span></div>`;
+
+  // PROMPT shell = rules + inject + messages (one request, not three sends)
+  const promptParts = [
+    step({
+      n: "1 · ZEUS RULES",
+      chip: "RULES",
+      title: `${base} · ${mode} catalog`,
+      body: "Hashed when stamped. Contract = system prompt + verbs[] tool schemas.",
+      bullets: [
+        "House rules the model must follow",
+        `${nVerbs} tools + parameter schemas`,
+        "Terminate field table lives here (how to finish)",
+      ],
+      tone: "is-rules",
       kind: "rules",
-      tags: ["rules", "base"],
-    },
-    {
-      n: "2 · Bind scope",
-      title: "Auth + boundary",
-      body: "Zeus binds bucket/scope; model cannot cross tenants.",
-      cls: "box-meta",
-      kind: "meta",
-      tags: ["meta", "scope"],
-    },
-    {
-      n: "3 · Inject BLUE",
-      title: "MINI-SCHEMA + brief",
-      body: "Client/Hub adds live schema, policies, user message.",
-      cls: "box-wire",
+      tags: ["rules", "base", "prompt"],
+    }),
+    plus,
+    step({
+      n: "2 · ZEUS_CLIENT INJECT",
+      chip: "INJECT",
+      title: "Not hashed · runtime only",
+      body: "Client/Hub fills live business + schema context. Still part of the PROMPT.",
+      bullets: [
+        "SCOPE BRIEF + MINI-SCHEMA",
+        "company_context → rules[] → hints",
+        "session · overrides · hooks",
+      ],
+      tone: "is-inject",
       kind: "inject",
       tags: ["inject"],
-    },
-    {
-      n: "4 · Model + tools",
-      title: "Call Zeus API verbs",
-      body: "LLM picks verbs, then terminates with Layer A fields.",
-      cls: "box-ed",
+    }),
+    plus,
+    step({
+      n: "3 · MESSAGES[]",
+      chip: "TRANSCRIPT",
+      title: "The chat so far",
+      body: "User turns, prior tool_calls, prior Zeus results — still inside the same PROMPT request.",
+      bullets: ["user turn text", "prior assistant tool_calls", "prior Zeus tool results (cap if huge)"],
+      tone: "is-transcript",
       kind: "guidance",
-      tags: ["guidance", "output"],
-    },
-  ];
-  el.innerHTML = steps
-    .map(
-      (s) =>
-        `<div class="story-card ${s.cls}" ${tileAttrs(s.kind, s.tags)}><div class="story-step">${escapeHtml(
-          s.n
-        )}</div><h4>${escapeHtml(s.title)}</h4><p>${escapeHtml(s.body)}</p></div>`
-    )
-    .join("");
+      tags: ["guidance", "messages"],
+    }),
+  ].join("");
+
+  const llmBlock = `
+    <div class="assembly-flow-arrow" aria-hidden="true">↓<span class="af-label">one request to the model</span></div>
+    <div class="assembly-mid">
+      <div class="assembly-llm-pill" ${tileAttrs("inject", ["tools", "llm"])}>LLM</div>
+      <span class="assembly-mid-note">may call tools ↔ Zeus API while thinking · not the final answer yet</span>
+    </div>
+    <div class="assembly-flow-arrow" aria-hidden="true">↓<span class="af-label">returns</span></div>`;
+
+  const outputPart = step({
+    n: "OUTPUT · Layer A terminate",
+    chip: "LAYER A",
+    title: th.ok ? "Flat JSON answer shape" : "End-of-turn fields incomplete",
+    body: "This is the OUTPUT — not more stacked prompt text. G1 user · G2 admin · G3 client.",
+    bullets: [
+      "G1 USER — summary · confidence · decompositions (chat UI)",
+      "G2 ADMIN — subject_confidence · wish_i_knew · jail_break_attempt (never chat UI)",
+      "G3 CLIENT — business_rules_triggers · policy_action",
+    ],
+    tone: "is-layera",
+    kind: "meta",
+    tags: ["meta", "output"],
+  });
+
+  el.innerHTML = `
+    <div class="assembly-shell is-prompt">
+      <div class="assembly-shell-head">PROMPT · stacked into ONE request (not three separate sends)</div>
+      <div class="assembly-shell-body">${promptParts}</div>
+      <div class="assembly-shell-foot">Rules + inject + messages ride together every model round</div>
+    </div>
+    ${llmBlock}
+    <div class="assembly-shell is-output">
+      <div class="assembly-shell-head">OUTPUT · Layer A terminate (the answer shape)</div>
+      <div class="assembly-shell-body">${outputPart}</div>
+      <div class="assembly-shell-foot">Detective / spans = server Layer B after the model — not inside this OUTPUT box</div>
+    </div>`;
   applyCardFilters();
 }
 
@@ -5380,11 +6182,13 @@ function extractPromptOutline(sys) {
   }
   // Heuristic topic detectors
   const heuristics = [
+    [/Terminate\s*\(Layer A\)|Layer A|policy_action|jail_break_attempt/i, "Terminate (Layer A) · G1/G2/G3"],
     [/evidence\s*loop|query_decomposition|hot-path/i, "Evidence loop / terminate contract"],
+    [/CRITICAL\s*EFFICIENCY|top-?N|brief\/schema/i, "CRITICAL EFFICIENCY"],
+    [/Verb Priority|cost tier|cheap|masq|expensive|mod=/i, "Verb Priority & Cost (masq)"],
     [/pipeline|steps\[\]|@as\.ids/i, "Pipeline / @as.ids chaining"],
     [/scope\s*(is\s*)?(a\s*)?hard|boundary|tenant/i, "Scope boundary"],
     [/confidence|high\s*\|\s*med\s*\|\s*low/i, "Confidence (high|med|low)"],
-    [/cheap|masq|expensive|mod=/i, "Verb cost tiers (masq)"],
     [/never|MUST|CRITICAL|Hard cap/i, "Hard constraints"],
     [/search|find|traverse|project/i, "Tool usage patterns"],
   ];
@@ -5417,7 +6221,8 @@ function renderPromptOutline(doc) {
 /* —— Diff —— */
 
 function fillDiffSelects() {
-  const entries = state.catalogEntries || [];
+  // Same newest-first order as mode dropdown
+  const entries = sortCatalogEntries(state.catalogEntries || []);
   const makeOpts = (selId, prefer) => {
     const sel = document.getElementById(selId);
     if (!sel) return;
@@ -5831,15 +6636,32 @@ async function renderFingerprintMatrix(force) {
       });
     }
   }
+  // Newest / highest BASE first (same order as dropdown)
+  rows.sort((a, b) =>
+    compareCatalogEntries(
+      { base_id: a.base_id, folder: a.folder, folder_label: a.folder, mode: a.mode, file: a.file },
+      { base_id: b.base_id, folder: b.folder, folder_label: b.folder, mode: b.mode, file: b.file }
+    )
+  );
   state.matrixRows = rows;
   paintMatrix(rows);
-  if (status) status.textContent = `${rows.length} catalogs · click a row to open in Structure`;
+  if (status) status.textContent = `${rows.length} catalogs · newest BASE first · click a row to open in Structure`;
 }
 
 function paintMatrix(rows) {
   const tbody = document.querySelector("#matrix-table tbody");
   if (!tbody) return;
-  tbody.innerHTML = rows
+  const ordered = sortCatalogEntries(
+    (rows || []).map((r) => ({
+      ...r,
+      folder: r.folder,
+      folder_label: r.folder,
+      base_id: r.base_id,
+      mode: r.mode,
+      file: r.file,
+    }))
+  );
+  tbody.innerHTML = ordered
     .map((r) => {
       const termCls = r.terminateOk ? "txt-ed" : "txt-ro";
       return `<tr data-file="${escapeHtml(r.file)}" title="${escapeHtml(r.file)}">
@@ -5928,6 +6750,9 @@ function syncUrlHash() {
     const params = new URLSearchParams();
     if (state.view && state.view !== "boxes") params.set("view", state.view);
     if (state.catalogFile) params.set("file", state.catalogFile);
+    if (state.view === "boxes" || !state.view) {
+      if (state.structureTab && state.structureTab !== "overview") params.set("struct", state.structureTab);
+    }
     if (state.view === "size" && state.sizeMode && state.sizeMode !== "catalog") params.set("sizeMode", state.sizeMode);
     if (state.view === "diff") {
       const a = document.getElementById("diff-select-a")?.value;
@@ -5936,7 +6761,7 @@ function syncUrlHash() {
       if (b) params.set("b", b);
     }
     const q = params.toString();
-    const next = q ? "#" + q : (location.hash.startsWith("#chapter") ? location.hash : "");
+    const next = q ? "#" + q : "";
     if (next) {
       if (location.hash !== next) history.replaceState(null, "", next);
     } else if (location.hash && location.hash.includes("=")) {
@@ -5950,15 +6775,16 @@ function syncUrlHash() {
 async function applyUrlHash() {
   const raw = (location.hash || "").replace(/^#/, "");
   if (!raw) return;
-  // legacy chapter anchors
-  if (!raw.includes("=") && document.getElementById(raw)) {
+  // legacy chapter / panel anchors → structure tab
+  if (!raw.includes("=")) {
     setView("boxes", { skipHash: true });
-    setTimeout(() => document.getElementById(raw)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    setStructureTab(raw, { skipHash: true });
     return;
   }
   const params = new URLSearchParams(raw);
   const view = params.get("view");
   const file = params.get("file");
+  const struct = params.get("struct");
   if (file) {
     const sel = document.getElementById("mode-select");
     if (sel && [...sel.options].some((o) => o.value === file)) sel.value = file;
@@ -5985,6 +6811,9 @@ async function applyUrlHash() {
     setView("matrix", { skipHash: true });
   } else if (view === "help") {
     setView("help", { skipHash: true });
+  } else {
+    setView("boxes", { skipHash: true });
+    if (struct) setStructureTab(struct, { skipHash: true });
   }
 }
 
@@ -6002,7 +6831,7 @@ function initExplorerExtras() {
     initThemeController();
     initSiteSearch();
     initTileFilters();
-    initCardsToc();
+    initStructureTabs();
     initExplorerExtras();
     const index = await loadCatalogIndex();
     state.manifest = index;
@@ -6018,12 +6847,6 @@ function initExplorerExtras() {
     fillDiffSelects();
     await selectMode(state.catalogFile || state.mode);
     await applyUrlHash();
-    // chapter deep-link without query form
-    if (location.hash && !location.hash.includes("=")) {
-      const id = location.hash.slice(1);
-      const el = document.getElementById(id);
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
-    }
   } catch (e) {
     document.getElementById("status").textContent =
       "Serve this folder over HTTP: docker compose up  or  python3 scripts/scan_catalogs.py && python3 -m http.server 8766  — " + e;

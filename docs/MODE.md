@@ -96,39 +96,39 @@ The **prompt** should **state the posture** the model can follow; the **engine**
 
 ---
 
-## 3. Current state (2026-07 diagnosis)
+## 3. Current state
 
-### 3.1 What is real today
+### 3.1 After base-5.1 (content train)
 
 | Surface | Reality |
 | --- | --- |
-| File names | 10 packs: `chat_request_<mode>_base-N.json` |
+| File names | 10 packs: `chat_request_<mode>_base-5.json` |
 | `_lineage.mode` | Correct per file |
-| System prompt | **9/10 modes share the same long essay**; only `` Current mode: `X` `` changes |
-| **auto** | Only structural outlier: shorter pipeline-first min prompt |
-| Verbs | Same 13 names in every base-5 mode |
-| Layer A / terminate | Same object shape (base-5) across modes |
-| Clone smell | Leftover strings like **`[exp] analytics job`** in non-analytics packs |
-| Zeus generator | Shared fragments under `ai/V2/prompt/core/`; **`modes/<mode>.md` overlay hook exists but no files** |
-| Tools registry | Many tools `AppliesTo: AllModes` → little catalog divergence from gating |
+| System prompt | **CORE + `## Mode: <name>` overlay** per mode (`work/mode_overlays/`) |
+| **auto** | Discovery / propose / handoff overlay (not analytics clone) |
+| Verbs | Same 13 names (wire shared); blurbs no longer say only “analytics job” |
+| Layer A / terminate | Same object shape (base-5 wire) across modes |
+| Assemble | `scripts/assemble_mode_prompts.py --base 5` |
+| Clone gate | `scripts/diff_modes.py --base 5 --fail-if-clone` |
+| Zeus generator | Overlay port to `ai/V2/prompt/core/modes/` still optional follow-up |
 
-### 3.2 Consequence
+### 3.2 Pre–base-5.1 failure (historical)
 
-Picking `mode=fraud` vs `mode=analytics` in the **catalog** barely changes model behavior. Graph ingest may still differ if the scope’s engine mode is set correctly — but **help / tool planning / terminate language does not**.
+Packs were **analytics × rename** (only mode string differed; `auto` shorter min essay). Engine hooks differed; LLM catalogs did not.
 
 ```text
 Intended:   mode ──► graph projection + LLM menu/persona
-Actual:     mode ──► graph projection (partial)
-                      LLM menu ≈ analytics × rename
+base-5.0:   mode ──► graph projection (partial); LLM ≈ analytics × rename
+base-5.1:   mode ──► graph projection + CORE + MODE_OVERLAY in messages[].content
 ```
 
-### 3.3 Why it drifted
+### 3.3 Why it drifted (pre-5.1)
 
 1. V2 minify / shared prompt fragments optimized for **one** efficient pipeline essay.  
 2. BASE diet trains (base-4/5) focused on **wire shape** (Terminate, objects), not mode personas.  
 3. Scaffold/`new_base` **copies parent packs** mode-by-mode without a mode matrix.  
 4. Overlay path in the generator was never filled.  
-5. Tests guard “don’t name missing tools” more than “modes differ.”
+5. Tests guarded tool-name drift more than “modes differ.”
 
 ---
 

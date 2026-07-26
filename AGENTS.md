@@ -69,6 +69,10 @@ python3 scripts/new_base.py --refresh-manifest --base 4
 # Structural pack gate (P0 after diet; N≥5 checks object triggers + app_output)
 python3 scripts/verify_base_pack.py --base 5
 
+# base-5.1 mode overlays (CORE + MODE_OVERLAY → messages[0].content)
+python3 scripts/assemble_mode_prompts.py --base 5
+python3 scripts/diff_modes.py --base 5 --fail-if-clone
+
 # Inspector index
 python3 scripts/scan_catalogs.py
 ```

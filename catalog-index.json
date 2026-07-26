@@ -3,7 +3,7 @@
   "description": "Auto-scanned chat_request*.json under v2/ for the inspector UI",
   "scan_glob": "v2/**/chat_request*.json",
   "count": 50,
-  "updated_at": "2026-07-26T14:45:42Z",
+  "updated_at": "2026-07-26T15:40:51Z",
   "catalogs": [
     {
       "file": "v2/base/base-5/min/chat_request_analytics_base-5.json",
@@ -29,8 +29,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "286373e8ee1576899d7b1bc8de1643b933780ddc1fa35d0a2ac7cd0438aa893f",
-      "bytes": 28959
+      "sha256": "943587eb775573c696f38e3c6786447be1d0c7d10cb9d51f1b589ae998055444",
+      "bytes": 29794
     },
     {
       "file": "v2/base/base-5/min/chat_request_auto_base-5.json",
@@ -56,8 +56,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "d8248cf40baa4803cc6d8d38a9e86f89af3a11c38adbda0f73bb23079429321b",
-      "bytes": 27142
+      "sha256": "3488d73b73b1cbabf7eef4b3f983a3a2563a7e9c0505b85c1723d006d79bcbce",
+      "bytes": 29645
     },
     {
       "file": "v2/base/base-5/min/chat_request_code_base-5.json",
@@ -83,8 +83,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "ffba60e29d9b34ae3e5ecdf64cf91bc0b41464588d04c52e607fac9a6b8461c3",
-      "bytes": 28924
+      "sha256": "6ae29e6c7b81aa7689d563dd8dee5d678c32d48b5f62d891d5e07b52fd429fb0",
+      "bytes": 29908
     },
     {
       "file": "v2/base/base-5/min/chat_request_custom_base-5.json",
@@ -110,8 +110,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "f7dfad0f2db9c84281798420c411425e2aff474d40c81a9b473fd88be1f9621f",
-      "bytes": 28938
+      "sha256": "949dec4c531e50a879d33fba819db2ce720cf2db4384e684f85f25e8aa822d93",
+      "bytes": 29196
     },
     {
       "file": "v2/base/base-5/min/chat_request_fraud_base-5.json",
@@ -137,8 +137,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "1c1bf5fa24f07ea05f9cd887c502e13a520c0e3d0e6d5c2469b6ed8cf6b4dcd4",
-      "bytes": 28931
+      "sha256": "71057f9a12a02787b2d15f55c1b65e7665c8eb8bd1f8d6d2b0cb4d518f1eff00",
+      "bytes": 30144
     },
     {
       "file": "v2/base/base-5/min/chat_request_open_base-5.json",
@@ -164,8 +164,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "35a209a563cd55e57772d418e344c17e39f8e5cb8ed6a45f4a2cbd3e62dbe55b",
-      "bytes": 28924
+      "sha256": "4a3bd010a237bdeb8c3adaa16e8a45b0bbd6605b4a3c21bec83cde919220b8e1",
+      "bytes": 29299
     },
     {
       "file": "v2/base/base-5/min/chat_request_private_base-5.json",
@@ -191,8 +191,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "f532d96ceda0c4e52492de8f3a39a9199ad1ff01e25e13037d80f0ab66eaaefd",
-      "bytes": 28945
+      "sha256": "4a27d29ef6644486105eb0b3c908b69a3e337bc92c35048ad981ef34f9cdb7d2",
+      "bytes": 29305
     },
     {
       "file": "v2/base/base-5/min/chat_request_regulated_base-5.json",
@@ -218,8 +218,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "518d15ada43c5be757ff8e9143fc34157bed6d0b535ae0d47a6b8b3ccfe7de34",
-      "bytes": 28959
+      "sha256": "60a5b0ba0ce29c13be68f780c1a1ed0ba9e56ceca11ddc37173b7b3d5474152a",
+      "bytes": 29882
     },
     {
       "file": "v2/base/base-5/min/chat_request_research_base-5.json",
@@ -245,8 +245,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "97ec28473cf710f893249b449d059df4f245dffeae34375d23f3b5ada38f44e1",
-      "bytes": 28952
+      "sha256": "f82ac17c4a5943d4fee65eae3463c0a6c202fe5dfb3b0de483f427aca66004be",
+      "bytes": 29942
     },
     {
       "file": "v2/base/base-5/min/chat_request_tenant_base-5.json",
@@ -272,8 +272,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "083a2216c9c41278e906090c8f013f2f936fdae7a10ed0de937224db79ae99bb",
-      "bytes": 28938
+      "sha256": "af28e7a95f01fd8d002e6c031f6a9727b09e8885d00f4463c379e02ca0828189",
+      "bytes": 29327
     },
     {
       "file": "v2/base/base-4/min/chat_request_analytics_base-4.json",

@@ -5,9 +5,20 @@ Short pack changelog. Full plan: [docs/ROADMAP.md](../../../docs/ROADMAP.md). Re
 | | |
 | --- | --- |
 | **BASE id** | `base-5` |
+| **Content train** | **base-5.1** (mode overlays; same wire) |
 | **Parent** | base-4 |
 | **Status** | Candidate pack (not pin) |
 | **Production pin** | base-1 until promote |
+
+## base-5.1 (content)
+
+System prompt = shared **CORE** + per-mode **MODE_OVERLAY** (`work/mode_overlays/`).  
+See [docs/MODE.md](../../../docs/MODE.md) · [docs/ROADMAP.md](../../../docs/ROADMAP.md) § base-5.1.
+
+```bash
+python3 scripts/assemble_mode_prompts.py --base 5
+python3 scripts/diff_modes.py --base 5 --fail-if-clone
+```
 
 ## What changed (vs base-4)
 

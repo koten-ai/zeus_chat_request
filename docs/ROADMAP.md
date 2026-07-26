@@ -42,6 +42,7 @@ No production traffic on the **base-4/5 line** yet. Use that:
 | --- | --- | --- |
 | **base-5** | **BREAKING OK** — freeze the contract | Object rules/triggers · settings bag · policy table · `output_request` · company+jailbreak in prompt |
 | **base-5.1** | **Content patch on base-5 wire** — **not** a new wire break | Restore **mode overlays** in system prompt (`messages[].content`); core+overlay; no Layer A rename |
+| **base-5.2** | **Additive G2 design on base-5 wire** | Keep classic **`wish_i_knew`** + append **`data_gaps`** for Helios acquisition ([WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md)) |
 | **base-6+** | **ADDITIVE / OPTIONAL only** | Soft hints/A/B · optional_when fields · Workbench UX · Helios norms as cheap emits · pin when green |
 | **Helios wishlist** | **Nice-to-have** (cheap provider first) | Pri-1 Zeus/Client report scalars — **never** required AI Layer A tax |
 
@@ -52,6 +53,9 @@ base-5    = last wire/control-plane break before real adoption of this line
 base-5.1  = content/diet train ON the base-5 wire (mode personas in prompts)
             Same schema objects / required four / app_output — packs stop being
             “analytics × rename”. See docs/MODE.md · work/RECREATE_MODE.md
+
+base-5.2  = additive G2: classic wish_i_knew (ops) + data_gaps (Helios acquisition)
+            Optional fields only; not a wire break of required four. See WISH_I_KNEW_DUAL.md
 
 base-6+   = additive / optional_when / hash-excluded soft injects / productization
             No rename/remove of base-5 wire keys without a new major BASE + migration hop.
@@ -100,7 +104,8 @@ Helios Motions read Analytics over **scalars** first; nested arrays are for dril
 | --- | --- | --- |
 | zeus_client implements object triggers + settings/policy/`output_request` | Catalogs ready; Client floor TBD | **CR-20** (+ CR-9/10/11) |
 | Zeus loaders / return schema / Detective for base-5 | Can’t pin | **CR-21** |
-| **base-5.1 mode overlays** — catalogs ≈ analytics×rename | LLM ignores DESIGN mode intent | **CR-23** (plan) |
+| **base-5.1 mode overlays** | Ship/land on main (PR #7) | **CR-23** |
+| **base-5.2 dual gaps** — ops wish_i_knew + Helios data_gaps | Design then implement | **CR-24** |
 | Helios Pri-1 report emits (cheap spine) | Not catalog tax | **CR-12** |
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
@@ -139,7 +144,8 @@ Last status pass: **2026-07-26**.
 | **CR-20** | zeus_client base-5 floor | To Do | § base-5 · full wishlist |
 | **CR-21** | Zeus base-5 loaders/Detective | To Do | § base-5 external |
 | **CR-22** | Pack docs completion tracker | In Review | § base-5 pack |
-| **CR-23** | **base-5.1** mode overlays in system prompt | To Do | § base-5.1 · [MODE.md](MODE.md) · [RECREATE_MODE.md](../work/RECREATE_MODE.md) |
+| **CR-23** | **base-5.1** mode overlays in system prompt | In Review / merge | § base-5.1 · [MODE.md](MODE.md) |
+| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | To Do | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 
@@ -444,12 +450,52 @@ Client → type-check values (descriptions not re-emitted)
 ### Sequencing vs other work
 
 ```text
-base-5 pack (wire)     ──done──►  base-5.1 (mode prompts)  ──►  base-6 soft injects
-        │                              │
-        └── Client CR-20 / Zeus CR-21 ─┴── can parallel; pin still last
+base-5 pack (wire)  ──done──►  base-5.1 (mode prompts)  ──►  base-5.2 (dual gaps design)
+        │                            │                              │
+        └── Client CR-20 / Zeus CR-21 ┴──────────────────────────────┴── pin last
+                                                                         │
+                                                                    base-6 soft injects
 ```
 
 Prefer **base-5.1 before or in parallel with Client spike** so trials exercise real mode personas, not 10 analytics clones.
+
+---
+
+## base-5.2 — “Dual gap channels: wish_i_knew + data_gaps”
+
+**Jira:** **[CR-24](https://kotenai.atlassian.net/browse/CR-24)** · parent epic **CR-3**  
+**SoT:** [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md)  
+**Related:** [BIBLE.md](BIBLE.md) §5 · [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)
+
+**Theme:** Keep the **classic** operator feedback channel (`wish_i_knew`) and **append** a Helios-oriented acquisition channel (`data_gaps`) when the model cannot fully answer because **schema / data / index** is missing. Both G2, optional, never chat UI. **Additive** on base-5 wire — not a required-four break.
+
+| Stream | Field | Consumer |
+| --- | --- | --- |
+| **A classic** | `wish_i_knew[]` (keep) | Detective, Workbench, prompt ops |
+| **B acquisition** | `data_gaps[]` (new) | Helios backlog / Motions (+ precomputed counts) |
+
+### Goals
+
+1. Design doc with A vs B rules and examples.  
+2. Additive wire: keep array `wish_i_knew`; add optional `data_gaps` with machine keys.  
+3. Document Zeus string dual-read for A; Helios cost law for B.  
+4. Implement PR later: schema + terminate table + Client/Zeus parse + report rollups.
+
+### Explicit non-goals
+
+- Require A or B every turn  
+- Nest-break `wish_i_knew` into `{feedback, acquisition}` without dual-read  
+- Soft HINTS/A/B (**base-6**)  
+- Pin promote  
+
+### Success signals
+
+- [x] [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) design authored  
+- [x] ROADMAP § base-5.2  
+- [x] CR-24 created  
+- [ ] Design PR merged to main  
+- [ ] Schema + pack terminate table implement (follow-up)  
+- [ ] Client/Zeus parse + Helios precomputed counters  
 
 ---
 
@@ -557,6 +603,10 @@ base-5.1 CONTENT on base-5 wire (not a wire break)
          ★ mode overlays in messages[].content (CORE + MODE_OVERLAY)
          ★ stop analytics×rename packs · DESIGN §14 personas
          ★ diff_modes / clone gate · Zeus modes/*.md port
+           │
+base-5.2 ADDITIVE G2 on base-5 wire
+         ★ keep wish_i_knew (ops feedback)
+         ★ append data_gaps (Helios schema/data/index acquisition)
            │
 base-6+ ADDITIVE / OPTIONAL only
         soft hints/A/B · optional norms · Workbench · pin when green

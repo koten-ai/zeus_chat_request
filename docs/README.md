@@ -54,6 +54,7 @@ COMPAT.md                      ← Zeus × BASE × zeus_client
 | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Helios emit requests (cost-aware) |
 | [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) | **zeus_client** backlog (base-5 floor → base-6+) |
 | [MODE.md](MODE.md) | **Modes** — engine vs catalog; why packs converged; overlay model |
+| [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) | **base-5.2** — classic `wish_i_knew` + `data_gaps` for Helios |
 | [../work/RECREATE_MODE.md](../work/RECREATE_MODE.md) | **Plan** — restore mode overlays into system prompt (`messages[].content`) |
 | [../images/assembled_prompt.svg](../images/assembled_prompt.svg) | Diagram |
 

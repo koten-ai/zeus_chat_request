@@ -95,6 +95,8 @@ For each track (catalog / Zeus / Client), complete the checklist for **your targ
 Execute in order. Skip only if the hop folder says “design only” and you are not scaffolding yet.
 
 ```text
+0. Copy docs/migration/RELEASE_CHECKLIST_TEMPLATE.md
+     → docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md  (work the boxes)
 1. Read COMPAT.md + ROADMAP (for Y)
 2. Read docs/migration/base-X_to_base-Y/  (GUIDE + lessons if present)
 3. Scaffold pack (when Y is a real pack):
@@ -103,13 +105,15 @@ Execute in order. Skip only if the hop folder says “design only” and you are
 5. Re-export text; refresh MANIFEST; scan_catalogs
 6. Zeus engine: snapshot / PIN / Detective / loaders / return schema (see §5)
 7. zeus_client: parse/validate new fields; dual-read only if X→Y break and ≤1 release; redaction; policy table
-8. Update COMPAT.md triples + feature table
-9. Ensure hop folder exists:
-     docs/migration/base-X_to_base-Y/GUIDE.md (+ lessons-learned.md)
+8. Update COMPAT.md triples + feature table + RELEASE_NOTES.md
+9. Ensure hop folder complete:
+     GUIDE.md + lessons-learned.md + RELEASE_CHECKLIST.md
 10. Update this playbook: §2 card for Y + §4 jump row
 11. Inspector Diff: same mode base-X vs base-Y
 12. Client spike + Hub stamp BEFORE CURRENT.json pin flip
 ```
+
+**Master checklist:** [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-5: [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md)
 
 ### 3.1 Where deltas live
 
@@ -218,14 +222,16 @@ When a hop becomes real:
 
 ```bash
 mkdir -p docs/migration/base-X_to_base-Y
-# add GUIDE.md, lessons-learned.md
+cp docs/migration/RELEASE_CHECKLIST_TEMPLATE.md \
+   docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md
+# fill RELEASE_CHECKLIST + GUIDE.md + lessons-learned.md
 # update docs/migration/README.md index
 # update this playbook §2 card + §4 jump table
-# update COMPAT.md
+# update COMPAT.md + RELEASE_NOTES.md
 # scaffold: python3 scripts/new_base.py --from v2/base/base-X --base Y
 ```
 
-Checklist for the hop `GUIDE.md`:
+Hop `GUIDE.md` should cover:
 
 - [ ] Filename / lineage changes  
 - [ ] Terminate / Layer A wire deltas  
@@ -233,6 +239,8 @@ Checklist for the hop `GUIDE.md`:
 - [ ] Zeus-breaking schema / Detective changes  
 - [ ] Hash / stamp impact  
 - [ ] Pin readiness criteria  
+
+Full ship bar: hop **`RELEASE_CHECKLIST.md`** (not GUIDE alone).
 
 ---
 

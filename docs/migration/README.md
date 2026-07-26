@@ -10,8 +10,9 @@
 | Hop folder | `docs/migration/base-<FROM>_to_base-<TO>/` |
 | Guide | `GUIDE.md` — what stayed / moved / added |
 | Lessons | `lessons-learned.md` — recommended |
-| Optional | `CHECKLIST.md` — short agent delta bullets |
+| **Required for real hops** | `RELEASE_CHECKLIST.md` — ship readiness (from template) |
 | Optional | hop `README.md` — status + links |
+| Template | [RELEASE_CHECKLIST_TEMPLATE.md](RELEASE_CHECKLIST_TEMPLATE.md) |
 
 **AI playbook** always links hops as:
 
@@ -30,11 +31,13 @@ See [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) · root [AGENTS.md](../.
 
 ## When you finish a new hop
 
-1. Create `docs/migration/base-X_to_base-Y/` with `GUIDE.md` (+ lessons).  
-2. Add a row to this index.  
-3. Update [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) jump table + comply cards.  
-4. Update [COMPAT.md](../../COMPAT.md).  
-5. Scaffold pack via [CREATE_BASE.md](../CREATE_BASE.md) when Y is real catalogs.
+1. Create `docs/migration/base-X_to_base-Y/`.  
+2. Copy [RELEASE_CHECKLIST_TEMPLATE.md](RELEASE_CHECKLIST_TEMPLATE.md) → hop `RELEASE_CHECKLIST.md` and work every box.  
+3. Add `GUIDE.md` (+ `lessons-learned.md`).  
+4. Add a row to this index.  
+5. Update [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) jump table + comply cards.  
+6. Update [COMPAT.md](../../COMPAT.md) + root [RELEASE_NOTES.md](../../RELEASE_NOTES.md).  
+7. Scaffold pack via [CREATE_BASE.md](../CREATE_BASE.md) when Y is real catalogs.
 
 ## Not here
 

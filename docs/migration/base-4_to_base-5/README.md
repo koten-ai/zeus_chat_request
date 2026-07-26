@@ -23,12 +23,17 @@ base-5 is specified in design docs, not as `v2/base/base-5/` catalogs yet.
 | Comply / upgrade steps | [../../BASE_AGENT_PLAYBOOK.md](../../BASE_AGENT_PLAYBOOK.md) |
 | Versions | [../../../COMPAT.md](../../../COMPAT.md) |
 
+## Release checklist (double-check before / while scaffolding)
+
+**[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)** — pack + docs + scripts + RELEASE_NOTES + COMPAT + Zeus/Client + base-5 content rules.
+
+Template for other hops: [../RELEASE_CHECKLIST_TEMPLATE.md](../RELEASE_CHECKLIST_TEMPLATE.md).
+
 ## When the pack exists
 
-Add here:
+Also add:
 
 - `GUIDE.md` — wire deltas vs base-4  
 - `lessons-learned.md`  
-- Optional `CHECKLIST.md` for agents  
 
-Until then, treat [ROADMAP.md](../../ROADMAP.md) as the delta source.
+Until pack exists, treat [ROADMAP.md](../../ROADMAP.md) as the delta source and work the RELEASE_CHECKLIST in design mode.

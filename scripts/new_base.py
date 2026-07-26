@@ -454,7 +454,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run:
         print("(dry-run — no files written)")
-    print("ok — next: edit catalogs, see docs/CREATE_BASE.md")
+    print("ok — next:")
+    print("  1. edit catalogs / Layer A schema under", pack_dst)
+    print("  2. fill docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md")
+    print("     (template: docs/migration/RELEASE_CHECKLIST_TEMPLATE.md)")
+    print("  3. see docs/CREATE_BASE.md + docs/BASE_AGENT_PLAYBOOK.md")
     return 0
 
 

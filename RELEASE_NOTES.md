@@ -26,6 +26,7 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 - base-5 **design** docs (not a pack): named rules objects, `output_request` type+description, settings/control plane ([ROADMAP](docs/ROADMAP.md), [PROMPT_SETTINGS](docs/PROMPT_SETTINGS.md), [RULES_OBJECT…](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md)).
 - **AI playbook:** root [AGENTS.md](AGENTS.md) + [BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) (comply with base-X / upgrade X→Y for catalog + Zeus + Client).
 - **Migration tree:** hops under [docs/migration/base-X_to_base-Y/](docs/migration/) (replaces one-off `docs/base-1_to_base-4/`).
+- **BASE bump release checklist:** [RELEASE_CHECKLIST_TEMPLATE.md](docs/migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-4→5: [RELEASE_CHECKLIST.md](docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md) (pack + docs + COMPAT + RELEASE_NOTES + Zeus/Client).
 
 ### Breaking changes
 

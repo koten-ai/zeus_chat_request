@@ -45,6 +45,8 @@ COMPAT.md                      ← Zeus × BASE × zeus_client
 | [ROADMAP.md](ROADMAP.md) | base-5 / base-6+ + Helios |
 | [CREATE_BASE.md](CREATE_BASE.md) | Scaffold a new `base-N` pack |
 | [migration/README.md](migration/README.md) | All BASE upgrade hops |
+| [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md) | **BASE bump release checklist** (copy per hop) |
+| [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md) | Filled checklist for base-5 |
 | [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) | Score + named rules + hooks |
 | [CHAT_REQUEST.md](CHAT_REQUEST.md) | What a catalog is, contracts, Client vs Hub |
 | [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Middleman multi-round |

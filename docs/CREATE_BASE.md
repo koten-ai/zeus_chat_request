@@ -36,7 +36,7 @@ v2/base/base-N/
 | `response_output_example.json` | **yes** | Copy from parent (edit later) |
 | `README.md` / `OVERVIEW.md` | **yes** | Templates from `new_base.py` |
 | Long design docs | **no** in pack | Live in `docs/` only |
-| Migration guide | optional | `docs/base-(N-1)_to_base-N/` when the bump is large |
+| Migration hop | **yes** for real bumps | `docs/migration/base-X_to_base-Y/` + **RELEASE_CHECKLIST.md** |
 
 ---
 
@@ -72,6 +72,9 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
 
 ### What you do after scaffold
 
+**Master list:** copy [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md)  
+→ `docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md` and check every box.
+
 ```text
 1. Diet / edit catalogs (text or JSON) for the BASE theme
 2. If Layer A changed: edit response_output_schema.json + example; keep in sync with return tool params
@@ -81,14 +84,13 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
      python3 scripts/new_base.py --refresh-manifest --base N
 5. Scan inspector index:
      python3 scripts/scan_catalogs.py
-6. Update docs/ROADMAP.md + RELEASE_NOTES.md
-7. Add hop folder: `docs/migration/base-(N-1)_to_base-N/` with `GUIDE.md` (+ lessons)
-8. Update [COMPAT.md](../COMPAT.md) + [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) jump/comply cards
-9. Diff in index.html (parent mode vs new mode)
-10. Client spike + stamp path before CURRENT pin
+6. Fill hop RELEASE_CHECKLIST + GUIDE (+ lessons)
+7. Update ROADMAP + RELEASE_NOTES + COMPAT + BASE_AGENT_PLAYBOOK
+8. Diff in index.html (parent mode vs new mode)
+9. Client spike + stamp path before CURRENT pin
 ```
 
-See [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) for the full agent upgrade recipe.
+See [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · base-4→5: [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md).
 
 
 
@@ -99,7 +101,7 @@ See [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) for the full agent upgrade 
 | Change type | Edit |
 | --- | --- |
 | Prompt construction, rules objects, settings, ownership | `docs/*.md` |
-| Migration story for this bump only | `docs/base-X_to_base-Y/` |
+| Migration story for this bump only | `docs/migration/base-X_to_base-Y/` |
 | Verb text, Terminate table in system prompt | `v2/base/base-N/min/*.json` (then re-export text) |
 | Layer A field machine schema | `v2/base/base-N/response_output_*.json` **and** return tool parameters in min JSON |
 
@@ -118,14 +120,13 @@ Envelope:    _format: "zeus.chat_request.v2"   # not the file stem
 
 ## Checklist (new BASE ready for Client trial)
 
-- [ ] `min/` has all modes you ship  
-- [ ] `text/` regenerated and readable  
-- [ ] `MANIFEST.json` lists every min file  
-- [ ] `response_output_schema.json` validates `response_output_example.json`  
-- [ ] Pack `README.md` points at `docs/BIBLE.md` (or successor)  
-- [ ] `scan_catalogs.py` / inspector Diff green vs parent  
+Use the hop **[RELEASE_CHECKLIST](migration/RELEASE_CHECKLIST_TEMPLATE.md)** (full). Minimum bar:
+
+- [ ] Pack §1 of RELEASE_CHECKLIST green  
+- [ ] Scripts §2 green  
+- [ ] RELEASE_NOTES + COMPAT updated  
+- [ ] Inspector Diff parent vs new  
 - [ ] No invented production `contract_hash`  
-- [ ] ROADMAP / RELEASE_NOTES mention the bump  
 
 ---
 
@@ -133,6 +134,8 @@ Envelope:    _format: "zeus.chat_request.v2"   # not the file stem
 
 | Doc | Role |
 | --- | --- |
+| [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md) | **Master BASE bump release checklist** |
+| [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md) | Filled instance for base-5 |
 | [BIBLE.md](BIBLE.md) | Current design-line requirements |
 | [ROADMAP.md](ROADMAP.md) | What base-5+ should contain |
 | [migration/](migration/) | All hops (`base-X_to_base-Y`) |

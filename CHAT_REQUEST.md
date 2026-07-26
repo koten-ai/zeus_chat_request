@@ -7,6 +7,14 @@ This document explains what a **chat_request** file is, what each part does, wha
 
 Files in this repo (`v2/min/chat_request_*_v2_min.json`) are **baseline templates** — starting points for modes (analytics, code, tenant, …), not final production catalogs for your data.
 
+**Mental model / assembly (authoring):**
+
+| Doc | Use |
+| --- | --- |
+| [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order: Zeus rules → Client inject → user → terminate; **token budget** |
+| [simple_layout.txt](simple_layout.txt) | Full field map; Contract vs Client; rules/triggers; admin output |
+| [base_layout.txt](base_layout.txt) | Short bridge + original sketch corrections |
+
 ---
 
 ## What is a chat_request?
@@ -32,6 +40,38 @@ User question (advice-shaped)
 ```
 
 Without a catalog, the model has no governed tool surface (or falls back to inventing unsafe behavior). With a **stamped** catalog, “help” stays within **your** allowed verbs and policy.
+
+---
+
+## Assembled prompt shape (three layers + output)
+
+The catalog file is **not** the full prompt by itself. At request time:
+
+```text
+1) ZEUS RULES     chat_request Contract (Base, verbs, schema, hard flags) — stamped/hashed
+2) ZEUS_CLIENT    business_injection, SCOPE BRIEF, MINI-SCHEMA, session/round — not hashed
+3) USER MESSAGE   this turn (+ history / tool results later)
+        │
+        ▼
+      LLM  ↔  Zeus verbs
+        │
+        ▼
+4) TERMINATE
+     G1 user-facing (summary, confidence, decompositions, …)
+     G2 admin-only (wish_i_knew, subject_confidence, jail_break_attempt 0.0..1.0)
+     G3 client control-plane (business_rules_triggers[] aligned to rules[])
+```
+
+| Layer | Re-stamp if changed? | Size note |
+| --- | --- | --- |
+| Contract / Zeus rules | **Yes** | Keep Base lean; prefer **min** profile |
+| Client inject | No | **Highest bloat risk** — short rules, lite schema |
+| Soft guidance (full) | Usually no | Drop first under token pressure |
+| Admin / trigger output | n/a | Cap length; never show G2/G3 in chat UI |
+
+**Business rules + Client rounds (design):** Client may pass `business_injection.rules[]` (stable indexes). On terminate, model emits `business_rules_triggers: [bool, …]` so Client can branch (e.g. coupon presented) without stuffing long policy prose every turn.
+
+**Token budget:** min catalog files are ~13–17KB; assembled prompts grow with inject + history + tool results. Avoid turning a ~10KB system into ~60KB by pasting novels into rules/guidance. Prefer indexed one-line rules + triggers, lite mini-schema, and drop soft guidance first. See [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md).
 
 ---
 
@@ -136,7 +176,7 @@ In Zeus Client config this looks like:
 | **Hub → Workbench** | Refine catalog for **your** data: guidance, business injections, emphasis, mode copy, preview against live scope | Admin / operator |
 | **Hub → stamp / verify** | Produce authoritative `contract_id` / `contract_hash` for a scope | Admin |
 | **Zeus Client `AgentHooks`** | Policy that prompts cannot override: pin tenant filters, reject verbs, cap rounds, inject labeled data | Developer |
-| **Zeus Client config** | `ZEUS_URL`, auth, sample bucket/scope/collection, mode, LLM provider, which stamped catalog to load | Developer |
+| **Zeus Client config / inject** | `ZEUS_URL`, auth, scope, mode, LLM; **business_injection** (brand `message_failure`, indexed `rules[]`, locale); session round | Developer |
 | **App prompt / user question** | Advice-shaped user text (untrusted) | App |
 
 ### Do **not** do these in production paths
@@ -220,6 +260,28 @@ Workbench changes that stay under **excluded** hash paths (e.g. much of `guidanc
 
 ---
 
+## File naming (base-2+ and customs)
+
+Everyone starts from a **BASE** file, then Hub Workbench / Prompt Helper saves **versioned customs** per scope:
+
+| Kind | Pattern | Example |
+| --- | --- | --- |
+| BASE | `chat_request_<mode>_base-<N>.json` | `chat_request_analytics_base-2.json` |
+| Custom v1 | `chat_request_<mode>_base-<N>_cus_<bucket>_<scope>-1.json` | `…_cus_travel-sample_default-1.json` |
+| Custom v2 | same pattern, **rev increments** | `…_cus_travel-sample_default-2.json` |
+| Legacy (base-1 pin today) | `chat_request_<mode>_v2_min.json` | `v2/min/…` |
+
+```text
+:9091 Hub → Workbench → Prompt Helper
+  load BASE → refine for bucket/scope → save custom -1
+  edit again → save custom -2 (immutable history preferred)
+```
+
+Inside JSON: customs set `_lineage.kind = "custom"`, `parent_base_id = base-N`, `custom_id = cus_<bucket>_<scope>-<rev>`.  
+Stamp (`contract_hash`) still comes from Hub verify — filename is identity, not the stamp itself.
+
+See [v2/base/base-2-prototype/PROTOTYPE.md](v2/base/base-2-prototype/PROTOTYPE.md) for the full contract.
+
 ## Modes in this distribution
 
 Each baseline file targets a **mode** (tool/policy slice), not a customer dataset:
@@ -253,8 +315,13 @@ Pick a mode that matches the **kind of help**, then refine in Workbench for **yo
 
 | Resource | Link |
 | --- | --- |
+| Assembled prompt + budget | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) |
+| Simple field layout | [simple_layout.txt](simple_layout.txt) |
+| Base layout bridge | [base_layout.txt](base_layout.txt) |
 | Modes + files | [README.md](README.md) |
 | Version history | [RELEASE_NOTES.md](RELEASE_NOTES.md) |
+| Compat BASE ↔ Zeus | [COMPAT.md](COMPAT.md) |
+| Helios emit wishlist | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) |
 | Manifest | [manifest.json](manifest.json) |
 | Platform docs | https://docs.koten.ai/ |
 | Zeus Client usage | https://docs.koten.ai/zeus-client/using-zeus-client |

@@ -1844,10 +1844,19 @@ Wire payload — What tends to hit the model: system prompt + tools (+ optional 
             </ol>
           </div>
 
-          <div class="help-block" data-help-block data-search="output scheme layer a layer b terminate report query_decomposition">
+          <div class="help-block" data-help-block data-search="output scheme layer a layer b terminate report query_decomposition base-4">
             <h3>What is the output scheme (Layer A vs B)?</h3>
-            <p><b>Layer A — model terminate</b> (same every mode): <code>summary</code>, <code>query_decomposition</code>, <code>decomposition</code>, <code>confidence</code> on <code>return</code> or terminating <code>pipeline</code>.</p>
-            <p><b>Layer B — server report</b>: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, <code>detail.ai.calls</code>, FTS/N1QL, <code>spans</code>) + <code>stored_at</code>. See Cards → chapter 4.</p>
+            <p><b>Layer A — model terminate</b> on <code>return</code> / terminating <code>pipeline</code>.</p>
+            <ul class="list-disc ml-5 mt-1 space-y-1">
+              <li><b>Required (base-1 and base-4):</b> <code>summary</code>, <code>query_decomposition</code>, <code>decomposition</code>, <code>confidence</code> (<code>high|med|low</code>).</li>
+              <li><b>Recommended (base-4+):</b> <code>policy_action</code>, <code>subject_confidence</code>, <code>jail_break_attempt</code> (0.0–1.0), <code>wish_i_knew</code>, <code>business_rules_triggers</code>, refs — see <code>v2/base/base-4-prototype/BIBLE.md</code>.</li>
+            </ul>
+            <p class="mt-2"><b>Layer B — server report</b>: <code>attribution</code> + <code>decision</code> + <code>report</code> (metrics, spans, …) + <code>stored_at</code>. Model does not emit Layer B. See Structure → chapter 4.</p>
+          </div>
+
+          <div class="help-block" data-help-block data-search="base-1 base-4 multiple bases dropdown migration diff">
+            <h3>base-1 and base-4 in this inspector?</h3>
+            <p><b>One <code>index.html</code></b> lists every <code>v2/**/chat_request*.json</code> (rescan with <code>scripts/scan_catalogs.py</code>). Use the mode dropdown (folder · mode · base_id) and <b>Diff</b> / <b>Matrix</b> to compare base-1 vs base-4. Do not maintain a separate index-base-4.html for catalog mapping. Migration map: <code>v2/base/base-4-prototype/BASE_1_TO_BASE_4_GUIDE.md</code>.</p>
           </div>
 
           <div class="help-block" data-help-block data-search="guidance yellow missing min">
@@ -2020,7 +2029,8 @@ const GLOSSARY = [
   { term: "query_decomposition", kind: "guidance", def: "Required terminate object: business intent facets (intent+entity…). Powers hot-path analytics." },
   { term: "report.detail.ai.calls", kind: "meta", def: "Ordered tool invocations with args + results in the server report. Where pipeline steps and terminate fields land as JSON." },
   { term: "report.spans", kind: "meta", def: "Timeline slices (dispatch, ai.round, pipeline step, fts, tool) with duration_ns for performance forensics." },
-  { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits the standard output schema (summary + decompositions + confidence)." },
+  { term: "return / return_result", kind: "rules", def: "Terminal verb: model stops and emits Layer A (required: summary + decompositions + confidence; base-4+ also recommends policy_action, admin scores, wish_i_knew, business_rules_triggers)." },
+  { term: "base-1 vs base-4", kind: "meta", def: "Same inspector: pick catalogs from the dropdown by folder/BASE. base-1 is production pin (v2/min); base-4 is prototype diet with richer Layer A. Diff/Matrix compare them." },
   { term: "Rules (hashed)", kind: "rules", def: "What production promised: messages, verbs, masq, etc. Change ⇒ new hash." },
   { term: "ScopeConfig", kind: "inject", def: "Per-scope operator config (auth, endpoints, injects, entity map). Where business language lives in production." },
   { term: "Search (this UI)", kind: "meta", def: "Top-bar search across the whole page. Scope with /help /glossary /prompt /catalog /tools /inject /output (e.g. /help mini-schema). Use * as wildcard (e.g. /output *ecomposition). Yellow mark shows matches; click a hit to jump." },
@@ -4965,8 +4975,10 @@ async function loadCatalog(file) {
 function optionLabel(entry) {
   const blurb = MODE_BLURBS[entry.mode];
   const short = blurb ? " — " + blurb.slice(0, 22) : "";
-  // folder · mode so min vs base-1/min are distinguishable
-  return `${entry.folder_label} · ${entry.mode}${short}`;
+  // folder · mode · base_id so min vs base-1 vs base-4 are distinguishable
+  const base = entry.base_id ? ` · ${entry.base_id}` : "";
+  const proto = entry.prototype ? " · proto" : "";
+  return `${entry.folder_label} · ${entry.mode}${base}${proto}${short}`;
 }
 
 function fillModes(index) {

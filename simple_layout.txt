@@ -1,0 +1,812 @@
+# chat_request — SIMPLE TEXT LAYOUT (v0 working draft)
+# Purpose: human-editable mental model first. JSON / TOON later.
+# Not wire format yet. Markers like Base-1 ... Base-1 are for copy/paste, not final schema.
+#
+# Canonical assembled-prompt picture + token budget:
+#   → PROMPT_ASSEMBLY.md
+# Prototype catalogs (Layer A in return schema):
+#   → v2/base/base-2-prototype/
+# Filenames: chat_request_<mode>_base-2.json
+#   customs: chat_request_<mode>_base-2_cus_<bucket>_<scope>-<rev>.json
+# Related: CHAT_REQUEST.md · base_layout.txt · README.md
+#
+# BUDGET: do not over-stuff rules/injects (10KB catalog → 60KB assembled is a failure mode).
+#   Prefer short indexed business_injection.rules[] + triggers; drop soft guidance first.
+#
+# Legend
+#   ""   string
+#   []   array
+#   {}   object
+#   true|false   boolean flag
+#   #IN  = in catalog file (shipped)
+#   #RT  = runtime inject (not baseline file)
+#   #OUT = model must emit on terminate
+#   #NEW = you want this explicit; today it is only prose / code / missing
+#   #HAS = already exists in chat_request*.json (maybe under another name)
+
+================================================================================
+A. HEADER / IDENTITY                                          #IN  #HAS
+================================================================================
+
+format:            "zeus.chat_request.v2"          #HAS  _format
+version:           1                               #HAS  _version
+profile:           "v2_min" | "v2_full"            #HAS  _lineage.profile / metadata
+mode:              "analytics" | "auto" | "code" | "custom" | "fraud"
+                   | "open" | "private" | "regulated" | "research" | "tenant"
+                   #HAS  _lineage.mode / metadata.mode
+
+base_id:           "base-{sequence}"               #HAS  _lineage.base_id   e.g. base-1
+custom_id:         null | "custom-{sequence}"      #HAS  _lineage.custom_id
+                   # today shape is closer to custom:<slug>-k + parent base_id
+parent_base_id:    null | "base-{sequence}"        #HAS (planned customs) when custom forks base
+
+contract_id:       ""                              #HAS  contract.id (full; thin on min)
+contract_hash:     "md5:…"                         #HAS  contract.hash / _hash
+scope:             "bucket/scope"                  #HAS  contract.scope (after stamp)
+builder:           ""                              #HAS  contract.builder
+
+# How hash works (keep this next to the stamp so we don't re-confuse it):
+#   hash covers CONTRACT BODY only (section C)
+#   does NOT cover: guidance soft text, runtime injects, user message, _lineage meta keys
+
+================================================================================
+B. CATALOG INTENT  (operator purpose for THIS catalog)                #NEW-ish
+================================================================================
+
+# "What is this catalog for?" — not the per-turn user intent (that is #OUT).
+# Today: mostly implied by mode name + system prompt prose. Make it explicit.
+#
+# NOTE: per-turn "wish I knew" is NOT here — it is admin #OUT (section G2).
+
+intent:            ""     #NEW  one-liner purpose of this catalog/mode
+                          # e.g. "Help analysts explore operational data safely"
+
+notes:             ""     #HAS-ish  _note / metadata.note (human, not model-facing)
+
+================================================================================
+C. CONTRACT START  (hashed / stamped body)                        #IN  #HAS
+================================================================================
+
+# Everything between CONTRACT START and CONTRACT END is the "easy copy unit"
+# plus policy that should re-stamp when it changes.
+
+CONTRACT START
+
+  ----------------------------------------------------------------------------
+  C1. Base block  (swap as a unit when base sequence bumps)
+  ----------------------------------------------------------------------------
+
+  Base-{sequence}                          # e.g. Base-1 … Base-1
+
+    how_zeus_works: ""                     #HAS  messages[0].content (system prompt)
+      # today includes:
+      #   - execution style (latency, act don't narrate)
+      #   - efficiency & correctness rules
+      #   - verb priority prose
+      #   - evidence-loop terminate rules
+      #   - "use SCOPE BRIEF + MINI-SCHEMA, don't rediscover"
+
+    apis_13: [                             #HAS  verbs[]  (OpenAI-style tools)
+      {
+        name: ""                           # describe|get|find|traverse|search|
+                                           # analyze|explain|set|order|enrich|
+                                           # project|pipeline|return
+        description: ""
+        parameters: {}                     # JSON Schema for tool args
+        cost_tier: "cheap"|"moderate"|"expensive"   #HAS  masq.costs[name] (full)
+      }
+      # … typically 13
+    ]
+
+    response_json_schema: {                #HAS  instructions.response_expectations
+                                           #      + guidance.query_decomposition
+                                           #      + guidance.data_decomposition
+                                           #      + system-prompt evidence section
+      required: [
+        "summary",                         # "" human facts
+        "query_decomposition",             # {} business intent facets
+        "decomposition",                   # {} data plan grounded in mini-schema
+        "confidence"                       # "high"|"med"|"low"  STRING only
+      ]
+      recommended: [
+        "node_refs", "entity_refs", "provenance", "evidence"
+      ]
+      optional_when_debug: [
+        "explanation", "latency_breakdown"
+      ]
+
+      # nested shapes (today split across guidance + prompt):
+      query_decomposition: {
+        core:    [ "intent", "entity" ]    #HAS
+        optional:[ "audience","geo","theme","occasion","price","parts","other" ]
+        example: {}
+      }
+      decomposition: {
+        fields: [ "intent", "targets", "predicates", "output", "context" ]
+        output_enum: [ "rows", "count", "ids", … ]
+      }
+    }
+
+  Base-{sequence}
+
+  ----------------------------------------------------------------------------
+  C2. API weight / order  (inside contract — re-stamp if changed)
+  ----------------------------------------------------------------------------
+
+  api_weight_order: [                      #HAS  instructions.verb_order (full)
+    "find", "get", "pipeline", "describe", "set", "order",
+    "enrich", "project", "traverse", "search", "analyze", "return"
+  ]
+  # note: masq has cheap/moderate/expensive; order array is preference sequence.
+  # explain + return exist on verbs[]; return often omitted from masq.costs today.
+
+  api_cost_tiers: {                        #HAS  masq (full; often missing on min)
+    tier_order: [ "cheap", "moderate", "expensive" ]
+    costs: { find: "cheap", search: "expensive", … }
+  }
+
+  ----------------------------------------------------------------------------
+  C3. Hard policy flags  (you want explicit true|false)
+  ----------------------------------------------------------------------------
+
+  # Today these are MOSTLY prose in system prompt or Client AgentHooks — not clean bools.
+  # Making them first-class is a redesign win.
+
+  user_message_can_influence_api_selection: true|false
+    #NEW  if false: model must stick to api_weight_order / fixed recipes;
+    #     user text cannot talk it into random tools.
+    # today: soft (prose + optimal_paths); hooks can hard-block verbs.
+
+  ai_only_zeus_data: true|false
+    #NEW  if true: answer ONLY from Zeus tool results (+ brief/schema);
+    #     do not interject world knowledge / invented rows.
+    # today: partially in prompt ("ground in MINI-SCHEMA", evidence rules)
+    #        but not a single explicit flag.
+
+  jail_break: {                            #NEW as structured block
+    enabled: true|false                    # usually true in prod = defenses ON
+    text: ""                               # optional prompt-side reinforcement
+    enforce_in_client_hooks: true|false    #HAS-ish  AgentHooks (code path)
+    # examples of hook-enforced policy (not in JSON today):
+    #   - pin tenant filters
+    #   - reject verbs
+    #   - cap rounds
+    #   - inject labeled data
+  }
+
+  # more hard flags worth promoting from prose:
+  must_terminate_with_return: true|false   #HAS prose "Always end with return"
+  allow_plain_text_final: true|false       # today effectively false
+  prefer_pipeline_multistep: true|false    #HAS prose
+  never_rediscover_stats: true|false       #HAS prose (use brief+schema)
+  debug: true|false                        #HAS  guidance.debug (full)
+
+CONTRACT END
+
+contract_hash: "md5:…"                     # computed over CONTRACT body (C)
+                                           # #HAS contract.hash after stamp
+
+================================================================================
+D. SOFT GUIDANCE  (optional; usually NOT hashed)                  #IN  #HAS full
+================================================================================
+
+# Min profile often OMITS this whole section (yellow "missing" in inspector).
+
+guidance:
+  optimal_paths: [                         #HAS  suggested multi-step recipes
+    {
+      when_to_use: ""
+      intent_pattern: {}
+      pipeline: [ { as, verb, params } ]
+      notes: ""
+    }
+  ]
+  strategy_boosts: {}                      #HAS
+  injections:
+    business_logic: []                     #HAS  often empty in baseline; Hub fills
+  assembler_hints: {                       #HAS  where to splice runtime text
+    append_scope_brief_after: "## Rules"
+    merge_business_logic_into: "Additional Business Rules (injected by middle-man)"
+    inject_debug_addendum_if_true: true
+  }
+  # facet docs for the model (also feed response_json_schema story):
+  query_decomposition: { … }               #HAS  (duplicate/overlap with C1 schema)
+  data_decomposition:  { … }               #HAS
+
+================================================================================
+E. RUNTIME INJECT  (not in baseline file)                         #RT  #HAS behavior
+================================================================================
+
+# Assembled by Zeus / Client / Hub at request time. Competes for tokens.
+
+SCOPE_BRIEF: ""                            # live scope orientation
+MINI_SCHEMA: {}                            # entity types + fields (lite schema)
+business_logic / prompt_override: ""       # Hub Workbench / middle-man
+client_hooks_effects: ""                   # hard filters, caps, labels (code)
+conversation_history: []                   # prior turns if multi-turn
+tool_results: []                           # after Zeus executes verbs
+
+# IMPORTANT: these should stay OUTSIDE Contract body so hash does not thrash
+# per scope / per turn. (Brief is stripped before hashing in Client today.)
+
+================================================================================
+E2. CLIENT BUSINESS INJECTION / BOILERPLATE                         #RT  #NEW
+================================================================================
+
+# Placeholders for zeus_client (+ Hub Workbench) team — NOT model "creativity".
+# Company-owned copy for fixed situations. Prefer Client config / inject over
+# baking into Base-n so each tenant can brand without re-stamping Base.
+#
+# Namespace sketch (final key path TBD by zeus_client):
+#
+#   zeus_client.business_injection.*
+#   or config: business_injection / prompt_override siblings
+
+business_injection:
+
+  # --- failure / soft-refuse (user-facing) ---
+  message_failure: ""
+    # When the agent cannot fulfill the ask (no data, out of policy, unclear, …)
+    # DEFAULT (generic): "I can't answer your question."
+    # COMPANY example (hotel):
+    #   "Sorry but we are not able to fulfil your request. Could you explain
+    #    again what you are looking for to book a room?"
+    #
+    # placeholder for zeus_client:
+    #   zeus_client.business_injection.message_failure = "Sorry but …"
+
+  message_clarify: ""
+    # Need more info from the user (missing dates, city, guests, …)
+    # e.g. "Happy to help — which city and check-in dates are you considering?"
+
+  message_out_of_scope: ""
+    # In-domain product but outside what this agent may do
+    # e.g. "I can help with room search and availability, not billing disputes."
+
+  message_jailbreak_soft: ""
+    # Safe user-facing reply when policy blocks (do NOT mention jailbreak score)
+    # e.g. "I can only help with booking-related questions on this site."
+
+  message_no_results: ""
+    # Zeus returned empty / no matching rows
+    # e.g. "We couldn't find rooms matching that. Want to widen dates or area?"
+
+  message_error: ""
+    # Transport / Zeus / tool failure (ops-safe wording)
+    # e.g. "Something went wrong looking that up. Please try again in a moment."
+
+  # --- indexed business rules (Client pass-in; triggers on terminate) ---
+  rules: [
+    "",
+    "if they present a coupon, treat coupon as applicable",
+    # …
+  ]
+    # Parallel output on terminate: business_rules_triggers: [false, true, …]
+    # See §M4–M5 for round/turn Client loop. Indexes must stay stable in-session.
+
+  # --- optional brand / tone ---
+  brand_voice: ""           # short tone note for inject (optional)
+  company_name: ""          # "Acme Hotels"
+  locale: ""                # "en-US" — pick string table later
+
+# Usage notes for zeus_client team:
+#   1. These strings are USER-FACING templates, not admin telemetry.
+#   2. Model (or Client post-process) should prefer message_failure etc. over
+#      free-form "I can't help" when a fixed situation matches.
+#   3. Keep OUT of contract hash (per-tenant brand must not thrash Base stamp).
+#   4. jail_break_attempt / wish_i_knew stay admin-only; user still gets
+#      message_jailbreak_soft or message_failure — never the score.
+#   5. Hub Workbench may edit the same bag as guidance.injections.business_logic
+#      or a dedicated business_injection object — wire-up is Client's job.
+
+================================================================================
+F. USER MESSAGE                                                   #RT
+================================================================================
+
+user_message: ""                           # e.g. "what tacos is great with goat cheese"
+
+# Interaction with flags in C3:
+#   if user_message_can_influence_api_selection == false
+#       → treat message as question only, not tool-routing advice
+#   if ai_only_zeus_data == true
+#       → never answer from message alone without Zeus evidence
+
+================================================================================
+G. OUTPUT (model terminate)                                       #OUT
+================================================================================
+
+# Split every terminate payload into two audiences.
+# Client / Hub MUST strip G2 before anything user-visible.
+
+# ----------------------------------------------------------------------------
+# G1. USER-FACING  (safe to show / derive product UI from)
+# ----------------------------------------------------------------------------
+# #HAS today as core terminate contract
+
+return.user: {
+  summary: ""                              # human facts for the user
+  # optional: structured rows already implied by Zeus tool results / UI
+}
+
+# Also often used in product analytics but not always shown raw:
+  query_decomposition: { intent, entity, … }   #HAS  evidence-loop facets
+  decomposition: { targets, predicates, output, … }  #HAS  data plan
+  confidence: "high" | "med" | "low"           #HAS  overall answer confidence (string)
+
+  node_refs?: []
+  entity_refs?: []
+  provenance?: …
+
+# ----------------------------------------------------------------------------
+# G2. ADMIN-ONLY  (audit / Workbench / Detective / Helios — NEVER user chat UI)
+# ----------------------------------------------------------------------------
+# #NEW  not first-class on current min terminate schema
+
+return.admin: {
+
+  subject_confidence: 0.0 .. 1.0
+    # how sure is the model that it identified the right subject/entity/topic?
+    # separate from overall answer confidence above
+
+  wish_i_knew: [                           # past tense: gaps this turn
+    {
+      what: ""                             # what was missing
+      kind: "rules" | "message" | "schema" | "data" | "tool" | "other"
+      why: ""                              # optional: how it would have helped
+      severity: "low" | "med" | "high"     # optional
+    }
+  ]
+    # empty [] = nothing material missing
+    # sources of gaps: prompt/rules, user message, mini-schema, Zeus data, tools
+
+  jail_break_attempt: 0.0 .. 1.0     # float, NOT boolean 0|1
+    # SUBJECTIVE AI self-assessment (same spirit as subject_confidence)
+    # how strongly does THIS turn look like a user jailbreak / policy-bypass attempt?
+    # examples of scale (guidance only, not hard thresholds):
+    #   0.0  no bypass intent sensed
+    #   0.2  vague "ignore rules" flavor, low confidence
+    #   0.5  clear pressure to break catalog / tool policy
+    #   0.8+ strong jailbreak / exfil / override attempt (still subjective)
+    # ADMIN ONLY — never show in chat UI
+    # imperfect by design; optional parallel hard signal can come from Client hooks
+}
+
+# Wire shape can still be one flat return{} object; the split above is audience
+# policy (what Client redacts for users), not necessarily two JSON roots.
+
+# Layer B — server turn report (NOT chat_request; Detective/Helios later)
+# attribution, decision, report{ metrics, detail, spans }
+# admin fields above should land in the same store / trace as Layer B.
+
+================================================================================
+H. ALREADY-IN-JSON CHECKLIST (map old names → this layout)
+================================================================================
+
+  chat_request field                    → simple layout home
+  ------------------------------------  ----------------------------------
+  _format / _version                    → A. format / version
+  _hash / contract.hash                 → A/C contract_hash
+  _hash_policy                          → (implementation of what Contract hashes)
+  _lineage.base_id                      → A. base_id  Base-{sequence}
+  _lineage.custom_id                    → A. custom_id
+  _lineage.mode / metadata.mode         → A. mode
+  _lineage.profile                      → A. profile
+  _note / metadata.note                 → B. notes
+  contract.id/name/scope/builder        → A. stamp meta
+  messages[0].content                   → C1. how_zeus_works
+  verbs[]                               → C1. apis_13
+  instructions.verb_order               → C2. api_weight_order
+  masq                                  → C2. api_cost_tiers
+  instructions.response_expectations    → C1. response_json_schema
+  guidance.query_decomposition          → C1 schema + D soft docs
+  guidance.data_decomposition           → C1 schema + D soft docs
+  guidance.optimal_paths                → D. optimal_paths
+  guidance.injections.business_logic    → D + E business inject
+  guidance.assembler_hints              → D (how E is spliced)
+  guidance.debug                        → C3 debug
+  AgentHooks (Client, not JSON)         → C3 jail_break.enforce_in_client_hooks
+  SCOPE BRIEF / MINI-SCHEMA (runtime)   → E
+  user turn                             → F
+  terminate return fields               → G
+
+================================================================================
+I. EXPLICIT GAPS (fields you named that are not clean today)
+================================================================================
+
+  [ ] intent (catalog-level purpose string)
+  [ ] return.admin.wish_i_knew[] (per-turn AI gap report — not user UI)
+  [ ] return.admin.subject_confidence 0..1
+  [ ] return.admin.jail_break_attempt float 0.0..1.0 (subjective AI)
+  [ ] user_message_can_influence_api_selection: true|false
+  [ ] ai_only_zeus_data: true|false
+  [ ] jail_break as first-class Contract policy block (text + enforce flags)
+  [ ] zeus_client.business_injection.message_failure (+ clarify/out_of_scope/…)
+  [ ] Client applies boilerplate on fail/refuse instead of generic model text
+  [ ] single unified response_json_schema (today split: prompt + instructions
+        + guidance.query_decomposition + guidance.data_decomposition)
+  [ ] Base-{sequence} copy delimiters (authoring UX; not physical yet)
+  [ ] custom-{sequence} naming (align custom:<slug>-k vs custom-1 style)
+  [ ] api_weight_order always present on min (today often only full + prose)
+  [ ] explain + return consistently in masq.costs
+
+================================================================================
+J. MORE CANDIDATES TO ADD LATER (from ecosystem, not always in file)
+================================================================================
+
+  - max_rounds / latency budget
+  - allowed_verbs subset (mode may hide tools later)
+  - denied_verbs[]
+  - tenant_pin required true|false
+  - multi_turn memory true|false
+  - structured_output / output_schema (Client structured=True path)
+  - A/B stamp id / eval pack id
+  - Helios cost rules (AI-expensive fields optional_when only)
+  - language / channel / market (Client cheap injects)
+  - evidence-loop keep/sample policy (server Layer B)
+
+================================================================================
+K. MINIMAL FILLED EXAMPLE (toy — not real stamp)
+================================================================================
+
+format: "zeus.chat_request.v2"
+version: 1
+profile: "v2_min"
+mode: "analytics"
+base_id: "base-1"
+custom_id: null
+
+intent: "Answer operational questions using Zeus verbs only"
+
+CONTRACT START
+  Base-1
+    how_zeus_works: |
+      This is Zeus. Use the APIs below to query data.
+      Prefer cheap tools. End with return + required fields.
+    apis_13: [ describe, get, find, traverse, search, analyze, explain,
+               set, order, enrich, project, pipeline, return ]
+    response_json_schema:
+      required: [ summary, query_decomposition, decomposition, confidence ]
+  Base-1
+
+  api_weight_order: [ find, get, pipeline, describe, set, order,
+                      enrich, project, traverse, search, analyze, return ]
+
+  user_message_can_influence_api_selection: false
+  ai_only_zeus_data: true
+  jail_break: { enabled: true, enforce_in_client_hooks: true, text: "" }
+  must_terminate_with_return: true
+  never_rediscover_stats: true
+CONTRACT END
+
+contract_hash: "md5:«computed after stamp»"
+
+# runtime (not hashed)
+E: SCOPE_BRIEF + MINI_SCHEMA + business_logic
+E2: business_injection.message_failure =
+      "Sorry but we are not able to fulfil your request. Could you explain
+       again what you are looking for to book a room?"
+F: user_message = "what tacos is great with goat cheese"
+
+# terminate example (G1 user + G2 admin)
+G1: summary = "…", confidence = "med"
+G2: subject_confidence = 0.72
+    wish_i_knew = [ { what: "cuisine constraint unclear", kind: "message" } ]
+    jail_break_attempt = 0.0
+
+
+================================================================================
+M. WHO OWNS WHAT — Client pass-in vs Contract (hashed) vs optional
+================================================================================
+
+# Three buckets. Do not mix them or every tenant edit re-stamps Base, and
+# every turn thrashes the contract hash.
+
+```text
+┌─ CONTRACT (hashed / stamped) ─────────────────────────────────────┐
+│  Base-n body, verbs, weight order, hard flags, response schema    │
+│  Change ⇒ new stamp / new hash                                    │
+└───────────────────────────────────────────────────────────────────┘
+┌─ ZEUS_CLIENT PASS-IN / OVERRIDES  (runtime, not hashed) ──────────┐
+│  brand boilerplate, business rules text, locale, session, hooks   │
+│  Change per tenant / per request without re-stamping Base         │
+└───────────────────────────────────────────────────────────────────┘
+┌─ OPTIONAL INSERTS  (soft / full profile / Workbench) ──────────────┐
+│  optimal_paths, extra examples, eval ids — usually hash-excluded  │
+└───────────────────────────────────────────────────────────────────┘
+┌─ TERMINATE OUTPUT                                              ───┐
+│  G1 user-facing · G2 admin · G3 client control-plane (triggers) │
+└───────────────────────────────────────────────────────────────────┘
+```
+
+--------------------------------------------------------------------------------
+M1. CONTRACT — must be hashed (stamp changes if these change)
+--------------------------------------------------------------------------------
+
+  # Identity / lineage (meta of the stamp; body still hashed via policy)
+  base_id / custom_id / mode / profile
+  contract_id + contract_hash (result of stamp)
+
+  # Body (Rules)
+  how_zeus_works / Base-n prose
+  apis_13 (verbs + parameter schemas)
+  api_weight_order[] + api_cost_tiers
+  response_json_schema (required terminate fields + shapes)
+  hard flags:
+    user_message_can_influence_api_selection
+    ai_only_zeus_data
+    must_terminate_with_return
+    never_rediscover_stats
+    require_evidence                     # NEW candidate
+    allow_plain_text_final
+  allowed_verbs[] / denied_verbs[]       # if mode locks tool surface
+  max_rounds                             # if product treats as policy
+  jail_break.enabled (+ whether defenses on)  # policy ON/OFF, not the score
+
+  # Explicitly NOT in contract hash
+  business_injection copy, locale, SCOPE_BRIEF, MINI-SCHEMA,
+  user message, soft guidance, per-turn scores/triggers
+
+--------------------------------------------------------------------------------
+M2. ZEUS_CLIENT — pass-in / overrides (runtime, per session or turn)
+--------------------------------------------------------------------------------
+
+  # Config / constructor / request options — Client owns wire keys.
+
+  # --- brand & boilerplate (user-facing templates) ---
+  business_injection.message_failure
+  business_injection.message_clarify
+  business_injection.message_out_of_scope
+  business_injection.message_jailbreak_soft
+  business_injection.message_no_results
+  business_injection.message_error
+  business_injection.company_name
+  business_injection.brand_voice
+  business_injection.locale
+
+  # --- business rules (operator policy text + trigger slots) ---
+  # Parallel lists: rule text in, booleans (or richer) out on terminate.
+  # Index alignment is the contract between Client and model.
+
+  business_injection.rules: [
+    "",                                          # index 0 — unused / reserved
+    "if they present a coupon, treat coupon as applicable",   # index 1
+    "if party size >= 3, mention family rate if present in data",
+    …
+  ]
+
+  # Client may also pass structured overrides each turn/round:
+  overrides: {
+    prompt_override: ""              # extra system text this request
+    denied_verbs_extra: []           # session hard blocks (hooks)
+    tenant_pin: {}                   # forced filters
+    max_rounds: 6                    # can tighten vs catalog default
+    debug: false
+  }
+
+  # --- session / round position (so model + Client share context) ---
+  session: {
+    zeus_session_id: ""
+    zeus_round: 1                    # 1-based round index this call
+    turn_index: 0                    # user-turn index if multi-message
+    max_rounds: 6
+    prior_tool_names: []             # optional cheap Client-filled
+  }
+
+  # --- environment (cheap Client inject, not model invention) ---
+  locale, timezone, channel, market_country
+  SCOPE_BRIEF, MINI-SCHEMA           # often from Zeus, Client merges
+
+  # --- hooks (code, not JSON catalog) ---
+  AgentHooks: pin tenant, reject verbs, cap rounds, inject labeled data
+  # hooks can ALSO emit hard signals alongside model-subjective scores
+
+--------------------------------------------------------------------------------
+M3. OPTIONAL INSERTS (soft — usually hash-excluded)
+--------------------------------------------------------------------------------
+
+  guidance.optimal_paths
+  guidance.strategy_boosts
+  few-shot examples[]
+  eval_pack_id / ab_arm
+  owner, changelog, deprecated, replaced_by
+  test_questions[]
+  wish-list of facets for Helios (catalog-level, not per-turn wish_i_knew)
+
+--------------------------------------------------------------------------------
+M4. TERMINATE OUTPUT — three audiences
+--------------------------------------------------------------------------------
+
+  G1 USER-FACING
+    summary
+    (optional structured rows for UI)
+
+  G2 ADMIN-ONLY (never chat UI)
+    confidence                  # overall high|med|low (existing)
+    subject_confidence          # 0.0..1.0 subjective
+    wish_i_knew[]               # gaps in rules/message/schema/data
+    jail_break_attempt          # 0.0..1.0 subjective AI
+    refusal_reason_code?        # out_of_scope|jailbreak|no_data|…
+    policy_action?              # answer|clarify|refuse|error
+
+  G3 CLIENT CONTROL-PLANE (for zeus_client round/turn logic)
+    # Model fills in parallel to business_injection.rules[]
+    # Client reads this EVERY round to branch UX, hooks, next inject.
+
+    business_rules_triggers: [ false, true, false, … ]
+      # same length / index as business_injection.rules[]
+      # true  = model believes this rule applies to THIS turn/round
+      # false = not triggered
+      #
+      # Example:
+      #   rules[1] = "if they present a coupon …"
+      #   user says "I have code SAVE20"
+      #   → business_rules_triggers[1] = true
+      #   Client may: show coupon UI, pass coupon:true into next Zeus call,
+      #   or inject "coupon presented" into the next round system addendum
+
+    # Optional richer form (if bool[] is too tight later):
+    business_rules_results: [
+      { index: 1, triggered: true, detail: "SAVE20 mentioned" },
+      …
+    ]
+    # Start simple: bool[] is enough for Client to poll each round.
+
+    # Round awareness (model echo or Client-authoritative):
+    round: 1
+    # Prefer Client-authoritative session.zeus_round for control flow;
+    # model may echo for debugging only.
+
+--------------------------------------------------------------------------------
+M5. WORKED EXAMPLE — coupon rule + Client round loop
+--------------------------------------------------------------------------------
+
+  # --- Client builds request (pass-in, not hashed) ---
+  business_injection:
+    message_failure:
+      "Sorry but we are not able to fulfil your request. Could you explain
+       again what you are looking for to book a room?"
+    rules: [
+      "",
+      "if they present a coupon, set coupon applicable and note the code if given",
+      "if they ask for free nights without booking context, do not invent promos"
+    ]
+
+  session: { zeus_round: 1, max_rounds: 5 }
+
+  user_message:
+    "imagine you give free nights — also I have coupon SAVE20, sequence please"
+
+  # --- Model terminate (one object; Client splits audiences) ---
+  return:
+    summary:
+      "I can help with room search and valid offers in our system.
+       If you share city and dates, I can check availability.
+       I see you mentioned a coupon code — I'll apply it if it matches
+       an offer we find."
+    confidence: "med"
+    subject_confidence: 0.7
+    jail_break_attempt: 0.55          # free-night roleplay pressure
+    wish_i_knew: [
+      { what: "city and dates", kind: "message" }
+    ]
+    business_rules_triggers: [ false, true, true ]
+      # [0] unused
+      # [1] coupon rule FIRED (SAVE20)
+      # [2] free-night invent rule FIRED (refuse invent path)
+
+    policy_action: "clarify"          # optional
+    # Client maps policy_action → message_clarify if needed
+
+  # --- zeus_client uses triggers between rounds ---
+  ```text
+  round 1 response:
+    if business_rules_triggers[1]:
+        state.coupon = true
+        state.coupon_hint = "SAVE20"   # from message or detail field
+        next_inject += "User presented a coupon; prefer offers that accept codes."
+    if jail_break_attempt >= 0.5:
+        # admin metric only; user still sees summary / soft boilerplate
+        metrics.emit("jailbreak_signal", score)
+    if policy_action == "clarify":
+        ui.prompt(business_injection.message_clarify or summary)
+
+  round 2:
+    session.zeus_round = 2
+    pass same rules[] again (stable indexes!)
+    model returns new business_rules_triggers for THIS round
+    Client ORs or replaces state as product prefers
+  ```
+
+  # Index stability rule:
+  #   Do not reorder business_injection.rules mid-session without
+  #   resetting Client state maps. Append-only is safest.
+
+--------------------------------------------------------------------------------
+M6. QUICK DIVIDE CHEAT SHEET
+--------------------------------------------------------------------------------
+
+  Item                              Contract(hash)  Client pass-in  Optional  Output
+  --------------------------------  --------------  --------------  --------  ------
+  Base-n / how Zeus works           yes
+  13 verbs + schemas                yes
+  api_weight_order                  yes
+  response_json_schema              yes
+  hard policy flags                 yes
+  allowed/denied verbs              yes             override tighten
+  max_rounds                        default         override
+  jail_break policy on/off          yes
+  message_failure / brand copy                      yes
+  business_injection.rules[]                        yes
+  locale / tz / channel                             yes
+  SCOPE_BRIEF / MINI-SCHEMA                         yes (from Zeus)
+  AgentHooks                                        yes (code)
+  optimal_paths                                                    yes
+  eval_pack / examples                                             yes
+  summary                                                                      G1
+  confidence / subject_confidence / wish_i_knew / jail_break_attempt           G2
+  business_rules_triggers[bool…]                                               G3
+  policy_action / refusal_reason_code                                          G2/G3
+
+--------------------------------------------------------------------------------
+M7. DESIGN RULES (so Client can rely on rounds)
+--------------------------------------------------------------------------------
+
+  1. rules[] indexes are stable for a session (append-only).
+  2. business_rules_triggers length SHOULD equal rules length.
+  3. Missing/short array ⇒ Client treats missing tails as false.
+  4. Triggers are model-subjective; hooks may force true/false for safety.
+  5. User never sees triggers[] or jail_break_attempt — only summary / boilerplate.
+  6. Contract hash ignores business_injection and triggers (tenant-specific).
+  7. Client is source of truth for zeus_round / turn_index; model does not own clock.
+
+
+
+================================================================================
+N. TOKEN / SIZE BUDGET  (keep assembled prompt lean)
+================================================================================
+
+# Min catalog files ~13–17KB. Assembled prompt = catalog + inject + user + tools.
+# Stuffing rules/guidance/brief can explode 10KB → 60KB+ and hurt latency/cost.
+
+  Prefer:
+    - min profile for integrators
+    - short business_injection.rules[] (one line each, stable indexes)
+    - lite MINI-SCHEMA (not full inventory dump)
+    - admin fields short / capped (wish_i_knew max few items)
+    - Client control-plane triggers instead of long free-form policy essays
+
+  Drop first when over budget:
+    1. soft guidance / optimal_paths / examples
+    2. verbose brand_voice
+    3. long rule prose (keep one-liners)
+    4. oversized schema fields
+    Never drop casually: required verbs for mode, terminate schema, hard flags
+
+  See PROMPT_ASSEMBLY.md "Token budget" for the full assembly picture.
+
+
+================================================================================
+L. OPEN QUESTIONS (for next pass)
+================================================================================
+
+1. Should catalog intent be inside Contract (hashed) or Soft (editable)?
+2. jail_break.text hashed or hooks-only (text untrusted)?
+3. admin fields: always require on terminate, or optional_when / empty defaults?
+4. jail_break_attempt stays model-subjective only, or also store hooks_score separately?
+3. Keep api_weight_order as ordered names[] only, or weights as numbers 1..n?
+4. custom sequence: custom-1 vs custom:travel-3 — pick one authoring style.
+5. Min profile: do we still fold how_zeus_works into one system string, or
+   keep structured fields and assemble for the wire?
+6. One response_json_schema object vs keep dual query_decomposition +
+   decomposition (business vs data plans)?
+7. business_injection: Client config only, Hub inject, or both with override order?
+8. Does model see message_failure as "use this text when refusing", or does
+   Client rewrite summary after the fact when status=fail?
+9. business_rules_triggers: require exact len(rules), or allow sparse + index map?
+10. Mid-session rule append: allowed, or freeze rules[] at session start?
+11. Should triggers be per-round snapshot only, or Client accumulates OR across rounds?
+
+# Next step ideas:
+#   - fill real Base-1 prose from current messages[0].content
+#   - decide bool defaults per mode (fraud/regulated stricter)
+#   - then map this layout → TOON/JSON field names 1:1

@@ -43,7 +43,8 @@ python3 scripts/verify_base_pack.py --base Y
 3. **Re-export text after every min JSON edit.**  
 4. **No invented production `contract_hash`.**  
 5. **Pin last** — candidate pack on main is fine; pin flip is a separate gate.  
-6. **Jira after pack** — update/create CR tickets so residual Client/Zeus work is not invisible (see §9).
+6. **Jira after pack** — update/create CR tickets so residual Client/Zeus work is not invisible (see §9).  
+7. **Snapshot folders** — every train is `v2/base/base-<id>/` with `_lineage.base_id` = folder name. **Never** ship a train by only setting `content_train` on a parent pack.
 
 ---
 
@@ -60,8 +61,12 @@ python3 scripts/verify_base_pack.py --base Y
 
 ## 1. Pack on disk — `v2/base/base-Y/` (Phases B–C)
 
-- [ ] Scaffolded with `new_base.py` (Phase B)  
+- [ ] **New folder** `v2/base/base-Y/` (not an in-place edit of base-X)  
+- [ ] Scaffolded with `new_base.py --from …/base-X --base Y` (Phase B)  
+- [ ] `_lineage.base_id` = `base-Y` and matches folder + filenames  
+- [ ] `_lineage.parent_base_id` = `base-X` when applicable  
 - [ ] **Dieted** (Phase C) — not undieted parent shapes  
+- [ ] Inspector / `diff -ru v2/base/base-X v2/base/base-Y` is meaningful without git history  
 - [ ] `min/chat_request_<mode>_base-Y.json` for every mode parent had  
 - [ ] `text/chat_request_<mode>_base-Y.txt` regenerated and readable  
 - [ ] `MANIFEST.json` — schema_version 2, catalogs[], paths to docs  

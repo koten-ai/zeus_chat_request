@@ -13,11 +13,13 @@ messages[0].content = CORE.md + "\n\n" + <mode>.md
 From repo root:
 
 ```bash
-python3 scripts/assemble_mode_prompts.py --base 5
-python3 scripts/export_base_text.py --from v2/base/base-5/min --base 5 --out v2/base/base-5 --no-set-base-id
-python3 scripts/new_base.py --refresh-manifest --base 5
-python3 scripts/verify_base_pack.py --base 5
-python3 scripts/diff_modes.py --base 5 --fail-if-clone
+# Write overlays into the base-5.1 SNAPSHOT folder only (not base-5/)
+python3 scripts/assemble_mode_prompts.py --base 5.1
+python3 scripts/export_base_text.py --from v2/base/base-5.1/min --base 5.1 --out v2/base/base-5.1 --no-set-base-id
+python3 scripts/new_base.py --refresh-manifest --base 5.1
+python3 scripts/verify_base_pack.py --base 5.1
+python3 scripts/diff_modes.py --base 5.1 --fail-if-clone
+# Diff: Inspector base-5 vs base-5.1 (or diff -ru v2/base/base-5 v2/base/base-5.1)
 ```
 
 ## Files

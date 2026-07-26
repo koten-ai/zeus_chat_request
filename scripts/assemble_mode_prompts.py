@@ -2,15 +2,14 @@
 """Assemble CORE + mode overlay into chat_request system prompts (base-5.1).
 
 Usage:
-  python3 scripts/assemble_mode_prompts.py --base 5
-  python3 scripts/assemble_mode_prompts.py --base 5 --dry-run
+  python3 scripts/assemble_mode_prompts.py --base 5.1
+  python3 scripts/assemble_mode_prompts.py --base 5.1 --dry-run
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -36,7 +35,6 @@ def assemble(core: str, overlay: str, mode: str) -> str:
 def fix_analytics_job_blurbs(doc: dict, mode: str) -> int:
     """Replace leftover '[exp] analytics job' style blurbs with mode name."""
     n = 0
-    blob = json.dumps(doc)
 
     def walk(o):
         nonlocal n
@@ -57,7 +55,11 @@ def fix_analytics_job_blurbs(doc: dict, mode: str) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--base", type=int, default=5)
+    ap.add_argument(
+        "--base",
+        default="5.1",
+        help="Pack id without base- prefix (e.g. 5.1). Writes into v2/base/base-<id>/ only.",
+    )
     ap.add_argument("--repo-root", default=".")
     ap.add_argument(
         "--overlays",
@@ -68,6 +70,8 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     root = Path(args.repo_root).resolve()
+    bare = str(args.base).removeprefix("base-")
+    base_id = f"base-{bare}"
     ov_dir = root / args.overlays
     core_path = ov_dir / "CORE.md"
     if not core_path.is_file():
@@ -75,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     core = core_path.read_text()
 
-    pack_min = root / "v2" / "base" / f"base-{args.base}" / "min"
+    pack_min = root / "v2" / "base" / base_id / "min"
     if not pack_min.is_dir():
         print(f"error: missing {pack_min}", file=sys.stderr)
         return 1
@@ -86,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: missing overlay {ov_path}", file=sys.stderr)
             return 1
         content = assemble(core, ov_path.read_text(), mode)
-        path = pack_min / f"chat_request_{mode}_base-{args.base}.json"
+        path = pack_min / f"chat_request_{mode}_base-{bare}.json"
         if not path.is_file():
             print(f"error: missing pack {path}", file=sys.stderr)
             return 1
@@ -101,11 +105,15 @@ def main(argv: list[str] | None = None) -> int:
         old_len = len(str(msgs[0].get("content", "")))
         msgs[0]["content"] = content
         fixed = fix_analytics_job_blurbs(doc, mode)
-        # note train in _base_meta if present
         meta = doc.get("_base_meta")
         if isinstance(meta, dict):
-            meta["content_train"] = f"base-{args.base}.1"
+            meta.pop("content_train", None)
             meta["mode_overlay"] = True
+            meta["base_id"] = base_id
+        lin = doc.get("_lineage") or {}
+        lin["base_id"] = base_id
+        lin["file_stem"] = path.name
+        doc["_lineage"] = lin
         print(
             f"{mode:12} system {old_len} → {len(content)} chars"
             + (f" (fixed {fixed} analytics-job blurb(s))" if fixed else "")
@@ -117,6 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         print("dry-run — no files written")
     else:
         print(f"ok — wrote system prompts under {pack_min.relative_to(root)}")
+        print("note: pack folder is the snapshot SoT — never set content_train only on parent")
     return 0
 
 

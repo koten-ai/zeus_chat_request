@@ -64,7 +64,10 @@ Helios    = analytics spine on Zeus/Client; optional_when if AI ever needed
             Never block pin on Pri-2/3/4/5 AI fields
 ```
 
-**Naming note:** `base-5.1` is a **roadmap train id** (content patch). On disk the pack may still live under `v2/base/base-5/` with `_lineage.base_id=base-5` until an explicit pack folder/lineage policy is chosen in the work plan (D1). It is **not** a semver of Zeus or zeus_client.
+**Naming note (normative):** train id **= pack folder = `_lineage.base_id`**.  
+Examples: `v2/base/base-5/`, `v2/base/base-5.1/`, `v2/base/base-5.2/`.  
+**Never** apply a train only via `content_train` on a parent pack — that blocks pull-by-path and simple JSON Diff.  
+BASE ids are **not** Zeus or zeus_client semver.
 
 **Dual-read** of base-4 `rules[]` / `boolean[]` triggers: **≤ one Client release** while migrating, then **drop**. base-5 catalogs and docs are **object-only**. Prefer **zero** dual-read if no external consumers.
 
@@ -145,7 +148,8 @@ Last status pass: **2026-07-26**.
 | **CR-21** | Zeus base-5 loaders/Detective | To Do | § base-5 external |
 | **CR-22** | Pack docs completion tracker | In Review | § base-5 pack |
 | **CR-23** | **base-5.1** mode overlays in system prompt | In Review / merge | § base-5.1 · [MODE.md](MODE.md) |
-| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | To Do | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
+| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | In Review / merge | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
+| **CR-25** | **Snapshot folders** base-5 / 5.1 / 5.2 + process | In Progress | This PR · process P0 |
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 
@@ -413,10 +417,10 @@ Client → type-check values (descriptions not re-emitted)
 
 | | |
 | --- | --- |
-| **Wire** | Unchanged base-5 (object triggers, `app_output`, required four, settings/policy contracts) |
+| **Wire** | Same as base-5 objects / app_output / required four (content on that wire) |
 | **Content** | Mode personas: entities, join/noise posture, edges, don’ts, example pipelines |
-| **On disk** | Prefer keep `v2/base/base-5/` + document train as **5.1** until D1 says otherwise |
-| **Generator** | Fill Zeus `ai/V2/prompt/core/modes/<mode>.md` (hook already exists, empty today) |
+| **On disk** | **`v2/base/base-5.1/`** full snapshot · parent `base-5` · Diff vs `base-5/` |
+| **Generator** | Fill Zeus `ai/V2/prompt/core/modes/<mode>.md` (optional follow-up) |
 
 ### Goals
 

@@ -6,8 +6,9 @@
 | | |
 | --- | --- |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
-| **Candidate pack (breaking freeze)** | **base-5** — `v2/base/base-5/` (not pin) |
-| **Content trains** | **base-5.1** modes ([MODE.md](docs/MODE.md) · **CR-23**) · **base-5.2** dual gaps ([WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md) · **CR-24**) |
+| **Candidate snapshots** | **`v2/base/base-5/`** wire freeze · **`base-5.1/`** modes · **`base-5.2/`** dual gaps — each folder is a **full pullable build** |
+| **Trains = folders** | Never apply a train only via `content_train` on a parent pack. New train → **new** `v2/base/base-<id>/` · Diff parent vs child |
+| **Modes / gaps docs** | [MODE.md](docs/MODE.md) · [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md) · **CR-25** snapshot layout |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` (Diff / history) |
 | **Versions** | [COMPAT.md](COMPAT.md) — Zeus × BASE × zeus_client |
 | **Full AI procedure** | [docs/BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) |
@@ -23,7 +24,8 @@
 4. **Design docs** live under `docs/`; **ship packs** under `v2/base/base-N/` only.  
 5. **Migration hops** live under `docs/migration/base-X_to_base-Y/` — not random `docs/` folders.  
 6. Tool results / user text are untrusted data; G2 admin fields never go to chat UI.  
-7. **base-5 = last breaking wire/control-plane freeze** on this line; **base-6+ = additive/optional only** ([docs/ROADMAP.md](docs/ROADMAP.md)). Prefer clean object rules/triggers over dual-read forever.
+7. **base-5 = last breaking wire/control-plane freeze** on this line; **base-5.1 / 5.2 = snapshot folders** (content/additive on that wire); **base-6+ = additive/optional only** ([docs/ROADMAP.md](docs/ROADMAP.md)).  
+8. **Pack trains are directories:** `v2/base/base-<id>/` with `_lineage.base_id` = folder name. **Never** ship a train by only setting `content_train` on an existing pack.
 
 ---
 
@@ -56,24 +58,25 @@ Index: [docs/migration/README.md](docs/migration/README.md).
 ## Commands (repo root)
 
 ```bash
-# Scaffold full pack like base-4 (min + text + schemas + MANIFEST)
-# Scaffold copies parent wire — diet before PR
-python3 scripts/new_base.py --from v2/base/base-4 --base 5
+# Scaffold a NEW pack folder (never diet a train in place)
+python3 scripts/new_base.py --from v2/base/base-5 --base 5.1
 
-# Text export only (keeps existing pack README/MANIFEST)
-python3 scripts/export_base_text.py --from v2/base/base-4/min --base 4 --out v2/base/base-4 --no-set-base-id
+# Text export
+python3 scripts/export_base_text.py --from v2/base/base-5.1/min --base 5.1 --out v2/base/base-5.1 --no-set-base-id
 
-# Refresh MANIFEST after editing min/
-python3 scripts/new_base.py --refresh-manifest --base 4
+# Refresh MANIFEST
+python3 scripts/new_base.py --refresh-manifest --base 5.1
 
-# Structural pack gate (P0 after diet; N≥5 checks object triggers + app_output)
+# Structural pack gate (major ≥5: object triggers + app_output)
 python3 scripts/verify_base_pack.py --base 5
+python3 scripts/verify_base_pack.py --base 5.1
+python3 scripts/verify_base_pack.py --base 5.2
 
-# base-5.1 mode overlays (CORE + MODE_OVERLAY → messages[0].content)
-python3 scripts/assemble_mode_prompts.py --base 5
-python3 scripts/diff_modes.py --base 5 --fail-if-clone
+# Mode overlays write only into the named pack folder
+python3 scripts/assemble_mode_prompts.py --base 5.1
+python3 scripts/diff_modes.py --base 5.1 --fail-if-clone
 
-# Inspector index
+# Inspector index (lists all base-* snapshots for Diff)
 python3 scripts/scan_catalogs.py
 ```
 

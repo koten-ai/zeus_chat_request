@@ -2,9 +2,549 @@
   "schema_version": 1,
   "description": "Auto-scanned chat_request*.json under v2/ for the inspector UI",
   "scan_glob": "v2/**/chat_request*.json",
-  "count": 50,
-  "updated_at": "2026-07-26T15:40:51Z",
+  "count": 70,
+  "updated_at": "2026-07-26T18:24:57Z",
   "catalogs": [
+    {
+      "file": "v2/base/base-5.2/min/chat_request_analytics_base-5.2.json",
+      "mode": "analytics",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:5aacbf1d7a4d9d5de9436cdffbce050f",
+        "id": "analytics_base5_2",
+        "name": "V2 analytics \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "e5aabc390b31ee764f879b26652242a8aae3f80190927ad3d03c8d4cb31c31ea",
+      "bytes": 32529
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_auto_base-5.2.json",
+      "mode": "auto",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:cb0e5e05c63ef4e1cbbb1fb271fb462c",
+        "id": "auto_base5_2",
+        "name": "V2 auto \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "9757ee9d42f84f09ed1d5d7fe81eb18396fe2ee0b869834f72f2f231b8531141",
+      "bytes": 32380
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_code_base-5.2.json",
+      "mode": "code",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:f6f9d780be9c7c7a18dae2a91dbc2d9d",
+        "id": "code_base5_2",
+        "name": "V2 code \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "7e5168e583486da8f6528874df38c6ca27b65e53a682183b1b3f7f8ecbe6f847",
+      "bytes": 32643
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_custom_base-5.2.json",
+      "mode": "custom",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:fcfd99157dcf6ff7dbba0c916cfba48c",
+        "id": "custom_base5_2",
+        "name": "V2 custom \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "d5dc880fc3b05fe8243d0ab2fe8271f9bcaa643067a2efe92fd42fbda1c8c2de",
+      "bytes": 31931
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_fraud_base-5.2.json",
+      "mode": "fraud",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:402227b9894e48d63723b54e11cb5fc1",
+        "id": "fraud_base5_2",
+        "name": "V2 fraud \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "f27540b47ff4206d928e9e8f34b9d9aa80ad3998d627a8829af875fd7824a0ab",
+      "bytes": 32879
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_open_base-5.2.json",
+      "mode": "open",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:2185889a077263d5a80bf238921084cf",
+        "id": "open_base5_2",
+        "name": "V2 open \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "4e087d4731e062ad2e9735937963d138ebf37cada432a61e09f08c90352ec150",
+      "bytes": 32034
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_private_base-5.2.json",
+      "mode": "private",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:2f148551bb803121705e3ccadbccfff7",
+        "id": "private_base5_2",
+        "name": "V2 private \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "95dd9f48e901cd892e1530151d191c0562c420f90bf59df614e6829e930f325f",
+      "bytes": 32040
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_regulated_base-5.2.json",
+      "mode": "regulated",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:269e553d190f3f388e0cabf1c18ed026",
+        "id": "regulated_base5_2",
+        "name": "V2 regulated \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "68ddfb93a843af0996260bee68482ffb3d401586b1888f09aa19c46010a73a0b",
+      "bytes": 32617
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_research_base-5.2.json",
+      "mode": "research",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:a0cce1a9161e45325fdc69358fe04e9f",
+        "id": "research_base5_2",
+        "name": "V2 research \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "965ee15b9d6bbd01a0894d2e8fd1712e1f9f379639135cd595bdd7eb69a59412",
+      "bytes": 32677
+    },
+    {
+      "file": "v2/base/base-5.2/min/chat_request_tenant_base-5.2.json",
+      "mode": "tenant",
+      "folder": "v2/base/base-5.2/min",
+      "folder_label": "base/base-5.2/min",
+      "base_id": "base-5.2",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:119621eda0515a29b0e2b6778cd4ca41",
+        "id": "tenant_base5_2",
+        "name": "V2 tenant \u00b7 base-5.2",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5.1",
+        "text_pack_base_id": "base-5.2"
+      },
+      "sha256": "e0ad6cdb2f3b39155894417a1f43881b1097e72e7ad5dd8407438d450394419a",
+      "bytes": 32062
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_analytics_base-5.1.json",
+      "mode": "analytics",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:5aacbf1d7a4d9d5de9436cdffbce050f",
+        "id": "analytics_base5_1",
+        "name": "V2 analytics \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "ddf265f8fce86f34abac55d3035d05ea113cde38ad57ad8f58590fdd6abaddf2",
+      "bytes": 29881
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_auto_base-5.1.json",
+      "mode": "auto",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:cb0e5e05c63ef4e1cbbb1fb271fb462c",
+        "id": "auto_base5_1",
+        "name": "V2 auto \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "26f11db4b324d2beef265b102d03cb4ae40170c7a814f64ad7587410250042e8",
+      "bytes": 29732
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_code_base-5.1.json",
+      "mode": "code",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:f6f9d780be9c7c7a18dae2a91dbc2d9d",
+        "id": "code_base5_1",
+        "name": "V2 code \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "e0a92a08d7a493ade449a832ab7482424904fc7365b73766d9e89b7238af32d7",
+      "bytes": 29995
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_custom_base-5.1.json",
+      "mode": "custom",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:fcfd99157dcf6ff7dbba0c916cfba48c",
+        "id": "custom_base5_1",
+        "name": "V2 custom \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "bfe13b44b32671a9692304ed1d91ac1d281263feaee54e159370cc8733c023a4",
+      "bytes": 29283
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_fraud_base-5.1.json",
+      "mode": "fraud",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:402227b9894e48d63723b54e11cb5fc1",
+        "id": "fraud_base5_1",
+        "name": "V2 fraud \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "97a6695012e34c2015ed70403f545ce5dcc553d88a62bc629bb69ff6137e510e",
+      "bytes": 30231
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_open_base-5.1.json",
+      "mode": "open",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:2185889a077263d5a80bf238921084cf",
+        "id": "open_base5_1",
+        "name": "V2 open \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "6939b313949e731174b78e9430f9acecd2f490c510eddb3ea777aa1c01f38651",
+      "bytes": 29386
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_private_base-5.1.json",
+      "mode": "private",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:2f148551bb803121705e3ccadbccfff7",
+        "id": "private_base5_1",
+        "name": "V2 private \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "15f14ab34f5ce039ca3d95c40d14f3454b9d3af5b7476166f0a3618b989e1f87",
+      "bytes": 29392
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_regulated_base-5.1.json",
+      "mode": "regulated",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:269e553d190f3f388e0cabf1c18ed026",
+        "id": "regulated_base5_1",
+        "name": "V2 regulated \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "9c7a996120e4dcb9bfa7a4ce0dd18c11d847b65efb4d59087b4569b8c56c85a4",
+      "bytes": 29969
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_research_base-5.1.json",
+      "mode": "research",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:a0cce1a9161e45325fdc69358fe04e9f",
+        "id": "research_base5_1",
+        "name": "V2 research \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "d9e3254b134b9bc030a5aa253b36ad52256877737c9ec19f15b2d24ac777ddef",
+      "bytes": 30029
+    },
+    {
+      "file": "v2/base/base-5.1/min/chat_request_tenant_base-5.1.json",
+      "mode": "tenant",
+      "folder": "v2/base/base-5.1/min",
+      "folder_label": "base/base-5.1/min",
+      "base_id": "base-5.1",
+      "custom_id": null,
+      "profile": "v2_min",
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "prototype": false,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-4",
+        "hash": "md5:119621eda0515a29b0e2b6778cd4ca41",
+        "id": "tenant_base5_1",
+        "name": "V2 tenant \u00b7 base-5.1",
+        "scope": "prototype/_unbound",
+        "built_at": "2026-07-26T04:47:57Z",
+        "built_by": "zeus_chat_request base-4",
+        "prototype": true,
+        "parent_base_id": "base-5",
+        "text_pack_base_id": "base-5.1"
+      },
+      "sha256": "be3b8095befcc05beaf0eaec1067888800cd800ca5cd4f8bb59551051a0ac811",
+      "bytes": 29414
+    },
     {
       "file": "v2/base/base-5/min/chat_request_analytics_base-5.json",
       "mode": "analytics",
@@ -29,8 +569,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "943587eb775573c696f38e3c6786447be1d0c7d10cb9d51f1b589ae998055444",
-      "bytes": 29794
+      "sha256": "3ecb4f529066d695dba966064a3bd40352e33f5780539296f106616a84cbe875",
+      "bytes": 29031
     },
     {
       "file": "v2/base/base-5/min/chat_request_auto_base-5.json",
@@ -56,8 +596,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "3488d73b73b1cbabf7eef4b3f983a3a2563a7e9c0505b85c1723d006d79bcbce",
-      "bytes": 29645
+      "sha256": "ec07344821f2be4817fcaf5aa43898eadbc85624f70f0ddc14f75aedf26be7ce",
+      "bytes": 27214
     },
     {
       "file": "v2/base/base-5/min/chat_request_code_base-5.json",
@@ -83,8 +623,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "6ae29e6c7b81aa7689d563dd8dee5d678c32d48b5f62d891d5e07b52fd429fb0",
-      "bytes": 29908
+      "sha256": "fde352cbe1d538a3fc90aa0ae21c962e8ddea84996fa087b23a987f41675d4c8",
+      "bytes": 28996
     },
     {
       "file": "v2/base/base-5/min/chat_request_custom_base-5.json",
@@ -110,8 +650,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "949dec4c531e50a879d33fba819db2ce720cf2db4384e684f85f25e8aa822d93",
-      "bytes": 29196
+      "sha256": "7a5a4df6bb74dd3000d35facb752153bd2440b6df8aa16c10d94acf09a518c70",
+      "bytes": 29010
     },
     {
       "file": "v2/base/base-5/min/chat_request_fraud_base-5.json",
@@ -137,8 +677,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "71057f9a12a02787b2d15f55c1b65e7665c8eb8bd1f8d6d2b0cb4d518f1eff00",
-      "bytes": 30144
+      "sha256": "195e881ab2b91f78460694d66d95b1e19d1ad28f5b06a61a06044378c3d9eccd",
+      "bytes": 29003
     },
     {
       "file": "v2/base/base-5/min/chat_request_open_base-5.json",
@@ -164,8 +704,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "4a3bd010a237bdeb8c3adaa16e8a45b0bbd6605b4a3c21bec83cde919220b8e1",
-      "bytes": 29299
+      "sha256": "978277b7e1d3df6086d36f94a5b371538754cc240636e8c69a8ea29f80a77569",
+      "bytes": 28996
     },
     {
       "file": "v2/base/base-5/min/chat_request_private_base-5.json",
@@ -191,8 +731,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "4a27d29ef6644486105eb0b3c908b69a3e337bc92c35048ad981ef34f9cdb7d2",
-      "bytes": 29305
+      "sha256": "b6584e291c856d505982396b9e2cf399c15d13d55e8f9c335007f00059a72446",
+      "bytes": 29017
     },
     {
       "file": "v2/base/base-5/min/chat_request_regulated_base-5.json",
@@ -218,8 +758,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "60a5b0ba0ce29c13be68f780c1a1ed0ba9e56ceca11ddc37173b7b3d5474152a",
-      "bytes": 29882
+      "sha256": "a1eab66d049dbfea3f3cebf605611e66d79fd76d918a8b2cdeaeea706ddcfdd3",
+      "bytes": 29031
     },
     {
       "file": "v2/base/base-5/min/chat_request_research_base-5.json",
@@ -245,8 +785,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "f82ac17c4a5943d4fee65eae3463c0a6c202fe5dfb3b0de483f427aca66004be",
-      "bytes": 29942
+      "sha256": "6acb8a1b06fab926ea88687244417107a488d80938b824b8ba1096c8fd205b5d",
+      "bytes": 29024
     },
     {
       "file": "v2/base/base-5/min/chat_request_tenant_base-5.json",
@@ -272,8 +812,8 @@
         "parent_base_id": "base-3",
         "text_pack_base_id": "base-5"
       },
-      "sha256": "af28e7a95f01fd8d002e6c031f6a9727b09e8885d00f4463c379e02ca0828189",
-      "bytes": 29327
+      "sha256": "dc234b0fdd741ca5e3de75325a2e1dd8228f0b2017133676e814ddcec49e0f18",
+      "bytes": 29010
     },
     {
       "file": "v2/base/base-4/min/chat_request_analytics_base-4.json",
@@ -811,8 +1351,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:3f9f83f6f3ded467b99169816864fdf9"
       },
-      "sha256": "a059ddf49d652a1c65b3982369d8b9edd76388acc032f3ea2bf19e29bd4cc664",
-      "bytes": 16859
+      "sha256": "23048371ddc094ba53bc891cdd918db62a640dbd44493b471c92edbc277cbcbc",
+      "bytes": 16890
     },
     {
       "file": "v2/base/base-1/min/chat_request_auto_v2_min.json",
@@ -830,8 +1370,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:126876870d8b2085266aca232a5641b6"
       },
-      "sha256": "1463fa2774db099b7020ce333ed133c923f9b7abd31b29decf80a8418bec4d95",
-      "bytes": 14983
+      "sha256": "c1aa6861dd70abfbae46a8055acc06cad9b7423ca803b849450cb79f24341bd5",
+      "bytes": 15012
     },
     {
       "file": "v2/base/base-1/min/chat_request_code_v2_min.json",
@@ -849,8 +1389,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:10a073976ebd01ba6dd7f36956875b11"
       },
-      "sha256": "2c0adf5daa90144a5c8a2479ec33c35ba295e0fdef532e3c3b1bb4919edadc3a",
-      "bytes": 16849
+      "sha256": "803700f6112e5bdc8fb27f1f8bddca31bf37719cc6ae1407a8ae740a4725a318",
+      "bytes": 16875
     },
     {
       "file": "v2/base/base-1/min/chat_request_custom_v2_min.json",
@@ -868,8 +1408,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:c84a98ffdfb71585fbc08a642f7cad9a"
       },
-      "sha256": "65159b909bbc532a1a3029f13eaed1b7a9c0e19aec51ef47292d19465f0047cb",
-      "bytes": 16853
+      "sha256": "85d5522a617d5641d6c62ca299d47dfb18d8d538e5d0ba215a578519b64f0fb9",
+      "bytes": 16881
     },
     {
       "file": "v2/base/base-1/min/chat_request_fraud_v2_min.json",
@@ -887,8 +1427,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:0358294df725710c1ec72c549c7e9fd1"
       },
-      "sha256": "da2a85d353db67e2e7f334f8cf774658d7b9adc44ab10022f0c21b011305edf3",
-      "bytes": 16851
+      "sha256": "d24242a7ef01ea06e8ca8fb5840e1bbbebb4f8a553a105e5bfecc9971feb86c4",
+      "bytes": 16878
     },
     {
       "file": "v2/base/base-1/min/chat_request_open_v2_min.json",
@@ -906,8 +1446,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:dc65edc59af5c90d88fa74b46e9ccf66"
       },
-      "sha256": "d6ef80ef262e5e78fc6467c0a0bb7810b722325d53b90717bc70c7cc88941936",
-      "bytes": 16849
+      "sha256": "7c34325efabed5b0a285d377fe18cc237b861d2e1f9b164db7bcb8fe587aa4f3",
+      "bytes": 16875
     },
     {
       "file": "v2/base/base-1/min/chat_request_private_v2_min.json",
@@ -925,8 +1465,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:3cfa6cf011de15270e19febd3b410b0e"
       },
-      "sha256": "49b6ee89ef73247a20bd22ec3d66137d78a1c2ee02f4cbb597044fb2f4e2e4dd",
-      "bytes": 16855
+      "sha256": "ade07a4c8fb4da87eed29e9c2e318e7c5ad4ea1db687c1f5965c887f036d13f3",
+      "bytes": 16884
     },
     {
       "file": "v2/base/base-1/min/chat_request_regulated_v2_min.json",
@@ -944,8 +1484,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:e315fcc0eb6bca2bc6ed39a72cd85aa8"
       },
-      "sha256": "d00934b5bd66a8520f224029cd312e1acc136ee20183eee9394cd83c9d198569",
-      "bytes": 16859
+      "sha256": "677167f85f6e5379e247ac1546d9a2bce99138a60cd3d76e08941991991d54c1",
+      "bytes": 16890
     },
     {
       "file": "v2/base/base-1/min/chat_request_research_v2_min.json",
@@ -963,8 +1503,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:b37c6e26ecef15a06b31e0c796e42751"
       },
-      "sha256": "c166f6748d8b18ed2a81c2a1e8806cea653cf9432b80028897b9f37356a0b491",
-      "bytes": 16857
+      "sha256": "12b32d94d4cccff5320c3a0d0edc039990cd73cf96d64978f80a65583d20d22d",
+      "bytes": 16887
     },
     {
       "file": "v2/base/base-1/min/chat_request_tenant_v2_min.json",
@@ -982,8 +1522,8 @@
         "builder": "ai-snapshot",
         "hash": "md5:f028bb66dd5751b14784f0016c9a4fbb"
       },
-      "sha256": "878931bf4867d071687a20f0976f527e1105b5aa4d49fee1ab27e8d6c3858c59",
-      "bytes": 16853
+      "sha256": "4f6eb4611d3b0393e0087f2759f4b48a1825a72b02f590f4d585da0b75d0b1c7",
+      "bytes": 16881
     },
     {
       "file": "v2/min/chat_request_analytics_v2_min.json",

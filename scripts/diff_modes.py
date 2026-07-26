@@ -2,8 +2,8 @@
 """Compare mode packs after neutralizing mode tokens (clone detector).
 
 Usage:
-  python3 scripts/diff_modes.py --base 5
-  python3 scripts/diff_modes.py --base 5 --fail-if-clone
+  python3 scripts/diff_modes.py --base 5.1
+  python3 scripts/diff_modes.py --base 5.1 --fail-if-clone
 """
 
 from __future__ import annotations
@@ -54,13 +54,13 @@ def system_content(doc: dict) -> str:
 def neutralize(text: str, mode: str) -> str:
     t = text
     t = re.sub(re.escape(mode), "MODE", t, flags=re.I)
-    t = re.sub(r"base-\d+", "BASE", t)
+    t = re.sub(r"base-[\d.]+", "BASE", t)
     return t
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--base", type=int, default=5)
+    ap.add_argument("--base", default="5.1", help="Pack id e.g. 5.1 (folder v2/base/base-5.1)")
     ap.add_argument("--repo-root", default=".")
     ap.add_argument(
         "--fail-if-clone",
@@ -74,14 +74,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = ap.parse_args(argv)
     root = Path(args.repo_root).resolve()
-    pack = root / "v2" / "base" / f"base-{args.base}" / "min"
+    bare = str(args.base).removeprefix("base-")
+    pack = root / "v2" / "base" / f"base-{bare}" / "min"
 
     rows = []
     errors: list[str] = []
     sigs: dict[str, list[str]] = defaultdict(list)
 
     for mode in MODES:
-        path = pack / f"chat_request_{mode}_base-{args.base}.json"
+        path = pack / f"chat_request_{mode}_base-{bare}.json"
         if not path.is_file():
             errors.append(f"missing {path.name}")
             continue
@@ -113,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
                 errors.append(f"{mode}: weak keyword hits {hits} missing {miss}")
 
     # clone clusters (same neutralized system prompt)
-    print(f"base-{args.base} mode system-prompt report")
+    print(f"base-{bare} mode system-prompt report")
     print(f"{'mode':12} {'len':>6} overlay  sig              keywords")
     for r in rows:
         print(
@@ -127,14 +128,13 @@ def main(argv: list[str] | None = None) -> int:
             any_clone = True
             print(f"  {sig}: {modes}")
             if args.fail_if_clone:
-                # auto may still differ; flag if analytics shares with others without overlay distinction
                 errors.append(f"clone cluster: {modes}")
     if not any_clone:
         print("  (none)")
 
     if args.report:
         lines = [
-            f"# Mode diff report base-{args.base}",
+            f"# Mode diff report base-{bare}",
             "",
             "| mode | len | overlay | sig | keyword hits | missing |",
             "| --- | ---: | --- | --- | --- | --- |",

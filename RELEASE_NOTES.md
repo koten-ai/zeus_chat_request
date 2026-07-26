@@ -20,8 +20,12 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 
 ### Highlights
 
-- **base-5.1 (content on base-5 wire):** system prompts are **CORE + MODE_OVERLAY** per mode (DESIGN §14 personas). Packs no longer “analytics × rename.” Author under `work/mode_overlays/`; assemble with `scripts/assemble_mode_prompts.py`. Clone gate: `scripts/diff_modes.py --fail-if-clone`. Jira **CR-23**.
-- **base-5 candidate pack** on disk: [`v2/base/base-5/`](v2/base/base-5/) — **last breaking wire/control-plane freeze** (objects, `app_output`, inject contracts). Pin remains **base-1**.
+- **Pack trains = snapshot folders (CR-25):** full trees for pull + JSON Diff — not in-place `content_train`:
+  - [`v2/base/base-5/`](v2/base/base-5/) — wire freeze (objects, `app_output`; no mode overlays)
+  - [`v2/base/base-5.1/`](v2/base/base-5.1/) — CORE + MODE_OVERLAY system prompts
+  - [`v2/base/base-5.2/`](v2/base/base-5.2/) — dual gaps (`data_gaps` + design [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md))
+- **base-5.1 modes:** Author under `work/mode_overlays/`; `assemble_mode_prompts.py --base 5.1`; `diff_modes.py --fail-if-clone`. Diff `base-5` vs `base-5.1` without git archaeology.
+- Pin remains **base-1**.
 - Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/) (GUIDE, lessons, RELEASE_CHECKLIST).
 - **base-4** remains available for Diff/history (`v2/base/base-4/`).
 - Docs/process: AI playbook, COMPAT, RELEASE_CHECKLIST, `verify_base_pack.py`, `new_base.py`.

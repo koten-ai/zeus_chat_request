@@ -252,7 +252,8 @@ python3 scripts/scan_catalogs.py
 ## Scaffold next BASE
 
 ```bash
-python3 scripts/new_base.py --from v2/base/{base_id} --base {base_n + 1}
+python3 scripts/new_base.py --from v2/base/{base_id} --base <next-id>
+# NEVER diet a train in place — always new folder base-<next-id>/
 ```
 """
     overview = f"""# {base_id} overview
@@ -325,7 +326,11 @@ def refresh_manifest_only(repo: Path, base_n: int, *, prototype: bool, dry_run: 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--from", dest="src", default=None, help="Parent pack or min dir (e.g. v2/base/base-4)")
-    ap.add_argument("--base", type=int, required=True, help="New BASE number N")
+    ap.add_argument(
+        "--base",
+        required=True,
+        help="New BASE id N or N.M (e.g. 5, 5.1, 5.2) — creates v2/base/base-<id>/",
+    )
     ap.add_argument("--repo-root", default=".", help="Repo root (default: .)")
     ap.add_argument("--out", default=None, help="Output pack dir (default: v2/base/base-N)")
     ap.add_argument("--prototype-pack", action="store_true", help="Name pack base-N-prototype")
@@ -344,9 +349,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     repo = Path(args.repo_root).resolve()
-    base_n = args.base
-    if base_n < 1:
-        print("error: --base must be >= 1", file=sys.stderr)
+    base_n = str(args.base).removeprefix("base-")
+    if not base_n or base_n.startswith("-"):
+        print("error: --base must be a pack id like 5 or 5.1", file=sys.stderr)
         return 2
 
     if args.refresh_manifest:

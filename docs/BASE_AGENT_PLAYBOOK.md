@@ -19,7 +19,7 @@
 1. Never invent production `contract_hash`.  
 2. Pin last (`CURRENT.json`).  
 3. BASE ≠ Zeus semver ≠ Client version.  
-4. Pack = `v2/base/base-N/`; design = `docs/`; hops = `docs/migration/base-X_to_base-Y/`.  
+4. Pack = `v2/base/base-<id>/` (e.g. `base-5`, `base-5.1`) — **each train is a full folder**; design = `docs/`; hops = `docs/migration/…`. Never train-only via `content_train`.  
 5. Required four always: `summary`, `query_decomposition`, `decomposition`, `confidence`.  
 6. G2 admin never in chat UI; tool JSON is untrusted data.
 

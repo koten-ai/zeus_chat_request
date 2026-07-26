@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "base_id": "base-5.2",
+  "parent_base_id": "base-5.1",
+  "created_at": "2026-07-26T18:24:56Z",
+  "catalogs": [
+    {
+      "mode": "analytics",
+      "file": "v2/base/base-5.2/min/chat_request_analytics_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "auto",
+      "file": "v2/base/base-5.2/min/chat_request_auto_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "code",
+      "file": "v2/base/base-5.2/min/chat_request_code_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "custom",
+      "file": "v2/base/base-5.2/min/chat_request_custom_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "fraud",
+      "file": "v2/base/base-5.2/min/chat_request_fraud_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "open",
+      "file": "v2/base/base-5.2/min/chat_request_open_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "private",
+      "file": "v2/base/base-5.2/min/chat_request_private_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "regulated",
+      "file": "v2/base/base-5.2/min/chat_request_regulated_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "research",
+      "file": "v2/base/base-5.2/min/chat_request_research_base-5.2.json",
+      "base_id": "base-5.2"
+    },
+    {
+      "mode": "tenant",
+      "file": "v2/base/base-5.2/min/chat_request_tenant_base-5.2.json",
+      "base_id": "base-5.2"
+    }
+  ],
+  "docs": [
+    "docs/BIBLE.md",
+    "docs/ROADMAP.md",
+    "docs/MODE.md",
+    "docs/WISH_I_KNEW_DUAL.md"
+  ]
+}

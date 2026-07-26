@@ -7,7 +7,7 @@
 | --- | --- |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
 | **Candidate pack (breaking freeze)** | **base-5** — `v2/base/base-5/` (not pin) |
-| **Next content train** | **base-5.1** — mode overlays in system prompt ([docs/MODE.md](docs/MODE.md) · [work/RECREATE_MODE.md](work/RECREATE_MODE.md) · **CR-23**) |
+| **Content trains** | **base-5.1** modes ([MODE.md](docs/MODE.md) · **CR-23**) · **base-5.2** dual gaps ([WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md) · **CR-24**) |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` (Diff / history) |
 | **Versions** | [COMPAT.md](COMPAT.md) — Zeus × BASE × zeus_client |
 | **Full AI procedure** | [docs/BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) |

@@ -1,0 +1,74 @@
+{
+  "base_id": "base-3",
+  "packaging": "base-3-prototype",
+  "kind": "text_export",
+  "source": "v2/base/base-2-prototype/min",
+  "content_policy": "text_export; lineage base_id set to base-N",
+  "format": "indented_text",
+  "file_pattern_text": "chat_request_<mode>_base-3.txt",
+  "file_pattern_json_later": "chat_request_<mode>_base-3.json",
+  "custom_pattern": "chat_request_<mode>_base-3_cus_<bucket>_<scope>-<rev>.json",
+  "generator": "scripts/export_base_text.py",
+  "files": [
+    {
+      "file": "text/chat_request_analytics_base-3.txt",
+      "mode": "analytics",
+      "chars": 23678,
+      "source_json": "chat_request_analytics_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_auto_base-3.txt",
+      "mode": "auto",
+      "chars": 21604,
+      "source_json": "chat_request_auto_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_code_base-3.txt",
+      "mode": "code",
+      "chars": 23633,
+      "source_json": "chat_request_code_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_custom_base-3.txt",
+      "mode": "custom",
+      "chars": 23651,
+      "source_json": "chat_request_custom_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_fraud_base-3.txt",
+      "mode": "fraud",
+      "chars": 23642,
+      "source_json": "chat_request_fraud_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_open_base-3.txt",
+      "mode": "open",
+      "chars": 23633,
+      "source_json": "chat_request_open_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_private_base-3.txt",
+      "mode": "private",
+      "chars": 23660,
+      "source_json": "chat_request_private_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_regulated_base-3.txt",
+      "mode": "regulated",
+      "chars": 23678,
+      "source_json": "chat_request_regulated_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_research_base-3.txt",
+      "mode": "research",
+      "chars": 23669,
+      "source_json": "chat_request_research_base-2-prototype.json"
+    },
+    {
+      "file": "text/chat_request_tenant_base-3.txt",
+      "mode": "tenant",
+      "chars": 23651,
+      "source_json": "chat_request_tenant_base-2-prototype.json"
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "schema_version": 2,
+  "base_id": "base-2-prototype",
+  "kind": "base",
+  "profile": "v2_min",
+  "status": "prototype",
+  "breaks_compat": true,
+  "parent_base_id": "base-1",
+  "created_at": "2026-07-26T03:11:55Z",
+  "repo": "koten-ai/zeus_chat_request",
+  "source": {
+    "forked_from": "v2/base/base-1/min",
+    "not_engine_snapshot": true,
+    "design_docs": [
+      "PROMPT_ASSEMBLY.md",
+      "simple_layout.txt",
+      "samples/terminate_response.sample.json",
+      "v2/base/base-2-prototype/PROTOTYPE.md"
+    ]
+  },
+  "usage": {
+    "warning": "PROTOTYPE ONLY \u2014 may break engines/clients expecting base-1 return schema. Not for production stamp.",
+    "client_sync": "Opt-in path for zeus_client experiments; do not replace v2/min alias yet",
+    "feedback": "zeus_client team: Layer A fields + business_rules_triggers + admin scores"
+  },
+  "layer_a": {
+    "required": [
+      "summary",
+      "query_decomposition",
+      "decomposition",
+      "confidence"
+    ],
+    "recommended": [
+      "policy_action",
+      "subject_confidence",
+      "jail_break_attempt",
+      "wish_i_knew",
+      "business_rules_triggers",
+      "node_refs",
+      "entity_refs"
+    ],
+    "forbidden_for_model": [
+      "attribution",
+      "decision",
+      "diagnosis",
+      "inject_inspect",
+      "prompt_checklist",
+      "spans",
+      "support_pack"
+    ],
+    "note": "Layer A = return tool args. Layer B = Detective/store (server-built)."
+  },
+  "catalogs": [
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_analytics_base-2-prototype.json",
+      "mode": "analytics",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:13749b37ae81651c7211ad053c31b132"
+      },
+      "sha256": "38177ebfff0103b2d5314e4df08cc31298f1a4a203eb67ff3d97b2ccf70ebbfd",
+      "bytes": 27571,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_auto_base-2-prototype.json",
+      "mode": "auto",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:ce308135d63fe9445cb7aef55fccd2f6"
+      },
+      "sha256": "1481faedd4f9d398b8aa661701df224f511d0375a9f0fcce5ae58c0494b93f84",
+      "bytes": 25673,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_code_base-2-prototype.json",
+      "mode": "code",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:f4c1c2e119e93bba3151d922db39e0ab"
+      },
+      "sha256": "3dafc8a76f8e9f84e15ffa270d9014ddbc48f27d7a95cbc14359876c3c6cbeeb",
+      "bytes": 27536,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_custom_base-2-prototype.json",
+      "mode": "custom",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:337af6f40b049c9e63e06fcceb426908"
+      },
+      "sha256": "743865de593902cd06fca3b4af99b85b293fc46ada8768015ee37764e597f7b9",
+      "bytes": 27550,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_fraud_base-2-prototype.json",
+      "mode": "fraud",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:de44dd03f17860cee582c24e25d15c6c"
+      },
+      "sha256": "9b6a987a427cfbb490d3e59f02fe4b1d170b95abe96a19ee329d189db10cf64c",
+      "bytes": 27543,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_open_base-2-prototype.json",
+      "mode": "open",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:a9d108e55b24e48e4aace90c06a03c2f"
+      },
+      "sha256": "421fff57bd2b1429250ae8d1d86729e011789333c386ff0479e4cf973fd283f2",
+      "bytes": 27536,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_private_base-2-prototype.json",
+      "mode": "private",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:c30fdeee26c05394cf5fa159f77f6037"
+      },
+      "sha256": "ca9a1409db2f013eb5fb917ae41d47205c1f28c6dc8661affce9f2afa644b204",
+      "bytes": 27557,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_regulated_base-2-prototype.json",
+      "mode": "regulated",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:24c91813bdf51b794201aabda41c4922"
+      },
+      "sha256": "f3a5430fc27fc32608a5f4efad34b42f3e53d2eb923edf33a59a60ea8a478d0f",
+      "bytes": 27571,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_research_base-2-prototype.json",
+      "mode": "research",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:4bd02c9651f1f4042efb24d7558e0bb5"
+      },
+      "sha256": "7fc765e676f3f2010c437121c6b4bb3f9d2e906d46a13bb0e2711e40af4860b3",
+      "bytes": 27564,
+      "prototype": true
+    },
+    {
+      "file": "v2/base/base-2-prototype/min/chat_request_tenant_base-2-prototype.json",
+      "mode": "tenant",
+      "base_id": "base-2-prototype",
+      "custom_id": null,
+      "format": "zeus.chat_request.v2",
+      "version": 2,
+      "verb_count": 13,
+      "contract": {
+        "builder": "base-2-prototype-script",
+        "hash": "md5:0d1cb398b409007fab3f5d0873d61ed4"
+      },
+      "sha256": "f699b556bbcd18ea879d9c95922d16ec610b1f51574aee6d5d543a5094c92605",
+      "bytes": 27550,
+      "prototype": true
+    }
+  ],
+  "file_naming": {
+    "base_pattern": "chat_request_<mode>_base-2-prototype.json",
+    "promoted_base_pattern": "chat_request_<mode>_base-2.json",
+    "custom_pattern": "chat_request_<mode>_base-<N>_cus_<bucket>_<scope>-<rev>.json",
+    "custom_example": "chat_request_analytics_base-2_cus_travel-sample_default-1.json",
+    "legacy_avoid": "chat_request_*_v2_min.json / chat_request_*_v2.json as base-2+ stems",
+    "lifecycle": "BASE \u2192 Hub Workbench/Prompt Helper \u2192 cus_\u2026-1 \u2192 edit \u2192 cus_\u2026-2",
+    "scope_normalize": "_default \u2192 default; no slashes in filenames"
+  }
+}

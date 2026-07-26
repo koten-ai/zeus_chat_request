@@ -1,0 +1,131 @@
+# chat_request*.json — base layout (bridge doc)
+#
+# Prefer these for current design:
+#   PROMPT_ASSEMBLY.md   ← assembled prompt shape (Zeus rules → Client → user → out)
+#   simple_layout.txt    ← full field map, Contract vs Client, triggers, admin out
+#   CHAT_REQUEST.md      ← product meaning, stamp, Hub vs Client
+#
+# This file keeps the original mental-model corrections and a short pointer map.
+# BUDGET: do not over-stuff rules/injects (10KB → 60KB assembled is a failure mode).
+
+[] = array
+"" = string
+{} = object
+#RULES  = in-file, hash-relevant (changing usually changes contract hash)
+#GUIDE  = in-file on FULL only, usually hash-EXCLUDED (tunable)
+#INJECT = NOT in the catalog file; assembled at request time (Client / Zeus / Hub)
+#META   = bookkeeping / stamp envelope
+#OUT    = model terminate fields
+
+================================================================================
+0. ASSEMBLED PROMPT (summary)
+================================================================================
+
+  1) ZEUS RULES     catalog / Contract (Base-n, verbs, schema, hard flags)  #RULES
+  2) ZEUS_CLIENT    business_injection, brief, mini-schema, session/round #INJECT
+  3) USER MESSAGE   this turn                                            #INJECT
+  4) TERMINATE      G1 user · G2 admin · G3 client triggers              #OUT
+
+Full picture: PROMPT_ASSEMBLY.md
+Filenames: chat_request_<mode>_base-2.json → Workbench
+  chat_request_<mode>_base-2_cus_<bucket>_<scope>-<rev>.json
+  (see v2/base/base-2-prototype/PROTOTYPE.md)
+
+
+================================================================================
+1. WHAT IS IN THE CATALOG FILE vs RUNTIME
+================================================================================
+
+  IN FILE (chat_request*.json)
+    _format, _version, _hash, _hash_policy, _note, _lineage
+    contract { builder, hash, … }
+    messages[0].content     = system / how Zeus works
+    verbs[13]               = tools
+    (full) instructions, masq, guidance, metadata
+
+  RUNTIME (not baseline file)
+    SCOPE BRIEF + MINI-SCHEMA
+    zeus_client.business_injection (messages + rules[])
+    session round/turn
+    user message, tool results
+    AgentHooks effects
+
+  TERMINATE (model → Client splits audiences)
+    G1 summary, confidence, decomposition fields
+    G2 subject_confidence, wish_i_knew, jail_break_attempt (admin)
+    G3 business_rules_triggers[] (parallel to rules[]; Client round state)
+
+================================================================================
+2. CONTRACT vs CLIENT (hash boundary)
+================================================================================
+
+  HASHED (re-stamp if changed)
+    Base-n body, verbs, weight order, response schema, hard flags,
+    allowed/denied verbs when locked
+
+  NOT HASHED (Client / tenant pass-in)
+    brand boilerplate, business_injection.rules[], locale,
+    SCOPE BRIEF, MINI-SCHEMA, user text, soft guidance
+
+  Why: tenant copy and live schema must not thrash production stamps.
+
+================================================================================
+3. TOKEN BUDGET
+================================================================================
+
+  Min catalogs ~13–17KB. Assembled prompt grows with inject + history + tools.
+  Prefer short indexed rules + triggers over 60KB policy novels.
+  Drop soft guidance first; keep verb surface + terminate schema + hard flags.
+  See PROMPT_ASSEMBLY.md and simple_layout.txt §N.
+
+================================================================================
+4. ORIGINAL SKETCH — RIGHT vs WRONG (history)
+================================================================================
+
+RIGHT
+  - System "how Zeus works" + ~13 APIs + priority + hash + user separate
+  - Mini-schema and business text appear in the AI-facing payload
+
+WRONG / imprecise
+  - No physical #B-{INT} markers — system lives in messages[0].content
+  - Hash is _hash_policy.pointers, not "md5 of all injects"
+  - 13 are VERBS, not "13 instructions"
+  - Jailbreak score is terminate admin 0.0..1.0 subjective, not catalog prose alone
+  - wish_i_knew is per-turn admin gap report, not catalog facet wishlist
+  - Mini-schema is runtime inject, not inside Base blob for hashing
+
+MISSING from first sketch (now in simple_layout / PROMPT_ASSEMBLY)
+  - Envelope, lineage, min vs full, soft guidance
+  - Contract vs Client ownership
+  - G1/G2/G3 terminate split
+  - business_rules_triggers[] for round control
+  - brand message_failure boilerplate
+  - token budget discipline
+
+================================================================================
+5. ORIGINAL SKETCH (preserved)
+================================================================================
+
+[] = array
+"" = string
+{} = object
+
+#B-{INT} = zeus basic text          ← metaphor only; real home = messages[0].content
+#contract    = md5 contact hash of #B-{INT}
+               ← too narrow; real = hash(_hash_policy.pointers), not all injects
+
+#### AI instruction begin ####
+    #B-1
+    "This is how zeus work and use the api below te query data"   ← YES: system prompt
+    [13 zeus api - how they work]                                 ← YES: verbs[]
+    [order of priority of the 13 instructions to use]             ← YES: verb_order/masq/prose
+    #B-1
+    {zeus.mini-schema}                                            ← YES but #INJECT, not file
+    {zeus.contract --- md5-hash}                                  ← #META bind; not mini-schema
+    "zeus_client.jailbreak instruction"                           ← policy + admin score #OUT
+    [zeus_client.busines_injection]                               ← #INJECT + rules/triggers
+    "custom.text -- this is for a travel book website ...."       ← Client inject / custom lineage
+#### AI instruction end ####
+#### message begin ####
+"what tacos is great with goat cheese"                            ← YES: user turn #INJECT
+#### message end   ####

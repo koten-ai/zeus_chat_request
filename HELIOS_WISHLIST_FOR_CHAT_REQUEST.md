@@ -7,6 +7,7 @@
 | Related | |
 | --- | --- |
 | Catalogs | [`v2/min/`](v2/min/) · [`v2/base/`](v2/base/) · [CHAT_REQUEST.md](CHAT_REQUEST.md) |
+| Prompt assembly | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [simple_layout.txt](simple_layout.txt) (admin terminate fields vs user summary; keep emits cheap) |
 | Helios today | `QUERY_DECOMPOSITION` on report · Explore live charts |
 | Process | Each item is a **Request** — not a committed schema until accepted into a BASE / Zeus emit |
 

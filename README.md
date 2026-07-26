@@ -21,6 +21,55 @@ Each catalog JSON includes `_lineage.base_id`. Customs (Workbench) will set `cus
 
 See **COMPAT.md** for Zeus version ↔ BASE ranges. Process: CR-1 / ZE-222.
 
+### Diet pack — **base-4** (single Terminate table)
+
+| Field | Value |
+| --- | --- |
+| **BASE id** | `base-4` |
+| **Tree** | [`v2/base/base-4-prototype/`](v2/base/base-4-prototype/) |
+| **JSON** | `min/chat_request_<mode>_base-4.json` |
+| **Text** | `text/chat_request_<mode>_base-4.txt` |
+| **Change** | One `## Terminate (Layer A)` table + example (removed duplicate Evidence-loop + Layer A essays) |
+| **Bible** | [`BIBLE.md`](v2/base/base-4-prototype/BIBLE.md) — full step-by-step requirements |
+| **base-1 → base-4** | [`BASE_1_TO_BASE_4_GUIDE.md`](v2/base/base-4-prototype/BASE_1_TO_BASE_4_GUIDE.md) |
+| **Docs** | [`PROTOTYPE.md`](v2/base/base-4-prototype/PROTOTYPE.md) |
+
+```bash
+python3 scripts/export_base_text.py --from v2/base/base-4-prototype/min --base 4
+```
+
+### Text working copy — **base-3** (diet / edit)
+
+| Field | Value |
+| --- | --- |
+| **BASE id** | `base-3` |
+| **Tree** | [`v2/base/base-3-prototype/`](v2/base/base-3-prototype/) |
+| **Files** | `text/chat_request_<mode>_base-3.txt` |
+| **Inside** | `_lineage.base_id: base-3` (parent: base-2-prototype) |
+| **Format** | Indented **text only** (not JSON) |
+| **Use** | Human/LLM rework (“go on a diet”); re-encode → `chat_request_<mode>_base-3.json` before stamp |
+| **Generator** | [`scripts/export_base_text.py`](scripts/export_base_text.py) |
+
+```bash
+# (re)build base-3 text pack from base-2-prototype JSON
+python3 scripts/export_base_text.py --from v2/base/base-2-prototype/min --base 3
+
+# later iterations
+python3 scripts/export_base_text.py --from v2/base/base-2-prototype/min --base 4
+```
+
+### Prototype BASE (not production)
+
+| Field | Value |
+| --- | --- |
+| **BASE** | `base-2-prototype` (fork of base-1) |
+| **Path** | [`v2/base/base-2-prototype/min/`](v2/base/base-2-prototype/min/) · files `chat_request_<mode>_base-2-prototype.json` (not `*_v2_min.json`) |
+| **Docs** | [`PROTOTYPE.md`](v2/base/base-2-prototype/PROTOTYPE.md) · Layer A terminate samples in [`samples/`](samples/) |
+| **Status** | Feedback for **zeus_client** — may break engines expecting base-1-only `return` schema |
+| **Pin** | Does **not** replace `CURRENT.json` / `v2/min` (still base-1) |
+
+Layer A adds recommended: `policy_action`, `subject_confidence`, `jail_break_attempt` (0.0–1.0), `wish_i_knew`, `business_rules_triggers[]`. Layer B Detective envelope remains server-built.
+
 ---
 
 
@@ -94,7 +143,22 @@ Deep links (examples):
 
 ## Learn the format
 
-**[CHAT_REQUEST.md](CHAT_REQUEST.md)** — what a `chat_request*.json` is for, section-by-section, what a **contract** is, what you can change (Client vs Hub Workbench), and why these files are **baselines** you refine for your dataset.
+| Doc | Contents |
+| --- | --- |
+| **[PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md)** | Assembled prompt: **Zeus rules → Client inject → user → terminate**; token budget (avoid 10KB→60KB stuffing) |
+| **[simple_layout.txt](simple_layout.txt)** | Working field map: Contract vs Client, business rules/triggers, admin-only output |
+| **[base_layout.txt](base_layout.txt)** | Short bridge + original sketch right/wrong |
+| **[CHAT_REQUEST.md](CHAT_REQUEST.md)** | What a catalog is, stamp/contract, Client vs Hub, anatomy of V2 JSON |
+| **[HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)** | Analytics emit wishlist (cost-aware; not all fields belong in every prompt) |
+
+### Assembled prompt (one line)
+
+```text
+ZEUS RULES (catalog/contract) → ZEUS_CLIENT inject (brand, rules[], brief/schema, round)
+  → USER message → LLM ↔ tools → terminate (user | admin | client triggers)
+```
+
+**Size:** prefer **min** catalogs (~13–17KB). Keep Client `business_injection.rules[]` short and indexed; do not paste policy novels into Base or inject until the wire prompt balloons toward tens of KB of rules alone.
 
 ## Why this repo exists
 
@@ -123,12 +187,37 @@ Historically catalogs lived only inside the Zeus engine tree (`Zeus/ai/V2/…`).
 
 Machine index: `manifest.json` (`mode`, `sha256`, `verb_count`, embedded `contract` metadata from generation).
 
+## File naming
+
+| Kind | Pattern | Example |
+| --- | --- | --- |
+| **BASE (start here)** | `chat_request_<mode>_base-<N>.json` | `chat_request_analytics_base-2.json` |
+| **base-2-prototype (this repo)** | `chat_request_<mode>_base-2-prototype.json` | `chat_request_analytics_base-2-prototype.json` |
+| **Custom (Hub → Workbench → Prompt Helper)** | `chat_request_<mode>_base-<N>_cus_<bucket>_<scope>-<rev>.json` | `chat_request_analytics_base-2_cus_travel-sample_default-1.json` |
+| **Custom next save** | bump `<rev>` | `…_default-2.json` |
+| **Legacy base-1 pin** | `chat_request_<mode>_v2_min.json` | under `v2/min/` and `v2/base/base-1/min/` |
+
+```text
+chat_request_analytics_base-2.json
+  → Workbench save
+chat_request_analytics_base-2_cus_travel-sample_default-1.json
+  → change & save
+chat_request_analytics_base-2_cus_travel-sample_default-2.json
+```
+
+- Normalize scope: `_default` → `default` in filenames (no `/`).
+- `_format: "zeus.chat_request.v2"` is the **JSON envelope** id, not the file stem.
+- Customs are produced on Hub, not required in this repo’s BASE tree.
+- Full naming + lineage: [v2/base/base-2-prototype/PROTOTYPE.md](v2/base/base-2-prototype/PROTOTYPE.md#file-naming-base-vs-workbench-customs)
+
+
 ## Critical rules
 
 1. **Do not invent production `contract_hash` values.** Templates here may include a generation-time hash; **your** Zeus stamp is authoritative after verify/stamp.
 2. Prefer **`sync_chat_requests`** from a live Zeus after ops stamps for that scope.
 3. Use this repo for **bootstrapping demos**, offline scaffolds, Dev Helper MCP `fetch_chat_request` fallbacks, and docs examples.
 4. Full (non-min) engine snapshots still regenerate inside Zeus (`ai/V2/chat_request_*_v2.json`) for Hub A/B; integrators should start with **min**.
+5. **Do not over-stuff prompts.** Catalog min is intentionally small; Client injects (brief, schema, business rules) must stay bounded or assembled size jumps from ~10KB toward 60KB+. Prefer short indexed rules + terminate triggers over long free-form policy.
 
 ## Use with Zeus Client (Python)
 

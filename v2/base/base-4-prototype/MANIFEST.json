@@ -1,0 +1,74 @@
+{
+  "base_id": "base-4",
+  "packaging": "base-4-prototype",
+  "kind": "text_export",
+  "source": "v2/base/base-4-prototype/min",
+  "content_policy": "text_export; lineage base_id set to base-N",
+  "format": "indented_text",
+  "file_pattern_text": "chat_request_<mode>_base-4.txt",
+  "file_pattern_json_later": "chat_request_<mode>_base-4.json",
+  "custom_pattern": "chat_request_<mode>_base-4_cus_<bucket>_<scope>-<rev>.json",
+  "generator": "scripts/export_base_text.py",
+  "files": [
+    {
+      "file": "text/chat_request_analytics_base-4.txt",
+      "mode": "analytics",
+      "chars": 23596,
+      "source_json": "chat_request_analytics_base-4.json"
+    },
+    {
+      "file": "text/chat_request_auto_base-4.txt",
+      "mode": "auto",
+      "chars": 21618,
+      "source_json": "chat_request_auto_base-4.json"
+    },
+    {
+      "file": "text/chat_request_code_base-4.txt",
+      "mode": "code",
+      "chars": 23551,
+      "source_json": "chat_request_code_base-4.json"
+    },
+    {
+      "file": "text/chat_request_custom_base-4.txt",
+      "mode": "custom",
+      "chars": 23569,
+      "source_json": "chat_request_custom_base-4.json"
+    },
+    {
+      "file": "text/chat_request_fraud_base-4.txt",
+      "mode": "fraud",
+      "chars": 23560,
+      "source_json": "chat_request_fraud_base-4.json"
+    },
+    {
+      "file": "text/chat_request_open_base-4.txt",
+      "mode": "open",
+      "chars": 23551,
+      "source_json": "chat_request_open_base-4.json"
+    },
+    {
+      "file": "text/chat_request_private_base-4.txt",
+      "mode": "private",
+      "chars": 23578,
+      "source_json": "chat_request_private_base-4.json"
+    },
+    {
+      "file": "text/chat_request_regulated_base-4.txt",
+      "mode": "regulated",
+      "chars": 23596,
+      "source_json": "chat_request_regulated_base-4.json"
+    },
+    {
+      "file": "text/chat_request_research_base-4.txt",
+      "mode": "research",
+      "chars": 23587,
+      "source_json": "chat_request_research_base-4.json"
+    },
+    {
+      "file": "text/chat_request_tenant_base-4.txt",
+      "mode": "tenant",
+      "chars": 23569,
+      "source_json": "chat_request_tenant_base-4.json"
+    }
+  ]
+}

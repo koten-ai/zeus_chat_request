@@ -1,0 +1,59 @@
+{
+  "_format": "zeus.terminate.v0",
+  "round": 2,
+  "policy_action": "answer",
+
+  "summary": "Here are 3 hotels in Paris for 12–14 Aug under $250/night with free cancellation on at least one rate. Coupon SAVE20 matched an eligible rate on Hotel Seine View.",
+
+  "confidence": "high",
+
+  "query_decomposition": {
+    "intent": "List",
+    "entity": "Hotel",
+    "geo": "Paris",
+    "theme": null,
+    "price": "< $250",
+    "audience": null,
+    "occasion": null,
+    "parts": null,
+    "other": { "coupon_code_mentioned": "SAVE20" }
+  },
+
+  "decomposition": {
+    "intent": "list hotels with price and cancellation filters",
+    "targets": [{ "entity_type": "Hotel", "focus": ["name", "price", "cancellation"] }],
+    "predicates": {
+      "city": "Paris",
+      "check_in": "2026-08-12",
+      "check_out": "2026-08-14",
+      "price_lt": 250
+    },
+    "output": "rows",
+    "context": {}
+  },
+
+  "node_refs": ["hotel:seine-view", "hotel:marais-inn", "hotel:left-bank-loft"],
+  "entity_refs": [
+    { "type": "Hotel", "id": "hotel:seine-view" },
+    { "type": "Hotel", "id": "hotel:marais-inn" },
+    { "type": "Hotel", "id": "hotel:left-bank-loft" }
+  ],
+  "provenance": [
+    { "step": "find", "as": "cands" },
+    { "step": "project", "as": "rows" }
+  ],
+
+  "admin": {
+    "subject_confidence": 0.94,
+    "jail_break_attempt": 0.0,
+    "wish_i_knew": [],
+    "refusal_reason_code": null
+  },
+
+  "client": {
+    "business_rules_triggers": [false, true, false],
+    "business_rules_detail": [
+      { "index": 1, "triggered": true, "note": "SAVE20 applied against eligible rate" }
+    ]
+  }
+}

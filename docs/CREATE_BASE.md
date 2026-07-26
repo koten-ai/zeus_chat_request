@@ -89,6 +89,9 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
      python3 scripts/scan_catalogs.py
 6. VERIFY (P0 — fail = do not open pack PR):
      python3 scripts/verify_base_pack.py --base N
+6b. If base-5+ modes: re-apply overlays (base-5.1) after scaffold diet:
+     python3 scripts/assemble_mode_prompts.py --base N
+     python3 scripts/diff_modes.py --base N --fail-if-clone
 7. Fill hop RELEASE_CHECKLIST + GUIDE (+ lessons)
 8. Update ROADMAP + RELEASE_NOTES + COMPAT + BASE_AGENT_PLAYBOOK
 9. Diff in index.html (parent mode vs new mode)

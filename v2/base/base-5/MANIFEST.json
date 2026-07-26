@@ -2,23 +2,19 @@
   "schema_version": 2,
   "base_id": "base-5",
   "kind": "base",
-  "status": "candidate",
-  "note": "base-5 candidate pack \u2014 last breaking wire/control-plane freeze on this line. Object rules/triggers, optional app_output, inject contracts documented. Production pin remains base-1 until CURRENT.json promote. See docs/ROADMAP.md \u00b7 docs/migration/base-4_to_base-5/.",
+  "status": "scaffold",
+  "note": "base-5 scaffolded from (refresh) v2/base/base-5. Edit catalogs + Layer A schemas; do not invent production contract hashes. Design docs live under docs/ (see docs/BIBLE.md, docs/CREATE_BASE.md).",
   "paths": {
     "min": "v2/base/base-5/min",
     "text": "v2/base/base-5/text",
     "bible": "docs/BIBLE.md",
     "roadmap": "docs/ROADMAP.md",
     "create_base": "docs/CREATE_BASE.md",
-    "playbook": "docs/BASE_AGENT_PLAYBOOK.md",
-    "agents": "AGENTS.md",
-    "migration": "docs/migration/base-4_to_base-5/",
-    "release_checklist": "docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md",
     "response_output_schema": "v2/base/base-5/response_output_schema.json",
     "response_output_example": "v2/base/base-5/response_output_example.json"
   },
-  "parent_source": "v2/base/base-4",
-  "updated_at": "2026-07-26T14:46:37Z",
+  "parent_source": "(refresh) v2/base/base-5",
+  "updated_at": "2026-07-26T15:40:50Z",
   "generator": "scripts/new_base.py",
   "catalogs": [
     {
@@ -26,70 +22,70 @@
       "mode": "analytics",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28959
+      "bytes": 29794
     },
     {
       "file": "v2/base/base-5/min/chat_request_auto_base-5.json",
       "mode": "auto",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 27142
+      "bytes": 29645
     },
     {
       "file": "v2/base/base-5/min/chat_request_code_base-5.json",
       "mode": "code",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28924
+      "bytes": 29908
     },
     {
       "file": "v2/base/base-5/min/chat_request_custom_base-5.json",
       "mode": "custom",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28938
+      "bytes": 29196
     },
     {
       "file": "v2/base/base-5/min/chat_request_fraud_base-5.json",
       "mode": "fraud",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28931
+      "bytes": 30144
     },
     {
       "file": "v2/base/base-5/min/chat_request_open_base-5.json",
       "mode": "open",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28924
+      "bytes": 29299
     },
     {
       "file": "v2/base/base-5/min/chat_request_private_base-5.json",
       "mode": "private",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28945
+      "bytes": 29305
     },
     {
       "file": "v2/base/base-5/min/chat_request_regulated_base-5.json",
       "mode": "regulated",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28959
+      "bytes": 29882
     },
     {
       "file": "v2/base/base-5/min/chat_request_research_base-5.json",
       "mode": "research",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28952
+      "bytes": 29942
     },
     {
       "file": "v2/base/base-5/min/chat_request_tenant_base-5.json",
       "mode": "tenant",
       "base_id": "base-5",
       "prototype": false,
-      "bytes": 28938
+      "bytes": 29327
     }
   ]
 }

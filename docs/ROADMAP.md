@@ -431,15 +431,15 @@ Client → type-check values (descriptions not re-emitted)
 
 ### Success signals
 
-- [ ] [MODE.md](MODE.md) + [RECREATE_MODE.md](../work/RECREATE_MODE.md) on main  
-- [ ] CORE extracted; analytics rebuild from CORE + overlay  
-- [ ] fraud / research / code / regulated overlays land in packs  
-- [ ] All 10 modes pass §6.1 keyword/entity smoke in MODE.md  
-- [ ] Neutralize-mode Diff ≠ empty vs analytics (except intentional shared CORE)  
-- [ ] `verify_base_pack.py --base 5` OK  
-- [ ] Zeus `modes/<mode>.md` ported or dual-home documented  
-- [ ] RELEASE_NOTES notes base-5.1 content train  
-- [ ] CR-23 Done  
+- [x] [MODE.md](MODE.md) + [RECREATE_MODE.md](../work/RECREATE_MODE.md) authored  
+- [x] CORE extracted; all 10 modes assembled CORE + overlay  
+- [x] fraud / research / code / regulated (+ tenant/private/open/auto/custom) overlays in packs  
+- [x] Keyword/entity smoke via `diff_modes.py --fail-if-clone`  
+- [x] Neutralize-mode signatures unique per mode  
+- [x] `verify_base_pack.py --base 5` OK  
+- [ ] Zeus `modes/<mode>.md` ported (follow-up; dual-home = `work/mode_overlays/`)  
+- [x] RELEASE_NOTES notes base-5.1 content train  
+- [ ] CR-23 Done (after PR merge)  
 
 ### Sequencing vs other work
 

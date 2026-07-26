@@ -8,8 +8,10 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 | **Format** | `zeus.chat_request.v2` |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
 | **Candidate pack** | **base-5** — `v2/base/base-5/` (last breaking freeze; not pin) |
+| **Content train** | **base-5.1** — mode overlays in system prompt (same pack path; not a wire break) |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` |
 | **Roadmap** | [ROADMAP.md](docs/ROADMAP.md) |
+| **Modes** | [MODE.md](docs/MODE.md) · [work/RECREATE_MODE.md](work/RECREATE_MODE.md) |
 | **Helios emit wishlist** | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) |
 
 ---
@@ -18,10 +20,11 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 
 ### Highlights
 
-- **base-5 candidate pack** shipped on disk: [`v2/base/base-5/`](v2/base/base-5/) — **last breaking wire/control-plane freeze** (objects, `app_output`, inject contracts). Pin remains **base-1**.
+- **base-5.1 (content on base-5 wire):** system prompts are **CORE + MODE_OVERLAY** per mode (DESIGN §14 personas). Packs no longer “analytics × rename.” Author under `work/mode_overlays/`; assemble with `scripts/assemble_mode_prompts.py`. Clone gate: `scripts/diff_modes.py --fail-if-clone`. Jira **CR-23**.
+- **base-5 candidate pack** on disk: [`v2/base/base-5/`](v2/base/base-5/) — **last breaking wire/control-plane freeze** (objects, `app_output`, inject contracts). Pin remains **base-1**.
 - Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/) (GUIDE, lessons, RELEASE_CHECKLIST).
 - **base-4** remains available for Diff/history (`v2/base/base-4/`).
-- Docs/process: AI playbook, COMPAT three-product matrix, RELEASE_CHECKLIST template, `scripts/new_base.py`.
+- Docs/process: AI playbook, COMPAT, RELEASE_CHECKLIST, `verify_base_pack.py`, `new_base.py`.
 
 ### Breaking changes (opt-in **base-5**)
 

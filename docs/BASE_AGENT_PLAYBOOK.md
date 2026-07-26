@@ -1,6 +1,6 @@
 # BASE agent playbook — comply & upgrade
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate pack **base-5** · prior candidate **base-4** · version matrix: [COMPAT.md](../COMPAT.md)
 
 **Audience:** coding agents (and humans) changing **catalogs**, **Zeus engine**, or **zeus_client** for a given `base-N`.  
 **Not:** a second Bible or Roadmap — **procedures + checklists** only. Depth lives in linked SoT docs.
@@ -32,11 +32,11 @@
 | Production pin | `CURRENT.json` → `base_id` | What prod clients should use |
 | Pack present | `v2/base/base-N/` + `_lineage.base_id` | Catalogs on disk |
 | Compat row | [COMPAT.md](../COMPAT.md) | Supported / candidate / design |
-| Design only | [ROADMAP.md](ROADMAP.md) | Spec without pack (e.g. base-5) |
+| Design only | [ROADMAP.md](ROADMAP.md) | Spec without pack (base-6+ themes until scaffolded) |
 
 ```text
-Pin base-1  +  pack base-4  +  design base-5
-→ production still base-1; trials may use base-4; do not claim base-5 catalogs exist
+Pin base-1  +  packs base-4 + base-5 on disk
+→ production still base-1; trials may use base-4 or base-5 candidate; pin last
 ```
 
 ---
@@ -87,7 +87,9 @@ For each track (catalog / Zeus / Client), complete the checklist for **your targ
 
 **Law:** base-5 freezes the wire. **base-6+ must be additive/optional only** ([ROADMAP.md](ROADMAP.md) BASE change law).
 
-**SoT:** pack [`v2/base/base-5/`](../v2/base/base-5/) · [ROADMAP.md](ROADMAP.md) · [RULES_OBJECT…](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)---
+**SoT:** pack [`v2/base/base-5/`](../v2/base/base-5/) · [ROADMAP.md](ROADMAP.md) · [RULES_OBJECT…](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
+
+---
 
 ## 3. Upgrade `base-X` → `base-Y` (generic recipe)
 
@@ -95,21 +97,24 @@ Execute in order. Skip only if the hop folder says “design only” and you are
 
 ```text
 0. Copy docs/migration/RELEASE_CHECKLIST_TEMPLATE.md
-     → docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md  (work the boxes)
+     → docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md  (phases A–G)
 1. Read COMPAT.md + ROADMAP (for Y)
 2. Read docs/migration/base-X_to_base-Y/  (GUIDE + lessons if present)
 3. Scaffold pack (when Y is a real pack):
      python3 scripts/new_base.py --from v2/base/base-X --base Y
-4. Apply Y deltas (Terminate table, Layer A schema, verb params, inject contracts)
+4. DIET Y deltas (Terminate table, Layer A schema, verb params, inject contracts)
+     — scaffold copies parent wire; never ship undieted
 5. Re-export text; refresh MANIFEST; scan_catalogs
-6. Zeus engine: snapshot / PIN / Detective / loaders / return schema (see §5)
-7. zeus_client: parse/validate new fields; dual-read only if X→Y break and ≤1 release; redaction; policy table
-8. Update COMPAT.md triples + feature table + RELEASE_NOTES.md
-9. Ensure hop folder complete:
+6. VERIFY (P0):
+     python3 scripts/verify_base_pack.py --base Y   # must OK before pack PR
+7. Zeus engine: snapshot / PIN / Detective / loaders / return schema (see §5; often separate ticket)
+8. zeus_client: parse/validate new fields; dual-read only if X→Y break and ≤1 release; redaction; policy table
+9. Update COMPAT.md triples + feature table + RELEASE_NOTES.md
+10. Ensure hop folder complete:
      GUIDE.md + lessons-learned.md + RELEASE_CHECKLIST.md
-10. Update this playbook: §2 card for Y + §4 jump row
-11. Inspector Diff: same mode base-X vs base-Y
-12. Client spike + Hub stamp BEFORE CURRENT.json pin flip
+11. Update this playbook: §2 card for Y + §4 jump row
+12. Inspector Diff: same mode base-X vs base-Y
+13. Client spike + Hub stamp BEFORE CURRENT.json pin flip
 ```
 
 **Master checklist:** [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-5: [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md)
@@ -129,7 +134,7 @@ Execute in order. Skip only if the hop folder says “design only” and you are
 | Jump | Migration path | Status | Comply card |
 | --- | --- | --- | --- |
 | base-1 → base-4 | [migration/base-1_to_base-4/](migration/base-1_to_base-4/) | Candidate pack | §2.1 → §2.2 |
-| base-4 → base-5 | [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | **Breaking hop** (design; last wire break) | §2.2 → §2.3 |
+| base-4 → base-5 | [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | **Candidate pack** (breaking freeze shipped; pin still base-1) | §2.2 → §2.3 |
 | base-5 → base-6+ | (add hop only if needed) | **Additive only** by default | No wire rename/remove |
 
 ### 4.1 base-1 → base-4 (summary)

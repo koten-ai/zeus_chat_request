@@ -53,6 +53,7 @@ Index: [docs/migration/README.md](docs/migration/README.md).
 
 ```bash
 # Scaffold full pack like base-4 (min + text + schemas + MANIFEST)
+# Scaffold copies parent wire — diet before PR
 python3 scripts/new_base.py --from v2/base/base-4 --base 5
 
 # Text export only (keeps existing pack README/MANIFEST)
@@ -60,6 +61,9 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 4 --out v2/
 
 # Refresh MANIFEST after editing min/
 python3 scripts/new_base.py --refresh-manifest --base 4
+
+# Structural pack gate (P0 after diet; N≥5 checks object triggers + app_output)
+python3 scripts/verify_base_pack.py --base 5
 
 # Inspector index
 python3 scripts/scan_catalogs.py

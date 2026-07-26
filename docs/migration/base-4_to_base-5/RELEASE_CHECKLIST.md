@@ -45,13 +45,14 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 
 ---
 
-## 2. Scripts / regenerate
+## 2. Scripts / regenerate (Phase D)
 
 - [x] `python3 scripts/new_base.py --from v2/base/base-4 --base 5`  
 - [x] Diet min JSON (objects, Terminate, schema-linked tool params)  
 - [x] `export_base_text.py --from v2/base/base-5/min --base 5 --out v2/base/base-5 --no-set-base-id`  
 - [x] `new_base.py --refresh-manifest --base 5`  
 - [x] `scan_catalogs.py`  
+- [x] **`python3 scripts/verify_base_pack.py --base 5` → OK**  
 - [ ] Root manifest/index if applicable  
 
 ---
@@ -137,12 +138,13 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 
 ---
 
-## 7. Verify (Client trial)
+## 7. Verify (Client trial) (Phase D + trial)
 
-- [ ] schema validates example  
-- [ ] scan_catalogs clean  
+- [x] **`python3 scripts/verify_base_pack.py --base 5` OK**  
+- [ ] schema validates example (structural gate done; full jsonschema optional)  
+- [x] scan_catalogs clean  
 - [ ] Diff base-4 vs base-5  
-- [ ] No invent hash  
+- [x] No invent hash  
 - [ ] Refuse / coupon-style policy path smoke (docs examples)  
 
 ---

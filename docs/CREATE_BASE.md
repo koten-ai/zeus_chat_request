@@ -1,11 +1,12 @@
 # Creating a new BASE pack (`base-N`)
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate pack **base-5** · prior candidate **base-4** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Audience:** catalog authors, release train  
 **Script:** [`scripts/new_base.py`](../scripts/new_base.py)  
-**Text export (only):** [`scripts/export_base_text.py`](../scripts/export_base_text.py)
+**Text export (only):** [`scripts/export_base_text.py`](../scripts/export_base_text.py)  
+**Pack verify (required after diet):** [`scripts/verify_base_pack.py`](../scripts/verify_base_pack.py)
 
 A BASE **pack** is the on-disk ship unit under `v2/base/base-N/`.  
 **Design docs** stay under `docs/` (do not copy BIBLE/ROADMAP into every pack).
@@ -72,6 +73,8 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
 
 ### What you do after scaffold
 
+**Scaffold ≠ ship.** Parent wire is copied until you diet. Phases A–G live in the master checklist.
+
 **Master list:** copy [migration/RELEASE_CHECKLIST_TEMPLATE.md](migration/RELEASE_CHECKLIST_TEMPLATE.md)  
 → `docs/migration/base-X_to_base-Y/RELEASE_CHECKLIST.md` and check every box.
 
@@ -84,10 +87,13 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
      python3 scripts/new_base.py --refresh-manifest --base N
 5. Scan inspector index:
      python3 scripts/scan_catalogs.py
-6. Fill hop RELEASE_CHECKLIST + GUIDE (+ lessons)
-7. Update ROADMAP + RELEASE_NOTES + COMPAT + BASE_AGENT_PLAYBOOK
-8. Diff in index.html (parent mode vs new mode)
-9. Client spike + stamp path before CURRENT pin
+6. VERIFY (P0 — fail = do not open pack PR):
+     python3 scripts/verify_base_pack.py --base N
+7. Fill hop RELEASE_CHECKLIST + GUIDE (+ lessons)
+8. Update ROADMAP + RELEASE_NOTES + COMPAT + BASE_AGENT_PLAYBOOK
+9. Diff in index.html (parent mode vs new mode)
+10. Open CR tickets for Zeus + Client residual work (pack can land first)
+11. Client spike + stamp path before CURRENT pin
 ```
 
 See [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · base-4→5: [migration/base-4_to_base-5/RELEASE_CHECKLIST.md](migration/base-4_to_base-5/RELEASE_CHECKLIST.md).
@@ -122,8 +128,8 @@ Envelope:    _format: "zeus.chat_request.v2"   # not the file stem
 
 Use the hop **[RELEASE_CHECKLIST](migration/RELEASE_CHECKLIST_TEMPLATE.md)** (full). Minimum bar:
 
-- [ ] Pack §1 of RELEASE_CHECKLIST green  
-- [ ] Scripts §2 green  
+- [ ] Pack §1 of RELEASE_CHECKLIST green (dieted, not scaffold-only)  
+- [ ] Scripts §2 green including **`verify_base_pack.py --base N` OK**  
 - [ ] RELEASE_NOTES + COMPAT updated  
 - [ ] Inspector Diff parent vs new  
 - [ ] No invented production `contract_hash`  

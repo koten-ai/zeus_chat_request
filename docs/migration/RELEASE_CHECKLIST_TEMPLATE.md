@@ -14,24 +14,50 @@
 **Commands:** [CREATE_BASE.md](../CREATE_BASE.md) · [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) · [COMPAT.md](../../COMPAT.md)
 
 ```bash
-# scaffold pack
+# scaffold pack (copies parent — then you MUST diet)
 python3 scripts/new_base.py --from v2/base/base-X --base Y
+
+# after diet — mandatory structural gate (P0)
+python3 scripts/verify_base_pack.py --base Y
 ```
+
+### Phases (do not skip)
+
+| Phase | When | Exit criteria |
+| --- | --- | --- |
+| **A — Design** | Before scaffold | ROADMAP + hop GUIDE outline; breaking vs additive decided |
+| **B — Scaffold** | `new_base.py` | Pack tree exists; lineage rewritten; **not** ship-ready |
+| **C — Diet** | Edit min + schema + tools | Theme of Y in Terminate + Layer A; **no parent wire as SoT** |
+| **D — Verify** | After diet, before PR | `verify_base_pack.py` **OK**; text/MANIFEST/scan refreshed |
+| **E — Docs ship** | Same PR as pack | RELEASE_NOTES + COMPAT + hop checklist + playbook |
+| **F — External** | Separate tickets | Zeus + zeus_client green (may lag pack) |
+| **G — Pin** | Later | Stamp + Client + Detective → only then `CURRENT.json` |
+
+**P0 process rules (from base-5 ship):**
+
+1. **Scaffold ≠ ship** — never open a “base-Y ready” PR until diet + `verify_base_pack.py` pass.  
+2. **Schema + return tool params together** — Detective/Client drift if only one side moves.  
+3. **Re-export text after every min JSON edit.**  
+4. **No invented production `contract_hash`.**  
+5. **Pin last** — candidate pack on main is fine; pin flip is a separate gate.
 
 ---
 
-## 0. Pre-flight
+## 0. Pre-flight (Phase A)
 
 - [ ] Read [COMPAT.md](../../COMPAT.md) — pin vs candidate vs design  
 - [ ] Read [ROADMAP.md](../ROADMAP.md) for base-Y theme  
 - [ ] Confirm **breaking vs additive** (base-5 = last break; base-6+ additive only)  
 - [ ] Read hop notes if any: `docs/migration/base-X_to_base-Y/`  
-- [ ] Know production pin still (`CURRENT.json`) — do **not** flip until §9  
+- [ ] Know production pin still (`CURRENT.json`) — do **not** flip until §8 / Phase G  
+- [ ] Open or update CR board tickets for pack + Zeus + Client residual work  
 
 ---
 
-## 1. Pack on disk — `v2/base/base-Y/`
+## 1. Pack on disk — `v2/base/base-Y/` (Phases B–C)
 
+- [ ] Scaffolded with `new_base.py` (Phase B)  
+- [ ] **Dieted** (Phase C) — not undieted parent shapes  
 - [ ] `min/chat_request_<mode>_base-Y.json` for every mode parent had  
 - [ ] `text/chat_request_<mode>_base-Y.txt` regenerated and readable  
 - [ ] `MANIFEST.json` — schema_version 2, catalogs[], paths to docs  
@@ -48,18 +74,19 @@ python3 scripts/new_base.py --from v2/base/base-X --base Y
 
 ---
 
-## 2. Scripts / regenerate
+## 2. Scripts / regenerate (Phase D)
 
 - [ ] Scaffold: `python3 scripts/new_base.py --from v2/base/base-X --base Y`  
 - [ ] After diet:  
   `python3 scripts/export_base_text.py --from v2/base/base-Y/min --base Y --out v2/base/base-Y --no-set-base-id`  
 - [ ] `python3 scripts/new_base.py --refresh-manifest --base Y`  
 - [ ] `python3 scripts/scan_catalogs.py` (inspector `catalog-index.json`)  
+- [ ] **`python3 scripts/verify_base_pack.py --base Y` → OK** (required before pack PR)  
 - [ ] Root `manifest.json` updated if it lists packs  
 
 ---
 
-## 3. Docs / markdown (this repo)
+## 3. Docs / markdown (this repo) (Phase E)
 
 ### Migration hop
 
@@ -111,7 +138,7 @@ _Fill for this hop — see hop-specific RELEASE_CHECKLIST for base-5._
 
 ---
 
-## 6. External repos
+## 6. External repos (Phase F — usually separate tickets)
 
 ### Zeus engine
 
@@ -134,8 +161,9 @@ _Fill for this hop — see hop-specific RELEASE_CHECKLIST for base-5._
 
 ---
 
-## 7. Verify (green bar for Client trial)
+## 7. Verify (green bar for Client trial) (Phase D + trial)
 
+- [ ] **`python3 scripts/verify_base_pack.py --base Y` OK**  
 - [ ] Example validates: schema ↔ example  
 - [ ] `scan_catalogs.py` clean  
 - [ ] Inspector Diff X vs Y  
@@ -144,7 +172,7 @@ _Fill for this hop — see hop-specific RELEASE_CHECKLIST for base-5._
 
 ---
 
-## 8. Pin gate (usually later — not same day as scaffold)
+## 8. Pin gate (Phase G — usually later — not same day as scaffold)
 
 - [ ] Hub stamp on real cluster  
 - [ ] Client spike green  

@@ -3,7 +3,7 @@
   "description": "Auto-scanned chat_request*.json under v2/ for the inspector UI",
   "scan_glob": "v2/**/chat_request*.json",
   "count": 40,
-  "updated_at": "2026-07-26T06:26:26Z",
+  "updated_at": "2026-07-26T06:34:45Z",
   "catalogs": [
     {
       "file": "v2/base/base-4/min/chat_request_analytics_base-4.json",

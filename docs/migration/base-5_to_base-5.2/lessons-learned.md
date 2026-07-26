@@ -1,7 +1,7 @@
 # Lessons: base-5 → base-5.2 + first Zeus 0.6 / Helios 0.6 pin
 
 **Audience:** agents/humans pinning Zeus (or Client) onto **base-5.2**; next BASE authors.  
-**Captured:** 2026-07-26 after Zeus **0.6.0 → 0.6.1** Beelink lab + Detective first chat (`req` sample: fruit beers / beer-sample).  
+**Captured:** 2026-07-26 after Zeus **0.6.0 → 0.6.5** Beelink lab (Detective → chat Layer A → report rollup).  
 **Related:** [README.md](README.md) · [WISH_I_KNEW_DUAL.md](../../WISH_I_KNEW_DUAL.md) · [base-4→5 lessons](../base-4_to_base-5/lessons-learned.md) · [COMPAT.md](../../../COMPAT.md)
 
 This is **experience**, not a second BIBLE. Prefer pack schema + BIBLE for wire; use this to avoid re-breaking engines.
@@ -73,8 +73,9 @@ summary · query_decomposition · decomposition · confidence
 | --- | --- |
 | Synthetic terminate fills **full required four** + `synthetic:true` (and optional `policy_action=error`) | Only inject QD “for Helios” |
 | Use assistant prose as `summary` when present; honest placeholder if empty | Leave summary empty and expect checklist pass |
-| Helios / Analytics: `WHERE query_decomposition.synthetic IS MISSING` | Treat synthetic QD as real demand |
+| Helios / Analytics: `WHERE synthetic IS MISSING` (or `WHERE query_decomposition.synthetic IS MISSING`) | Treat synthetic QD as real demand |
 | Detective: note “terminate is synthetic” in diagnosis | Pretend `has_terminate=true` means model obeyed Layer A |
+| Report root promotes `synthetic` + `layer_a_via` | Only bury synthetic on nested tool status |
 
 **Open product risk:** force-`return` round (tools-only instruction) is still weaker than a real model terminate. Synthetic bag is a **safety net for observability**, not a substitute for teaching the model to call `return`.
 
@@ -109,21 +110,30 @@ From base-5 wire + base-5.2 dual gaps:
 - Tool handler only copies `wish_i_knew` if `string` → **drops** array emits.  
 - Pipeline struct tags `WishIKnew string` → JSON decode fails silently / empties.  
 - Detective `String(args.wish_i_knew)` on array → useless UI.  
-- Report rollup `WishIKnew []string` only — fine as **flattened** display, but keep **items** (or raw) for Helios if you query structure.
+- Report rollup `WishIKnew []string` only — fine as **flattened** display, but keep **items** (or raw) for Helios if you query structure.  
+- `if len(triggers) > 0` only → **drops explicit `{}`** (“no rules fired” vs “not emitted”).
 
-**Lesson:** Passthrough Layer A as `any` / map first; strict validate later. Prefer **pass-through** on day-one pin; fail closed on **known wrong shapes** (string wish / array triggers) in Detective.
+**Lesson:** Passthrough Layer A as `any` / map first; strict validate later. Prefer **pass-through** on day-one pin; fail closed on **known wrong shapes** (string wish / array triggers) in Detective. On report root, emit **presence flags** (`business_rules_triggers_present`, `data_gaps_present`) when JSON `omitempty` would hide empty bags.
 
 ---
 
-## 6. G1 / G2 / G3 still confuse first-debug
+## 6. G1 / G2 / G3 still confuse first-debug (and chat UI)
 
 | Audience | Fields | UI |
 | --- | --- | --- |
 | G1 user | `summary` only | Chat bubble |
 | G2 admin | wish, data_gaps, scores | Detective only |
 | G3 client | policy_action, triggers, app_output | Client control plane |
+| G2 **light** (ops) | confidence, policy, intent·entity chips | Optional under bubble (ZE-260) — **not** full G2 dump |
 
-**Lesson:** Detective must **render** G2/G3; chat must **not** dump them into user bubbles. First 0.6 work correctly prioritized Detective over Workbench chat polish.
+**Lesson:** Detective must **render** full G2/G3; chat must **not** dump wish/triggers/scores into user bubbles. Zeus 0.6 order that worked:
+
+1. **Detective + pin** (ZE-259) — see the bag  
+2. **Chat G1 + light chips** (ZE-260) — summary fills empty bubble; chips only  
+3. **Report rollup** (ZE-265) — Helios root fields  
+4. Then Prompt Vault / Contract / Wizard / docs
+
+Do **not** start with Vault or Ingress polish before Detective can show a real `return`.
 
 ---
 
@@ -147,20 +157,54 @@ Catalog pin green ≠ graph healthy.
 
 ---
 
-## 8. Helios is a second product, not a SQL footnote
+## 8. Hub freezes and “hung chat” are often client-side
+
+0.6.2 lab: Debug chat “Live streaming…” forever was **browser graph seed density** (hundreds of labeled nodes), not a stuck LLM.
+
+| Symptom | Real cause | Fix pattern |
+| --- | --- | --- |
+| Tab freezes after answer | Force-graph labels + unbounded seeds | Cap seeds, hide labels above N nodes, bound deep-walk |
+| Spinner forever | Nested backticks broke `app.js` parse (ZE-80) | `make check-admin-js` before ship |
+| Stream never ends | No AbortController | 3 min timeout on Debug fetch |
+
+**Lesson:** After pin, **soak Debug chat + graph** once. Ship freeze fixes in the same train as pin if lab is unusable.
+
+---
+
+## 9. Report rollup is the Helios contract (do it early)
+
+Analytics must **not** UNNEST `detail.ai.calls[].args` for every chart. Zeus **0.6.5 / ZE-265** promotes terminate bag onto `session.traces.report` root:
+
+| Report root | Source |
+| --- | --- |
+| `query_decomposition`, `decomposition`, `intent` | terminate args / AI |
+| `confidence`, `policy_action` | terminate |
+| `wish_i_knew` (flat strings), `wish_i_knew_items` (objects) | wish array / legacy string |
+| `business_rules_triggers` + `business_rules_triggers_present` | object (incl. empty `{}`) |
+| `data_gaps` + `data_gaps_present` | array (incl. empty) |
+| `app_output`, `subject_confidence`, `jail_break_attempt` | when emitted |
+| `synthetic`, `layer_a_via` | bag + tool status |
+
+**Terminate tool names to scan (last wins):** `return` · `return_result` · `pipeline` (with summary/QD/turn_complete) · `classic.return`.
+
+**Unit test requirement for next pin:** `TestBuildReportLayerAG2FromReturn` style — marshal report JSON and assert Helios keys exist at **root**, not only under `detail`.
+
+**Lesson:** Open **ZE report rollup + HEL epic the same day** as pin. Hub UI can lag a few patches; Helios blocked on missing report fields cannot.
+
+---
+
+## 10. Helios is a second product, not a SQL footnote
 
 | Mistake | Fix |
 | --- | --- |
 | “Helios will tolerate anything sparse” | Sparse ≠ wrong type forever |
 | No HEL tickets until Zeus ships | Open **HEL epic 0.6** with Zeus epic same day |
-| Query only `report.query_decomposition` | Plan `data_gaps`, structured wish, object triggers on report root |
+| Query only `report.query_decomposition` | Plan `data_gaps`, structured wish, object triggers, `synthetic` on report root |
 | Same Helios VERSION as 0.2 motions train | Jump **0.6** with Zeus to signal break |
-
-Zeus should promote Layer A G2 fields onto **report** (cheap code path) so Analytics does not UNNEST tool args every chart.
 
 ---
 
-## 9. Recommended Zeus pin shell block
+## 11. Recommended Zeus pin shell block
 
 ```bash
 # From Zeus repo; sibling clone of this repo recommended
@@ -177,15 +221,23 @@ make chat-request-vendor ZEUS_CHAT_REQUEST_ROOT=$ZEUS_CHAT_REQUEST_ROOT
 
 # 4) Structure gate + unit tests
 make chat-request-check
-go test ./internal/chatrequest/ ./internal/admin/ -count=1
+go test ./internal/chatrequest/ ./internal/admin/ ./internal/tracebundle/ -count=1
 
 # 5) Rebuild / deploy lab; open Detective after one terminate chat
 # Expect: chat_request_base_id=base-5.2 on /admin/api/status
 ```
 
+### Lab deploy gotchas (Beelink / Dockhand)
+
+| Gotcha | Fix |
+| --- | --- |
+| Image load OK but assert fails | Local `docker-compose.frontend.yml` must pin `zeus:X.Y.Z` before deploy script |
+| Tar served from Mac | `python3 -m http.server 8765` in `__dev_only/env`; Dockhand pulls Mac IP not localhost |
+| Only push `5TH` | Ticket branches stay local (`Agents.md`); never open PR ticket → main |
+
 ---
 
-## 10. Detective soak definition of done (first pin)
+## 12. Detective soak definition of done (first pin)
 
 Do **not** mark engine pin green until:
 
@@ -193,38 +245,57 @@ Do **not** mark engine pin green until:
 2. Real model **`return`** (not only synthetic) on a healthy scope  
 3. Checklist: Layer A required four **pass** (or fail for real missing fields, not wording noise)  
 4. Structured wish / object triggers / data_gaps render when model emits them  
-5. Report rollup carries G2 fields for Helios  
-6. One known-bad chat (synthetic or empty graph) still **explains** itself in diagnosis
+5. **Report rollup** carries G2 fields at root for Helios (unit + one lab trace)  
+6. One known-bad chat (synthetic or empty graph) still **explains** itself in diagnosis  
+7. Chat bubble shows **summary** when content empty; chips optional; no full G2 dump  
 
 ---
 
-## 11. Jira pairing (what worked)
+## 13. Ordered Zeus residual (ZE-258 surfaces) — do not reshuffle casually
 
-| Project | Epic (example) | First story |
+| Order | Surface | Why |
 | --- | --- | --- |
-| ZE | 0.6 base-5.2 adoption | Detective + pin |
-| HEL | 0.6 Layer A / dual gaps | ROADMAP train docs, then SQL |
+| 1 | Detective + pin | Fast feedback on real terminate |
+| 2 | Chat Layer A (G1 + light chips) | Operator-visible without Helios |
+| 3 | **Report rollup** | Unblocks Helios SQL/BFF |
+| 4 | Prompt Vault / Vault+ | Catalog UX; not on critical Helios path |
+| 5 | Contract hash + Verify | Stamp authority vs new `_hash_policy` |
+| 6 | Wizard + Ingress | Optimize paths / app_output |
+| 7 | Docs COMPAT / openapi | End of train cut |
+
+**Anti-pattern:** polish Prompt Vault or Wizard before report root fields exist — Helios sits idle while Hub chrome moves.
+
+---
+
+## 14. Jira pairing (what worked)
+
+| Project | Epic (example) | First stories |
+| --- | --- | --- |
+| ZE | 0.6 base-5.2 adoption | Detective + pin → chat chips → **report rollup** |
+| HEL | 0.6 Layer A / dual gaps | ROADMAP/VERSION docs → schema → SQL on report root |
 
 Open Helios tickets when Zeus residual is named — not after SQL breaks in production charts.
 
 ---
 
-## 12. One-line takeaways
+## 15. One-line takeaways
 
 | Topic | Takeaway |
 | --- | --- |
 | Pins | CURRENT ≠ Zeus PIN ≠ Helios VERSION |
 | Files | Strip `_base-5.2`; never leave v2_min beside pin |
-| Synthetic | Full required four + synthetic flags |
+| Synthetic | Full required four + synthetic flags on bag **and** report |
 | Wording | “evidence rules” counts as evidence guidance |
 | Shapes | Object triggers + wish **array**; no half string handlers |
-| Lab | Empty graph ≠ bad catalog |
-| Helios | Same minor jump; report fields cheap on Zeus |
-| Done | Real return on healthy scope, not only green CI |
+| Empty bags | Presence flags when `omitempty` would hide `{}` / `[]` |
+| Lab | Empty graph ≠ bad catalog; freezes often graph UI |
+| Helios | Same minor jump; **report root** is the contract |
+| UI order | Detective → chat G1 → report → Vault/Contract/Wizard |
+| Done | Real return on healthy scope + report JSON keys + green CI |
 
 ---
 
-## 13. Pointers
+## 16. Pointers
 
 | Doc | Use |
 | --- | --- |
@@ -233,7 +304,9 @@ Open Helios tickets when Zeus residual is named — not after SQL breaks in prod
 | [base-4_to_base-5/lessons-learned.md](../base-4_to_base-5/lessons-learned.md) | Pack diet + residual #10.1 |
 | [COMPAT.md](../../../COMPAT.md) | Supported triples |
 | Pack | `v2/base/base-5.2/response_output_schema.json` + `min/` |
+| Zeus | `internal/tracebundle/report.go` (`BuildReport` / `extractLayerAFromSnap`) |
+| Zeus | `web/static/admin/app.js` (`extractLayerATerminate` / chips) |
 
 ---
 
-*Update this file when CURRENT flips to base-5.2, Client ships object floor, or Helios 0.6 SQL lands.*
+*Update this file when CURRENT flips to base-5.2, Client ships object floor, Helios 0.6 SQL lands, or the next BASE hop starts.*

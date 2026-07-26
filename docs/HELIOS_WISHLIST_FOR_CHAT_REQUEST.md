@@ -1,5 +1,8 @@
 # Helios wishlist — structured requests for chat_request / traces
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Canonical home:** [koten-ai/zeus_chat_request](https://github.com/koten-ai/zeus_chat_request) · branch **`helios-beta`**  
 **Audience:** catalog / Workbench / Zeus / Zeus Client · Helios Motions  
 **Consumer:** [Helios](https://github.com/koten-ai/Helios) via Analytics `` `zeus_sessions`.`session`.`traces` ``  

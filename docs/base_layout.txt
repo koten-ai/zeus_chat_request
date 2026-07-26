@@ -1,3 +1,6 @@
+# HISTORICAL DRAFT — bridge notes. Canonical now: docs/README.md layout, docs/PROMPT_ASSEMBLY.md, docs/BIBLE.md, COMPAT.md.
+# Last reviewed: 2026-07-26 · pin base-1 · design base-4
+#
 # chat_request*.json — base layout (bridge doc)
 #
 # Prefer these for current design:
@@ -27,9 +30,9 @@
   4) TERMINATE      G1 user · G2 admin · G3 client triggers              #OUT
 
 Full picture: PROMPT_ASSEMBLY.md
-Filenames: chat_request_<mode>_base-2.json → Workbench
-  chat_request_<mode>_base-2_cus_<bucket>_<scope>-<rev>.json
-  (see v2/base/base-2-prototype/OVERVIEW.md)
+Filenames: chat_request_<mode>_base-N.json → Workbench customs
+  chat_request_<mode>_base-N_cus_<bucket>_<scope>-<rev>.json
+  (canonical: COMPAT.md + docs/CREATE_BASE.md — not base-2 prototype)
 
 
 ================================================================================

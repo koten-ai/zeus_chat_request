@@ -1,5 +1,8 @@
 # Catalog inspector (`index.html`) — multi-BASE
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Decision:** one `index.html` for all BASE lines (not a separate `index-base-4.html`).
 
 ## Why

@@ -1,5 +1,8 @@
 # BASE + Helios roadmap
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Status:** living plan after base-1 → base-4  
 **Normative (base-4):** [BIBLE.md](BIBLE.md) · **Lessons:** [base-1_to_base-4/lessons-learned.md](base-1_to_base-4/lessons-learned.md)  
 **Helios requests (source of truth for analytics emits):** [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)  
@@ -193,91 +196,19 @@ base-4 has the **thermometer** and Terminate table (triggers still **arrays**). 
 
 Client **dual-read** arrays for one transition release if needed; objects are canonical.
 
-### base-5 `output_request` — type + description (App → prompt → AI → validate)
+### base-5 `output_request` — type + description (summary)
 
-**Problem:** If the App only sets a type map, the model has no idea *what* to compute.
-
-```text
-# BAD — type only (not enough)
-{ "sum_favorites": "INT" }
-```
-
-**Rule:** each app field is **type** (machine) + **description** (model instruction). Client **renders descriptions into the prompt**; validates **types** on terminate.
+**Rule:** each app field is **`type` (validate) + `description` (model instruction in the prompt)**. Type-only maps like `{ "sum_favorites": "INT" }` are **rejected**.
 
 ```text
-# GOOD
-output_request.app.fields = {
-  sum_favorites: {
-    type: "integer",   # or INT → normalize
-    description: "Sum of favorites across rows returned by Zeus this turn for the asked subject. Use 0 if none. Integer only — not in summary."
-  },
-  booking_ready: {
-    type: "boolean",
-    description: "True only if city, check-in, and check-out are known and a search could run; else false."
-  }
-}
-required: ["sum_favorites", "booking_ready"]
+App:  fields.sum_favorites = { type: integer, description: "Sum favorites…; 0 if none" }
+Client → prompt "Output request" block from descriptions
+AI → app_output: { "sum_favorites": 1284 }
+Client → type-check values (descriptions not re-emitted)
 ```
 
-**Flow:**
-
-```text
-App sets:   field → { type, description }
-Client:     injects short "Output request" block into prompt (from descriptions)
-            keeps types for post-return validation
-AI:         reads instruction → tools/work → emits app_output values only
-Client:     validates type/required → App UI / flags
-            descriptions are NOT re-emitted on terminate
-```
-
-**What the model should see (Client-rendered, not a raw schema dump):**
-
-```text
-## Output request (this turn) — fill app_output on terminate
-Always also emit required Layer A: summary, query_decomposition, decomposition, confidence.
-
-app_output fields (follow the instruction; types are for the JSON value):
-- sum_favorites (integer, required): Sum of favorites across rows returned by Zeus
-  this turn for the asked subject. Use 0 if none. Integer only — not in summary.
-- booking_ready (boolean, required): True only if city, check-in, and check-out
-  are known and a search could run; else false.
-
-Emit: app_output: { "sum_favorites": <int>, "booking_ready": <bool>, ... }
-Only these keys. Ground numbers in tool results; do not invent inventory.
-```
-
-**Example terminate:**
-
-```json
-{
-  "summary": "…",
-  "confidence": "high",
-  "query_decomposition": { "intent": "List", "entity": "Beer" },
-  "decomposition": { "targets": [], "predicates": {}, "output": "rows" },
-  "app_output": {
-    "sum_favorites": 1284,
-    "booking_ready": false
-  }
-}
-```
-
-| Piece | Goes to model prompt? | On terminate / validate? |
-| --- | --- | --- |
-| field **name** | yes | yes (`app_output` key) |
-| **type** | yes (short) | **yes** (Client schema check) |
-| **description** | **yes (main instruction)** | no (prompt-only) |
-| **value** | no (model produces it) | **yes** (`app_output`) |
-
-| Author rule | Guidance |
-| --- | --- |
-| Description length | Soft ~40 words · hard ~80; one sentence: what / from where / null-or-zero policy |
-| Not a second summary | Scalars, bools, short id lists — long prose stays in G1 `summary` |
-| Type-only input | Client **rejects** or requires parallel descriptions map |
-| Size | Soft ~8 fields · hard ~15; cannot remove required four Layer A fields |
-| Cost law | Prefer Zeus/Client when they can compute cheaper than AI (don’t tax Layer A for free) |
-
-**Slots:** `layer_a` (soft-require known Layer A) · `app.fields` (custom bag) · `rows` (projection + optional per-field description).  
-**Full design:** [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) §2 · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · Bible §2 `app_output` ownership.
+**Canonical detail + full examples:** [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) §2  
+**Ownership:** [BIBLE.md](BIBLE.md) §2 · **Version floors:** [COMPAT.md](../COMPAT.md)
 
 ### Catalog / Client goals (full list)
 
@@ -544,7 +475,8 @@ Helios volume is **report/session scalars**.
 3. Who owns Client spike (named triggers + `output_request` + settings bag + policy table + 007/009)?  
 4. Who owns Zeus spike (003/014) vs this repo’s catalog docs?  
 5. Max min-profile catalog KB?  
-6. When does `COMPAT.md` gain base-4/5 rows?  
+6. ~~When does `COMPAT.md` gain base-4/5 rows?~~ → **Done** (see [COMPAT.md](../COMPAT.md) triples + feature table); keep updating Client TBD floors as `zeus_client` ships features  
+
 7. Closed enums for `path.stage` / `intent_norm` — registry owner? (Helios §9)  
 8. company_context: hard-truncate at 250 words in Client, or reject save in Workbench?  
 9. A/B: one `ab_paste` slot vs named arms `ab.A` / `ab.B` in the paste UI?  
@@ -570,6 +502,7 @@ Helios volume is **report/session scalars**.
 | [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules/triggers + Client `output_request` |
 | [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) | Settings · merge · Client policy · cache · security |
 | [CREATE_BASE.md](CREATE_BASE.md) | Scaffold new base-N pack (`scripts/new_base.py`) |
+| [COMPAT.md](../COMPAT.md) | Zeus × chat_request BASE × zeus_client matrix |
 | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order + budgets |
 | [BIBLE.md](BIBLE.md) | Normative base-4 + §2 ownership |
 | [RELEASE_NOTES.md](../RELEASE_NOTES.md) | What shipped + **breaking changes** |

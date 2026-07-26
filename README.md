@@ -2,6 +2,8 @@
 
 **Published Zeus V2 chat_request catalogs** for Zeus Client, Developer Helper MCP, demos, and coding agents.
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · **[COMPAT.md](COMPAT.md)** = Zeus × BASE × zeus_client matrix
+
 ![Assembled prompt flow](images/assembled_prompt.svg)
 
 *One model round: **PROMPT** = rules **+** client inject **+** messages (one request) → LLM ↔ Zeus → **OUTPUT** = Layer A terminate (G1/G2/G3). See [docs/PROMPT_ASSEMBLY.md](docs/PROMPT_ASSEMBLY.md).*
@@ -12,18 +14,12 @@
 
 | Doc | Topic |
 | --- | --- |
-| **[docs/](docs/)** | All education / design docs |
-| [docs/PROMPT_ASSEMBLY.md](docs/PROMPT_ASSEMBLY.md) | Assembled prompt wire order (base-4 design) |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | base-5 / base-6+ + Helios |
-| [docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules/triggers + Client `output_request` |
-| [docs/PROMPT_SETTINGS.md](docs/PROMPT_SETTINGS.md) | Settings · merge · Client policy · security |
+| **[docs/README.md](docs/README.md)** | **Doc hub** — layout rules + full index |
+| [COMPAT.md](COMPAT.md) | **Zeus × chat_request BASE × zeus_client** versions |
+| [docs/BIBLE.md](docs/BIBLE.md) | Requirements + ownership (set/unset/change) |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | base-5+ plan |
 | [docs/CREATE_BASE.md](docs/CREATE_BASE.md) | Scaffold a new `base-N` pack |
-| [docs/JAILBREAK_POLICY.md](docs/JAILBREAK_POLICY.md) | Score + named rules + hooks + examples |
-| [docs/CHAT_REQUEST.md](docs/CHAT_REQUEST.md) | What a catalog is, contracts, Client vs Hub |
-| [docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Helios emit wishlist |
-| [docs/BIBLE.md](docs/BIBLE.md) | Full base-4 requirements |
-| [RELEASE_NOTES.md](RELEASE_NOTES.md) | Releases + **breaking changes** |
-| [COMPAT.md](COMPAT.md) | Zeus semver ↔ BASE |
+| [RELEASE_NOTES.md](RELEASE_NOTES.md) | Releases + breaking changes |
 
 ---
 
@@ -32,7 +28,9 @@
 | Field | Value |
 | --- | --- |
 | **Production BASE** | **base-1** (`CURRENT.json` · [`v2/min/`](v2/min/)) |
-| **New BASE line** | **base-4** ([`v2/base/base-4/`](v2/base/base-4/)) — not yet production pin |
+| **Candidate pack** | **base-4** ([`v2/base/base-4/`](v2/base/base-4/)) — not the pin |
+| **Zeus engine (example)** | `0.5.x` (e.g. `0.5.107`) — see [COMPAT.md](COMPAT.md) |
+| **zeus_client (Python)** | `0.1.0` (`kotenai-zeus-client`) — see [COMPAT.md](COMPAT.md) |
 | **Profile** | `v2_min` |
 | **Format** | `zeus.chat_request.v2` |
 

@@ -1,5 +1,8 @@
 # Understanding `chat_request*.json`
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Platform docs (published):** [https://docs.koten.ai/](https://docs.koten.ai/)  
 *(site may still be a placeholder while GitBook is wired)*
 
@@ -11,9 +14,12 @@ Files in this repo (`v2/min/chat_request_*_v2_min.json`) are **baseline template
 
 | Doc | Use |
 | --- | --- |
-| [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order: Zeus rules → Client inject → user → terminate; **token budget** |
-| [simple_layout.txt](simple_layout.txt) | Full field map; Contract vs Client; rules/triggers; admin output |
-| [base_layout.txt](base_layout.txt) | Short bridge + original sketch corrections |
+| [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | **SoT** wire order + token budget |
+| [BIBLE.md](BIBLE.md) | **SoT** ownership (set/unset/change) + Layer A |
+| [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules + `output_request` (type + description) |
+| [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) | Settings bag · Client policy · security |
+| [COMPAT.md](../COMPAT.md) | Zeus × BASE × zeus_client versions |
+| [simple_layout.txt](simple_layout.txt) / [base_layout.txt](base_layout.txt) | **Historical drafts** only |
 
 ---
 
@@ -263,16 +269,16 @@ Workbench changes that stay under **excluded** hash paths (e.g. much of `guidanc
 
 ---
 
-## File naming (base-2+ and customs)
+## File naming (BASE + customs)
 
 Everyone starts from a **BASE** file, then Hub Workbench / Prompt Helper saves **versioned customs** per scope:
 
 | Kind | Pattern | Example |
 | --- | --- | --- |
-| BASE | `chat_request_<mode>_base-<N>.json` | `chat_request_analytics_base-2.json` |
+| BASE | `chat_request_<mode>_base-<N>.json` | `chat_request_analytics_base-4.json` |
 | Custom v1 | `chat_request_<mode>_base-<N>_cus_<bucket>_<scope>-1.json` | `…_cus_travel-sample_default-1.json` |
 | Custom v2 | same pattern, **rev increments** | `…_cus_travel-sample_default-2.json` |
-| Legacy (base-1 pin today) | `chat_request_<mode>_v2_min.json` | `v2/min/…` |
+| Legacy **production pin** | `chat_request_<mode>_v2_min.json` | `v2/min/…` (**base-1** today) |
 
 ```text
 :9091 Hub → Workbench → Prompt Helper
@@ -283,7 +289,7 @@ Everyone starts from a **BASE** file, then Hub Workbench / Prompt Helper saves *
 Inside JSON: customs set `_lineage.kind = "custom"`, `parent_base_id = base-N`, `custom_id = cus_<bucket>_<scope>-<rev>`.  
 Stamp (`contract_hash`) still comes from Hub verify — filename is identity, not the stamp itself.
 
-See [v2/base/base-2-prototype/OVERVIEW.md](v2/base/base-2-prototype/OVERVIEW.md) for the full contract.
+**Canonical naming + version triples:** [COMPAT.md](../COMPAT.md) · new packs: [CREATE_BASE.md](CREATE_BASE.md).
 
 ## Modes in this distribution
 
@@ -324,7 +330,8 @@ Pick a mode that matches the **kind of help**, then refine in Workbench for **yo
 | Base layout bridge | [base_layout.txt](base_layout.txt) |
 | Modes + files | [README.md](../README.md) |
 | Version history | [RELEASE_NOTES.md](../RELEASE_NOTES.md) |
-| Compat BASE ↔ Zeus | [COMPAT.md](../COMPAT.md) |
+| Zeus × BASE × zeus_client | [COMPAT.md](../COMPAT.md) |
+| Scaffold new BASE | [CREATE_BASE.md](CREATE_BASE.md) |
 | Helios emit wishlist | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) |
 | BASE roadmap | [ROADMAP.md](ROADMAP.md) |
 | Manifest | [manifest.json](manifest.json) |

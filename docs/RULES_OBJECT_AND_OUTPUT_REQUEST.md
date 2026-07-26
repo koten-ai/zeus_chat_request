@@ -1,5 +1,8 @@
 # Rules as objects + Client-requested outputs
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Status:** design for **base-5** (not yet wire-normative on base-4)  
 **Audience:** Zeus Client, catalog authors, Hub Workbench  
 **Related:** [ROADMAP.md](ROADMAP.md) · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) (merge · freeze · Client policy) · [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) · [BIBLE.md §2](BIBLE.md) · [response_output_schema.json](../v2/base/base-4/response_output_schema.json)

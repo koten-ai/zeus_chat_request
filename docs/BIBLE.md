@@ -1,5 +1,8 @@
 # base-4 Bible
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **One document so a human or AI can implement, review, or operate base-4 end-to-end.**
 
 | | |
@@ -477,94 +480,24 @@ entity_refs: []
 
 ---
 
-## 7. Multi-round middleman (step-by-step)
+## 7. Multi-round middleman (summary)
 
-**Yes — still append a `messages[]` array.** That is the easy loop.  
-Also keep **artifacts** for UI copies and **last_terminate** for Layer A.
+**Yes — still append a `messages[]` array.** Also keep **artifacts** and **last_terminate**.
 
-Detail + full walkthrough: [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md).  
-Snapshot: [multi_round_example.json](multi_round_example.json).
-
-### 7.1 Four bags
-
-```text
-A. CATALOG      base-4 file + contract pin
-B. INJECTS      brief, mini-schema, business_injection
-C. MESSAGES[]   append-only transcript (AI + tool results)
-D. ARTIFACTS    tables, entities, tool_log, last_terminate
-```
-
-### 7.2 One user turn, two model rounds (happy path)
-
-```text
-messages = [system, user]
-
-# ROUND 1
-AI → tool_calls: pipeline(find→order→project)
-messages.append(assistant tool_calls)
-Zeus runs pipeline → rows
-messages.append(tool result)              # append array
-artifacts.tables / entities.update(rows)  # Client enrichment copy
-
-# ROUND 2
-AI → tool_calls: return({ Layer A … })
-messages.append(assistant return)         # optional audit
-layer_a = parse(arguments)
-artifacts.last_terminate = layer_a
-ui.show(layer_a.summary)                  # G1 only
-apply(layer_a.business_rules_triggers)  # G3
-metrics.emit(admin fields)                # G2 never UI
-# stop
-```
-
-### 7.3 Full messages[] picture after 2 rounds
-
-```text
-[
-  { role: system,    content: catalog + injects },
-  { role: user,      content: "Top 5 highest ABV beers…" },
-  { role: assistant, tool_calls: [pipeline] },   # round 1
-  { role: tool,      content: "{ rows: […] }" }, # Zeus
-  { role: assistant, tool_calls: [return] },     # round 2 Layer A
-]
-```
-
-### 7.4 Pseudocode loop
-
-```text
-messages = [system, user]
-for round in 1..max_rounds:
-  resp = ai.chat(messages, tools=verbs)
-
-  if tool_calls and not terminate:
-    messages.append(assistant+tool_calls)
-    for tc in tool_calls:
-      result = zeus.execute(tc)
-      messages.append(tool_result)       # still just append
-      artifacts.upsert(result)
-    continue
-
-  if return / terminating pipeline:
-    layer_a = parse(return_args)         # validate vs response_output_schema.json
-    assert required fields present
-    ui.show(layer_a.summary)
-    client.apply(layer_a.policy_action, layer_a.business_rules_triggers)
-    admin.metrics(layer_a.subject_confidence, layer_a.jail_break_attempt, layer_a.wish_i_knew)
-    break
-
-  # plain text without return → protocol miss → clarify / message_failure
-```
-
-### 7.5 What goes where
-
-| Source | Store in |
+| Bag | Contents |
 | --- | --- |
-| Catalog / stamp | Bag A |
-| Brief, schema, rules, brand strings | Bag B |
-| AI tool_calls + Zeus JSON strings | Bag C `messages[]` (**append**) |
-| Flattened UI rows, id maps | Bag D `artifacts` |
-| Final Layer A | Bag D `last_terminate` |
-| Detective diagnosis/spans | Zeus server Layer B (not Client loop) |
+| A Catalog | base-N file + contract pin |
+| B Injects | brief, mini-schema, business_injection, settings |
+| C Messages | append-only transcript (AI + tool results) |
+| D Artifacts | tables, entities, tool_log, last_terminate |
+
+```text
+round: tools → append results → … → return(Layer A)
+Client: show G1 only · apply G3 triggers/flags · metrics G2 · never UI for admin
+```
+
+**Canonical walkthrough + examples:** [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [multi_round_example.json](multi_round_example.json).  
+**Ownership of clocks / flags:** §2. **Post-terminate law:** [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) §3.
 
 ---
 
@@ -703,7 +636,7 @@ if business_rules_triggers[1]:
 2. Open `text/chat_request_analytics_base-4.txt` — skim system + verb list.  
 3. Open `response_output_schema.json` + `response_output_example.json`.  
 4. Walk `MULTI_ROUND_CLIENT.md` + `multi_round_example.json`.  
-5. Implement Client loop (section 7.4); keep **Client clock** and G2 redaction.  
+5. Implement Client loop ([MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md)); keep **Client clock** and G2 redaction.  
 6. Validate terminates with the schema; map G3 triggers → flags (do not forge triggers).  
 7. Only then wire Hub stamp + production pin.  
 

@@ -1,3 +1,6 @@
+# HISTORICAL DRAFT — working mental model pre base-4/5. Canonical now: docs/BIBLE.md §2, docs/PROMPT_ASSEMBLY.md, docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md, COMPAT.md.
+# Last reviewed: 2026-07-26 · pin base-1 · design base-4
+#
 # chat_request — SIMPLE TEXT LAYOUT (v0 working draft)
 # Purpose: human-editable mental model first. JSON / TOON later.
 # Not wire format yet. Markers like Base-1 ... Base-1 are for copy/paste, not final schema.

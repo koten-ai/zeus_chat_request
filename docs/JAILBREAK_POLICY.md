@@ -1,5 +1,8 @@
 # Jailbreak policy — score, rules, enforcement, best practices
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Audience:** Zeus Client, Hub Workbench, catalog authors, security-minded ops  
 **Status:** Implementation guide for **base-4** (score exists) → **base-5** (formal **named `rules` object** + boilerplate + `output_request`)  
 **Related:** [BIBLE.md](BIBLE.md) · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) (merge · Client policy · dual scores) · [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [ROADMAP.md](ROADMAP.md)

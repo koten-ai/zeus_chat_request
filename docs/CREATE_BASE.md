@@ -1,5 +1,8 @@
 # Creating a new BASE pack (`base-N`)
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Audience:** catalog authors, release train  
 **Script:** [`scripts/new_base.py`](../scripts/new_base.py)  
 **Text export (only):** [`scripts/export_base_text.py`](../scripts/export_base_text.py)
@@ -79,9 +82,11 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
 5. Scan inspector index:
      python3 scripts/scan_catalogs.py
 6. Update docs/ROADMAP.md + RELEASE_NOTES.md; optional docs/base-(N-1)_to_base-N/
-7. Diff in index.html (parent mode vs new mode)
-8. Client spike + stamp path before CURRENT pin
+7. Update [COMPAT.md](../COMPAT.md) (Zeus × BASE × zeus_client row for the new BASE)
+8. Diff in index.html (parent mode vs new mode)
+9. Client spike + stamp path before CURRENT pin
 ```
+
 
 ---
 

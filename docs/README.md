@@ -1,5 +1,8 @@
 # Documentation
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 Educational and design docs for **zeus_chat_request**.  
 Catalog **JSON packs** live under `v2/base/base-N/` (not here). Production pin is still **base-1** until promote.
 
@@ -72,10 +75,16 @@ v2/base/base-4/                ← pack (what Client/stamp load)
 | [../v2/base/base-4/response_output_schema.json](../v2/base/base-4/response_output_schema.json) | Layer A JSON Schema |
 | [../v2/base/base-4/response_output_example.json](../v2/base/base-4/response_output_example.json) | Terminate example |
 
+## Version matrix
+
+| Doc | Role |
+| --- | --- |
+| [../COMPAT.md](../COMPAT.md) | **SoT** — Zeus engine × chat_request BASE × zeus_client |
+
 ## Root (not under docs/)
 
 | Doc | Why at root |
 | --- | --- |
 | [../README.md](../README.md) | Project entry + diagram |
 | [../RELEASE_NOTES.md](../RELEASE_NOTES.md) | Releases + breaking changes |
-| [../COMPAT.md](../COMPAT.md) | Zeus semver ↔ BASE matrix |
+| [../COMPAT.md](../COMPAT.md) | Version matrix (three products) |

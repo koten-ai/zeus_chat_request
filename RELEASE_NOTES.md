@@ -21,6 +21,9 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 - Intermediate packs: **base-2-prototype** (Layer A design), **base-3-prototype** (text export).
 - Authoring docs: prompt assembly, simple/base layout, root **ROADMAP** aligned with **Helios wishlist**.
 - Inspector: one `index.html` lists multi-BASE catalogs; scanner understands `*_base-N.json` / `*_cus_*` names.
+- **Docs layout:** design essays live under `docs/`; packs keep `min/` + `text/` + MANIFEST + Layer A schemas only. Process: [CREATE_BASE.md](docs/CREATE_BASE.md) · `scripts/new_base.py`.
+- **COMPAT matrix** expanded: **Zeus × chat_request BASE × zeus_client** (pin base-1, candidate base-4, base-5 design, Client `0.1.0` floors TBD for base-5 features).
+- base-5 **design** docs (not a pack): named rules objects, `output_request` type+description, settings/control plane ([ROADMAP](docs/ROADMAP.md), [PROMPT_SETTINGS](docs/PROMPT_SETTINGS.md), [RULES_OBJECT…](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md)).
 
 ### Breaking changes
 

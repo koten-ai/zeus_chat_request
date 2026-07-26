@@ -1,5 +1,8 @@
 # Prompt construction · rules · settings (control plane)
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Status:** design for **base-5** (core) · base-6/7 (hints, Workbench polish, cache productization)  
 **Audience:** Zeus Client, App integrators, Hub/Workbench, catalog authors  
 **Normative ownership:** [BIBLE.md §2](BIBLE.md) (set · unset · change)  

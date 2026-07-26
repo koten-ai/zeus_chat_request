@@ -1,5 +1,8 @@
 # Assembled prompt shape (base-4 design)
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 ![Assembled prompt flow](../images/assembled_prompt.svg)
 
 **Status:** authoring model aligned with **base-4** (the new chat_request line).  
@@ -388,10 +391,12 @@ Full walkthrough: [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [multi_round
 | Terminate G2/G3 | Model → Client store | n/a | Cap `wish_i_knew` |
 
 **Normative set / unset / change matrix** (App user · Zeus Client logic · AI API):  
-[docs/BIBLE.md §2](BIBLE.md) — use that table when deciding who may mutate a field.
+[BIBLE.md §2](BIBLE.md) — use that table when deciding who may mutate a field.
 
 **Control plane** (settings bag, rule merge/freeze, post-terminate policy, cache zones, security):  
-[PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · [ROADMAP.md](ROADMAP.md) base-5.
+[PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · [ROADMAP.md](ROADMAP.md) base-5 (headlines).
+
+**Versions:** [COMPAT.md](../COMPAT.md) — Zeus × BASE × zeus_client.
 
 ### Settings vs prompt text
 

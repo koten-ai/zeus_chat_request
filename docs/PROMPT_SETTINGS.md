@@ -8,6 +8,8 @@
 **Normative ownership:** [BIBLE.md §2](BIBLE.md) (set · unset · change)  
 **Related:** [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) · [ROADMAP.md](ROADMAP.md)
 
+**BASE law:** base-5 **freezes** the hard control plane (settings, merge/freeze, policy table, inject security). Soft `hints.*` are **base-6+ additive** (hash-excluded) — do not re-break the wire. See [ROADMAP.md](ROADMAP.md).
+
 This doc is the **control plane** next to the assembled prompt: structured **settings**, **rule-pack merge**, **post-terminate Client policy**, **cache stability**, **security**, and **observability**. It does **not** grow Layer A with Helios Pri-1 scalars (cheap Zeus/Client still win).
 
 ---

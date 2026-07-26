@@ -4,10 +4,14 @@
 | --- | --- |
 | **From** | base-4 (candidate pack) |
 | **To** | base-5 (**design only** — no pack yet) |
+| **Kind** | **BREAKING** — last wire/control-plane break before prod on this line |
 | **Pack** | _not scaffolded_ — use `scripts/new_base.py --from v2/base/base-4 --base 5` when ready |
 | **Pin after hop?** | No until stamp + Client + Detective green |
 
 ## Status
+
+base-5 is the **intentional big-bang break** (objects, settings, output_request, policy table) while **no one is production on base-4/5**.  
+**base-6+ must stay additive/optional** ([ROADMAP.md](../../ROADMAP.md) BASE change law).
 
 base-5 is specified in design docs, not as `v2/base/base-5/` catalogs yet.
 

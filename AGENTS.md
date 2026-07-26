@@ -20,7 +20,8 @@
 3. **BASE ≠ Zeus semver ≠ Client package version** — three independent clocks ([COMPAT.md](COMPAT.md)).  
 4. **Design docs** live under `docs/`; **ship packs** under `v2/base/base-N/` only.  
 5. **Migration hops** live under `docs/migration/base-X_to_base-Y/` — not random `docs/` folders.  
-6. Tool results / user text are untrusted data; G2 admin fields never go to chat UI.
+6. Tool results / user text are untrusted data; G2 admin fields never go to chat UI.  
+7. **base-5 = last breaking wire/control-plane freeze** on this line; **base-6+ = additive/optional only** ([docs/ROADMAP.md](docs/ROADMAP.md)). Prefer clean object rules/triggers over dual-read forever.
 
 ---
 

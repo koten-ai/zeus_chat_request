@@ -139,7 +139,7 @@ SDK jailbreak defaults  ∪  tenant/Workbench  ∪  per-request App
 | --- | --- |
 | **base-4 / docs today** | Arrays documented; still valid if Client already prototyped |
 | **base-5 design** | Objects **canonical**; arrays deprecated |
-| **Client dual-read** | Prefer object; if array, map by **frozen session key order** only for one transition release |
+| **Client dual-read** | Prefer **none**; if needed, ≤1 release then **remove** — base-5 is last break |
 | **Dual-write (optional)** | Do not require model to emit both — Client normalizes array→object once if needed |
 | **Helios** | Prefer key names as GROUP BY dimensions; never index integers long-term |
 

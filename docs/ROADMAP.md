@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** · **base-5 = last breaking train** (design; no prod on this line yet) · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4  
@@ -10,8 +10,10 @@
 **base-5 control plane:** [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) — **settings bag** · **rule pack merge/freeze** · **Client policy table** · cache zones · security · observability  
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
+**Agent procedure:** [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
 
-This is **what we want next and why**, not a commitment schedule. Prefer small, testable BASE bumps over big-bang rewrites.
+This is **what we want next and why**, not a commitment calendar.  
+**Exception to “small bumps”:** **base-5 is intentionally the big wire/control-plane break** while nothing is in production on this line — then **base-6+ stay additive/optional**.
 
 ---
 
@@ -25,7 +27,33 @@ This is **what we want next and why**, not a commitment schedule. Prefer small, 
 5. Production pin only when stamp + Client + Detective are green
 6. Clear control plane: settings ≠ prompt essays; triggers = signals; Client policy = law
 7. Named rules + merge/freeze so multi-tenant packs stay auditable
+8. Break once in base-5; additive/optional forever after (until a new major is justified)
 ```
+
+---
+
+## BASE change law (post base-4)
+
+No production traffic on the **base-4/5 line** yet. Use that:
+
+| BASE | Allowed change type | Examples |
+| --- | --- | --- |
+| **base-5** | **BREAKING OK** — freeze the contract | Object rules/triggers · settings bag · policy table · `output_request` · company+jailbreak in prompt |
+| **base-6+** | **ADDITIVE / OPTIONAL only** | Soft hints/A/B · optional_when fields · Workbench UX · Helios norms as cheap emits · pin when green |
+| **Helios wishlist** | **Nice-to-have** (cheap provider first) | Pri-1 Zeus/Client report scalars — **never** required AI Layer A tax |
+
+```text
+base-5  = last wire/control-plane break before real adoption of this line
+          Prefer one clean object contract over dual-read forever.
+
+base-6+ = additive / optional_when / hash-excluded soft injects / productization
+          No rename/remove of base-5 wire keys without a new major BASE + migration hop.
+
+Helios  = analytics spine on Zeus/Client; optional_when if AI ever needed
+          Never block pin on Pri-2/3/4/5 AI fields
+```
+
+**Dual-read** of base-4 `rules[]` / `boolean[]` triggers: **≤ one Client release** while migrating, then **drop**. base-5 catalogs and docs are **object-only**. Prefer **zero** dual-read if no external consumers.
 
 ---
 
@@ -102,7 +130,8 @@ Canonical detail: [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT
 | **018** | Compare score parts | **Zeus** when ranking | No |
 | **019** | Refine offer / recovery | **Zeus / Client UI** | No |
 
-→ **base-5/6:** document QD optional facets (`geo`, `parts`) + sparse rules; implement norms on Zeus/Client.
+→ **base-5:** document QD optional facets (`geo`, `parts`) in Terminate notes (guidance only).  
+→ **base-6+:** implement norms on Zeus/Client as **optional / additive** (nice-to-have; not wire breaks).
 
 ### Priority 3 (scheduled — optional_when / map first)
 
@@ -145,9 +174,9 @@ Canonical detail: [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT
 
 ---
 
-## base-5 — “Company + named rules + output_request + control plane + hooks”
+## base-5 — “Last breaking freeze + company + control plane”
 
-**Theme:** Policy **in the prompt** (company + hard named rules); Layer A **objects** + **`app_output`**; and a full **Client control plane** (settings bag, rule merge/freeze, post-terminate policy table, cache zones, inject security, multi-turn flags, cheap observability). Start Helios Pri-1 on Zeus/Client (not more AI fields).
+**Theme:** Take **all remaining wire/control-plane breaks now** (nothing prod on this line yet). Freeze a clean contract: company + hard named rules; Layer A **objects** + **`app_output`**; Client **settings + policy table + merge/freeze**. Helios Pri-1 stays **Zeus/Client report emits** (nice spine, not Layer A tax).
 
 **Design detail:**
 
@@ -158,6 +187,8 @@ Canonical detail: [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT
 | [BIBLE.md §2](BIBLE.md) | Who may set / unset / change |
 | [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) | Score + hard rules + hooks |
 | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order + budgets |
+| [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) | Agent comply/upgrade checklists |
+| [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | Hop stub (breaking) |
 
 ### Headline deliverables (must ship in base-5)
 
@@ -182,19 +213,31 @@ Canonical detail: [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT
 | **AgentHooks baseline** | Client code | Prompt-dump / secrets / denied verbs even if model cooperates |
 
 **Why base-5 (not base-4, not base-6):**  
-base-4 has the **thermometer** and Terminate table (triggers still **arrays**). Real products need **policy in the prompt**, **named control-plane**, **settings not essays**, and **post-model law** — before soft HINTS/A-B (**base-6**) or Hub UI (**base-7**).
+base-4 has the **thermometer** and Terminate table (triggers still **arrays**). Real products need **policy in the prompt**, **named control-plane**, **settings not essays**, and **post-model law**. Soft HINTS/A-B and Helios norms are **additive later** — they must **not** re-open the wire.
 
-### Breaking vs base-4 (document in RELEASE_NOTES when shipping)
+### Breaking vs base-4 (take **all** of this now — document in RELEASE_NOTES)
 
-| base-4 | base-5 |
+| base-4 | base-5 (**canonical; no multi-BASE dual-read plan**) |
 | --- | --- |
-| `rules: string[]` (index `0` often empty) | `rules: { [id]: string }` |
-| `business_rules_triggers: boolean[]` | `business_rules_triggers: { [id]: boolean }` |
-| No first-class app bag | Optional `app_output` when Client sends `output_request.app.fields` |
+| `rules: string[]` (index `0` often empty) | `rules: { [id]: string }` **only** |
+| `business_rules_triggers: boolean[]` | `business_rules_triggers: { [id]: boolean }` **only** (sparse) |
+| No first-class app bag | `app_output` when Client sends `output_request.app.fields` |
 | Type-only app maps (e.g. `sum_favorites: "INT"`) | **Rejected** — each field needs **`type` + `description`** |
-| Informal Client behavior | Normative settings bag + merge + policy table |
+| Informal Client behavior | Normative settings bag + merge + policy table + hooks dual score |
+| Array triggers forever / dual-read lifestyle | **Migrate once** · Client dual-read **≤ 1 release** then **remove** |
 
-Client **dual-read** arrays for one transition release if needed; objects are canonical.
+### Frozen after base-5 (do not break without a new major BASE + migration hop)
+
+| Surface | Frozen shape |
+| --- | --- |
+| `rules` / `business_rules_triggers` | **Objects** keyed by stable `rule_id` |
+| `app_output` | Optional G3/app bag; field map is type+description on inject |
+| Settings bag | Structured keys (max_rounds, locale, redaction, verb deny, …) — extend additively |
+| G1 / G2 / G3 audiences | User / admin / client split on Layer A |
+| Required four | Unchanged forever unless major BASE |
+| Soft inject slot names | Reserve hash-excluded `hints.*` for base-6+ (**additive**; implement later) |
+
+After base-5 ships as candidate: **prefer only additive optional fields and soft injects** until pin.
 
 ### base-5 `output_request` — type + description (summary)
 
@@ -262,65 +305,60 @@ Client → type-check values (descriptions not re-emitted)
 ### Explicit non-goals for base-5
 
 - Require `wish_i_knew` / make `jail_break_attempt` required (still recommended telemetry; **rules go in prompt**)  
-- Soft **HINTS / A/B paste UI** (that is **base-6 / base-7**)  
-- AI-primary HEL-WISH-004/005/006/010  
-- TOON as SoT · separate index HTML · pin CURRENT to base-4 without Client proof  
+- Soft **HINTS / A/B paste UI** (**base-6+ additive** — not a second wire break)  
+- AI-primary HEL-WISH-004/005/006/010 (nice-to-have / off-path)  
+- Multi-year dual-read of array triggers (objects only after ≤1 Client release)  
+- TOON as SoT · separate index HTML · pin CURRENT without Client proof  
 - Multi-page company manifesto in the inject (hard-cap 250 words)  
-- Giant `app` JSON Schema / OpenAPI dumps (soft max ~8 properties; hard ~15)  
+- Giant `app` JSON Schema dumps (soft max ~8 properties; hard ~15)  
 - Replacing required four with app schema alone  
-- Keeping index-aligned `rules[]` as the long-term contract (arrays only for dual-read)  
-- Provider prompt-cache **product** as a hard dependency (document zones only; productize later)  
+- Provider prompt-cache **product** as a hard dependency  
 - Auto-summarize tool history via a second LLM (truncate first)  
-- Workbench full key/value editor (design ok; UI is **base-7**)
+- Workbench full key/value editor (additive **base-7** product)  
+- Blocking base-5 on Helios Pri-2+ dashboard norms  
 
 ### Success signals
 
-- [ ] Diff base-4 → base-5 documents **array→object rules/triggers** + **`app_output`** + **control plane**  
-- [ ] Client injects **company_context** + **merged frozen jailbreak `rules` object** on every turn  
+- [ ] Diff base-4 → base-5 documents **all breaking wire** (array→object, app_output, control plane)  
+- [ ] base-5 catalogs: **object rules/triggers only** (no array as SoT)  
+- [ ] Client: object triggers; dual-read arrays **≤1 release** then removed  
+- [ ] Client injects **company_context** + **merged frozen jailbreak `rules` object**  
 - [ ] Client spike: `triggers.get("coupon_presented")` + sticky flags + `policy_action` + `message_jailbreak_soft`  
-- [ ] Client spike: **settings bag** + **policy table** runs on every terminate  
-- [ ] Client spike: `output_request.app.fields` with **type + description** → prompt “Output request” block + validated **`app_output`**  
-- [ ] Client **rejects** type-only fields (e.g. `sum_favorites: "INT"` without description)  
-- [ ] Description rendered for model; types used only for validate; values-only on terminate  
-
+- [ ] Client spike: **settings bag** + **policy table** every terminate  
+- [ ] Client spike: `output_request.app.fields` type+description → prompt + validated **`app_output`**  
+- [ ] Client **rejects** type-only fields  
 - [ ] Merge rejects deleting default jailbreak keys without `override_defaults`  
-- [ ] Mid-session rule rename rejected or requires session reset  
-- [ ] Tool JSON treated as untrusted; G2 never in chat UI  
-- [ ] Cheap emit: `ruleset_id` and/or zone size estimates on a demo path  
-- [ ] Refuse path works on freebie/prompt-dump examples in [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md)  
-- [ ] At least one Pri-1 Helios field path demoed on **Zeus report** (003 or 014 preferred)  
-- [ ] Inspector: base-1 + base-5 Diff  
+- [ ] Tool JSON untrusted; G2 never in chat UI  
+- [ ] Cheap emit: `ruleset_id` / zone sizes (ops, not Layer A tax)  
+- [ ] Refuse path works on [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) examples  
+- [ ] Helios Pri-1 path on **Zeus report** (003 or 014) — not new required AI fields  
+- [ ] COMPAT: base-5 candidate with **object-only** Client floor  
+- [ ] Playbook + migration hop describe base-5 as **last breaking** train  
 - [ ] Catalog bytes ≤ base-4 or justified  
-- [ ] Bible §2 + PROMPT_SETTINGS + this section stay aligned  
 
 ### Why this order
 
-**Policy in the prompt + named control-plane + post-model law** before soft A/B hints or more admin fields. Helios Pri-1 remains **report/session emit**, not “grow return schema for every dashboard.”
+**Break the wire once (base-5)** while no one is prod on this line, then **only additive/optional** changes. Soft A/B and Helios norms must not force a second contract rewrite. Helios Pri-1 remains **report/session emit**.
 
 ---
 
-## base-6 — “G2 telemetry + prompt budget + soft hints + Helios norms”
+## base-6 — “Additive soft inject + optional Helios norms”
 
-**Theme:** Admin Layer A discipline; **measured** prompt size zones; formal **soft hints** (not hard policy); **typed norms** Helios can GROUP BY.  
-**Depends on base-5:** company_context + named `rules` + settings/policy table already work.
+**Theme:** **No breaking wire changes vs base-5.** Soft hints/A/B (hash-excluded); optional budget metrics; optional Helios norms as **cheap Zeus/Client** work — same spirit as Helios “nice to have.”  
+**Depends on base-5:** frozen objects + company_context + settings/policy already ship.
 
-### Catalog / Client goals
+### Catalog / Client goals (all additive or optional)
 
-1. **`wish_i_knew` optional-but-shaped** (max 3, kinds enum) — Workbench gaps, not UI.  
-2. **`subject_confidence` / `jail_break_attempt` metrics hygiene** — never `summary`; **require dual path** for `hooks_jailbreak_score` in ops docs.  
-3. **Assembled prompt budget zones (enforced)** — drop order; size map tags; company_context / hints caps; build on base-5 zone *estimates*.  
-4. **`hints` / Hot-Path / A/B paste slots (formal)** — **after** hard `rules`  
-   - Workbench **Prompt Helper** whole-block copy-paste (`hot_path`, `ab_paste`, `ab_arm`).  
-   - **Hash-excluded** so A/B does not thrash contract pins.  
-   - Same word discipline: soft max ~150 / hard max ~250 **per block**.  
-   - **Must not strip or replace base-5 jailbreak rules** by default.  
-   - Why base-6 (not base-5): needs stable company_context + frozen hard rules first; soft ≠ hard.  
-5. **Optional terminate retry** — one “required four only” repair pass after incomplete Layer A.  
-6. **De-demo efficiency prose** — generic entity examples.  
-7. **Customs filename smoke** — `…_cus_<bucket>_<scope>-N` in scan + Client.  
-8. **Settings `ab_arm` / experiment slice** on report (cheap Client).
+1. **`wish_i_knew` hygiene** — already optional; shape/docs polish only.  
+2. **G2 metrics hygiene** — never `summary`; dual path docs for `hooks_jailbreak_score` (base-5 already has dual scores).  
+3. **Budget zone metrics (enforced reporting)** — size tags; caps already in base-5 design.  
+4. **`hints` / Hot-Path / A/B paste** — **after** hard `rules`; hash-excluded; must not strip jailbreak rules.  
+5. **Optional** terminate retry (“required four only”).  
+6. **De-demo** efficiency prose.  
+7. Customs filename smoke in scan + Client.  
+8. **`ab_arm`** on report (cheap Client scalar).
 
-### Helios goals (Pri-2/3 norms)
+### Helios goals (Pri-2/3 — optional / nice-to-have)
 
 | Work | HEL-WISH | AI load |
 | --- | --- | --- |
@@ -329,91 +367,78 @@ Client → type-check values (descriptions not re-emitted)
 | deployment / ruleset / mode / base_id slice | **016** | none |
 | context dump metrics | **017** | none |
 | multi_part normalize on Zeus | **012** | flag cheap |
-| intent_norm map (Zeus first) | **005** | light if AI |
-| price_norm (Client slider preferred) | **004** | light if AI |
+| intent_norm map (Zeus first) | **005** | light if AI · optional_when |
+| price_norm (Client slider preferred) | **004** | light if AI · optional_when |
 | Tool fingerprint / chat recovery | **021, 020** | none |
 
 ### Explicit non-goals for base-6
 
+- **Any breaking rename/remove** of base-5 wire keys  
 - Full wishlist as always-on Layer A  
 - HEL-WISH-010 on hot path  
 - Auto-ban on jailbreak float  
+- “Must wait for base-6 to have company_context” (already base-5)  
 
 ### Success signals
 
+- [ ] Diff base-5 → base-6 shows **additive-only** (hints slots, metrics)  
 - [ ] G2 metrics without UI leak  
-- [ ] System prompt flat/down after de-demo  
-- [ ] At least one `*_norm` path live (001 or 005) without new required AI fields  
-- [ ] lessons-learned updated  
+- [ ] At least one `*_norm` path live without new **required** AI fields  
+- [ ] lessons-learned / migration note if any optional fields added  
 
 ---
 
-## base-7 — “Workbench + stamp + product events”
+## base-7 — “Workbench + stamp + product events” (additive product)
 
-**Theme:** Productize base-N authoring; Helios product-path events; Detective soft fail.
+**Theme:** Productize authoring and ops; **no Layer A wire break** vs base-5. Helios product-path events remain optional/nice.
 
-| Goal | Why | Helios / control plane |
+| Goal | Why | Breaking? |
 | --- | --- | --- |
-| Hub load/save base-N + custom rev | Customs lifecycle | **016** ruleset identity |
-| **Rules key/value editor** + company_context word meter | Authors don’t freehand JSON only | base-5 packs become operable |
-| **Lint** (rule length, dup keys, default-key delete, inject caps) | Catch bad packs early | PROMPT_SETTINGS §10 |
-| **Preview assembled prompt** with zone sizes | Debug budget before prod | base-6 zones |
-| **Prompt Helper UI for HINTS + A/B arms** | Whole-block paste, arm label, Diff arms | **016** + experiment slice |
-| Stamp/verify for base-N | Real hashes before pin | Contract slice |
-| Detective: optional Layer A = **warn** not fail | Don’t block on wish_i_knew | Terminate reliability |
-| Compat: Zeus semver ↔ base-N | `COMPAT.md` | — |
-| Compare score parts when ranking | Product | **018** |
-| Refine recovery events | Product | **019** |
-| Demand rollups jobs | Batch | **011** |
+| Hub load/save base-N + custom rev | Customs lifecycle | No |
+| Rules key/value editor + company_context word meter | Authors | No |
+| Lint (rule length, dup keys, caps) | Catch bad packs | No |
+| Preview assembled prompt + zone sizes | Debug | No |
+| Prompt Helper A/B UI | Experiments | No |
+| Stamp/verify for base-N | Real hashes | No |
+| Detective: optional Layer A = **warn** not fail | Soften | No (softer) |
+| COMPAT rows kept current | Versions | No |
+| Compare / refine / demand events | HEL 018, 019, 011 | No (product) |
 
 ---
 
-## base-8+ — “Pin, compression, cache product, optional AI-heavy”
+## base-8+ — “Pin + optional compression / AI-heavy”
 
-| Idea | Why | Gate |
+| Idea | Why | Breaking wire? |
 | --- | --- | --- |
-| Promote base-N to `CURRENT` / `v2/min` | Users get diet | Stamp + Client + Helios Pri-1 green |
-| Provider **prompt-cache** productization | Cost on stable prefix | Measured savings; base-5 zones already documented |
-| Structured-output / JSON-schema constrained `return` | Layer A reliability | AI API support |
-| Tool-history auto-summarize | Long sessions | Quality evals; truncate first |
-| TOON view for Workbench | Editor tokens | JSON remains SoT |
-| Per-mode default rule packs (fraud stricter) | Mode matrix | After merge algorithm stable |
-| Soft AI insights (JTBD/sentiment) | **HEL-WISH-010** | Off by default; offline/batch only |
-| Constraints AI (006) only if forms insufficient | Cost | Client forms first |
-| Multimodal user parts | Product | Same inject model |
-| Require more Layer A fields | Quality | Measured emit rates |
+| Promote base-N to `CURRENT` / `v2/min` | Users get diet | Pin gate only |
+| Provider prompt-cache productization | Cost | No |
+| Structured-output constrained `return` | Reliability | Optional path |
+| Tool-history auto-summarize | Long sessions | No |
+| TOON view for Workbench | Editor tokens | No (JSON SoT) |
+| Per-mode default rule packs | Mode matrix | Additive packs |
+| Soft AI JTBD/sentiment (**010**) | Insights | Off-path only |
+| Constraints AI (006) if forms fail | Cost | Optional |
+| Multimodal user parts | Product | Additive message parts |
+| Require more Layer A fields | Quality | **Only with measured rates + new major if required** |
 
 ---
 
 ## Suggested sequencing (summary)
 
 ```text
-base-4  Terminate table + Layer A score fields (jail_break_attempt telemetry only)
-        triggers still boolean[] (index-aligned) in schema
+base-4  Terminate table + Layer A scores (triggers still boolean[])
            │
-base-5  ★ company_context IN PROMPT (≤150 / 250 words)
-        ★ hard rules as OBJECT { id → text } + triggers OBJECT (sparse)
-        ★ output_request → app_output (type + description per field; type-only rejected)
-        ★ Client renders field descriptions into prompt; validates types on return
-        ★ settings bag (caps, verbs, locale, redaction, …)
-        ★ rule pack merge + freeze + override_defaults
-        ★ Client post-terminate policy table (signals → law)
-        ★ assembly zones + inject security + sticky flags
-        ★ cheap observability (ruleset_id, zone sizes, dual scores)
-        ★ message_jailbreak_soft + policy_action + hooks baseline
-        + Layer A reliability levers (soft-require, force return)
-        + Helios Pri-1 cheap spine (Zeus/Client)  HEL 003,008,013,014,007,009
+base-5  ★ LAST BREAKING WIRE / CONTROL-PLANE FREEZE
+        ★ rules{} + triggers{} (object-only; dual-read ≤1 Client release)
+        ★ company_context + jailbreak pack + message_*
+        ★ output_request (type+description) → app_output
+        ★ settings bag + merge/freeze + policy table + hooks
+        ★ inject security + multi-turn flags + cheap ops metrics
+        ★ Helios Pri-1 = Zeus/Client emits only (nice spine, not Layer A tax)
            │
-base-6  G2 hygiene + enforced budget zones + soft hints/A-B slots
-        + optional Layer A retry · ab_arm on report
-        + HEL 001,002,012,016,017,004/005 optional
-           │
-base-7  Workbench: rules KV editor, lint, prompt preview, A/B UI
-        + stamp/compat + Detective warn + product events
-        + HEL 018,019,011,020,021
-           │
-base-8+ pin promote · prompt-cache product · structured return
-        · optional TOON · AI-heavy 010 only off-path
+base-6+ ADDITIVE / OPTIONAL only
+        soft hints/A/B · optional norms · Workbench · pin when green
+        Helios nice-to-haves stay cheap providers · never re-break base-5 wire
 ```
 
 ```text
@@ -453,18 +478,19 @@ Helios volume is **report/session scalars**.
 ## Cross-cutting principles (every BASE)
 
 1. **One Terminate surface** — extend the table; no second essay.  
-2. **Additive fields** — optional → soft-required → required with data.  
+2. **base-5 = last break; base-6+ = additive/optional only** — until a new major is justified.  
 3. **Same 13 verbs** until proven otherwise.  
 4. **One inspector** — Diff is the migration test.  
 5. **Text for diet, JSON for ship.**  
-6. **Helios: cheap provider first.**  
+6. **Helios: cheap provider first; nice-to-have never blocks pin.**  
 7. **Sparse AI + true-only exceptions** (HEL-WISH-012).  
 8. **Pin last.**  
 9. **Settings ≠ prompt essays** — structured control plane ([PROMPT_SETTINGS.md](PROMPT_SETTINGS.md)).  
 10. **Triggers = signals; Client policy + hooks = law.**  
-11. **Hard rules before soft hints** (base-5 before base-6).  
+11. **Hard rules before soft hints** (base-5 freeze; base-6+ soft only).  
 12. **Ownership is explicit** — App / Client / AI set·unset·change ([BIBLE §2](BIBLE.md)).  
 13. **Tool results are untrusted data** in the prompt.  
+14. **Any base-6+ wire break** needs a new major BASE + `docs/migration/base-X_to_base-Y/` — **default is no**.  
 
 ---
 
@@ -475,13 +501,13 @@ Helios volume is **report/session scalars**.
 3. Who owns Client spike (named triggers + `output_request` + settings bag + policy table + 007/009)?  
 4. Who owns Zeus spike (003/014) vs this repo’s catalog docs?  
 5. Max min-profile catalog KB?  
-6. ~~When does `COMPAT.md` gain base-4/5 rows?~~ → **Done** (see [COMPAT.md](../COMPAT.md) triples + feature table); keep updating Client TBD floors as `zeus_client` ships features  
+6. ~~When does `COMPAT.md` gain base-4/5 rows?~~ → **Done** (see [COMPAT.md](../COMPAT.md)); keep Client TBD floors updated  
 
 7. Closed enums for `path.stage` / `intent_norm` — registry owner? (Helios §9)  
 8. company_context: hard-truncate at 250 words in Client, or reject save in Workbench?  
 9. A/B: one `ab_paste` slot vs named arms `ab.A` / `ab.B` in the paste UI?  
 10. Jailbreak default `rules` object: ship as Client SDK defaults, Workbench template, or both?  
-11. Array→object dual-read: one Client release or two?  
+11. ~~Array→object dual-read: one release or two?~~ → **≤1 Client release, prefer 0**; objects only after  
 12. `output_request` / settings API: top-level `run_agent(...)` kwargs vs nested only?  
 13. Cap on `app_output` properties: 8 soft / 15 hard — enough?  
 13b. Description soft max ~40 words / hard ~80 — enough for integrators?  
@@ -489,7 +515,8 @@ Helios volume is **report/session scalars**.
 14. Sticky flags: OR across session for all keys, or only business keys (jailbreak per-round)?  
 15. `ruleset_id`: content hash vs Workbench version string?  
 16. Force final `return`: always at `max_rounds-1`, or only after tool data exists?  
-17. Frozen session prefix vs full re-assemble as Client v1 default?
+17. Frozen session prefix vs full re-assemble as Client v1 default?  
+18. Any proposed base-6+ **breaking** change — force new major BASE? (**default yes**)
 
 ---
 

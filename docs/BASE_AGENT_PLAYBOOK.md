@@ -77,16 +77,17 @@ For each track (catalog / Zeus / Client), complete the checklist for **your targ
 - [ ] Detective: required four; optional fields warn not fail (product choice)  
 - [ ] Snapshot/publish can emit `base-4` lineage  
 
-### 2.3 base-5 (design only — no pack yet)
+### 2.3 base-5 (design — **last breaking train**; no pack yet)
 
 | Track | Must (when implementing) | Notes |
 | --- | --- | --- |
-| **Catalog** | Scaffold with `new_base.py`; object `rules`; Terminate docs for object triggers + `app_output` | See ROADMAP |
-| **Zeus** | Same as base-4 plus any Detective soft-require policy for new fields | Don’t require Helios Pri-1 on Layer A |
-| **Client** | Settings bag; rule pack merge/freeze; **object** triggers; `output_request` fields = **type + description** → prompt block; post-terminate policy table | Dual-read arrays during transition |
+| **Catalog** | Scaffold with `new_base.py`; **object-only** `rules` + triggers; Terminate + `app_output` | No array SoT |
+| **Zeus** | Same as base-4 plus optional Detective soft-require policy | Don’t require Helios Pri-1 on Layer A |
+| **Client** | Settings bag; merge/freeze; **object** triggers; `output_request` type+description; policy table | Dual-read arrays **≤1 release** then **remove** |
 
-**SoT:** [ROADMAP.md](ROADMAP.md) § base-5 · [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · hop stub [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
+**Law:** base-5 freezes the wire. **base-6+ must be additive/optional only** ([ROADMAP.md](ROADMAP.md) BASE change law).
 
+**SoT:** [ROADMAP.md](ROADMAP.md) § base-5 · [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
 ---
 
 ## 3. Upgrade `base-X` → `base-Y` (generic recipe)
@@ -125,7 +126,8 @@ Execute in order. Skip only if the hop folder says “design only” and you are
 | Jump | Migration path | Status | Comply card |
 | --- | --- | --- | --- |
 | base-1 → base-4 | [migration/base-1_to_base-4/](migration/base-1_to_base-4/) | Candidate pack | §2.1 → §2.2 |
-| base-4 → base-5 | [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | Design only | §2.2 → §2.3 |
+| base-4 → base-5 | [migration/base-4_to_base-5/](migration/base-4_to_base-5/) | **Breaking hop** (design; last wire break) | §2.2 → §2.3 |
+| base-5 → base-6+ | (add hop only if needed) | **Additive only** by default | No wire rename/remove |
 
 ### 4.1 base-1 → base-4 (summary)
 

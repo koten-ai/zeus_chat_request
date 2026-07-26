@@ -20,9 +20,9 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | --- | --- |
 | **Zeus engine (example latest)** | `0.5.107` (line `0.5.x`) |
 | **chat_request production pin** | **`base-1`** — [`CURRENT.json`](CURRENT.json) · [`v2/min/`](v2/min/) |
-| **chat_request design / candidate pack** | **`base-4`** — [`v2/base/base-4/`](v2/base/base-4/) (opt-in, **not** pin) |
-| **chat_request next design (docs only)** | **base-5** — see [`docs/ROADMAP.md`](docs/ROADMAP.md) (no pack until scaffold) |
-| **zeus_client (Python)** | **`0.1.0`** — package `kotenai-zeus-client` |
+| **chat_request candidate (breaking freeze)** | **`base-5`** — [`v2/base/base-5/`](v2/base/base-5/) (opt-in, **not** pin) |
+| **chat_request prior candidate** | **`base-4`** — [`v2/base/base-4/`](v2/base/base-4/) (history / Diff) |
+| **zeus_client (Python)** | **`0.1.0`** — package `kotenai-zeus-client` (object floor TBD until Client ships) |
 | **Envelope** | `_format: "zeus.chat_request.v2"` |
 
 ---
@@ -32,8 +32,8 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | Zeus engine | chat_request BASE | zeus_client | Status | Notes |
 | --- | --- | --- | --- | --- |
 | `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | **supported** | Production pin; required four Layer A |
-| `0.5.x` (current line) | **`base-4`** | `≥ 0.1.0` + optional Layer A G2/G3 | **candidate / opt-in** | Pack on disk; not `CURRENT`; array triggers if used |
-| *future* | **`base-5`** | *TBD* — **object rules/triggers only**; settings; `output_request` | **design / last breaking train** | No prod on this line yet — take wire breaks here; dual-read ≤1 Client release · [ROADMAP](docs/ROADMAP.md) |
+| `0.5.x` (current line) | **`base-4`** | `≥ 0.1.0` + optional Layer A G2/G3 | **candidate / history** | Pack on disk; array triggers in schema |
+| `0.5.x` (current line) | **`base-5`** | *TBD* — **object rules/triggers only**; settings; `output_request` | **candidate / last breaking train** | Pack [`v2/base/base-5/`](v2/base/base-5/); not pin; dual-read arrays ≤1 Client release · [ROADMAP](docs/ROADMAP.md) |
 | *future* | **`base-6+`** | base-5 floor + optional soft injects | **additive only** | No rename/remove of base-5 wire without new major |
 | *future* | promoted pin (`CURRENT`) | matching Client floor | — | Only after stamp + Client + Detective green |
 
@@ -56,18 +56,18 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 
 ## 3. Feature capability by BASE (what Client must handle)
 
-| Capability | base-1 (pin) | base-4 (candidate) | base-5 (design) |
+| Capability | base-1 (pin) | base-4 (history) | base-5 (candidate pack) |
 | --- | --- | --- | --- |
 | Required four: `summary`, `query_decomposition`, `decomposition`, `confidence` | **yes** | **yes** | **yes** |
-| Filename `*_v2_min.json` | **yes** (legacy pin) | no (uses `*_base-4.json`) | `*_base-5.json` |
-| Filename `*_base-N.json` | lineage only | **yes** | **yes** |
-| Recommended Layer A (`policy_action`, scores, `wish_i_knew`) | informal / absent | **recommended** | **recommended** + soft-require paths |
-| `business_rules_triggers` | — | `boolean[]` (legacy) | **`{ id: bool }` object only** (sparse; dual-read ≤1 release) |
-| Inject `rules` | free text / informal | array prototype | **named object only** + merge/freeze |
-| `company_context` + jailbreak rule pack in prompt | no | score field only | **yes** (design) |
-| `output_request` → `app_output` | informal `structured` | informal | **`type` + `description` per field** |
-| Settings bag (max_rounds, locale, redaction, …) | ad hoc config | ad hoc | **formal** ([PROMPT_SETTINGS](docs/PROMPT_SETTINGS.md)) |
-| Client post-terminate policy table | app-defined | recommended | **normative** |
+| Filename `*_v2_min.json` | **yes** (legacy pin) | no | no |
+| Filename `*_base-N.json` | lineage only | **yes** (`base-4`) | **yes** (`base-5`) |
+| Recommended Layer A (`policy_action`, scores, `wish_i_knew`) | informal / absent | **recommended** | **recommended** + soft-require `policy_action` |
+| `business_rules_triggers` | — | `boolean[]` | **`{ id: bool }` object only** (sparse) |
+| Inject `rules` | free text / informal | array design | **named object only** + merge/freeze |
+| `company_context` + jailbreak rule pack | no | score field only | **documented inject** |
+| `output_request` → `app_output` | informal `structured` | informal | **schema + tool params** (`type` + `description`) |
+| Settings bag | ad hoc config | ad hoc | **formal** ([PROMPT_SETTINGS](docs/PROMPT_SETTINGS.md)) |
+| Client post-terminate policy table | app-defined | recommended | **normative** (Client implement) |
 
 Detail: [docs/BIBLE.md](docs/BIBLE.md) · [docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [docs/PROMPT_SETTINGS.md](docs/PROMPT_SETTINGS.md).
 

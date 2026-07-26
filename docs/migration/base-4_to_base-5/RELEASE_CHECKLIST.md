@@ -8,7 +8,7 @@
 | **From** | base-4 |
 | **To** | base-5 |
 | **Breaking?** | **yes** |
-| **Pack yet?** | no until `new_base.py --from v2/base/base-4 --base 5` |
+| **Pack yet?** | **yes** — `v2/base/base-5/` |
 | **Pin after?** | no until stamp + Client + Detective |
 
 ```bash
@@ -20,38 +20,38 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 
 ## 0. Pre-flight
 
-- [ ] COMPAT: pin still base-1; base-4 candidate; base-5 design/last break  
-- [ ] ROADMAP § base-5 (breaking freeze + frozen surfaces)  
-- [ ] [README.md](README.md) hop status  
-- [ ] Do **not** flip `CURRENT.json` in this hop  
+- [x] COMPAT: pin still base-1; base-4 candidate; base-5 design/last break  
+- [x] ROADMAP § base-5 (breaking freeze + frozen surfaces)  
+- [x] [README.md](README.md) hop status  
+- [x] Do **not** flip `CURRENT.json` in this hop  
 
 ---
 
 ## 1. Pack — `v2/base/base-5/` (when scaffolding)
 
-- [ ] `min/chat_request_<mode>_base-5.json` all modes from base-4  
-- [ ] `text/*_base-5.txt` regenerated  
-- [ ] `MANIFEST.json` lists all min + paths (`docs/BIBLE.md`, migration, playbook)  
-- [ ] `response_output_schema.json` — **object** `business_rules_triggers`; optional `app_output`  
-- [ ] `response_output_example.json` validates; uses object triggers / sample `app_output` if shown  
-- [ ] Thin README / OVERVIEW: base-5 theme + links to ROADMAP / RULES_OBJECT / PROMPT_SETTINGS  
-- [ ] `_lineage.base_id` = `base-5`  
-- [ ] Names `*_base-5.json`  
-- [ ] Doc pointers → `docs/…` (not old pack-local BIBLE)  
-- [ ] `_format: zeus.chat_request.v2`  
-- [ ] No invented `contract_hash`  
-- [ ] Terminate table in system prompt: objects + output_request notes  
-- [ ] `return` / pipeline params **in sync** with schema  
+- [x] `min/chat_request_<mode>_base-5.json` all modes from base-4  
+- [x] `text/*_base-5.txt` regenerated  
+- [x] `MANIFEST.json` lists all min + paths (`docs/BIBLE.md`, migration, playbook)  
+- [x] `response_output_schema.json` — **object** `business_rules_triggers`; optional `app_output`  
+- [x] `response_output_example.json` validates; uses object triggers / sample `app_output` if shown  
+- [x] Thin README / OVERVIEW: base-5 theme + links to ROADMAP / RULES_OBJECT / PROMPT_SETTINGS  
+- [x] `_lineage.base_id` = `base-5`  
+- [x] Names `*_base-5.json`  
+- [x] Doc pointers → `docs/…` (not old pack-local BIBLE)  
+- [x] `_format: zeus.chat_request.v2`  
+- [x] No invented `contract_hash`  
+- [x] Terminate table in system prompt: objects + output_request notes  
+- [x] `return` / pipeline params **in sync** with schema  
 
 ---
 
 ## 2. Scripts / regenerate
 
-- [ ] `python3 scripts/new_base.py --from v2/base/base-4 --base 5`  
-- [ ] Diet min JSON (objects, Terminate, schema-linked tool params)  
-- [ ] `export_base_text.py --from v2/base/base-5/min --base 5 --out v2/base/base-5 --no-set-base-id`  
-- [ ] `new_base.py --refresh-manifest --base 5`  
-- [ ] `scan_catalogs.py`  
+- [x] `python3 scripts/new_base.py --from v2/base/base-4 --base 5`  
+- [x] Diet min JSON (objects, Terminate, schema-linked tool params)  
+- [x] `export_base_text.py --from v2/base/base-5/min --base 5 --out v2/base/base-5 --no-set-base-id`  
+- [x] `new_base.py --refresh-manifest --base 5`  
+- [x] `scan_catalogs.py`  
 - [ ] Root manifest/index if applicable  
 
 ---
@@ -61,34 +61,34 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 ### Hop
 
 - [x] `docs/migration/base-4_to_base-5/README.md`  
-- [ ] `GUIDE.md` — stayed / moved / added (fill when pack real)  
-- [ ] `lessons-learned.md` (after first real diet)  
+- [x] `GUIDE.md` — stayed / moved / added (fill when pack real)  
+- [x] `lessons-learned.md` (after first real diet)  
 - [x] **This RELEASE_CHECKLIST.md**  
 - [x] `docs/migration/README.md` indexes this hop  
 
 ### Living design (already mostly written — re-check when pack ships)
 
 - [x] ROADMAP base-5 = last breaking train  
-- [ ] ROADMAP success signals checked off as work completes  
-- [ ] BASE_AGENT_PLAYBOOK §2.3 + §4.2 still accurate  
-- [ ] RULES_OBJECT: object rules + type+description output_request  
-- [ ] PROMPT_SETTINGS: settings + policy table + merge/freeze  
-- [ ] JAILBREAK: named rules pack  
+- [ ] ROADMAP success signals (partial — pack shipped; Client/Zeus open)  
+- [x] BASE_AGENT_PLAYBOOK §2.3 + §4.2 still accurate  
+- [x] RULES_OBJECT: object rules + type+description output_request  
+- [x] PROMPT_SETTINGS: settings + policy table + merge/freeze  
+- [x] JAILBREAK: named rules pack  
 - [ ] BIBLE: either still “base-4 era + base-5 design” or bump when base-5 is normative  
-- [ ] Doc banners: design line includes base-5 candidate when pack exists  
+- [x] Doc banners: design line includes base-5 candidate when pack exists  
 
 ### Release + matrix
 
-- [ ] `RELEASE_NOTES.md` — **breaking** table (arrays→objects, app_output, settings contract)  
-- [ ] `COMPAT.md` — base-5 triple + object-only Client floor + dual-read ≤1 release  
+- [x] `RELEASE_NOTES.md` — **breaking** table (arrays→objects, app_output, settings contract)  
+- [x] `COMPAT.md` — base-5 triple + object-only Client floor + dual-read ≤1 release  
 - [ ] AGENTS.md / docs/README if labels change  
 
 ---
 
 ## 4. Format / naming
 
-- [ ] `chat_request_<mode>_base-5.json` / `.txt`  
-- [ ] Customs: `…_base-5_cus_<bucket>_<scope>-<rev>.json`  
+- [x] `chat_request_<mode>_base-5.json` / `.txt`  
+- [x] Customs: pattern documented `…_base-5_cus_<bucket>_<scope>-<rev>.json`  
 - [ ] Inspector Diff: analytics (or any mode) **base-4 vs base-5**  
 
 ---
@@ -111,7 +111,7 @@ python3 scripts/new_base.py --from v2/base/base-4 --base 5
 | Helios Pri-1 | Zeus/Client report emits — **not** new required Layer A fields |
 | Frozen after ship | No base-6 wire rename of objects/app_output without new major |
 
-- [ ] All rows above reflected in pack system prompt + schema + Client docs  
+- [x] Pack system prompt + schema reflect object triggers / app_output / inject notes (Client implement open)  
 
 ---
 

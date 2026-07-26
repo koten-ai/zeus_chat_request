@@ -77,18 +77,17 @@ For each track (catalog / Zeus / Client), complete the checklist for **your targ
 - [ ] Detective: required four; optional fields warn not fail (product choice)  
 - [ ] Snapshot/publish can emit `base-4` lineage  
 
-### 2.3 base-5 (design — **last breaking train**; no pack yet)
+### 2.3 base-5 (**candidate pack** — last breaking train)
 
-| Track | Must (when implementing) | Notes |
+| Track | Must | Notes |
 | --- | --- | --- |
-| **Catalog** | Scaffold with `new_base.py`; **object-only** `rules` + triggers; Terminate + `app_output` | No array SoT |
-| **Zeus** | Same as base-4 plus optional Detective soft-require policy | Don’t require Helios Pri-1 on Layer A |
+| **Catalog** | Use **`v2/base/base-5/`**; object triggers + optional `app_output` in schema/tools | No array SoT |
+| **Zeus** | Accept object triggers + optional `app_output`; optional Detective soft-require | Don’t require Helios Pri-1 on Layer A |
 | **Client** | Settings bag; merge/freeze; **object** triggers; `output_request` type+description; policy table | Dual-read arrays **≤1 release** then **remove** |
 
 **Law:** base-5 freezes the wire. **base-6+ must be additive/optional only** ([ROADMAP.md](ROADMAP.md) BASE change law).
 
-**SoT:** [ROADMAP.md](ROADMAP.md) § base-5 · [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)
----
+**SoT:** pack [`v2/base/base-5/`](../v2/base/base-5/) · [ROADMAP.md](ROADMAP.md) · [RULES_OBJECT…](RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)---
 
 ## 3. Upgrade `base-X` → `base-Y` (generic recipe)
 

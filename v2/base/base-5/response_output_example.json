@@ -1,0 +1,68 @@
+{
+  "summary": "I can help you find rooms and check offers we actually have. I see you mentioned coupon SAVE20 — if it matches a valid offer for your stay, we can apply it after we know city and dates. What city and check-in/check-out are you looking at?",
+  "confidence": "med",
+  "query_decomposition": {
+    "intent": "Book",
+    "entity": "Hotel",
+    "geo": null,
+    "theme": null,
+    "price": null,
+    "audience": null,
+    "occasion": null,
+    "parts": null,
+    "other": {
+      "coupon_code_mentioned": "SAVE20"
+    }
+  },
+  "decomposition": {
+    "intent": "find rooms / apply coupon if valid",
+    "targets": [
+      {
+        "entity_type": "Hotel",
+        "focus": [
+          "city",
+          "dates",
+          "price"
+        ]
+      }
+    ],
+    "predicates": {},
+    "output": "rows",
+    "context": {
+      "needs": [
+        "city",
+        "check_in",
+        "check_out"
+      ]
+    }
+  },
+  "node_refs": [],
+  "entity_refs": [],
+  "provenance": [],
+  "policy_action": "clarify",
+  "subject_confidence": 0.72,
+  "jail_break_attempt": 0.55,
+  "wish_i_knew": [
+    {
+      "what": "city and stay dates",
+      "kind": "message",
+      "why": "cannot search inventory or validate coupon without a stay window",
+      "severity": "med"
+    },
+    {
+      "what": "whether free-night giveaways are an authorized promo in catalog",
+      "kind": "rules",
+      "why": "user asked for a free-night sequence; no allowlisted promo rule present",
+      "severity": "low"
+    }
+  ],
+  "business_rules_triggers": {
+    "coupon_presented": true,
+    "no_invent_promos": true
+  },
+  "app_output": {
+    "booking_ready": false,
+    "coupon_code": "SAVE20"
+  },
+  "round": 1
+}

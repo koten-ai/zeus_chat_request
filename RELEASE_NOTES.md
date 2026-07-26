@@ -7,7 +7,8 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 | **Repo** | https://github.com/koten-ai/zeus_chat_request |
 | **Format** | `zeus.chat_request.v2` |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
-| **New BASE line** | **base-4** — `v2/base/base-4/` (not yet the production pin) |
+| **Candidate pack** | **base-5** — `v2/base/base-5/` (last breaking freeze; not pin) |
+| **Prior candidate** | **base-4** — `v2/base/base-4/` |
 | **Roadmap** | [ROADMAP.md](docs/ROADMAP.md) |
 | **Helios emit wishlist** | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) |
 
@@ -17,30 +18,34 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 
 ### Highlights
 
-- **base-4** established as the **new chat_request BASE line** (`v2/base/base-4/`), with Bible, migration guide, multi-round Client docs, Layer A JSON Schema, lessons learned.
-- Intermediate packs: **base-2-prototype** (Layer A design), **base-3-prototype** (text export).
-- Authoring docs: prompt assembly, simple/base layout, root **ROADMAP** aligned with **Helios wishlist**.
-- Inspector: one `index.html` lists multi-BASE catalogs; scanner understands `*_base-N.json` / `*_cus_*` names.
-- **Docs layout:** design essays live under `docs/`; packs keep `min/` + `text/` + MANIFEST + Layer A schemas only. Process: [CREATE_BASE.md](docs/CREATE_BASE.md) · `scripts/new_base.py`.
-- **COMPAT matrix** expanded: **Zeus × chat_request BASE × zeus_client** (pin base-1, candidate base-4, base-5 design, Client `0.1.0` floors TBD for base-5 features).
-- base-5 **design** docs (not a pack): named rules objects, `output_request` type+description, settings/control plane ([ROADMAP](docs/ROADMAP.md), [PROMPT_SETTINGS](docs/PROMPT_SETTINGS.md), [RULES_OBJECT…](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md)).
-- **AI playbook:** root [AGENTS.md](AGENTS.md) + [BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) (comply with base-X / upgrade X→Y for catalog + Zeus + Client).
-- **Migration tree:** hops under [docs/migration/base-X_to_base-Y/](docs/migration/) (replaces one-off `docs/base-1_to_base-4/`).
-- **BASE bump release checklist:** [RELEASE_CHECKLIST_TEMPLATE.md](docs/migration/RELEASE_CHECKLIST_TEMPLATE.md) · base-4→5: [RELEASE_CHECKLIST.md](docs/migration/base-4_to_base-5/RELEASE_CHECKLIST.md) (pack + docs + COMPAT + RELEASE_NOTES + Zeus/Client).
+- **base-5 candidate pack** shipped on disk: [`v2/base/base-5/`](v2/base/base-5/) — **last breaking wire/control-plane freeze** (objects, `app_output`, inject contracts). Pin remains **base-1**.
+- Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/) (GUIDE, lessons, RELEASE_CHECKLIST).
+- **base-4** remains available for Diff/history (`v2/base/base-4/`).
+- Docs/process: AI playbook, COMPAT three-product matrix, RELEASE_CHECKLIST template, `scripts/new_base.py`.
 
-### Breaking changes
+### Breaking changes (opt-in **base-5**)
 
-> **Pin is still base-1.** Breakage applies when you **opt in** to base-4 (or base-2-prototype) catalogs or assume only legacy filenames.
+> **Pin is still base-1.** These apply when you **opt in** to base-5 catalogs.
 
 | Breaking change | Who is affected | Mitigation |
 | --- | --- | --- |
-| **Filename pattern** | Loaders that only glob `chat_request_*_v2_min.json` | Also accept `chat_request_<mode>_base-4.json` (and future `base-N`); prefer path from `manifest` / `catalog-index` / Hub sync |
-| **`return` / terminating `pipeline` tool parameters grow** | Clients that reject unknown tool JSON Schema properties or freeze a base-1 schema | Treat extra properties as **optional**; keep validating required four; see `response_output_schema.json` |
-| **System prompt Terminate contract rewritten (base-4)** | A/B or hash comparisons that assume base-1 system text | Expect new hash after stamp; Diff in inspector base-1 vs base-4 |
-| **`_lineage.base_id` / packaging** | Code that assumes only `base-1` or ignores lineage | Read `_lineage.base_id`; customs use `…_cus_<bucket>_<scope>-<rev>` |
-| **`_base_meta` replaces ad-hoc notes (base-4 JSON)** | Tools that required `_prototype` key from early prototypes | Prefer `_lineage` + docs; `_base_meta` is non-hashed design metadata |
-| **Recommended Layer A fields** (`policy_action`, admin floats, `wish_i_knew`, `business_rules_triggers`) | Integrators who only implement user `summary` | Not required for Detective “core four,” but base-4 docs treat Client/admin paths as part of the product contract |
-| **Prototype packs are not production stamps** | Anyone copying `contract.hash` from base-2/3/4 trees into prod | Hub verify/stamp only; never invent hashes |
+| **`business_rules_triggers` is an object** `{ rule_id: bool }` (not `boolean[]`) | Clients/parsers assuming array indexes | Parse object; missing key = false; dual-read arrays ≤1 Client release |
+| **Inject `rules` is an object** `{ id: text }` | Clients building parallel arrays | Use named keys; merge/freeze per PROMPT_SETTINGS |
+| **Optional `app_output`** on terminate | Strict tool schema rejecting unknown props | Allow optional object; validate against Client `output_request` |
+| **`output_request` fields need type + description** | Type-only maps | Client renders descriptions into prompt; reject type-only |
+| **Filename `*_base-5.json`** | Loaders only knowing `v2_min` or base-4 | Accept `base-N` pattern from COMPAT / manifest |
+| **New stamp required** for any production use of base-5 | Anyone copying scaffold hashes | Hub verify/stamp only |
+
+### Breaking changes (opt-in **base-4** / prototypes — still valid)
+
+> Breakage when opting into base-4 (or base-2-prototype) vs base-1 pin only.
+
+| Breaking change | Who is affected | Mitigation |
+| --- | --- | --- |
+| **Filename pattern** | Loaders that only glob `*_v2_min.json` | Accept `*_base-N.json` |
+| **`return` / pipeline params grow** (recommended Layer A) | Strict unknown-property clients | Treat extra props optional; required four unchanged |
+| **Terminate contract rewritten (base-4)** | Hash comparisons to base-1 system text | New stamp after opt-in |
+| **Prototype packs are not production stamps** | Copying `contract.hash` from trees | Hub stamp only |
 
 **Non-breaking for base-1 pin consumers:**  
 `v2/min/` and `CURRENT.json` remain base-1; existing `*_v2_min.json` paths and the **required four** terminate fields are unchanged on that pin.

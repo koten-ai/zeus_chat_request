@@ -1,0 +1,374 @@
+# BASE + Helios roadmap
+
+**Status:** living plan after base-1 → base-4  
+**Normative (base-4):** [v2/base/base-4/BIBLE.md](../v2/base/base-4/BIBLE.md) · **Lessons:** [v2/base/base-4/lessons-learned.md](../v2/base/base-4/lessons-learned.md)  
+**Helios requests (source of truth for analytics emits):** [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)  
+**Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
+
+This is **what we want next and why**, not a commitment schedule. Prefer small, testable BASE bumps over big-bang rewrites.
+
+---
+
+## North star
+
+```text
+1. Model reliably emits complete Layer A (required + useful recommended)
+2. Client multi-round state without prompt explosion
+3. Humans/AIs can diet a BASE in text, re-encode JSON, Diff in one inspector
+4. Helios gets typed, queryable scalars — prefer Zeus/Client over AI emit tax
+5. Production pin only when stamp + Client + Detective are green
+```
+
+---
+
+## Cost law (Helios-aligned — every BASE)
+
+From [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) §0:
+
+| Provider | Cost | Role |
+| --- | --- | --- |
+| **AI / Layer A** | Expensive | Meaning only the model knows |
+| **Zeus Client** | Cheap | tz, language, channel, market, deployment |
+| **Zeus** | Cheap | tools, outcome, path, precomputed counts/sums |
+
+**Rules:** Prefer cheap providers · AI only for meaning in the ask · piggyback before expand · `optional_when` over always-on · JSON numbers as numbers · sparse AI is normal · exception flags **true-only**.
+
+Helios Motions read Analytics over **scalars** first; nested arrays are for drill-down.
+
+---
+
+## Where we are (base-4)
+
+| Done | Why it mattered |
+| --- | --- |
+| Layer A G1/G2/G3 design | User / admin / client without Detective pollution |
+| Single Terminate table + example | Clarity > second essay |
+| base-N naming + customs pattern | Lineage on disk |
+| Text export + `export_base_text.py` | Repeatable diet loops |
+| Bible, mapping, lessons, multi-round docs | Onboarding |
+| One `index.html` multi-BASE Diff | Migration without forking UI |
+
+| Still open | Risk |
+| --- | --- |
+| Required four often incomplete in the wild | Detective fail · weak Helios QD |
+| Recommended Layer A easy to drop | No Client control / admin telemetry |
+| **No formal `company_context` or jailbreak `rules[]` in the prompt** | Score without policy ([JAILBREAK_POLICY.md](JAILBREAK_POLICY.md)) |
+| Most HEL-WISH items not in Layer A (by design) | Helios still on proxies until Zeus/Client emit |
+| Production stamp path for base-4 | Can’t pin safely |
+| Text → JSON re-encode | Manual drift |
+
+**base-4 Layer A already useful for Helios (when emitted):**  
+`query_decomposition` (intent/entity/geo/price strings), `decomposition`, `confidence`, plus recommended `subject_confidence`, `jail_break_attempt`, `wish_i_knew`, `policy_action`, `business_rules_triggers`.
+
+**base-4 does *not* yet put in the prompt:** tenant **company/service content** or a default **jailbreak rule pack**. That is **base-5**.
+
+---
+
+## Helios wishlist → BASE / emit owner
+
+Canonical detail: [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) §3–§5.  
+**Do not** shove Pri-1 cheap items into AI Layer A.
+
+### Priority 1 (cheap — ship first, almost never AI)
+
+| ID | Title | Primary owner | BASE touch? |
+| --- | --- | --- | --- |
+| **003** | Outcome quality beyond `status=ok` | **Zeus** report | No catalog growth — Zeus emit |
+| **008** | Path / rail / evidence counts | **Zeus** | No |
+| **013** | User text preview (privacy-safe) | **Zeus** | No |
+| **014** | Funnel / path stage enum | **Zeus** | No |
+| **007** | Locale / language / timezone | **Client** → Zeus | Client inject / session headers |
+| **009** | Channel & tenant-safe identity | **Client + Zeus** | Client session |
+
+→ Track under **base-5 “emit spine”** (Zeus/Client workstreams), not “more return fields.”
+
+### Priority 2 (cheap / mixed — next)
+
+| ID | Title | Primary owner | BASE touch? |
+| --- | --- | --- | --- |
+| **002** | Session market geo | **Client** | Inject / config |
+| **001** | `geo_norm` | AI `geo` string **piggyback** → **Zeus geocode** | Guidance: keep free-text `geo` on QD; Zeus fills norm |
+| **012** | `multi_part` true-only + sparse AI | **Zeus** normalize; AI may propose parts | Guidance in Terminate / QD docs (not always-on) |
+| **016** | Deployment / ruleset / mode slice | **Client + Zeus** | Session config (ties to base-id pin) |
+| **017** | Context dump metrics | **Zeus** | No |
+| **018** | Compare score parts | **Zeus** when ranking | No |
+| **019** | Refine offer / recovery | **Zeus / Client UI** | No |
+
+→ **base-5/6:** document QD optional facets (`geo`, `parts`) + sparse rules; implement norms on Zeus/Client.
+
+### Priority 3 (scheduled — optional_when / map first)
+
+| ID | Title | Primary owner | BASE touch? |
+| --- | --- | --- | --- |
+| **004** | `price_norm` numeric | Client slider preferred; AI last | Guidance types; not required every turn |
+| **005** | `intent_norm` enum | Zeus synonym map preferred | Optional closed set in guidance |
+| **011** | Demand rollups | Zeus jobs | No Layer A |
+| **020** | chat_id recovery link | Zeus | No |
+| **021** | Tool sequence fingerprint | Zeus from `tool_usage` | No |
+
+### Priority 4–5 (defer AI-heavy)
+
+| ID | Title | Primary owner | BASE touch? |
+| --- | --- | --- | --- |
+| **006** | Constraints / party size | Client forms preferred | Avoid AI-required bags |
+| **010** | JTBD / sentiment | AI only | **Do not** put on hot-path terminate |
+
+### Helios Motions → BASE alignment (quick)
+
+| Motion | Wishlist unlocks | Prefer |
+| --- | --- | --- |
+| Explore | 013, 001, 017 | Zeus scalars + geo_norm |
+| Compare | 018, 005, 013 | Zeus scores; intent_norm map |
+| Refine | 019, 006, 004 | Product events; forms not AI |
+| Funnel | 014, 016, 003 | Zeus stage + outcome.kind |
+
+### Build order (from Helios §3 — unchanged)
+
+```text
+1. Zeus: outcome.kind + user_visible_count (003)
+2. Zeus: path/funnel stage + evidence counts (008, 014)
+3. Zeus: user_text_preview; context.chars (013, 017)
+4. Client: language, tz, channel, tenant, market, deployment_id
+5. Zeus: multi_part true-only; geocode geo_norm
+6. Product: compare scores (018); refine (019)
+7. AI only if needed: intent_norm / price_norm (optional_when)
+8. Defer: soft AI JTBD/sentiment (010)
+```
+
+---
+
+## base-5 — “Company content + jailbreak rules in the prompt + Client hooks”
+
+**Theme:** Put **`company_context` and jailbreak/hard `rules[]` into the inject stack** (with Layer A reliability + triggers). Start Helios Pri-1 on Zeus/Client (not more AI fields).
+
+### Headline deliverables (must ship in base-5)
+
+| Deliverable | Where in prompt | Notes |
+| --- | --- | --- |
+| **`company_context` / service brief** | After MINI-SCHEMA, **before** `rules[]` | “We sell ice cream…” + out-of-scope · soft max **150** / hard max **250** words · hash-excluded · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) |
+| **Jailbreak + hard policy `rules[]`** | After company_context | Default pack in [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) · one sentence each · indexed |
+| **`message_jailbreak_soft`** (+ other `message_*`) | Boilerplate | User-facing refuse; never show score |
+| **`business_rules_triggers[]` + `policy_action`** | Terminate G3 | Soft-require `policy_action`; pad triggers to `len(rules)` |
+
+**Why base-5 (not base-4, not base-6):**  
+base-4 has the **thermometer** (`jail_break_attempt`) and Terminate table only. Real products need **policy text in the prompt** (company + jailbreak rules) before soft HINTS/A-B (**base-6**) or Hub paste UI (**base-7**).
+
+### Catalog / Client goals (full list)
+
+1. **`company_context` formal inject** — tenant identity + do/don’t; Client truncate at hard max.  
+2. **Default jailbreak `rules[]` pack in the prompt** — ignore-system, no prompt dump, no unrestricted agent, no invent freebies/data, no secrets, stay in company_context ([JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) §5 + §9).  
+3. **`message_jailbreak_soft`** mapped from `policy_action: refuse` when jailbreak-like.  
+4. **`business_rules_triggers` + `rules[]` contract frozen** — G3; append-only indexes in-session.  
+5. **`policy_action` soft-required** — Client `message_*` mapping.  
+6. **Required four always practiced** — Terminate example first; Detective-aligned missing-field language.  
+7. **AgentHooks baseline** — hard block prompt-dump / critical paths even if model cooperates.  
+8. **Verb schema diet (names stay)** — shorter descriptions.  
+9. **Text↔JSON policy** — import script or “edit JSON only”; pick one.
+
+### Helios goals (Pri-1 cheap — primary Zeus/Client)
+
+| Work | HEL-WISH | Why here |
+| --- | --- | --- |
+| Outcome.kind + counts | **003** | Fill rate without re-parsing tools |
+| Path/evidence scalars | **008** | Rail health charts |
+| Funnel stage enum | **014** | Funnel Motion |
+| user_text_preview | **013** | Explore samples without PII dump |
+| Client locale/tz/channel/tenant | **007, 009** | Slice dashboards |
+| Document: do **not** add these to Layer A | — | Cost law |
+
+### Catalog guidance only (no required AI tax)
+
+| Work | HEL-WISH |
+| --- | --- |
+| QD optional `geo` piggyback for geocode | **001** |
+| Sparse / `multi_part` true-only semantics in Terminate notes | **012** |
+
+### Explicit non-goals for base-5
+
+- Require `wish_i_knew` / make `jail_break_attempt` required (still recommended telemetry; **rules go in prompt**)  
+- Soft **HINTS / A/B paste UI** (that is **base-6 / base-7**)  
+- AI-primary HEL-WISH-004/005/006/010  
+- TOON as SoT · separate index HTML · pin CURRENT to base-4 without Client proof  
+- Multi-page company manifesto in the inject (hard-cap 250 words)
+
+### Success signals
+
+- [ ] Diff base-4 → base-5 &lt; 10 bullets  
+- [ ] Client injects **company_context** + **default jailbreak rules[]** on every turn  
+- [ ] Client spike: `policy_action` + `business_rules_triggers` + `message_jailbreak_soft`  
+- [ ] Refuse path works on freebie/prompt-dump examples in [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md)  
+- [ ] At least one Pri-1 Helios field path demoed on **Zeus report** (003 or 014 preferred)  
+- [ ] Inspector: base-1 + base-5 Diff  
+- [ ] Catalog bytes ≤ base-4 or justified  
+
+### Why this order
+
+**Policy in the prompt (company + jailbreak rules) + Client control** before soft A/B hints or more admin fields. Helios Pri-1 remains **report/session emit**, not “grow return schema.”
+
+---
+
+## base-6 — “G2 telemetry + prompt budget + Helios norms”
+
+**Theme:** Admin Layer A discipline; prompt size; **typed norms** that Helios can GROUP BY.  
+**Depends on base-5:** `company_context` + jailbreak `rules[]` already in the inject stack.
+
+### Catalog / Client goals
+
+1. **`wish_i_knew` optional-but-shaped** (max 3, kinds enum) — Workbench gaps, not UI.  
+2. **`subject_confidence` / `jail_break_attempt` metrics hygiene** — never `summary`; optional `hooks_jailbreak_score`.  
+3. **Assembled prompt budget zones** — drop order; size map tags; enforce company_context / hints caps.  
+4. **`hints` / Hot-Path / A/B paste slots (formal)** — **after** `rules[]`  
+   - Workbench **Prompt Helper** whole-block copy-paste (`hot_path`, `ab_paste`, `ab_arm`).  
+   - **Hash-excluded** so A/B does not thrash contract pins.  
+   - Same word discipline: soft max ~150 / hard max ~250 **per block**.  
+   - **Must not strip or replace base-5 jailbreak rules** by default.  
+   - Why base-6 (not base-5): needs stable company_context + `rules[]` first; soft hints ≠ hard policy.  
+5. **De-demo efficiency prose** — generic entity examples.  
+6. **Customs filename smoke** — `…_cus_<bucket>_<scope>-N` in scan + Client.
+
+### Helios goals (Pri-2/3 norms)
+
+| Work | HEL-WISH | AI load |
+| --- | --- | --- |
+| `geo_norm` via Zeus geocode from QD `geo` | **001** | piggyback only |
+| Client market geo | **002** | none |
+| deployment / ruleset / mode / base_id slice | **016** | none |
+| context dump metrics | **017** | none |
+| multi_part normalize on Zeus | **012** | flag cheap |
+| intent_norm map (Zeus first) | **005** | light if AI |
+| price_norm (Client slider preferred) | **004** | light if AI |
+| Tool fingerprint / chat recovery | **021, 020** | none |
+
+### Explicit non-goals for base-6
+
+- Full wishlist as always-on Layer A  
+- HEL-WISH-010 on hot path  
+- Auto-ban on jailbreak float  
+
+### Success signals
+
+- [ ] G2 metrics without UI leak  
+- [ ] System prompt flat/down after de-demo  
+- [ ] At least one `*_norm` path live (001 or 005) without new required AI fields  
+- [ ] lessons-learned updated  
+
+---
+
+## base-7 — “Workbench + stamp + product events”
+
+**Theme:** Productize base-N; Helios product-path events.
+
+| Goal | Why | Helios |
+| --- | --- | --- |
+| Hub load/save base-N + custom rev | Customs lifecycle | **016** ruleset identity |
+| **Prompt Helper UI for HINTS + A/B arms** | Whole-block paste, arm label, Diff arms | **016** + experiment slice |
+| Stamp/verify for base-N | Real hashes before pin | Contract slice |
+| Detective: optional Layer A = **warn** not fail | Don’t block on wish_i_knew | — |
+| Compat: Zeus semver ↔ base-N | `COMPAT.md` | — |
+| Compare score parts when ranking | Product | **018** |
+| Refine recovery events | Product | **019** |
+| Demand rollups jobs | Batch | **011** |
+
+---
+
+## base-8+ — “Pin, compression, optional AI-heavy”
+
+| Idea | Why | Gate |
+| --- | --- | --- |
+| Promote base-N to `CURRENT` / `v2/min` | Users get diet | Stamp + Client + Helios Pri-1 green |
+| TOON view for Workbench | Editor tokens | JSON remains SoT |
+| Soft AI insights (JTBD/sentiment) | **HEL-WISH-010** | Off by default; offline/batch only |
+| Constraints AI (006) only if forms insufficient | Cost | Client forms first |
+| Require more Layer A fields | Quality | Measured emit rates |
+
+---
+
+## Suggested sequencing (summary)
+
+```text
+base-4  Terminate table + Layer A score fields (jail_break_attempt telemetry only)
+           │
+base-5  ★ company_context IN PROMPT (≤150 / 250 words)
+        ★ jailbreak + hard policy rules[] IN PROMPT
+        ★ message_jailbreak_soft + policy_action/triggers + hooks baseline
+        + Layer A reliability
+        + Helios Pri-1 cheap spine (Zeus/Client)  HEL 003,008,013,014,007,009
+           │
+base-6  G2 + budget + norms
+        + hints/hot_path/ab_paste AFTER rules (hash-excluded; cannot replace jailbreak rules)
+        + HEL 001,002,012,016,017,004/005 optional
+           │
+base-7  Workbench Prompt Helper A/B UI + stamp/compat + product events
+        + HEL 018,019,011,020,021
+           │
+base-8+ pin promote · optional TOON · AI-heavy 010 only off-path
+```
+
+```text
+Helios cost filter (every proposal):
+  Can Zeus/Client emit it?  → do that (BASE guidance only if needed)
+  Needs AI meaning?         → optional_when · never always-on hot path
+  Needs dashboard GROUP BY? → precomputed scalar on report, not only arrays
+```
+
+---
+
+## Why not dump Helios into base-5 Layer A
+
+| Temptation | Why not |
+| --- | --- |
+| AI emits outcome.kind / path.stage | Zeus already knows — cheaper and exact |
+| AI lat/lon | Geocode from free-text geo |
+| Always-on sentiment/JTBD | Poisons Analytics; Pri 5 |
+| Require price_norm every turn | Client slider; optional_when |
+| Grow return schema for every HEL-WISH | Violates Helios §0 cost law |
+| Put company manifesto / jailbreak law only in base-6 hints | Soft A/B can strip it — belongs in **base-5 rules + company_context** |
+| Rely on `jail_break_attempt` without rules in the prompt | Score without policy ([JAILBREAK_POLICY.md](JAILBREAK_POLICY.md)) |
+
+base-4 already has the **AI meaning** slots (QD facets + recommended G2/G3).  
+base-5 puts **company content + jailbreak rules in the prompt**.  
+Helios volume is **report/session scalars**.
+
+---
+
+## Cross-cutting principles (every BASE)
+
+1. **One Terminate surface** — extend the table; no second essay.  
+2. **Additive fields** — optional → soft-required → required with data.  
+3. **Same 13 verbs** until proven otherwise.  
+4. **One inspector** — Diff is the migration test.  
+5. **Text for diet, JSON for ship.**  
+6. **Helios: cheap provider first.**  
+7. **Sparse AI + true-only exceptions** (HEL-WISH-012).  
+8. **Pin last.**  
+
+---
+
+## Open questions
+
+1. Text pack review-only vs text→JSON import?  
+2. `policy_action` required in tool schema or docs/tests only?  
+3. Who owns Client spike (triggers + 007/009 session fields)?  
+4. Who owns Zeus spike (003/014) vs this repo’s catalog docs?  
+5. Max min-profile catalog KB?  
+6. When does `COMPAT.md` gain base-4/5 rows?  
+7. Closed enums for `path.stage` / `intent_norm` — registry owner? (Helios §9)  
+8. company_context: hard-truncate at 250 words in Client, or reject save in Workbench?  
+9. A/B: one `ab_paste` slot vs named arms `ab.A` / `ab.B` in the paste UI?  
+10. Jailbreak default `rules[]`: ship as Client SDK defaults, Workbench template, or both?
+
+---
+
+## Doc ownership
+
+| Doc | Role |
+| --- | --- |
+| [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Structured Helios Requests + priorities |
+| [ROADMAP.md](ROADMAP.md) | BASE sequencing + Helios alignment |
+| [v2/base/base-4/BIBLE.md](../v2/base/base-4/BIBLE.md) | Normative base-4 |
+| [RELEASE_NOTES.md](../RELEASE_NOTES.md) | What shipped + **breaking changes** |
+| [v2/base/base-4/lessons-learned.md](../v2/base/base-4/lessons-learned.md) | Experience |
+
+---
+
+*Align with Helios wishlist when HEL-WISH IDs change; revise BASE section when base-5 starts.*

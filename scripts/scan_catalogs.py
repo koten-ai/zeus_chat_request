@@ -45,18 +45,21 @@ def folder_label(rel: Path) -> str:
 
 
 def sort_key(entry: dict) -> tuple:
-    """Prefer latest alias v2/min first, then BASE pins (by base_id), then mode."""
-    folder = entry.get("folder") or ""
+    """Newest / highest BASE first (base-4 → base-1 → v2/min pin), then mode.
+
+    Inspector dropdown + Matrix both rely on this order.
+    """
+    folder = (entry.get("folder") or "").replace("\\", "/")
     mode = entry.get("mode") or ""
-    base_id = entry.get("base_id") or ""
-    if folder == "v2/min":
-        group = 0
-    elif "/base/" in folder.replace("\\", "/"):
-        group = 1
-    else:
-        group = 2
-    # natural-ish: base-1 before base-4 before base-4-prototype strings
-    return (group, str(base_id), folder, mode)
+    base_id = str(entry.get("base_id") or "")
+    hay = f"{base_id} {folder}"
+    m = re.search(r"base-(\d+)", hay, flags=re.I)
+    n = int(m.group(1)) if m else 0
+    proto = 1 if re.search(r"prototype", hay, flags=re.I) else 0
+    # Production pin last within the same generation
+    is_v2_min = 1 if folder == "v2/min" else 0
+    # Higher n first: negate. Formal pack before prototype. base/base-N before v2/min.
+    return (-n, proto, is_v2_min, folder, mode)
 
 
 def main() -> None:

@@ -26,8 +26,8 @@
 
 ## Related authoring docs
 
-- [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) — assembled prompt shape; BASE body stays hashed, Client inject does not  
-- [simple_layout.txt](simple_layout.txt) — `base_id` / `custom_id` in the layout map
+- [PROMPT_ASSEMBLY.md](docs/PROMPT_ASSEMBLY.md) — assembled prompt shape; BASE body stays hashed, Client inject does not  
+- [simple_layout.txt](docs/simple_layout.txt) — `base_id` / `custom_id` in the layout map
 
 ## Prototypes (not in compat matrix)
 
@@ -44,4 +44,4 @@
 
 Customs always record `parent_base_id = base-N`. Compat rows above apply to the **parent BASE**, not each custom rev. Bumping custom `-1` → `-2` does not create a new BASE.
 
-See [v2/base/base-2-prototype/PROTOTYPE.md](v2/base/base-2-prototype/PROTOTYPE.md#file-naming-base-vs-workbench-customs).
+See [v2/base/base-2-prototype/OVERVIEW.md](v2/base/base-2-prototype/OVERVIEW.md#file-naming-base-vs-workbench-customs).

@@ -15,7 +15,7 @@ Use this 4–10 times as you iterate:
 
 What it does:
   - Reads chat_request*.json from --from
-  - Writes v2/base/base-<N>-prototype/text/chat_request_<mode>_base-<N>.txt
+  - Writes v2/base/base-<N>/text/… (or base-<N>-prototype if --prototype-pack)
   - Indented text only (not JSON)
   - Optionally rewrites _lineage.base_id / packaging fields to base-<N> (--set-base-id, default on)
 
@@ -95,7 +95,7 @@ def emit_value(v, indent: int = 0) -> list[str]:
     return lines
 
 
-def apply_base_id(doc: dict, base_n: int, source_label: str) -> dict:
+def apply_base_id(doc: dict, base_n: int, source_label: str, prototype: bool = False) -> dict:
     """Shallow-copy and set packaging/lineage base id for the new text pack."""
     import copy
 
@@ -106,14 +106,14 @@ def apply_base_id(doc: dict, base_n: int, source_label: str) -> dict:
     lin["base_id"] = base_id
     if parent and parent != base_id:
         lin["parent_base_id"] = parent
-    lin["prototype"] = True
+    lin["prototype"] = bool(prototype)
     lin["file_stem"] = None  # filled per mode later
     d["_lineage"] = lin
 
     if isinstance(d.get("_prototype"), dict):
         proto = dict(d["_prototype"])
         proto["base_id"] = base_id
-        proto["packaging"] = f"base-{base_n}-prototype"
+        proto["packaging"] = f"base-{base_n}-prototype" if prototype else f"base-{base_n}"
         proto["text_export_from"] = source_label
         proto["exported_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         d["_prototype"] = proto
@@ -133,7 +133,7 @@ def catalog_to_text(doc: dict, *, mode: str, base_n: int, source_label: str) -> 
     lines = [
         "# chat_request catalog — indented text working copy",
         f"# file: chat_request_{mode}_{base_id}.txt",
-        f"# packaging: base-{base_n}-prototype",
+        f"# packaging: base-{base_n}",
         f"# source: {source_label}",
         f"# base_id (lineage): {base_id}",
         "# NOT JSON. Indent = 2 spaces. Multiline: key: | then indented lines.",
@@ -183,7 +183,8 @@ def catalog_to_text(doc: dict, *, mode: str, base_n: int, source_label: str) -> 
 
 def write_pack_readme(dst: Path, base_n: int, files: list[dict], source: str) -> None:
     base_id = f"base-{base_n}"
-    body = f"""# base-{base_n}-prototype
+    pack = f"base-{base_n}-prototype" if "prototype" in str(dst) else f"base-{base_n}"
+    body = f"""# {pack}
 
 Indented **text** working copy for diet/edit iterations.
 
@@ -236,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
         "--base",
         type=int,
         required=True,
-        help="BASE number N → base-N-prototype + chat_request_*_base-N.txt",
+        help="BASE number N → base-N (+ chat_request_*_base-N.txt)",
     )
     ap.add_argument(
         "--repo-root",
@@ -246,13 +247,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--out",
         default=None,
-        help="Output dir (default: <repo>/v2/base/base-<N>-prototype)",
+        help="Output dir (default: <repo>/v2/base/base-<N>)",
     )
     ap.add_argument(
         "--set-base-id",
         action=argparse.BooleanOptionalAction,
         default=True,
         help="Rewrite _lineage.base_id (and related) to base-N inside the text (default: true)",
+    )
+    ap.add_argument(
+        "--prototype-pack",
+        action="store_true",
+        help="Use folder/packaging name base-N-prototype (default: base-N)",
     )
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
@@ -270,7 +276,8 @@ def main(argv: list[str] | None = None) -> int:
         print("error: --base must be >= 1", file=sys.stderr)
         return 2
 
-    dst = Path(args.out) if args.out else repo / "v2" / "base" / f"base-{base_n}-prototype"
+    pack = f"base-{base_n}-prototype" if args.prototype_pack else f"base-{base_n}"
+    dst = Path(args.out) if args.out else repo / "v2" / "base" / pack
     if not dst.is_absolute():
         dst = (repo / dst).resolve()
     text_dir = dst / "text"
@@ -296,7 +303,7 @@ def main(argv: list[str] | None = None) -> int:
         doc = json.loads(path.read_text())
         mode = find_mode(doc, path)
         if args.set_base_id:
-            doc = apply_base_id(doc, base_n, source_label)
+            doc = apply_base_id(doc, base_n, source_label, prototype=args.prototype_pack)
             doc["_lineage"]["mode"] = mode
             doc["_lineage"]["file_stem"] = f"chat_request_{mode}_base-{base_n}.txt"
 
@@ -317,7 +324,7 @@ def main(argv: list[str] | None = None) -> int:
 
     manifest = {
         "base_id": f"base-{base_n}",
-        "packaging": f"base-{base_n}-prototype",
+        "packaging": f"base-{base_n}-prototype" if args.prototype_pack else f"base-{base_n}",
         "kind": "text_export",
         "source": source_label,
         "content_policy": "text_export; lineage base_id set to base-N"

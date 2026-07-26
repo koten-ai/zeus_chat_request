@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 980" width="720" height="980" role="img" aria-label="One model round: PROMPT is rules plus inject plus messages; LLM; OUTPUT is Layer A terminate">
+  <defs>
+    <style type="text/css"><![CDATA[
+      .title { font: 700 16px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; fill: #020617; }
+      .sub { font: 500 11px Inter, ui-sans-serif, system-ui, sans-serif; fill: #1e293b; }
+      .shell-label { font: 800 12px Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.06em; }
+      .h { font: 700 12px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .meta { font: 600 10px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #1e293b; }
+      .body { font: 600 11px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 400 10.5px Inter, ui-sans-serif, system-ui, sans-serif; fill: #1e293b; }
+      .chip { font: 700 9px Inter, ui-sans-serif, system-ui, sans-serif; }
+      .plus { font: 800 22px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .mid { font: 600 11px Inter, ui-sans-serif, system-ui, sans-serif; fill: #334155; }
+      .g1 { font: 700 11px Inter, ui-sans-serif, system-ui, sans-serif; fill: #14532d; }
+      .g2 { font: 700 11px Inter, ui-sans-serif, system-ui, sans-serif; fill: #b91c1c; }
+      .g3 { font: 700 11px Inter, ui-sans-serif, system-ui, sans-serif; fill: #1d4ed8; }
+    ]]></style>
+    <marker id="m" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="720" height="980" fill="#f8fafc"/>
+  <text x="36" y="32" class="title">One model round · what the AI sees vs what it returns</text>
+  <text x="36" y="50" class="sub">PROMPT = rules + client inject + messages (one request)  ·  OUTPUT = Layer A terminate (one response)</text>
+
+  <!-- ===================== PROMPT SHELL ===================== -->
+  <rect x="28" y="66" width="664" height="508" rx="14" ry="14" fill="#ffffff" stroke="#0f172a" stroke-width="2.5"/>
+  <rect x="28" y="66" width="664" height="34" rx="14" ry="14" fill="#0f172a"/>
+  <rect x="28" y="86" width="664" height="14" fill="#0f172a"/>
+  <text x="48" y="88" class="shell-label" fill="#f8fafc">PROMPT  ·  stacked into ONE request to the model  ·  not three separate sends</text>
+
+  <!-- 1 RULES -->
+  <rect x="48" y="116" width="624" height="118" rx="10" ry="10" fill="#fef2f2" stroke="#b91c1c" stroke-width="2"/>
+  <rect x="48" y="116" width="8" height="118" fill="#b91c1c" rx="2"/>
+  <text x="68" y="138" class="h">1) ZEUS RULES  ·  catalog  ·  HASHED when stamped</text>
+  <text x="68" y="156" class="meta">system prompt + verbs[]  ·  contract_hash</text>
+  <text x="68" y="176" class="small">Execution style · CRITICAL EFFICIENCY · Verb Priority &amp; Cost</text>
+  <text x="68" y="192" class="small">Terminate table + example · 13 tools + parameter schemas</text>
+  <text x="68" y="214" class="small">optional full profile (usually NOT hashed): guidance / masq — min omits</text>
+  <rect x="556" y="126" width="96" height="20" rx="4" fill="#fee2e2" stroke="#b91c1c" stroke-width="1"/>
+  <text x="580" y="140" class="chip" fill="#7f1d1d">RULES</text>
+
+  <!-- PLUS -->
+  <text x="348" y="260" class="plus" text-anchor="middle">+</text>
+  <text x="380" y="258" class="mid">combined</text>
+
+  <!-- 2 INJECT -->
+  <rect x="48" y="274" width="624" height="128" rx="10" ry="10" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+  <rect x="48" y="274" width="8" height="128" fill="#1d4ed8" rx="2"/>
+  <text x="68" y="296" class="h">2) ZEUS_CLIENT INJECT  ·  NOT hashed</text>
+  <text x="68" y="316" class="small">SCOPE BRIEF + MINI-SCHEMA (live scope from Zeus)</text>
+  <text x="68" y="334" class="small">company_context → message templates → rules[] → hints / hot_path / A/B</text>
+  <text x="68" y="352" class="small">session · overrides · AgentHooks</text>
+  <text x="68" y="376" class="small">Runtime only — Client/Hub fills this; not in the BASE catalog file</text>
+  <rect x="556" y="284" width="96" height="20" rx="4" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1"/>
+  <text x="578" y="298" class="chip" fill="#1e3a8a">INJECT</text>
+
+  <!-- PLUS -->
+  <text x="348" y="430" class="plus" text-anchor="middle">+</text>
+  <text x="380" y="428" class="mid">combined</text>
+
+  <!-- 3 MESSAGES -->
+  <rect x="48" y="444" width="624" height="100" rx="10" ry="10" fill="#f0fdf4" stroke="#15803d" stroke-width="2"/>
+  <rect x="48" y="444" width="8" height="100" fill="#15803d" rx="2"/>
+  <text x="68" y="468" class="h">3) MESSAGES[]  ·  append-only transcript</text>
+  <text x="68" y="488" class="small">user turn text · prior assistant tool_calls · prior Zeus tool results (cap if huge)</text>
+  <text x="68" y="508" class="small">system may be prepended once or stored in the array</text>
+  <text x="68" y="528" class="small">This is the “chat” part — still inside the same PROMPT request</text>
+  <rect x="540" y="454" width="112" height="20" rx="4" fill="#dcfce7" stroke="#15803d" stroke-width="1"/>
+  <text x="556" y="468" class="chip" fill="#14532d">TRANSCRIPT</text>
+
+  <text x="360" y="560" class="small" text-anchor="middle" fill="#475569">All three layers ride together as one model request</text>
+
+  <!-- Arrow PROMPT → LLM -->
+  <path d="M360 580 L360 608" stroke="#64748b" stroke-width="2.5" fill="none" marker-end="url(#m)"/>
+
+  <!-- LLM -->
+  <rect x="248" y="616" width="120" height="48" rx="24" fill="#4f46e5" stroke="#4338ca" stroke-width="2"/>
+  <text x="284" y="646" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" fill="#ffffff">LLM</text>
+  <text x="384" y="644" class="small">tools ↔ Zeus while thinking</text>
+  <path d="M470 638 L530 638" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#m)"/>
+  <rect x="538" y="620" width="100" height="36" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="556" y="643" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="700" fill="#0f172a">Zeus API</text>
+
+  <!-- Arrow LLM → OUTPUT -->
+  <path d="M308 670 L308 698" stroke="#64748b" stroke-width="2.5" fill="none" marker-end="url(#m)"/>
+  <text x="320" y="690" class="small" fill="#475569">returns</text>
+
+  <!-- ===================== OUTPUT SHELL ===================== -->
+  <rect x="28" y="706" width="664" height="246" rx="14" ry="14" fill="#ffffff" stroke="#6d28d9" stroke-width="2.5"/>
+  <rect x="28" y="706" width="664" height="34" rx="14" ry="14" fill="#6d28d9"/>
+  <rect x="28" y="726" width="664" height="14" fill="#6d28d9"/>
+  <text x="48" y="728" class="shell-label" fill="#f8fafc">OUTPUT  ·  Layer A terminate (flat JSON on return / pipeline)  ·  this is the answer shape</text>
+
+  <rect x="48" y="756" width="624" height="172" rx="10" ry="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="2"/>
+  <rect x="48" y="756" width="8" height="172" fill="#6d28d9" rx="2"/>
+  <text x="68" y="780" class="h">TERMINATE  ·  one flat JSON object (not more chat prose)</text>
+  <text x="68" y="798" class="meta">response_output_schema.json  ·  G1 user  ·  G2 admin  ·  G3 client control-plane</text>
+  <text x="68" y="822" class="g1">G1 USER</text>
+  <text x="136" y="822" class="small">summary · confidence · query_decomposition · decomposition · refs?  (chat UI)</text>
+  <text x="68" y="842" class="g2">G2 ADMIN</text>
+  <text x="146" y="842" class="small">subject_confidence · wish_i_knew[] · jail_break_attempt  (never chat UI)</text>
+  <text x="68" y="862" class="g3">G3 CLIENT</text>
+  <text x="148" y="862" class="small">business_rules_triggers[] · policy_action (answer|clarify|refuse|error)</text>
+  <text x="68" y="890" class="small" fill="#64748b">Not Layer A: Detective store / spans / inject_inspect — server Layer B (after the model)</text>
+  <rect x="540" y="766" width="112" height="20" rx="4" fill="#ede9fe" stroke="#6d28d9" stroke-width="1"/>
+  <text x="564" y="780" class="chip" fill="#4c1d95">LAYER A</text>
+</svg>

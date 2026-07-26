@@ -1,7 +1,7 @@
 # chat_request catalog — indented text working copy
 # file: chat_request_tenant_base-5.txt
 # packaging: base-5
-# source: v2/base/base-5/min
+# source: chat_request_tenant_base-5.json
 # base_id (lineage): base-5
 # NOT JSON. Indent = 2 spaces. Multiline: key: | then indented lines.
 # Re-encode later → chat_request_tenant_base-5.json for stamp/Client.
@@ -40,7 +40,7 @@ _lineage:
   kind: base
   parent_base_id: base-4
   prototype: false
-  file_stem: chat_request_tenant_base-5.json
+  file_stem: null
   status: current_candidate
 
 contract:
@@ -69,40 +69,50 @@ messages:
       
       ## CRITICAL EFFICIENCY & CORRECTNESS RULES
       
-      1. **NEVER rediscover stats or entity lists.**
+      1. **NEVER rediscover stats or entity lists.** 
          The SCOPE BRIEF (in this message) + MINI-SCHEMA already contain:
          - nodes_total, entities_total, edges_total
          - nodes_by_type / entities_by_type (with counts)
          - per-entity numeric facets (min/max for abv, price, etc.)
          - top categories / attributes
          Use these values directly for counts, ranges, "how many", or entity type lists.
-         **Do not** call get_stats, count_nodes, list_entity_types, or emit raw `COUNT(*) ... zeus_nodes ... entity_type` (or similar system/indexstats counts).
-         These cause 10-20+ repeated expensive queries per turn. If the brief seems stale, use a single cheap `find` with `limit:1` or `describe` instead.
+         **Do not** call get_stats, count_nodes, list_entity_types, or emit raw `COUNT(*) ... zeus_nodes ... entity_type` (or similar system/indexstats counts). 
+         These cause 10-20+ repeated expensive queries per turn (as seen in many "answer"/"List" traces with 18-40 queries for 1-2 tools). If the brief seems stale, use a single cheap `find` with `limit:1` or `describe` instead.
       
       2. **Vague "answer" or bare "List" intents cause massive waste.**
+         From aggregates: these dominate high-waste cases (18-40 queries, minimal tools). 
          - Always decompose first (use query_decomposition).
          - Use the brief + MINI-SCHEMA for overview/stats.
          - Prefer targeted `find` with `where` (from schema) or `search` with `query_text`.
          - Never trigger full discovery fanouts for vague requests.
+         - Example for "list beers from Belgian breweries": find Beer where brewery_country = "Belgium" (or search "Belgian brewery").
       
       3. **"Top N", "highest", "lowest", "most", "ranked by", "sorted desc" queries:**
-         - Do **not** guess ranges in `where` for ranking.
-         - Retrieve a broad candidate set with `find`/`search` (large `limit` or broad filter).
-         - Then `order` by the field with explicit `direction`, then `project`/`get` with `limit: N`.
-         - Prefer one `pipeline` for ranking multi-steps.
-         - Use `order` for post-filter ranking; `find` where is for exact filters only. **Always specify `direction`.**
+         - Do **not** guess ranges in `where` (e.g. avoid `abv: {$gt: 0}` for "highest" – as in observed traces that returned empty after early limit + asc order).
+         - Retrieve a broad candidate set with `find` (or `search`) using broad or omitted where + large `limit` (e.g. 100) or the full set.
+         - Then `order` the ids by the numeric/text field, `direction: "desc"` (or "asc").
+         - Then `project` (or `get`) with `limit: N` on the ordered ids.
+         - Always wrap in one `pipeline` for complex ranking.
+         - Correct example for "top 5 highest ABV beers":
+           steps: [
+             {"as": "cands", "verb": "find", "entity_type": "Beer", "limit": 100},
+             {"as": "ord", "verb": "order", "ids": "@cands.ids", "by": "abv", "direction": "desc"},
+             {"as": "top", "verb": "project", "ids": "@ord.ids", "fields": ["name", "abv", "style"], "limit": 5}
+           ]
+         - Use `order` for post-filter ranking. `find` where is for exact filters only. **Always specify `direction`.**
       
       Terminating pipeline: put final fields at top level. Must include summary + decomposition + query_decomposition.
       
-      Scope is a hard boundary (see mode overlay for tenancy posture).
+      Scope is a hard boundary.
       
-      Hard cap: **8 steps** unless the mode overlay raises traversal hop expectations (still respect engine caps).
+      Hard cap: **8 steps**.
       
       confidence (STRING only: high | med | low — never object).
       
       ## Verb Priority & Cost Model
+      Choose cheapest.
       
-      Choose cheapest path that still answers under this mode's evidence rules (see **Mode: tenant** below).
+      (MIN PROFILE: trimmed for speed; core invariants kept.)
       
       ## Terminate (Layer A) — copy this shape
       
@@ -147,33 +157,13 @@ messages:
       Omitting required fields on terminate is a contract miss.
       Use @as.ids. Lead multi-step with pipeline. Lite schema injected at runtime.
       
+      
       ### base-5 Client inject (not hashed; middle-man)
       - company_context: short product identity (soft ≤150 / hard ≤250 words)
       - business_injection.rules: object { rule_id: "one sentence" } — not a string array
       - output_request.app.fields: each { type, description }; model fills app_output values only
       - policy_action: soft-required (answer|clarify|refuse|error) for Client message_* mapping
       - business_rules_triggers: object map, not boolean[]
-      
-      ## Mode: tenant
-      
-      **Mission:** Multi-tenant SaaS with a **hard wall** — data must not cross tenants. Retrieval style is analytics-like; isolation is non-negotiable.
-      
-      **Entities:** Typical BI/KG entities (Email, Account, Person, Organization) **within this scope only**.
-      
-      **Join / noise posture:** Same selectivity discipline as analytics for entity joins. Isolation is enforced by **scope/storage**, not by inventing weaker joins.
-      
-      **Edges / relations:** Core relations only within scope. Never imply global entity indexes across tenants.
-      
-      **Traversal:** Scope is a **hard boundary**. If tools return empty, do not invent cross-tenant explanations.
-      
-      **Terminate flavor:** Answers only from this tenant scope; state when data is missing rather than guessing other tenants.
-      
-      **Don't:**
-      - Suggest querying another tenant or “global” pool.
-      - Treat shared product vocabulary as shared identity across tenants.
-      - Leak identifiers that look like other-tenant keys from the user message into tools without scope.
-      
-      **Example:** Same as analytics ranking pipelines — but all ids are in-scope only.
     role: system
 
 verbs:
@@ -327,7 +317,7 @@ verbs:
     type: function
   - [5] analyze
     function:
-      description: [exp] tenant job
+      description: [exp] analytics job
       name: analyze
       parameters:
         properties:
@@ -722,5 +712,5 @@ _base_meta:
   packaging: base-4
   updated_at: 2026-07-26T04:47:57Z
   breaking: object rules/triggers; app_output; control-plane inject contracts
-  content_train: base-5.1
-  mode_overlay: true
+  theme: Wire freeze (objects, app_output)
+  snapshot: true

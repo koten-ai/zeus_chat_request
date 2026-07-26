@@ -31,7 +31,7 @@ def mode_from_name(name: str) -> str:
     rest = stem[len("chat_request_") :]
     # strip custom + base suffixes first (…_base-4_cus_bucket_scope-1)
     rest = re.sub(r"_cus_.*$", "", rest, flags=re.I)
-    rest = re.sub(r"_base-\d+(?:-prototype)?$", "", rest, flags=re.I)
+    rest = re.sub(r"_base-[\d.]+(?:-prototype)?$", "", rest, flags=re.I)
     rest = re.sub(r"_v\d+(?:_min)?$", "", rest, flags=re.I)
     return rest or stem
 
@@ -53,13 +53,20 @@ def sort_key(entry: dict) -> tuple:
     mode = entry.get("mode") or ""
     base_id = str(entry.get("base_id") or "")
     hay = f"{base_id} {folder}"
-    m = re.search(r"base-(\d+)", hay, flags=re.I)
-    n = int(m.group(1)) if m else 0
+    m = re.search(r"base-(\d+(?:\.\d+)*)", hay, flags=re.I)
+    if m:
+        parts = [int(x) for x in m.group(1).split(".")]
+        # pad for sort: (major, minor, patch…)
+        while len(parts) < 3:
+            parts.append(0)
+        n_key = tuple(-p for p in parts)
+    else:
+        n_key = (0, 0, 0)
     proto = 1 if re.search(r"prototype", hay, flags=re.I) else 0
     # Production pin last within the same generation
     is_v2_min = 1 if folder == "v2/min" else 0
-    # Higher n first: negate. Formal pack before prototype. base/base-N before v2/min.
-    return (-n, proto, is_v2_min, folder, mode)
+    # Higher base first: negate parts. Formal pack before prototype.
+    return (*n_key, proto, is_v2_min, folder, mode)
 
 
 def main() -> None:

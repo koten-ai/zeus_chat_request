@@ -54,7 +54,7 @@ RESTORE = core discipline (shared) + MODE_OVERLAY (per mode) inside messages[].c
 
 | # | Question | Options | Recommendation |
 | --- | --- | --- | --- |
-| D1 | Ship train / folder | Keep diet in `v2/base/base-5/` labeled **base-5.1** vs new folder `base-5.1` | **Keep base-5 folder**; train id **base-5.1** in ROADMAP/RELEASE_NOTES (content patch) |
+| D1 | Ship train / folder | In-place `content_train` vs **new folder** | **RESOLVED: `v2/base/base-5.1/`** full snapshot; parent remains `base-5/` wire freeze (CR-25) |
 | D2 | Author SoT for overlays | This repo only vs Zeus `ai/V2/prompt/core/modes/` first | **Author in this repo** under `work/mode_overlays/` then port to Zeus generator |
 | D3 | Overlay length | Short (≤800 words) vs long | **Short**; link DESIGN for depth |
 | D4 | Soft tips | All in system vs split to hash-excluded `guidance` | **Hard posture in system**; demos/tips may use `guidance` later |

@@ -3,9 +3,9 @@
 > **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate pack **base-5** · next content train **base-5.1** (mode overlays) · version matrix: [COMPAT.md](../COMPAT.md)
 
 **Audience:** catalog authors, Zeus engine, zeus_client, Workbench  
-**Roadmap train:** **base-5.1** — [ROADMAP.md § base-5.1](ROADMAP.md)  
+**Roadmap train:** **base-5.1** — pack folder **`v2/base/base-5.1/`** · [ROADMAP.md § base-5.1](ROADMAP.md)  
 **Executable restore plan:** [../work/RECREATE_MODE.md](../work/RECREATE_MODE.md)  
-**Jira:** [CR-23](https://kotenai.atlassian.net/browse/CR-23) (parent **CR-3**)  
+**Jira:** [CR-23](https://kotenai.atlassian.net/browse/CR-23) · snapshot layout [CR-25](https://kotenai.atlassian.net/browse/CR-25)  
 **Normative product design (engine modes):** [zeus_design_docs DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) · runtime hooks `Zeus/internal/modes/`  
 **Related:** [CHAT_REQUEST.md](CHAT_REQUEST.md) · [BIBLE.md](BIBLE.md) · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [ROADMAP.md](ROADMAP.md)
 
@@ -154,10 +154,10 @@ base-5.1:   mode ──► graph projection + CORE + MODE_OVERLAY in messages[].
 
 Mode **prose/overlays** are **content**. They do **not** require a wire break if Layer A schema and object rules stay base-5.
 
-**Roadmap name: base-5.1** — content patch **on** the base-5 wire (not base-6 soft-hints, not a new breaking major).  
-On disk packs may remain `v2/base/base-5/` with `_lineage.base_id=base-5` until the work plan’s D1 says otherwise.
+**Roadmap name: base-5.1** — content on the base-5 **wire**, shipped as its **own snapshot folder** `v2/base/base-5.1/` (parent `base-5`).  
+**Do not** mutate `base-5/` in place with `content_train` — pullable Diff requires separate trees.
 
-See [ROADMAP.md § base-5.1](ROADMAP.md) · [work/RECREATE_MODE.md](../work/RECREATE_MODE.md).
+See [ROADMAP.md § base-5.1](ROADMAP.md) · [work/RECREATE_MODE.md](../work/RECREATE_MODE.md) · **CR-25**.
 
 ---
 

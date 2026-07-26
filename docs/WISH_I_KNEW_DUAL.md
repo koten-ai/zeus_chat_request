@@ -269,7 +269,7 @@ Client must not forge B and pretend the model said it (same as triggers → flag
 | **Breaking?** | **No** if `data_gaps` is optional and `wish_i_knew` stays array |
 | **Required four** | Unchanged |
 | **Objects / app_output** | Unchanged (base-5 freeze) |
-| **On disk** | Same `v2/base/base-5/` until implement PR updates schema + terminate table |
+| **On disk** | **`v2/base/base-5.2/`** full snapshot (parent `base-5.1`); Diff vs 5.1 |
 
 ### Rejected for default
 

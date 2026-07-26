@@ -27,7 +27,9 @@ See [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) · root [AGENTS.md](../.
 | Jump | Path | Status |
 | --- | --- | --- |
 | base-1 → base-4 | [base-1_to_base-4/](base-1_to_base-4/) | Candidate pack on disk (`v2/base/base-4/`); pin still base-1 |
-| base-4 → base-5 | [base-4_to_base-5/](base-4_to_base-5/) | **Candidate pack** `v2/base/base-5/` (breaking freeze; pin still base-1) |
+| base-4 → base-5 | [base-4_to_base-5/](base-4_to_base-5/) | Wire freeze pack `v2/base/base-5/` (pin still base-1) |
+| base-5 → base-5.1 | (folder Diff) | Mode overlays snapshot `v2/base/base-5.1/` |
+| base-5.1 → base-5.2 | (folder Diff) | Dual gaps snapshot `v2/base/base-5.2/` · [WISH_I_KNEW_DUAL.md](../WISH_I_KNEW_DUAL.md) |
 
 ## When you finish a new hop
 

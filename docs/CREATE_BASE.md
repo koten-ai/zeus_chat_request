@@ -8,8 +8,18 @@
 **Text export (only):** [`scripts/export_base_text.py`](../scripts/export_base_text.py)  
 **Pack verify (required after diet):** [`scripts/verify_base_pack.py`](../scripts/verify_base_pack.py)
 
-A BASE **pack** is the on-disk ship unit under `v2/base/base-N/`.  
+A BASE **pack** is the on-disk ship unit under `v2/base/base-<id>/` (e.g. `base-5`, `base-5.1`, `base-5.2`).  
 **Design docs** stay under `docs/` (do not copy BIBLE/ROADMAP into every pack).
+
+### P0 — snapshot folders (not in-place trains)
+
+```text
+WRONG:  edit v2/base/base-5/ and set content_train=base-5.1
+RIGHT:  copy parent → v2/base/base-5.1/ → diet → _lineage.base_id=base-5.1
+Diff:   Inspector / diff -ru v2/base/base-5 v2/base/base-5.1
+```
+
+Every train that ships pack content is a **full pullable tree**. `content_train` is not the source of truth.
 
 ---
 
@@ -46,8 +56,9 @@ v2/base/base-N/
 From repo root:
 
 ```bash
-# Scaffold base-5 from base-4 (copies min JSON, schemas, exports text, MANIFEST, README, OVERVIEW)
+# Scaffold a new snapshot folder (copies parent; then diet in the NEW tree only)
 python3 scripts/new_base.py --from v2/base/base-4 --base 5
+python3 scripts/new_base.py --from v2/base/base-5 --base 5.1
 
 # Dry run
 python3 scripts/new_base.py --from v2/base/base-4 --base 5 --dry-run
@@ -89,9 +100,10 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
      python3 scripts/scan_catalogs.py
 6. VERIFY (P0 — fail = do not open pack PR):
      python3 scripts/verify_base_pack.py --base N
-6b. If base-5+ modes: re-apply overlays (base-5.1) after scaffold diet:
-     python3 scripts/assemble_mode_prompts.py --base N
-     python3 scripts/diff_modes.py --base N --fail-if-clone
+6b. Mode overlays only on packs that need them (e.g. base-5.1+):
+     python3 scripts/assemble_mode_prompts.py --base 5.1
+     python3 scripts/diff_modes.py --base 5.1 --fail-if-clone
+6c. Diff parent folder vs new folder (Inspector or diff -ru)
 7. Fill hop RELEASE_CHECKLIST + GUIDE (+ lessons)
 8. Update ROADMAP + RELEASE_NOTES + COMPAT + BASE_AGENT_PLAYBOOK
 9. Diff in index.html (parent mode vs new mode)

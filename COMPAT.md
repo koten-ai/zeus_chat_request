@@ -33,7 +33,9 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | --- | --- | --- | --- | --- |
 | `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | **supported** | Production pin; required four Layer A |
 | `0.5.x` (current line) | **`base-4`** | `≥ 0.1.0` + optional Layer A G2/G3 | **candidate / history** | Pack on disk; array triggers in schema |
-| `0.5.x` (current line) | **`base-5`** | *TBD* — **object rules/triggers only**; settings; `output_request` | **candidate / last breaking train** | Pack [`v2/base/base-5/`](v2/base/base-5/); not pin; dual-read arrays ≤1 Client release · [ROADMAP](docs/ROADMAP.md) |
+| `0.5.x` (current line) | **`base-5`** | *TBD* — object rules/triggers; settings; `output_request` | **candidate / wire freeze** | Pack [`v2/base/base-5/`](v2/base/base-5/); no mode overlays; dual-read arrays ≤1 Client release |
+| `0.5.x` (current line) | **`base-5.1`** | *TBD* — base-5 wire + mode overlays | **candidate snapshot** | Pack [`v2/base/base-5.1/`](v2/base/base-5.1/); parent base-5; Diff vs base-5 |
+| `0.5.x` (current line) | **`base-5.2`** | *TBD* — base-5.1 + optional `data_gaps` | **candidate snapshot** | Pack [`v2/base/base-5.2/`](v2/base/base-5.2/); dual gaps design [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md) |
 | *future* | **`base-6+`** | base-5 floor + optional soft injects | **additive only** | No rename/remove of base-5 wire without new major |
 | *future* | promoted pin (`CURRENT`) | matching Client floor | — | Only after stamp + Client + Detective green |
 

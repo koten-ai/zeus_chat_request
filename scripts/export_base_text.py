@@ -207,7 +207,8 @@ Indented **text** working copy for diet/edit iterations.
 python3 scripts/export_base_text.py --from {source} --base {base_n}
 
 # next iteration (example)
-python3 scripts/export_base_text.py --from {source} --base {base_n + 1}
+python3 scripts/export_base_text.py --from {source} --base <next-id>
+# always new pack folder for a train — never mutate parent in place
 ```
 
 ## Files
@@ -238,9 +239,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument(
         "--base",
-        type=int,
         required=True,
-        help="BASE number N → base-N (+ chat_request_*_base-N.txt)",
+        help="BASE id N or N.M (e.g. 5, 5.1) → base-<id> (+ chat_request_*_base-<id>.txt)",
     )
     ap.add_argument(
         "--repo-root",
@@ -274,9 +274,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: source not a directory: {src}", file=sys.stderr)
         return 2
 
-    base_n = args.base
-    if base_n < 1:
-        print("error: --base must be >= 1", file=sys.stderr)
+    base_n = str(args.base).removeprefix("base-")
+    if not base_n:
+        print("error: --base must be a pack id like 5 or 5.1", file=sys.stderr)
         return 2
 
     pack = f"base-{base_n}-prototype" if args.prototype_pack else f"base-{base_n}"

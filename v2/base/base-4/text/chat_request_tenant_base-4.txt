@@ -12,7 +12,7 @@ _format: zeus.chat_request.v2
 _version: 2
 
 _note: |
-  base-4 chat_request (dieted Terminate table + Layer A fields). Required: summary, query_decomposition, decomposition, confidence. Recommended: policy_action, subject_confidence, jail_break_attempt, wish_i_knew, business_rules_triggers. See v2/base/base-4/BIBLE.md. Production pin may still be base-1 until CURRENT.json is updated.
+  base-4 chat_request (dieted Terminate table + Layer A fields). Required: summary, query_decomposition, decomposition, confidence. Recommended: policy_action, subject_confidence, jail_break_attempt, wish_i_knew, business_rules_triggers. See docs/BIBLE.md. Production pin may still be base-1 until CURRENT.json is updated.
 
 _hash: md5:119621eda0515a29b0e2b6778cd4ca41
 
@@ -648,8 +648,8 @@ _base_meta:
   breaks_compat: true
   audience: zeus_client + Hub feedback
   docs:
-    - v2/base/base-4/BIBLE.md
-    - v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md
+    - docs/BIBLE.md
+    - docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md
     - ROADMAP.md
   layer_a:
     required:

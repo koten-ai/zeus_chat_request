@@ -19,7 +19,7 @@
     ],
     "version": 1
   },
-  "_note": "base-4 chat_request (dieted Terminate table + Layer A fields). Required: summary, query_decomposition, decomposition, confidence. Recommended: policy_action, subject_confidence, jail_break_attempt, wish_i_knew, business_rules_triggers. See v2/base/base-4/BIBLE.md. Production pin may still be base-1 until CURRENT.json is updated.",
+  "_note": "base-4 chat_request (dieted Terminate table + Layer A fields). Required: summary, query_decomposition, decomposition, confidence. Recommended: policy_action, subject_confidence, jail_break_attempt, wish_i_knew, business_rules_triggers. See docs/BIBLE.md. Production pin may still be base-1 until CURRENT.json is updated.",
   "_version": 2,
   "contract": {
     "builder": "base-4",
@@ -681,8 +681,8 @@
     "breaks_compat": true,
     "audience": "zeus_client + Hub feedback",
     "docs": [
-      "v2/base/base-4/BIBLE.md",
-      "v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md",
+      "docs/BIBLE.md",
+      "docs/migration/base-1_to_base-4/GUIDE.md",
       "ROADMAP.md"
     ],
     "layer_a": {

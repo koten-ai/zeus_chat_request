@@ -3,84 +3,91 @@
   "base_id": "base-4",
   "kind": "base",
   "status": "current_candidate",
-  "note": "base-4 is the new chat_request line (v2/base/base-4). Production pin may remain base-1 until CURRENT.json promotes.",
+  "note": "base-4 is the new chat_request line (v2/base/base-4). Production pin may remain base-1 until CURRENT.json promotes. Design docs: docs/BIBLE.md \u00b7 docs/CREATE_BASE.md \u00b7 docs/base-1_to_base-4/.",
   "paths": {
     "min": "v2/base/base-4/min",
     "text": "v2/base/base-4/text",
-    "bible": "v2/base/base-4/BIBLE.md",
-    "roadmap": "ROADMAP.md"
+    "bible": "docs/BIBLE.md",
+    "roadmap": "docs/ROADMAP.md",
+    "create_base": "docs/CREATE_BASE.md",
+    "migration": "docs/migration/",
+    "response_output_schema": "v2/base/base-4/response_output_schema.json",
+    "response_output_example": "v2/base/base-4/response_output_example.json",
+    "agents": "AGENTS.md",
+    "playbook": "docs/BASE_AGENT_PLAYBOOK.md"
   },
-  "updated_at": "2026-07-26T04:48:50Z",
+  "updated_at": "2026-07-26T14:04:51Z",
+  "generator": "scripts/new_base.py --refresh-manifest",
   "catalogs": [
     {
       "file": "v2/base/base-4/min/chat_request_analytics_base-4.json",
       "mode": "analytics",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27525
+      "bytes": 27497
     },
     {
       "file": "v2/base/base-4/min/chat_request_auto_base-4.json",
       "mode": "auto",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 25708
+      "bytes": 25680
     },
     {
       "file": "v2/base/base-4/min/chat_request_code_base-4.json",
       "mode": "code",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27490
+      "bytes": 27462
     },
     {
       "file": "v2/base/base-4/min/chat_request_custom_base-4.json",
       "mode": "custom",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27504
+      "bytes": 27476
     },
     {
       "file": "v2/base/base-4/min/chat_request_fraud_base-4.json",
       "mode": "fraud",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27497
+      "bytes": 27469
     },
     {
       "file": "v2/base/base-4/min/chat_request_open_base-4.json",
       "mode": "open",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27490
+      "bytes": 27462
     },
     {
       "file": "v2/base/base-4/min/chat_request_private_base-4.json",
       "mode": "private",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27511
+      "bytes": 27483
     },
     {
       "file": "v2/base/base-4/min/chat_request_regulated_base-4.json",
       "mode": "regulated",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27525
+      "bytes": 27497
     },
     {
       "file": "v2/base/base-4/min/chat_request_research_base-4.json",
       "mode": "research",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27518
+      "bytes": 27490
     },
     {
       "file": "v2/base/base-4/min/chat_request_tenant_base-4.json",
       "mode": "tenant",
       "base_id": "base-4",
       "prototype": false,
-      "bytes": 27504
+      "bytes": 27476
     }
   ]
 }

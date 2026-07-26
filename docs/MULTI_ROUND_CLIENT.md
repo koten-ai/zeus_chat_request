@@ -1,7 +1,10 @@
 # Multi-round data model (zeus_client) — base-4
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 **Audience:** zeus_client / middleman  
-**Related:** [OVERVIEW.md](OVERVIEW.md) · [response_output_schema.json](response_output_schema.json) · [response_output_example.json](response_output_example.json)
+**Related:** [../v2/base/base-4/OVERVIEW.md](../v2/base/base-4/OVERVIEW.md) · [../v2/base/base-4/response_output_schema.json](../v2/base/base-4/response_output_schema.json) · [../v2/base/base-4/response_output_example.json](../v2/base/base-4/response_output_example.json) · [BIBLE.md](BIBLE.md)
 
 ---
 

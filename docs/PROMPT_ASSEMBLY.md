@@ -1,18 +1,24 @@
 # Assembled prompt shape (base-4 design)
 
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · design line **base-4** (base-5 = design only) · version matrix: [COMPAT.md](../COMPAT.md)
+
+
 ![Assembled prompt flow](../images/assembled_prompt.svg)
 
 **Status:** authoring model aligned with **base-4** (the new chat_request line).  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until promote.  
-**Normative base-4:** [v2/base/base-4/BIBLE.md](../v2/base/base-4/BIBLE.md)
+**Normative base-4:** [docs/BIBLE.md](BIBLE.md)
 
 | | |
 | --- | --- |
 | **Catalogs (JSON)** | [`v2/base/base-4/min/chat_request_<mode>_base-4.json`](../v2/base/base-4/min/) |
 | **Catalogs (text)** | [`v2/base/base-4/text/`](../v2/base/base-4/text/) |
 | **Layer A schema** | [`v2/base/base-4/response_output_schema.json`](../v2/base/base-4/response_output_schema.json) |
-| **Multi-round Client** | [`v2/base/base-4/MULTI_ROUND_CLIENT.md`](../v2/base/base-4/MULTI_ROUND_CLIENT.md) |
+| **Multi-round Client** | [`docs/MULTI_ROUND_CLIENT.md`](MULTI_ROUND_CLIENT.md) |
 | **Roadmap** | [ROADMAP.md](ROADMAP.md) |
+| **base-5: rules object + output_request** | [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) |
+| **base-5: settings · merge · Client policy · security** | [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) |
+| **Ownership set/unset/change** | [BIBLE.md §2](BIBLE.md) |
 | **Helios (cheap emits)** | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) |
 
 **Filenames**
@@ -65,8 +71,8 @@ No second “Evidence loop” essay.
 ║                              +                                   ║
 ║  ┌─ 2) ZEUS_CLIENT INJECT  ·  NOT hashed ───────────────────┐  ║
 ║  │  SCOPE BRIEF + MINI-SCHEMA                                 │  ║
-║  │  company_context → message templates → rules[] → hints     │  ║
-║  │  session · overrides · AgentHooks                          │  ║
+║  │  company_context → message_* → rules{} → output_request?   │  ║
+║  │  → hints (base-6+) · session · overrides · AgentHooks      │  ║
 ║  └────────────────────────────────────────────────────────────┘  ║
 ║                              +                                   ║
 ║  ┌─ 3) MESSAGES[]  ·  chat transcript ──────────────────────┐  ║
@@ -83,12 +89,14 @@ No second “Evidence loop” essay.
 ╔═ OUTPUT  ·  Layer A terminate (flat JSON) ═════════════════════╗
 ║  G1 USER   summary · confidence · decompositions · refs?       ║
 ║  G2 ADMIN  subject_confidence · wish_i_knew · jail_break…      ║
-║  G3 CLIENT business_rules_triggers · policy_action             ║
+║  G3 CLIENT triggers{} · policy_action · app_output? (base-5)   ║
 ║  (Detective / spans = server Layer B — after the model)        ║
 ╚════════════════════════════════════════════════════════════════╝
 ```
 
 **Wire note:** Layer A is **flat** on the tool. G1/G2/G3 are **audiences** for Client redaction.
+
+**base-5 design (not yet wire-normative on base-4):** `rules` and `business_rules_triggers` become **objects** keyed by stable `rule_id` (not parallel arrays). Client may pass **`output_request`** so the model fills optional **`app_output`**. See [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md).
 
 **Not Layer A:** Detective store (attribution, diagnosis, spans, inject_inspect) — **Layer B**, server-built.
 
@@ -106,10 +114,12 @@ No second “Evidence loop” essay.
 | `subject_confidence` | no | G2 admin | 0.0–1.0 entity surety (≠ confidence) |
 | `jail_break_attempt` | no | G2 admin | 0.0–1.0 subjective |
 | `wish_i_knew` | no | G2 admin | max 3 `{what, kind}`; gaps *I* lacked |
-| `business_rules_triggers` | no | G3 client | `boolean[]` parallel to inject `rules[]` |
+| `business_rules_triggers` | no | G3 client | base-4: `boolean[]` ∥ `rules[]` · **base-5:** `{ rule_id: bool }` sparse |
+| `app_output` | no† | G3 / app | base-5: only when Client sent `output_request.app` |
 | `node_refs` / `entity_refs` / `provenance` | no | G1/ui | optional grounding |
 
-\*Roadmap (base-5): soft-require `policy_action`.
+\*Roadmap (base-5): soft-require `policy_action`.  
+†Roadmap (base-5): Client-requested bag — [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md).
 
 ### One-line distinctions
 
@@ -132,10 +142,60 @@ policy_action: answer
 subject_confidence: 0.8
 jail_break_attempt: 0.0
 wish_i_knew: []
-business_rules_triggers: []
+business_rules_triggers: []   # base-4 array; base-5: { coupon_presented: true, … }
+# app_output: { … }           # base-5 only when Client output_request.app set
 node_refs: []
 entity_refs: []
 ```
+
+---
+
+## Client-requested outputs (base-5 — `output_request`)
+
+Apps often need more than the fixed required four without forking the BASE catalog.
+
+| Inject (Client, not hashed) | Terminate |
+| --- | --- |
+| `output_request.layer_a.soft_require` / `include` | Soft-require known Layer A fields this turn |
+| `output_request.app.fields` — each **`type` + `description`** | Model fills **`app_output`** (values); Client validates types |
+| `output_request.rows.fields` / `max_rows` | UI projection guidance (tool results + artifacts) |
+
+**Type alone is not enough.** `sum_favorites: INT` needs a short **description** so the model knows *what* to compute (e.g. sum favorites across Zeus rows this turn; 0 if none). Client **renders descriptions into the prompt**; types are for validation.
+
+```text
+# sketch — zeus_client
+run_agent(
+  …,
+  output_request={
+    "layer_a": {"soft_require": ["policy_action", "business_rules_triggers"]},
+    "app": {
+      "fields": {
+        "sum_favorites": {
+          "type": "integer",
+          "description": "Sum of favorites across Zeus rows this turn; 0 if none."
+        },
+        "booking_ready": {
+          "type": "boolean",
+          "description": "True only if enough stay params exist to search; else false."
+        }
+      },
+      "required": ["sum_favorites", "booking_ready"]
+    },
+    "rows": {"fields": ["name", "city", "price"], "max_rows": 10}
+  }
+)
+```
+
+**Prompt render (Client → model), not raw schema only:**
+
+```text
+## Output request
+app_output:
+- sum_favorites (integer, required): Sum of favorites across Zeus rows this turn; 0 if none.
+- booking_ready (boolean, required): True only if enough stay params exist to search; else false.
+```
+
+**Rules:** required four always stay; ~8 soft / ~15 hard fields; description required per field; Client validates `app_output` types; never put G2 in `app_output`. Full design: [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md).
 
 ---
 
@@ -153,9 +213,10 @@ This is a **Client / Workbench inject**, not stamped BASE prose (every tenant wo
 2) SCOPE BRIEF + MINI-SCHEMA
 3) company_context / service_brief     ← YOU ARE HERE
 4) business_injection.message_*
-5) business_injection.rules[]
-6) hints / hot_path / A/B paste        ← after rules (base-6+)
-7) user question + tool history
+5) business_injection.rules            ← base-4: rules[] · base-5: rules { id → text }
+6) business_injection.output_request   ← base-5 optional (what extra to emit)
+7) hints / hot_path / A/B paste        ← after rules (base-6+)
+8) user question + tool history
 ```
 
 ### Word budget (optimized range)
@@ -217,7 +278,8 @@ Tone: friendly and brief.
 | --- | --- |
 | MINI-SCHEMA | **Fields and types** — not brand story |
 | SCOPE BRIEF | **Live counts / orientation** — not marketing |
-| `rules[]` | **Hard policy** (coupons, compliance) — indexed triggers |
+| `rules` / `rules[]` | **Hard policy** (coupons, compliance) — base-5: **named** triggers |
+| `output_request` | **What extra structure** the app wants this turn (base-5) |
 | company_context | **Soft identity + scope of help** |
 | User question | e.g. “what ice cream do people love most in Tucson?” |
 
@@ -245,12 +307,13 @@ base-4 has **`jail_break_attempt`** (telemetry). Policy pack (`rules[]`, `messag
 … MINI-SCHEMA
 … company_context          (base-5+)
 … message_* boilerplate
-… rules[]                  (hard, indexed, G3 triggers)
+… rules { id → text }      (hard policy; G3 triggers by id — base-5 object)
+… output_request           (optional; Client-requested outputs — base-5)
 … hints / hot_path / ab    ← HERE (soft, hash-excluded)
 … user + history
 ```
 
-**Why after rules:** Rules are policy (stable, triggerable). Hints are **steering** (try this path, emphasize this facet, A/B variant copy). Soft text must not override hard rules; order reinforces that.
+**Why after rules:** Rules are policy (stable, triggerable by **name**). Hints are **steering** (try this path, emphasize this facet, A/B variant copy). Soft text must not override hard rules; order reinforces that.
 
 ### Shape (sketch — not base-4 wire yet)
 
@@ -273,7 +336,7 @@ Or flat paste slots the UI can fill:
 | `hints.hot_path` | yes (soft) | Proven multi-step recipes, facet emphasis |
 | `hints.ab_paste` | yes (per arm) | Full experimental block for A/B |
 | `hints.ab_arm` | meta / optional line | Label for Detective / Helios slice |
-| `rules[]` | yes (hard) | Indexed; `business_rules_triggers` |
+| `rules` | yes (hard) | Named ids; `business_rules_triggers` object (base-5) |
 
 **Copy-paste UX requirement:** each slot is a **single textarea** so ops can paste a whole arm without JSON surgery.
 
@@ -313,7 +376,7 @@ round 1: LLM → tools → Zeus → append tool result → upsert artifacts
 round 2: LLM → return(Layer A) → parse → G1 UI / G2 metrics / G3 flags
 ```
 
-Full walkthrough: [MULTI_ROUND_CLIENT.md](../v2/base/base-4/MULTI_ROUND_CLIENT.md) · [multi_round_example.json](../v2/base/base-4/multi_round_example.json).
+Full walkthrough: [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [multi_round_example.json](multi_round_example.json).
 
 ---
 
@@ -326,6 +389,30 @@ Full walkthrough: [MULTI_ROUND_CLIENT.md](../v2/base/base-4/MULTI_ROUND_CLIENT.m
 | Client inject | zeus_client / tenant | No | **Highest** |
 | User + tool transcript | Client `messages[]` | No | Cap old tool dumps |
 | Terminate G2/G3 | Model → Client store | n/a | Cap `wish_i_knew` |
+
+**Normative set / unset / change matrix** (App user · Zeus Client logic · AI API):  
+[BIBLE.md §2](BIBLE.md) — use that table when deciding who may mutate a field.
+
+**Control plane** (settings bag, rule merge/freeze, post-terminate policy, cache zones, security):  
+[PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · [ROADMAP.md](ROADMAP.md) base-5 (headlines).
+
+**Versions:** [COMPAT.md](../COMPAT.md) — Zeus × BASE × zeus_client.
+
+### Settings vs prompt text
+
+| In the model prompt | In structured **settings** (usually not full prose) |
+| --- | --- |
+| company_context, rules{}, output_request, brief/schema | max_rounds, model, denied_verbs, redaction, debug |
+| Optional one-liner locale/channel | ab_arm, ruleset_id, pii_in_logs, deployment_id |
+
+### After the model (Client policy — every terminate)
+
+```text
+parse Layer A → normalize triggers → hooks may force refuse
+→ map policy_action → message_* → sticky flags → validate app_output → G2 metrics
+```
+
+Triggers are **signals**; Client (+ hooks) is **law**. See [PROMPT_SETTINGS.md §3](PROMPT_SETTINGS.md).
 
 ---
 
@@ -364,11 +451,16 @@ business_injection.company_context: |   # ≤150 words sweet spot / hard max 250
   Help search rooms and rates from catalog data. Do not invent hotels,
   take payment, or give visa/legal advice. Tone: clear and calm.
 business_injection.message_failure: "Sorry… rephrase what you want to book."
-business_injection.rules: [
-  "",
-  "if they present a coupon, treat coupon as applicable",
-  "if free nights without inventory data, do not invent promos"
-]
+# base-5 canonical (object). base-4 docs/schema still show string[] + boolean[].
+business_injection.rules: {
+  coupon_presented: "if they present a coupon, treat coupon as applicable",
+  no_invent_promos: "if free nights without inventory data, do not invent promos"
+}
+business_injection.output_request: {     # base-5; optional
+  layer_a: { soft_require: [policy_action, business_rules_triggers] }
+  app: { schema: { booking_ready: boolean, coupon_code: string|null }, required: [booking_ready] }
+  rows: { fields: [name, city, price], max_rows: 5 }
+}
 business_injection.hints.hot_path: |     # base-6+; after rules; optional A/B
   When user wants a shortlist, prefer find → order → project; always ground in schema.
 session.zeus_round: 1
@@ -382,8 +474,10 @@ LLM → tools → Zeus rows → messages.append(tool) → artifacts.tables
 ── 4) TERMINATE (Layer A) ──
 G1: summary = in-policy help + ask city/dates · confidence = med
 G2: jail_break_attempt = 0.55 · wish_i_knew = [{ city/dates, kind: message }]
-G3: policy_action = clarify · business_rules_triggers = [false, true, true]
-    → Client: flags.coupon=true; maybe message_clarify chrome
+G3: policy_action = clarify
+    business_rules_triggers = { coupon_presented: true, no_invent_promos: true }
+    app_output = { booking_ready: false, coupon_code: "SAVE20" }
+    → Client: state.coupon=true; message_clarify chrome; validate app_output
 ```
 
 ---
@@ -400,7 +494,8 @@ G3: policy_action = clarify · business_rules_triggers = [false, true, true]
 | Lineage | `_lineage.base_id` = `base-4` |
 | Soft guidance | full profile only — min omits |
 | Brief / mini-schema | runtime inject |
-| Business rules / triggers | Client inject `rules[]` + terminate G3 |
+| Business rules / triggers | Client inject `rules` + terminate G3 (`{}` in base-5; `[]` in base-4) |
+| Client-requested outputs | `output_request` inject → `app_output` (base-5+) |
 | Company / service brief | Client `company_context` (base-5+; word-budgeted; not BASE body) |
 | HINTS / Hot-Path / A/B paste | Client/Workbench after rules (base-6+; hash-excluded) |
 | Admin scores | terminate G2 |
@@ -416,7 +511,7 @@ G3: policy_action = clarify · business_rules_triggers = [false, true, true]
 | Recommended Layer A | — | policy_action, scores, wish_i_knew, triggers |
 | Inspector | same `index.html` | pick folder · mode · **base_id** |
 
-Full map: [BASE_1_TO_BASE_4_GUIDE.md](../v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md).
+Full map: [GUIDE.md](migration/base-1_to_base-4/GUIDE.md).
 
 ---
 
@@ -425,13 +520,15 @@ Full map: [BASE_1_TO_BASE_4_GUIDE.md](../v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.m
 | Doc | Role |
 | --- | --- |
 | **This file** | Assembled prompt + budget (base-4 design) |
-| [v2/base/base-4/BIBLE.md](../v2/base/base-4/BIBLE.md) | Full requirements step-by-step |
+| [docs/BIBLE.md](BIBLE.md) | Full requirements step-by-step |
 | [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) | Jailbreak score + rules + hooks |
-| [v2/base/base-4/MULTI_ROUND_CLIENT.md](../v2/base/base-4/MULTI_ROUND_CLIENT.md) | Middleman append loop |
+| [docs/MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Middleman append loop |
 | [simple_layout.txt](simple_layout.txt) | Field map (Contract / Client / output) |
 | [base_layout.txt](base_layout.txt) | Early sketch corrections |
 | [CHAT_REQUEST.md](CHAT_REQUEST.md) | Catalog product meaning, stamp |
 | [ROADMAP.md](ROADMAP.md) | base-5+ and Helios alignment |
+| [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules/triggers + `output_request` / `app_output` |
+| [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) | Settings · merge · Client policy · cache · security |
 | [RELEASE_NOTES.md](../RELEASE_NOTES.md) | Breaking changes when opting into base-4 |
 | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Cheap Analytics emits (prefer Zeus/Client) |
 | [README.md](../README.md) | Repo entry + inspector |

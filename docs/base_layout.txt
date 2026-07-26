@@ -1,3 +1,6 @@
+# HISTORICAL DRAFT — bridge notes. Canonical now: docs/README.md layout, docs/PROMPT_ASSEMBLY.md, docs/BIBLE.md, COMPAT.md.
+# Last reviewed: 2026-07-26 · pin base-1 · design base-4
+#
 # chat_request*.json — base layout (bridge doc)
 #
 # Prefer these for current design:
@@ -27,9 +30,9 @@
   4) TERMINATE      G1 user · G2 admin · G3 client triggers              #OUT
 
 Full picture: PROMPT_ASSEMBLY.md
-Filenames: chat_request_<mode>_base-2.json → Workbench
-  chat_request_<mode>_base-2_cus_<bucket>_<scope>-<rev>.json
-  (see v2/base/base-2-prototype/OVERVIEW.md)
+Filenames: chat_request_<mode>_base-N.json → Workbench customs
+  chat_request_<mode>_base-N_cus_<bucket>_<scope>-<rev>.json
+  (canonical: COMPAT.md + docs/CREATE_BASE.md — not base-2 prototype)
 
 
 ================================================================================
@@ -45,7 +48,7 @@ Filenames: chat_request_<mode>_base-2.json → Workbench
 
   RUNTIME (not baseline file)
     SCOPE BRIEF + MINI-SCHEMA
-    zeus_client.business_injection (messages + rules[])
+    zeus_client.business_injection (messages + rules object + optional output_request)
     session round/turn
     user message, tool results
     AgentHooks effects
@@ -53,7 +56,7 @@ Filenames: chat_request_<mode>_base-2.json → Workbench
   TERMINATE (model → Client splits audiences)
     G1 summary, confidence, decomposition fields
     G2 subject_confidence, wish_i_knew, jail_break_attempt (admin)
-    G3 business_rules_triggers[] (parallel to rules[]; Client round state)
+    G3 business_rules_triggers (base-5: { id → bool }) + optional app_output
 
 ================================================================================
 2. CONTRACT vs CLIENT (hash boundary)
@@ -64,8 +67,8 @@ Filenames: chat_request_<mode>_base-2.json → Workbench
     allowed/denied verbs when locked
 
   NOT HASHED (Client / tenant pass-in)
-    brand boilerplate, business_injection.rules[], locale,
-    SCOPE BRIEF, MINI-SCHEMA, user text, soft guidance
+    brand boilerplate, business_injection.rules (named object), output_request,
+    locale, SCOPE BRIEF, MINI-SCHEMA, user text, soft guidance
 
   Why: tenant copy and live schema must not thrash production stamps.
 
@@ -74,9 +77,9 @@ Filenames: chat_request_<mode>_base-2.json → Workbench
 ================================================================================
 
   Min catalogs ~13–17KB. Assembled prompt grows with inject + history + tools.
-  Prefer short indexed rules + triggers over 60KB policy novels.
+  Prefer short named rules + sparse trigger objects over 60KB policy novels.
   Drop soft guidance first; keep verb surface + terminate schema + hard flags.
-  See PROMPT_ASSEMBLY.md and simple_layout.txt §N.
+  See PROMPT_ASSEMBLY.md, RULES_OBJECT_AND_OUTPUT_REQUEST.md, simple_layout.txt §N.
 
 ================================================================================
 4. ORIGINAL SKETCH — RIGHT vs WRONG (history)
@@ -98,7 +101,8 @@ MISSING from first sketch (now in simple_layout / PROMPT_ASSEMBLY)
   - Envelope, lineage, min vs full, soft guidance
   - Contract vs Client ownership
   - G1/G2/G3 terminate split
-  - business_rules_triggers[] for round control
+  - business_rules_triggers (named object in base-5) for round control
+  - output_request / app_output for Client-specific structure
   - brand message_failure boilerplate
   - token budget discipline
 

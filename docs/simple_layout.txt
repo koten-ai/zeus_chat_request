@@ -1,3 +1,6 @@
+# HISTORICAL DRAFT — working mental model pre base-4/5. Canonical now: docs/BIBLE.md §2, docs/PROMPT_ASSEMBLY.md, docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md, COMPAT.md.
+# Last reviewed: 2026-07-26 · pin base-1 · design base-4
+#
 # chat_request — SIMPLE TEXT LAYOUT (v0 working draft)
 # Purpose: human-editable mental model first. JSON / TOON later.
 # Not wire format yet. Markers like Base-1 ... Base-1 are for copy/paste, not final schema.
@@ -11,7 +14,8 @@
 # Related: CHAT_REQUEST.md · base_layout.txt · README.md
 #
 # BUDGET: do not over-stuff rules/injects (10KB catalog → 60KB assembled is a failure mode).
-#   Prefer short indexed business_injection.rules[] + triggers; drop soft guidance first.
+#   Prefer short named business_injection.rules {} + sparse triggers {}; drop soft guidance first.
+#   base-5 design: RULES_OBJECT_AND_OUTPUT_REQUEST.md (rules object + output_request → app_output).
 #
 # Legend
 #   ""   string
@@ -275,14 +279,25 @@ business_injection:
     # Transport / Zeus / tool failure (ops-safe wording)
     # e.g. "Something went wrong looking that up. Please try again in a moment."
 
-  # --- indexed business rules (Client pass-in; triggers on terminate) ---
-  rules: [
-    "",
-    "if they present a coupon, treat coupon as applicable",
+  # --- business rules (Client pass-in; triggers on terminate) ---
+  # base-4 design: string[] + boolean[] (index-aligned; index 0 often empty).
+  # base-5 CANONICAL: named object — see RULES_OBJECT_AND_OUTPUT_REQUEST.md
+  rules: {
+    coupon_presented: "if they present a coupon, treat coupon as applicable",
+    no_invent_promos: "if free nights without inventory, do not invent promos",
     # …
-  ]
-    # Parallel output on terminate: business_rules_triggers: [false, true, …]
-    # See §M4–M5 for round/turn Client loop. Indexes must stay stable in-session.
+  }
+    # Parallel output on terminate: business_rules_triggers: { coupon_presented: true, … }
+    # Missing key = false. Sparse OK. Keys stable in-session (prefer stable forever).
+
+  # --- Client-requested outputs (base-5; optional) ---
+  output_request: {
+    layer_a: { soft_require: ["policy_action"], include: ["entity_refs"] }
+    app: { schema: { … small JSON Schema … }, required: ["booking_ready"] }
+    rows: { fields: ["name", "city", "price"], max_rows: 10 }
+  }
+    # Terminate: app_output matches app.schema when present.
+    # Cannot remove required four (summary, QD, decomposition, confidence).
 
   # --- optional brand / tone ---
   brand_voice: ""           # short tone note for inject (optional)
@@ -438,7 +453,7 @@ J. MORE CANDIDATES TO ADD LATER (from ecosystem, not always in file)
   - denied_verbs[]
   - tenant_pin required true|false
   - multi_turn memory true|false
-  - structured_output / output_schema (Client structured=True path)
+  - structured_output / output_request (Client structured=True + app_output; base-5)
   - A/B stamp id / eval pack id
   - Helios cost rules (AI-expensive fields optional_when only)
   - language / channel / market (Client cheap injects)
@@ -564,15 +579,16 @@ M2. ZEUS_CLIENT — pass-in / overrides (runtime, per session or turn)
   business_injection.locale
 
   # --- business rules (operator policy text + trigger slots) ---
-  # Parallel lists: rule text in, booleans (or richer) out on terminate.
-  # Index alignment is the contract between Client and model.
+  # base-5: named object — rule text in, bool map out on terminate.
+  # Key alignment (not array index) is the contract between Client and model.
 
-  business_injection.rules: [
-    "",                                          # index 0 — unused / reserved
-    "if they present a coupon, treat coupon as applicable",   # index 1
-    "if party size >= 3, mention family rate if present in data",
+  business_injection.rules: {
+    coupon_presented: "if they present a coupon, treat coupon as applicable",
+    family_rate: "if party size >= 3, mention family rate if present in data",
     …
-  ]
+  }
+
+  business_injection.output_request: { … }   # optional; see RULES_OBJECT_AND_OUTPUT_REQUEST.md
 
   # Client may also pass structured overrides each turn/round:
   overrides: {
@@ -629,27 +645,31 @@ M4. TERMINATE OUTPUT — three audiences
     policy_action?              # answer|clarify|refuse|error
 
   G3 CLIENT CONTROL-PLANE (for zeus_client round/turn logic)
-    # Model fills in parallel to business_injection.rules[]
+    # Model fills in parallel to business_injection.rules (by KEY in base-5)
     # Client reads this EVERY round to branch UX, hooks, next inject.
 
-    business_rules_triggers: [ false, true, false, … ]
-      # same length / index as business_injection.rules[]
+    business_rules_triggers: { coupon_presented: true, family_rate: false, … }
+      # keys match business_injection.rules
       # true  = model believes this rule applies to THIS turn/round
-      # false = not triggered
+      # missing key or false = not triggered (sparse OK)
       #
       # Example:
-      #   rules[1] = "if they present a coupon …"
+      #   rules.coupon_presented = "if they present a coupon …"
       #   user says "I have code SAVE20"
-      #   → business_rules_triggers[1] = true
+      #   → business_rules_triggers.coupon_presented = true
       #   Client may: show coupon UI, pass coupon:true into next Zeus call,
       #   or inject "coupon presented" into the next round system addendum
 
-    # Optional richer form (if bool[] is too tight later):
-    business_rules_results: [
-      { index: 1, triggered: true, detail: "SAVE20 mentioned" },
+    app_output: { … }   # base-5; only when output_request.app was set
+      # e.g. { booking_ready: false, coupon_code: "SAVE20" }
+      # Client validates against output_request.app.schema
+
+    # Optional richer form (later):
+    business_rules_results: {
+      coupon_presented: { triggered: true, detail: "SAVE20 mentioned" },
       …
-    ]
-    # Start simple: bool[] is enough for Client to poll each round.
+    }
+    # Start simple: id → bool is enough for Client to poll each round.
 
     # Round awareness (model echo or Client-authoritative):
     round: 1
@@ -665,11 +685,20 @@ M5. WORKED EXAMPLE — coupon rule + Client round loop
     message_failure:
       "Sorry but we are not able to fulfil your request. Could you explain
        again what you are looking for to book a room?"
-    rules: [
-      "",
-      "if they present a coupon, set coupon applicable and note the code if given",
-      "if they ask for free nights without booking context, do not invent promos"
-    ]
+    rules: {
+      coupon_presented: "if they present a coupon, set coupon applicable and note the code if given",
+      no_invent_promos: "if they ask for free nights without booking context, do not invent promos"
+    }
+    output_request: {
+      layer_a: { soft_require: ["policy_action"] }
+      app: {
+        schema: { type: object, properties: {
+          booking_ready: { type: boolean },
+          coupon_code: { type: ["string", "null"] }
+        }}
+        required: ["booking_ready"]
+      }
+    }
 
   session: { zeus_round: 1, max_rounds: 5 }
 
@@ -689,10 +718,14 @@ M5. WORKED EXAMPLE — coupon rule + Client round loop
     wish_i_knew: [
       { what: "city and dates", kind: "message" }
     ]
-    business_rules_triggers: [ false, true, true ]
-      # [0] unused
-      # [1] coupon rule FIRED (SAVE20)
-      # [2] free-night invent rule FIRED (refuse invent path)
+    business_rules_triggers: {
+      coupon_presented: true,           # SAVE20
+      no_invent_promos: true            # refuse invent path
+    }
+    app_output: {
+      booking_ready: false,
+      coupon_code: "SAVE20"
+    }
 
     policy_action: "clarify"          # optional
     # Client maps policy_action → message_clarify if needed
@@ -700,26 +733,26 @@ M5. WORKED EXAMPLE — coupon rule + Client round loop
   # --- zeus_client uses triggers between rounds ---
   ```text
   round 1 response:
-    if business_rules_triggers[1]:
+    if business_rules_triggers.get("coupon_presented"):
         state.coupon = true
-        state.coupon_hint = "SAVE20"   # from message or detail field
+        state.coupon_hint = app_output.get("coupon_code") or "SAVE20"
         next_inject += "User presented a coupon; prefer offers that accept codes."
     if jail_break_attempt >= 0.5:
         # admin metric only; user still sees summary / soft boilerplate
         metrics.emit("jailbreak_signal", score)
-    if policy_action == "clarify":
+    if policy_action == "clarify" or not app_output.get("booking_ready"):
         ui.prompt(business_injection.message_clarify or summary)
 
   round 2:
     session.zeus_round = 2
-    pass same rules[] again (stable indexes!)
+    pass same rules object again (stable keys!)
     model returns new business_rules_triggers for THIS round
     Client ORs or replaces state as product prefers
   ```
 
-  # Index stability rule:
-  #   Do not reorder business_injection.rules mid-session without
-  #   resetting Client state maps. Append-only is safest.
+  # Key stability rule:
+  #   Do not rename rule ids mid-session without resetting Client state maps.
+  #   Adding new keys is fine; prefer never reusing a key for a different meaning.
 
 --------------------------------------------------------------------------------
 M6. QUICK DIVIDE CHEAT SHEET
@@ -736,7 +769,8 @@ M6. QUICK DIVIDE CHEAT SHEET
   max_rounds                        default         override
   jail_break policy on/off          yes
   message_failure / brand copy                      yes
-  business_injection.rules[]                        yes
+  business_injection.rules { id → text }            yes
+  business_injection.output_request                 yes (base-5)
   locale / tz / channel                             yes
   SCOPE_BRIEF / MINI-SCHEMA                         yes (from Zeus)
   AgentHooks                                        yes (code)
@@ -744,20 +778,22 @@ M6. QUICK DIVIDE CHEAT SHEET
   eval_pack / examples                                             yes
   summary                                                                      G1
   confidence / subject_confidence / wish_i_knew / jail_break_attempt           G2
-  business_rules_triggers[bool…]                                               G3
+  business_rules_triggers { id → bool }                                        G3
+  app_output                                                                   G3/app
   policy_action / refusal_reason_code                                          G2/G3
 
 --------------------------------------------------------------------------------
 M7. DESIGN RULES (so Client can rely on rounds)
 --------------------------------------------------------------------------------
 
-  1. rules[] indexes are stable for a session (append-only).
-  2. business_rules_triggers length SHOULD equal rules length.
-  3. Missing/short array ⇒ Client treats missing tails as false.
+  1. rule ids (keys) are stable for a session (prefer stable forever).
+  2. business_rules_triggers keys SHOULD be subset of rules keys.
+  3. Missing key ⇒ Client treats as false (sparse is correct).
   4. Triggers are model-subjective; hooks may force true/false for safety.
-  5. User never sees triggers[] or jail_break_attempt — only summary / boilerplate.
-  6. Contract hash ignores business_injection and triggers (tenant-specific).
+  5. User never sees triggers or jail_break_attempt — only summary / boilerplate.
+  6. Contract hash ignores business_injection, output_request, and triggers.
   7. Client is source of truth for zeus_round / turn_index; model does not own clock.
+  8. app_output only when output_request.app set; validate in Client; never G2 scores.
 
 
 
@@ -770,7 +806,7 @@ N. TOKEN / SIZE BUDGET  (keep assembled prompt lean)
 
   Prefer:
     - min profile for integrators
-    - short business_injection.rules[] (one line each, stable indexes)
+    - short business_injection.rules (one line each, stable named keys)
     - lite MINI-SCHEMA (not full inventory dump)
     - admin fields short / capped (wish_i_knew max few items)
     - Client control-plane triggers instead of long free-form policy essays
@@ -802,9 +838,11 @@ L. OPEN QUESTIONS (for next pass)
 7. business_injection: Client config only, Hub inject, or both with override order?
 8. Does model see message_failure as "use this text when refusing", or does
    Client rewrite summary after the fact when status=fail?
-9. business_rules_triggers: require exact len(rules), or allow sparse + index map?
-10. Mid-session rule append: allowed, or freeze rules[] at session start?
+9. business_rules_triggers: object sparse-only, or also allow legacy array dual-read?
+10. Mid-session rule key add: allowed, or freeze rules object at session start?
 11. Should triggers be per-round snapshot only, or Client accumulates OR across rounds?
+12. output_request API: run_agent kwarg vs business_injection only?
+13. app_output property soft max 8 / hard 15 — enough for product demos?
 
 # Next step ideas:
 #   - fill real Base-1 prose from current messages[0].content

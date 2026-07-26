@@ -2,7 +2,7 @@
 
 **Audience:** humans and AIs doing the next BASE bump (base-5, base-6, …)  
 **Context:** First real pass from production **base-1** min catalogs through prototypes **base-2 → base-3 → base-4**, plus inspector/`index.html` dual-BASE testing.  
-**Related:** [BASE_1_TO_BASE_4_GUIDE.md](BASE_1_TO_BASE_4_GUIDE.md) · [BIBLE.md](BIBLE.md) · [INSPECTOR.md](INSPECTOR.md) · [ROADMAP.md](../../../docs/ROADMAP.md)
+**Related:** [BASE_1_TO_BASE_4_GUIDE.md](BASE_1_TO_BASE_4_GUIDE.md) · [BIBLE.md](../BIBLE.md) · [INSPECTOR.md](../INSPECTOR.md) · [ROADMAP.md](../ROADMAP.md)
 
 This is **experience**, not a second spec. Prefer the Bible for requirements; use this to avoid repeating mistakes.
 
@@ -129,7 +129,7 @@ For the first migration test, **Diff / Matrix** on a single inspector is the pro
 3. Dropdown labels need **folder · mode · base_id** so base-1 and base-4 are obvious.  
 4. A second HTML fork would fight Diff and double maintenance. Fork only later for a **Client lab** UI, sharing one JS core.
 
-See [INSPECTOR.md](INSPECTOR.md).
+See [INSPECTOR.md](../INSPECTOR.md).
 
 ---
 
@@ -215,10 +215,10 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
 | Doc | Use |
 | --- | --- |
 | [BASE_1_TO_BASE_4_GUIDE.md](BASE_1_TO_BASE_4_GUIDE.md) | Field/section mapping tables |
-| [BIBLE.md](BIBLE.md) | Normative base-4 requirements |
-| [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Append loop + examples |
-| [response_output_schema.json](response_output_schema.json) | Layer A machine schema |
-| [INSPECTOR.md](INSPECTOR.md) | Running Diff base-1 vs base-4 |
+| [BIBLE.md](../BIBLE.md) | Normative base-4 requirements |
+| [MULTI_ROUND_CLIENT.md](../MULTI_ROUND_CLIENT.md) | Append loop + examples |
+| [response_output_schema.json](../../v2/base/base-4/response_output_schema.json) | Layer A machine schema |
+| [INSPECTOR.md](../INSPECTOR.md) | Running Diff base-1 vs base-4 |
 
 ---
 

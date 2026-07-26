@@ -1,8 +1,6 @@
-# base-4
+# base-4 overview
 
-> **Start here for full requirements:** [**BIBLE.md**](BIBLE.md) — step-by-step rules, naming, Layer A, multi-round Client, examples, checklists.
-
-**Diet release:** one **Terminate (Layer A)** table + one example (replaces two long essays).
+Short pack changelog only. Full requirements: [docs/BIBLE.md](../../../docs/BIBLE.md).
 
 | | |
 | --- | --- |
@@ -11,19 +9,21 @@
 | **Text** | `text/chat_request_<mode>_base-4.txt` |
 | **Parent** | base-3 (text pack) / base-2-prototype (JSON source) |
 | **Production pin** | Still base-1 until CURRENT.json promotes |
-| **Bible (full requirements)** | [**BIBLE.md**](BIBLE.md) |
-| **base-1 → base-4 map** | [BASE_1_TO_BASE_4_GUIDE.md](BASE_1_TO_BASE_4_GUIDE.md) |
-| **Lessons learned** | [lessons-learned.md](lessons-learned.md) |
-| **Roadmap** | [ROADMAP.md](../../../docs/ROADMAP.md) |
-| **Multi-round Client** | [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [multi_round_example.json](multi_round_example.json) |
+| **Bible** | [docs/BIBLE.md](../../../docs/BIBLE.md) |
+| **base-1 → base-4 map** | [docs/base-1_to_base-4/](../../../docs/base-1_to_base-4/) |
+| **Roadmap** | [docs/ROADMAP.md](../../../docs/ROADMAP.md) |
+| **Multi-round** | [docs/MULTI_ROUND_CLIENT.md](../../../docs/MULTI_ROUND_CLIENT.md) |
+| **Create next BASE** | [docs/CREATE_BASE.md](../../../docs/CREATE_BASE.md) |
 
 ## What changed
 
 **Removed from system prompt:**
+
 - `## Evidence loop / hot-path return contract (CRITICAL)`
 - `## Layer A terminate contract (base-2-prototype)`
 
 **Added:**
+
 - `## Terminate (Layer A) — copy this shape`
 - Field table: req | audience | type
 - One-line distinctions (`query_decomposition` vs `wish_i_knew`, dual confidence)
@@ -48,5 +48,6 @@ chat_request_analytics_base-4_cus_travel-sample_default-1.json
 ## Regenerate text
 
 ```bash
-python3 scripts/export_base_text.py --from v2/base/base-4/min --base 4
+python3 scripts/export_base_text.py --from v2/base/base-4/min --base 4 --out v2/base/base-4 --no-set-base-id
+python3 scripts/new_base.py --refresh-manifest --base 4
 ```

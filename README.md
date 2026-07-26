@@ -15,10 +15,13 @@
 | **[docs/](docs/)** | All education / design docs |
 | [docs/PROMPT_ASSEMBLY.md](docs/PROMPT_ASSEMBLY.md) | Assembled prompt wire order (base-4 design) |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | base-5 / base-6+ + Helios |
-| [docs/JAILBREAK_POLICY.md](docs/JAILBREAK_POLICY.md) | Score + rules[] + hooks + examples |
+| [docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules/triggers + Client `output_request` |
+| [docs/PROMPT_SETTINGS.md](docs/PROMPT_SETTINGS.md) | Settings · merge · Client policy · security |
+| [docs/CREATE_BASE.md](docs/CREATE_BASE.md) | Scaffold a new `base-N` pack |
+| [docs/JAILBREAK_POLICY.md](docs/JAILBREAK_POLICY.md) | Score + named rules + hooks + examples |
 | [docs/CHAT_REQUEST.md](docs/CHAT_REQUEST.md) | What a catalog is, contracts, Client vs Hub |
 | [docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Helios emit wishlist |
-| [v2/base/base-4/BIBLE.md](v2/base/base-4/BIBLE.md) | Full base-4 requirements |
+| [docs/BIBLE.md](docs/BIBLE.md) | Full base-4 requirements |
 | [RELEASE_NOTES.md](RELEASE_NOTES.md) | Releases + **breaking changes** |
 | [COMPAT.md](COMPAT.md) | Zeus semver ↔ BASE |
 
@@ -44,10 +47,10 @@ See [COMPAT.md](COMPAT.md) · process CR-1 / board [CR](https://kotenai.atlassia
 | --- | --- |
 | **JSON** | `v2/base/base-4/min/chat_request_<mode>_base-4.json` |
 | **Text** | `v2/base/base-4/text/chat_request_<mode>_base-4.txt` |
-| **Bible** | [BIBLE.md](v2/base/base-4/BIBLE.md) |
-| **base-1 → base-4** | [BASE_1_TO_BASE_4_GUIDE.md](v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md) |
-| **Multi-round Client** | [MULTI_ROUND_CLIENT.md](v2/base/base-4/MULTI_ROUND_CLIENT.md) |
-| **Inspector notes** | [INSPECTOR.md](v2/base/base-4/INSPECTOR.md) |
+| **Bible** | [BIBLE.md](docs/BIBLE.md) |
+| **base-1 → base-4** | [BASE_1_TO_BASE_4_GUIDE.md](docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md) |
+| **Multi-round Client** | [MULTI_ROUND_CLIENT.md](docs/MULTI_ROUND_CLIENT.md) |
+| **Inspector notes** | [INSPECTOR.md](docs/INSPECTOR.md) |
 
 ```bash
 python3 scripts/export_base_text.py --from v2/base/base-4/min --base 4 --out v2/base/base-4 --no-set-base-id
@@ -102,7 +105,7 @@ These chips match the Structure map and [images/assembled_prompt.svg](images/ass
 | **BLUE · Inject** | Client / Zeus runtime inject (scope brief, business rules, session) — **not** hashed with the BASE. |
 | **PURPLE · Meta** | Lineage, envelope, Layer A–related meta. |
 
-In-app **Help** explains the chapters in more detail. Deeper notes: [v2/base/base-4/INSPECTOR.md](v2/base/base-4/INSPECTOR.md).
+In-app **Help** explains the chapters in more detail. Deeper notes: [docs/INSPECTOR.md](docs/INSPECTOR.md).
 
 ### Deep links
 
@@ -168,8 +171,9 @@ Machine index: `manifest.json`. Full scan: `catalog-index.json` (`scripts/scan_c
 2. Prefer **`sync_chat_requests`** from live Zeus after stamp.  
 3. Use this repo for demos, scaffolds, MCP fallbacks, docs.  
 4. Full (non-min) engine snapshots stay under Zeus `ai/V2/` for Hub A/B.  
-5. **Do not over-stuff prompts** — short indexed `rules[]`; company_context ≤150/250 words; see PROMPT_ASSEMBLY budget.  
-6. Opt-in **base-4** has **breaking** filename/schema deltas — see [RELEASE_NOTES.md](RELEASE_NOTES.md).
+5. **Do not over-stuff prompts** — short named `rules` (base-5 objects); company_context ≤150/250 words; see PROMPT_ASSEMBLY budget.  
+6. Opt-in **base-4** has **breaking** filename/schema deltas — see [RELEASE_NOTES.md](RELEASE_NOTES.md).  
+7. **base-5 design:** named **rules/triggers objects**; **`output_request` → `app_output`**; **settings bag** + rule merge + Client policy table — [docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md](docs/RULES_OBJECT_AND_OUTPUT_REQUEST.md) · [docs/PROMPT_SETTINGS.md](docs/PROMPT_SETTINGS.md) · [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ---
 

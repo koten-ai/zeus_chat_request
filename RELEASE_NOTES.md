@@ -47,7 +47,7 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 | Diet | Single `## Terminate (Layer A)` table + example (merged old Evidence-loop + Layer A essays) |
 | Layer A required | `summary`, `query_decomposition`, `decomposition`, `confidence` |
 | Layer A recommended | `policy_action`, `subject_confidence`, `jail_break_attempt`, `wish_i_knew`, `business_rules_triggers`, refs |
-| Docs | [BIBLE.md](v2/base/base-4/BIBLE.md) · [BASE_1_TO_BASE_4_GUIDE.md](v2/base/base-4/BASE_1_TO_BASE_4_GUIDE.md) · [lessons-learned.md](v2/base/base-4/lessons-learned.md) · [MULTI_ROUND_CLIENT.md](v2/base/base-4/MULTI_ROUND_CLIENT.md) · [JAILBREAK_POLICY.md](docs/JAILBREAK_POLICY.md) |
+| Docs | [BIBLE.md](docs/BIBLE.md) · [BASE_1_TO_BASE_4_GUIDE.md](docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md) · [lessons-learned.md](docs/base-1_to_base-4/lessons-learned.md) · [MULTI_ROUND_CLIENT.md](docs/MULTI_ROUND_CLIENT.md) · [JAILBREAK_POLICY.md](docs/JAILBREAK_POLICY.md) |
 | Schema | [response_output_schema.json](v2/base/base-4/response_output_schema.json) |
 | Helios | Aligns with wishlist **cost law**; does **not** add Pri-1 Helios fields as always-on AI emits (see ROADMAP) |
 

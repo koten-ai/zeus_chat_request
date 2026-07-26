@@ -23,6 +23,9 @@ What it does NOT do:
   - Diet/edit content for you
   - Hub stamp / contract hash validity
   - Custom cus_* naming (Workbench)
+  - Full pack scaffold (min JSON + Layer A schemas) — use scripts/new_base.py
+
+Full pack layout: docs/CREATE_BASE.md
 """
 
 from __future__ import annotations
@@ -339,10 +342,26 @@ def main(argv: list[str] | None = None) -> int:
     }
 
     if not args.dry_run:
-        (dst / "MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n")
-        write_pack_readme(dst, base_n, written, source_label)
-        print(f"wrote {dst / 'README.md'}")
-        print(f"wrote {dst / 'MANIFEST.json'}")
+        # Text-export MANIFEST is only for text-only packs. Prefer scripts/new_base.py
+        # for full packs (min+text+Layer A). Do not clobber a richer MANIFEST.
+        man_path = dst / "MANIFEST.json"
+        existing = None
+        if man_path.is_file():
+            try:
+                existing = json.loads(man_path.read_text())
+            except json.JSONDecodeError:
+                existing = None
+        if existing and existing.get("schema_version") == 2 and existing.get("catalogs"):
+            print(f"kept existing full-pack MANIFEST.json (schema_version 2); text list not overwritten")
+        else:
+            man_path.write_text(json.dumps(manifest, indent=2) + "\n")
+            print(f"wrote {man_path}")
+        readme_path = dst / "README.md"
+        if readme_path.is_file():
+            print(f"kept existing README.md (not overwritten; use scripts/new_base.py for pack README)")
+        else:
+            write_pack_readme(dst, base_n, written, source_label)
+            print(f"wrote {readme_path}")
     else:
         print("(dry-run — no files written)")
 

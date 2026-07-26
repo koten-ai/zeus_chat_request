@@ -682,7 +682,7 @@
     "audience": "zeus_client + Hub feedback",
     "docs": [
       "docs/BIBLE.md",
-      "docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md",
+      "docs/migration/base-1_to_base-4/GUIDE.md",
       "ROADMAP.md"
     ],
     "layer_a": {

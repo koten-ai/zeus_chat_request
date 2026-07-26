@@ -24,7 +24,7 @@ python3 -m http.server 8766 --bind 127.0.0.1
 
 1. Mode dropdown labels: `folder · mode · base_id · proto?`
 2. Diff: pick same mode from `v2/min` (base-1) and `base/base-4/min` (base-4)
-3. Full requirements: [BIBLE.md](BIBLE.md) · mapping: [base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md](base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md)
+3. Full requirements: [BIBLE.md](BIBLE.md) · mapping: [migration/base-1_to_base-4/GUIDE.md](migration/base-1_to_base-4/GUIDE.md)
 4. New pack scaffold: [CREATE_BASE.md](CREATE_BASE.md)
 
 ## Optional later

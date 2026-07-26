@@ -17,7 +17,7 @@
 | Step | File | Why |
 | --- | --- | --- |
 | 1 | **This Bible** | Requirements + step-by-step |
-| 1b | [base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md](base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md) | Map from production base-1 → base-4 |
+| 1b | [migration/base-1_to_base-4/GUIDE.md](migration/base-1_to_base-4/GUIDE.md) | Map from production base-1 → base-4 |
 | 2 | [`../v2/base/base-4/text/`](../v2/base/base-4/text/) | Full catalog text (easiest to read) |
 | 3 | [`../v2/base/base-4/response_output_schema.json`](../v2/base/base-4/response_output_schema.json) | Machine Layer A schema |
 | 4 | [`../v2/base/base-4/response_output_example.json`](../v2/base/base-4/response_output_example.json) | One valid terminate instance |
@@ -26,7 +26,7 @@
 | 7 | [`../v2/base/base-4/min/`](../v2/base/base-4/min/) | JSON source for stamp/Client loaders |
 | 8 | [`../v2/base/base-4/OVERVIEW.md`](../v2/base/base-4/OVERVIEW.md) | Short diet changelog only |
 | 9 | [INSPECTOR.md](INSPECTOR.md) | One index.html for multi-BASE |
-| 10 | [base-1_to_base-4/lessons-learned.md](base-1_to_base-4/lessons-learned.md) | Migration experience |
+| 10 | [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md) | Migration experience |
 | 11 | [ROADMAP.md](ROADMAP.md) | base-5 / base-6+ goals |
 | 12 | [JAILBREAK_POLICY.md](JAILBREAK_POLICY.md) | Score + rules + hooks |
 | 13 | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [assembled_prompt.svg](../images/assembled_prompt.svg) | Wire order |
@@ -715,7 +715,8 @@ docs/
   RULES_OBJECT_AND_OUTPUT_REQUEST.md
   JAILBREAK_POLICY.md · ROADMAP.md · CREATE_BASE.md
   INSPECTOR.md
-  base-1_to_base-4/             ← migration archive only
+  migration/base-X_to_base-Y/   ← hop archives
+  BASE_AGENT_PLAYBOOK.md       ← AI comply / upgrade
 
 v2/base/base-4/                 ← ship pack only
   min/*.json · text/*.txt

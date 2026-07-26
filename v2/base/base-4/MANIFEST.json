@@ -10,9 +10,11 @@
     "bible": "docs/BIBLE.md",
     "roadmap": "docs/ROADMAP.md",
     "create_base": "docs/CREATE_BASE.md",
-    "migration": "docs/base-1_to_base-4/",
+    "migration": "docs/migration/",
     "response_output_schema": "v2/base/base-4/response_output_schema.json",
-    "response_output_example": "v2/base/base-4/response_output_example.json"
+    "response_output_example": "v2/base/base-4/response_output_example.json",
+    "agents": "AGENTS.md",
+    "playbook": "docs/BASE_AGENT_PLAYBOOK.md"
   },
   "updated_at": "2026-07-26T14:04:51Z",
   "generator": "scripts/new_base.py --refresh-manifest",

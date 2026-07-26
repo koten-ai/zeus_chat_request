@@ -511,7 +511,7 @@ G3: policy_action = clarify
 | Recommended Layer A | — | policy_action, scores, wish_i_knew, triggers |
 | Inspector | same `index.html` | pick folder · mode · **base_id** |
 
-Full map: [BASE_1_TO_BASE_4_GUIDE.md](../docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md).
+Full map: [GUIDE.md](migration/base-1_to_base-4/GUIDE.md).
 
 ---
 

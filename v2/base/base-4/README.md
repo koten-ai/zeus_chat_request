@@ -13,8 +13,8 @@ Ship pack for chat_request catalogs. **Design docs** live under [`docs/`](../../
 | **Overview / diet notes** | [OVERVIEW.md](OVERVIEW.md) |
 | **Requirements (docs)** | [BIBLE.md](../../../docs/BIBLE.md) — ownership §2 |
 | **Control plane** | [PROMPT_SETTINGS.md](../../../docs/PROMPT_SETTINGS.md) · [ROADMAP.md](../../../docs/ROADMAP.md) |
-| **base-1 → base-4 map** | [BASE_1_TO_BASE_4_GUIDE.md](../../../docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md) |
-| **Lessons** | [lessons-learned.md](../../../docs/base-1_to_base-4/lessons-learned.md) |
+| **base-1 → base-4 map** | [BASE_1_TO_BASE_4_GUIDE.md](../../../docs/migration/base-1_to_base-4/GUIDE.md) |
+| **Lessons** | [lessons-learned.md](../../../docs/migration/base-1_to_base-4/lessons-learned.md) |
 | **Multi-round** | [MULTI_ROUND_CLIENT.md](../../../docs/MULTI_ROUND_CLIENT.md) |
 | **Inspector** | [INSPECTOR.md](../../../docs/INSPECTOR.md) |
 | **Create next BASE** | [CREATE_BASE.md](../../../docs/CREATE_BASE.md) · `scripts/new_base.py` |

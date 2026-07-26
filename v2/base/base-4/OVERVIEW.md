@@ -10,7 +10,7 @@ Short pack changelog only. Full requirements: [docs/BIBLE.md](../../../docs/BIBL
 | **Parent** | base-3 (text pack) / base-2-prototype (JSON source) |
 | **Production pin** | Still base-1 until CURRENT.json promotes |
 | **Bible** | [docs/BIBLE.md](../../../docs/BIBLE.md) |
-| **base-1 → base-4 map** | [docs/base-1_to_base-4/](../../../docs/base-1_to_base-4/) |
+| **base-1 → base-4 map** | [docs/migration/base-1_to_base-4/](../../../docs/migration/base-1_to_base-4/) |
 | **Roadmap** | [docs/ROADMAP.md](../../../docs/ROADMAP.md) |
 | **Multi-round** | [docs/MULTI_ROUND_CLIENT.md](../../../docs/MULTI_ROUND_CLIENT.md) |
 | **Create next BASE** | [docs/CREATE_BASE.md](../../../docs/CREATE_BASE.md) |

@@ -81,11 +81,15 @@ python3 scripts/export_base_text.py --from v2/base/base-4/min --base 5
      python3 scripts/new_base.py --refresh-manifest --base N
 5. Scan inspector index:
      python3 scripts/scan_catalogs.py
-6. Update docs/ROADMAP.md + RELEASE_NOTES.md; optional docs/base-(N-1)_to_base-N/
-7. Update [COMPAT.md](../COMPAT.md) (Zeus × BASE × zeus_client row for the new BASE)
-8. Diff in index.html (parent mode vs new mode)
-9. Client spike + stamp path before CURRENT pin
+6. Update docs/ROADMAP.md + RELEASE_NOTES.md
+7. Add hop folder: `docs/migration/base-(N-1)_to_base-N/` with `GUIDE.md` (+ lessons)
+8. Update [COMPAT.md](../COMPAT.md) + [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) jump/comply cards
+9. Diff in index.html (parent mode vs new mode)
+10. Client spike + stamp path before CURRENT pin
 ```
+
+See [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) for the full agent upgrade recipe.
+
 
 
 ---
@@ -131,5 +135,7 @@ Envelope:    _format: "zeus.chat_request.v2"   # not the file stem
 | --- | --- |
 | [BIBLE.md](BIBLE.md) | Current design-line requirements |
 | [ROADMAP.md](ROADMAP.md) | What base-5+ should contain |
-| [base-1_to_base-4/](base-1_to_base-4/) | Example migration archive |
+| [migration/](migration/) | All hops (`base-X_to_base-Y`) |
+| [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) | AI comply / upgrade procedures |
+| [../AGENTS.md](../AGENTS.md) | Repo AI entry |
 | [../v2/base/base-4/](../v2/base/base-4/) | Reference pack layout |

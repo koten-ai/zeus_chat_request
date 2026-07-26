@@ -4,7 +4,7 @@
 
 
 **Status:** living plan after base-1 → base-4  
-**Normative (base-4):** [BIBLE.md](BIBLE.md) · **Lessons:** [base-1_to_base-4/lessons-learned.md](base-1_to_base-4/lessons-learned.md)  
+**Normative (base-4):** [BIBLE.md](BIBLE.md) · **Lessons:** [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md)  
 **Helios requests (source of truth for analytics emits):** [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)  
 **base-5 inject / Layer A deltas:** [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) — **rules + triggers as objects**; Client **`output_request` → `app_output`** (each app field = **`type` + `description`**; type-only is not enough)  
 **base-5 control plane:** [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) — **settings bag** · **rule pack merge/freeze** · **Client policy table** · cache zones · security · observability  
@@ -506,7 +506,10 @@ Helios volume is **report/session scalars**.
 | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order + budgets |
 | [BIBLE.md](BIBLE.md) | Normative base-4 + §2 ownership |
 | [RELEASE_NOTES.md](../RELEASE_NOTES.md) | What shipped + **breaking changes** |
-| [base-1_to_base-4/lessons-learned.md](base-1_to_base-4/lessons-learned.md) | Experience |
+| [migration/README.md](migration/README.md) | All BASE hops `base-X_to_base-Y` |
+| [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) | AI comply / upgrade procedures |
+| [../AGENTS.md](../AGENTS.md) | Repo AI entry |
+| [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md) | Experience (1→4 hop) |
 
 ---
 

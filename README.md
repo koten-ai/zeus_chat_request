@@ -14,6 +14,9 @@
 
 | Doc | Topic |
 | --- | --- |
+| **[AGENTS.md](AGENTS.md)** | **AI entry** — hard rules + BASE comply/upgrade |
+| [docs/BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) | Comply with base-X · upgrade X→Y |
+| [docs/migration/](docs/migration/) | Hop archives (`base-X_to_base-Y`) |
 | **[docs/README.md](docs/README.md)** | **Doc hub** — layout rules + full index |
 | [COMPAT.md](COMPAT.md) | **Zeus × chat_request BASE × zeus_client** versions |
 | [docs/BIBLE.md](docs/BIBLE.md) | Requirements + ownership (set/unset/change) |
@@ -46,7 +49,7 @@ See [COMPAT.md](COMPAT.md) · process CR-1 / board [CR](https://kotenai.atlassia
 | **JSON** | `v2/base/base-4/min/chat_request_<mode>_base-4.json` |
 | **Text** | `v2/base/base-4/text/chat_request_<mode>_base-4.txt` |
 | **Bible** | [BIBLE.md](docs/BIBLE.md) |
-| **base-1 → base-4** | [BASE_1_TO_BASE_4_GUIDE.md](docs/base-1_to_base-4/BASE_1_TO_BASE_4_GUIDE.md) |
+| **base-1 → base-4** | [BASE_1_TO_BASE_4_GUIDE.md](docs/migration/base-1_to_base-4/GUIDE.md) |
 | **Multi-round Client** | [MULTI_ROUND_CLIENT.md](docs/MULTI_ROUND_CLIENT.md) |
 | **Inspector notes** | [INSPECTOR.md](docs/INSPECTOR.md) |
 

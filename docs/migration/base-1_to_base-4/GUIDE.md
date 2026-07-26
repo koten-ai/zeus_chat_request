@@ -2,7 +2,7 @@
 
 **Purpose:** Show what stayed the same, what moved, and what was added from the production pin (**base-1**) through prototypes (**base-2**, **base-3**) to the current diet pack (**base-4**).
 
-**Start here for full base-4 requirements:** [BIBLE.md](../BIBLE.md)  
+**Start here for full base-4 requirements:** [BIBLE.md](../../BIBLE.md)  
 **Experience / pitfalls:** [lessons-learned.md](lessons-learned.md)
 
 | BASE | Role | Path |
@@ -242,7 +242,7 @@ Growth base-1 → base-2/4 is mostly **Layer A schema text + system addendum**, 
 4. Switch file discovery to `*_base-4.json` (or pin path).  
 5. Wire `business_injection.rules[]` if using triggers.  
 6. Stamp on Hub before production — do not reuse prototype hashes.  
-7. Read [BIBLE.md](../BIBLE.md) §10 checklists.
+7. Read [BIBLE.md](../../BIBLE.md) §10 checklists.
 
 ### What you do **not** need to relearn
 
@@ -274,8 +274,8 @@ Growth base-1 → base-2/4 is mostly **Layer A schema text + system addendum**, 
 
 | Need | base-1 | base-4 |
 | --- | --- | --- |
-| What is a catalog | [docs/CHAT_REQUEST.md](../CHAT_REQUEST.md) | + [BIBLE.md](../BIBLE.md) |
-| Assembled prompt | [docs/PROMPT_ASSEMBLY.md](../PROMPT_ASSEMBLY.md) · [diagram](../../images/assembled_prompt.svg) | Bible §1 |
+| What is a catalog | [docs/CHAT_REQUEST.md](../../CHAT_REQUEST.md) | + [BIBLE.md](../../BIBLE.md) |
+| Assembled prompt | [docs/PROMPT_ASSEMBLY.md](../../PROMPT_ASSEMBLY.md) · [diagram](../../../images/assembled_prompt.svg) | Bible §1 |
 | Terminate schema | implied by tools + prompt | `response_output_schema.json` |
 | Multi-round Client | informal | `MULTI_ROUND_CLIENT.md` |
 | Naming customs | — | Bible §2 + this guide §2 |
@@ -299,7 +299,7 @@ Growth base-1 → base-2/4 is mostly **Layer A schema text + system addendum**, 
 ## 15. Recommended reading path (migrator)
 
 1. This guide (orientation)  
-2. [BIBLE.md](../BIBLE.md) (normative base-4)  
+2. [BIBLE.md](../../BIBLE.md) (normative base-4)  
 3. Diff mentally: base-1 Evidence loop ↔ base-4 Terminate table  
 4. `response_output_schema.json` vs base-1 four fields  
 5. `MULTI_ROUND_CLIENT.md` if building/updating Client  

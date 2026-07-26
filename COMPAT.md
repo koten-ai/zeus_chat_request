@@ -124,12 +124,17 @@ Scaffold process: [docs/CREATE_BASE.md](docs/CREATE_BASE.md) · `scripts/new_bas
 
 | Doc | Role |
 | --- | --- |
+| [AGENTS.md](AGENTS.md) | AI entry — hard rules |
+| [docs/BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md) | **Comply with base-X / upgrade X→Y** (checklists for catalog + Zeus + Client) |
+| [docs/migration/README.md](docs/migration/README.md) | Hop archives `base-X_to_base-Y` |
 | [docs/README.md](docs/README.md) | Doc hub + layout rules |
 | [docs/BIBLE.md](docs/BIBLE.md) | Normative base-4-era requirements + ownership |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | base-5+ plan |
 | [docs/CREATE_BASE.md](docs/CREATE_BASE.md) | New pack process |
 | [RELEASE_NOTES.md](RELEASE_NOTES.md) | What shipped + breaking changes |
 | [CURRENT.json](CURRENT.json) | Production BASE pin |
+
+**Implementing a matrix row:** follow [BASE_AGENT_PLAYBOOK.md](docs/BASE_AGENT_PLAYBOOK.md), then record the hop under `docs/migration/base-X_to_base-Y/`.
 
 ---
 

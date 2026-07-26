@@ -70,11 +70,26 @@ python3 scripts/verify_base_pack.py --base N   # must print OK
 
 ## 10. Residual after pack (not pack PR)
 
-These stay open until green — do **not** flip `CURRENT.json`:
+These stay open until green — do **not** flip `CURRENT.json` until stamp + Client + Detective green:
 
-1. **zeus_client** — object rules/triggers, settings bag, output_request type+description, policy table, app_output validate, dual-read ≤1 release.  
-2. **Zeus** — loaders `*_base-5.json`, return/Detective allow object triggers + optional app_output, lineage stamp path.  
-3. **Pin** — only after stamp + Client + Detective (see CR pin epic / checklist §8).
+1. **zeus_client** — object rules/triggers, settings bag, output_request type+description, policy table, app_output validate; prefer **no** dual-read if no external consumers.  
+2. **Zeus engine** — not just “allow fields”; full list of gotchas is in  
+   **[base-5 → base-5.2 lessons (Zeus 0.6 pin)](../base-5_to_base-5.2/lessons-learned.md)**  
+   (filenames, synthetic `return`, checklist wording, report rollup, Helios).  
+3. **Helios** — Analytics SQL / Motions must jump with Zeus minor (e.g. Helios **0.6** with Zeus **0.6**); sparse optional, but **shapes when present** are base-5+ only.  
+4. **Pin** — only after stamp + Client + Detective (checklist §8). Zeus can **vendor** base-5.2 via `PIN.json` before `CURRENT.json` flips — those are independent pins.
+
+### 10.1 What Zeus residual actually meant (2026-07, first 0.6 lab)
+
+Do **not** treat residual #2 as “paste catalog and ship”:
+
+| Assumed | Reality on first Beelink chat |
+| --- | --- |
+| Loader finds `*_base-5.json` | Must strip `_base-N` / `_base-N.M` from mode parse **and** prefer pin filenames over leftover `*_v2_min.json` in the same folder |
+| Detective grades “required four” | If the model never calls `return`, Zeus may stamp a **synthetic** terminate — that bag must still fill the four fields (or checklist always fails) |
+| “Evidence loop” string in prompt | base-5 min packs say **evidence rules** / terminate tables — checklist must not hard-require the old heading |
+| `wish_i_knew` string passthrough | base-5.2 schema is **array of objects** — string-only tool handlers drop model emits |
+| Helios keeps working | Object `business_rules_triggers`, dual gaps, report fields need a **Helios version train**, not silent dual-read |
 
 ## 11. Jira is part of the ship (Phase J)
 

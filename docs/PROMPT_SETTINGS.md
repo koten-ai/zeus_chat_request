@@ -78,13 +78,13 @@ settings:
   # After Zeus tool results land in messages[]:
   #   false (default) = cheap path: surface tables/UI; do not require a second AI turn
   #   true            = schedule another AI round so the model can analyze/narrate tool JSON
-  # See ROADMAP.md § Emit usr + ai_process_result · ZC-WISH-044
+  # See ROADMAP.md § Emit user + ai_process_result · ZC-WISH-044
   ai_process_result: false
 
   # --- emit / analytics provenance (cheap Client stamp on report root) ---
-  # Who wrote the Analytics/session row: zc|z|h|a — product Client always "zc"
+  # Who wrote the Analytics/session row: zeus_client|zeus|helios|admin — product Client always "zeus_client"
   # See ROADMAP.md · ZC-WISH-035 · HEL-WISH-022
-  # usr is set by Client on sink, not by the model
+  # user is set by Client on sink, not by the model
 
   # --- safety / ops ---
   redaction: "default" | "strict" | "off_dev_only"
@@ -105,7 +105,7 @@ settings:
 | `ab_arm` | **S C U** | report slice | R | base-6+ product |
 | `output_request` | **S C U** | inject + validate | R | base-5 |
 | `ai_process_result` | **S C** | **C** loop after tools | — | default **false**; base-6+ / ZC-WISH-044 |
-| `usr` (report stamp) | — | **S C** on sink | — | closed enum; ZC-WISH-035 · not model |
+| `user` (report stamp) | — | **S C** on sink | — | closed enum; ZC-WISH-035 · not model |
 | `redaction` / `debug` / log flags | **S C** | enforce | — | Defaults safe |
 | `zeus_round` | — | **S C** | echo only | Bible §2 |
 

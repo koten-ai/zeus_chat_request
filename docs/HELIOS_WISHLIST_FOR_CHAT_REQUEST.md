@@ -1219,37 +1219,37 @@ Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `t
 
 ---
 
-### HEL-WISH-022 — Emit provenance `usr` (who wrote the row)
+### HEL-WISH-022 — Emit provenance `user` (who wrote the row)
 
 | Attribute | Value |
 | --- | --- |
 | **Business requirement** | Helios Motions must slice **product Client** traffic vs Hub/admin/engine noise without parsing free text. |
-| **Insight sought** | “Only zc product sessions today with a real scope.” |
+| **Insight sought** | “Only zeus_client product sessions today with a real scope.” |
 | **Example** | See JSON + SQL. |
-| **Fields** | Root `usr` closed enum. |
+| **Fields** | Root `user` closed enum. |
 | **Required?** | **recommended** on every new sink; missing = legacy/unknown |
-| **Provider** | **Zeus Client** (`zc`) · **admin/Hub** (`a`) · **Zeus** (`z` if engine sinks) · **Helios** (`h` if Helios writes) |
+| **Provider** | **Zeus Client** (`zeus_client`) · **admin/Hub** (`admin`) · **Zeus** (`zeus` if engine sinks) · **Helios** (`helios` if Helios writes) |
 | **AI load** | **none** |
 | **Cost class** | **cheap** |
 | **Data kind** | low-card string enum |
 | **Motions** | Funnel / Explore day filters; quality dashboards |
 | **Priority** | **2** (cheap spine; pairs with ZC-WISH-035) |
-| **Related** | [ROADMAP.md § Emit `usr` + `ai_process_result`](ROADMAP.md) |
+| **Related** | [ROADMAP.md § Emit `user` + `ai_process_result`](ROADMAP.md) |
 
 ```json
 {
-  "usr": "zc",
+  "user": "zeus_client",
   "ts": "2026-07-27T22:10:00.000Z",
   "scope": "yelp-demo/_default"
 }
 ```
 
-| `usr` | Meaning |
+| `user` | Meaning |
 | --- | --- |
-| `zc` | zeus_client (product middleman) |
-| `z` | Zeus engine (engine-authored sink only) |
-| `h` | Helios |
-| `a` | admin / Hub |
+| `zeus_client` | zeus_client (product middleman) |
+| `zeus` | Zeus engine (engine-authored sink only) |
+| `helios` | Helios |
+| `admin` | admin / Hub |
 
 ```sql
 SELECT META().id
@@ -1257,7 +1257,7 @@ FROM `zeus_sessions`.`session`.`traces` t
 WHERE t.`ts` >= /* today start */
   AND t.`ts` <  /* tomorrow start */
   AND t.`scope` IS NOT MISSING
-  AND t.`usr` = "zc"
+  AND t.`user` = "zeus_client"
 ```
 
 ---
@@ -1270,7 +1270,7 @@ WHERE t.`ts` >= /* today start */
 - Materialized rollup collection naming in Analytics?  
 - Closed enums for `path.stage` / `refine.offer_type` / `blocker_code` — who owns the registry?  
 - Compare candidates: max N per turn to protect Analytics size?  
-- **`usr`:** session-level only vs per-turn override when Hub embeds Client? (ROADMAP open Qs)  
+- **`user`:** session-level only vs per-turn override when Hub embeds Client? (ROADMAP open Qs)  
 
 ---
 
@@ -1282,4 +1282,4 @@ WHERE t.`ts` >= /* today start */
 | 2026-07-24 | **Explicit JSON examples + types**; **raw vs precomputed/both** with turn-time sum pattern; precomputed counts/sums on outcome/path/constraints. |
 | 2026-07-24 | **§0.2 + HEL-WISH-012**: sparse AI semantics; `multi_part` true-only exception; primary QD rule; dump ≠ multi; Helios SCHEMA_AND_SPARSE_DATA cross-link. |
 | 2026-07-24 | **HEL-WISH-013–021** after Helios Motions live train: user_text_preview, funnel stage, deployment_id, context dump, compare scores, refine recovery, chat recovery, tool fingerprint. |
-| 2026-07-27 | **HEL-WISH-022** root **`usr`** (`zc`\|`z`\|`h`\|`a`) for Helios day/scope filters; pairs with Client **ZC-WISH-035** + optional **`ai_process_result`** (ROADMAP). |
+| 2026-07-27 | **HEL-WISH-022** root **`user`** (`zeus_client`|`zeus`|`helios`|`admin`) for Helios day/scope filters; pairs with Client **ZC-WISH-035** + optional **`ai_process_result`** (ROADMAP). |

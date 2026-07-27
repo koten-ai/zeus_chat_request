@@ -261,7 +261,7 @@ ai_process_result=false  →  AI → Zeus → UI(+ optional terminate)
 ai_process_result=true   →  AI → Zeus → AI (process results) → return
 ```
 
-**Report root:** stamp **`usr`** (`zc` for product Client) on every Analytics/session sink so Helios can filter product traffic. See [ROADMAP.md § Emit `usr` + `ai_process_result`](ROADMAP.md) · **ZC-WISH-035** (`usr`) · **ZC-WISH-044** (`ai_process_result`) · **HEL-WISH-022**.
+**Report root:** stamp **`user`** (`zeus_client` for product Client) on every Analytics/session sink so Helios can filter product traffic. See [ROADMAP.md § Emit `user` + `ai_process_result`](ROADMAP.md) · **ZC-WISH-035** (`user`) · **ZC-WISH-044** (`ai_process_result`) · **HEL-WISH-022**.
 
 ---
 

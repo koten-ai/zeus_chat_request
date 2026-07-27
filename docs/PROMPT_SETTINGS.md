@@ -78,12 +78,12 @@ settings:
   # After Zeus tool results land in messages[]:
   #   false (default) = cheap path: surface tables/UI; do not require a second AI turn
   #   true            = schedule another AI round so the model can analyze/narrate tool JSON
-  # See ROADMAP.md § Emit user + ai_process_result · ZC-WISH-044
+  # See ROADMAP.md § base-6.1 · ZC-WISH-044 · pack v2/base/base-6.1/
   ai_process_result: false
 
   # --- emit / analytics provenance (cheap Client stamp on report root) ---
   # Who wrote the Analytics/session row: zeus_client|zeus|helios|admin — product Client always "zeus_client"
-  # See ROADMAP.md · ZC-WISH-035 · HEL-WISH-022
+  # See ROADMAP.md § base-6.1 · ZC-WISH-035 · HEL-WISH-022
   # user is set by Client on sink, not by the model
 
   # --- safety / ops ---
@@ -104,8 +104,8 @@ settings:
 | `locale` / `tz` / `channel` / `market` | **S C U** | inject meta line | R | Helios cheap |
 | `ab_arm` | **S C U** | report slice | R | base-6+ product |
 | `output_request` | **S C U** | inject + validate | R | base-5 |
-| `ai_process_result` | **S C** | **C** loop after tools | — | default **false**; base-6+ / ZC-WISH-044 |
-| `user` (report stamp) | — | **S C** on sink | — | closed enum; ZC-WISH-035 · not model |
+| `ai_process_result` | **S C** | **C** loop after tools | — | default **false**; **base-6.1** · ZC-WISH-044 |
+| `user` (report stamp) | — | **S C** on sink | — | closed enum; **base-6.1** · ZC-WISH-035 · not model |
 | `redaction` / `debug` / log flags | **S C** | enforce | — | Defaults safe |
 | `zeus_round` | — | **S C** | echo only | Bible §2 |
 

@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6** (`v2/base/base-6/`) · last wire break **base-5** · Zeus 0.6 vendor **base-6** · next **Client inject `hints.*` (ZC-WISH-040)** · **`user` + `ai_process_result` (ZC-WISH-035/044 · HEL-WISH-022)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6.1** (`v2/base/base-6.1/`) · last wire break **base-5** · Zeus 0.6 vendor **base-5.3 / base-6 packs available** · next **Client `user` + `ai_process_result` (ZC-WISH-035/044)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4 → **base-5 wire freeze** → **5.1 / 5.2 / 5.3 content** (5.3 pack on main)  
@@ -62,10 +62,14 @@ This is **what we want next and why**, not a commitment calendar.
 
 ---
 
-## Emit `user` + `ai_process_result` (Client · Helios · Hub)
+## base-6.1 — `user` emit + `ai_process_result` (Client loop)
 
-**Status:** design / wishlist · **not** a base-5 wire break · land as **cheap Client + report emits** (base-6+ / Client package)  
-**SoT backlog:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) **ZC-WISH-035** (`user`), **ZC-WISH-044** (`ai_process_result`) · [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) **HEL-WISH-022** · multi-round bags [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · settings [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md)
+**Jira residual:** Client **ZC-WISH-035 / 044** · Helios **HEL-WISH-022** (filters only)  
+**Pack:** [`v2/base/base-6.1/`](../v2/base/base-6.1/) · parent **base-6** · hop [migration/base-6_to_base-6.1/](migration/base-6_to_base-6.1/)  
+**Status:** **candidate pack on main** · **not** a base-5 wire break · Client runtime residual  
+**SoT backlog:** [ZEUS_CLIENT_WISHLIST…](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) · multi-round [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · settings [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · Helios filter [HEL-WISH-022](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)
+
+### Emit `user` + `ai_process_result`
 
 ### Why (lab example)
 
@@ -160,21 +164,28 @@ ai_process_result = true (insight):
 4. Should insight turn be **blocked** when tool status ≠ ok / empty rows (avoid paying for “I found nothing” essays)? **Proposal:** product policy flag later; default still call AI if true.  
 5. Exact Analytics path for `user` (`session.user` vs per-turn `turn.user`) — **Proposal:** both session default + per-turn override if multi-writer sessions appear.
 
-### 5) Success signals
+### Success signals (base-6.1)
 
-- [ ] Spec in ROADMAP + wishlists (**this section**)  
-- [ ] Client stamps `user` on every report sink · COMPAT row  
-- [ ] Helios Motions / sample queries filter `user = "zeus_client"` + scope + day  
-- [ ] Client implements `ai_process_result` default false · integration test both arms  
+- [x] Spec in ROADMAP + wishlists (**this section**)  
+- [x] Pack `v2/base/base-6.1/` + hop + CORE note  
+- [x] `verify_base_pack.py --base 6.1` OK  
+- [x] COMPAT candidate row · RELEASE_NOTES  
+- [x] Client wishlist stripped of Helios Pri-3 bulk; ZC-035/044 kept  
+- [ ] Client stamps `user` on every report sink (ZC-WISH-035)  
+- [ ] Helios Motions filter `user = "zeus_client"` + scope + day (HEL-WISH-022)  
+- [ ] Client implements `ai_process_result` default false (ZC-WISH-044)  
 - [ ] Hub documents Debug default if different from product  
 - [ ] No new **required** Layer A fields for either feature  
 
-### 6) Sequencing
+### Sequencing
 
 ```text
-base-5 Client floor (CR-20) ──► cheap Helios spine (user = HEL-WISH-022 / ZC-WISH-035)
-                            ──► ai_process_result (ZC-WISH-044) product flag
-base-6 hints (ZC-WISH-040) remains orthogonal (soft steer, not insight-turn law)
+base-6 (hints pack) ──► base-6.1 (user + ai_process_result pack + docs)
+        │                      │
+        │                      ├── Client ZC-WISH-035 / 044
+        │                      └── Helios HEL-WISH-022 filters only
+base-5 Client floor (CR-20) remains orthogonal floor
+ZC-WISH-040 hints inject remains orthogonal soft steer
 ```
 
 ---
@@ -189,8 +200,10 @@ No production traffic on the **base-4/5 line** yet. Use that:
 | **base-5.1** | **Content patch on base-5 wire** — **not** a new wire break | Restore **mode overlays** in system prompt (`messages[].content`); core+overlay; no Layer A rename |
 | **base-5.2** | **Additive G2 design on base-5 wire** | Keep classic **`wish_i_knew`** + append **`data_gaps`** for Helios acquisition ([WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md)) |
 | **base-5.3** | **Content skinny train on base-5 wire** — **not** a wire break | Prose no-rediscovery · **verb clarity** (desc + params vs V2 API) · schema diet · **usage-driven** skinny packs (stamped A/B) · world-model CORE blurb · **no** runtime strip of hashed verbs · **no** Layer A rename |
-| **base-6+** | **ADDITIVE / OPTIONAL only** | Soft hints/A/B · optional_when fields · Workbench UX · Helios norms as cheap emits · pin when green |
-| **Helios wishlist** | **Nice-to-have** (cheap provider first) | Pri-1 Zeus/Client report scalars — **never** required AI Layer A tax |
+| **base-6** | **ADDITIVE** soft inject | Soft **`hints.*`** after hard `rules{}` ([HINTS.md](HINTS.md)) |
+| **base-6.1** | **ADDITIVE** Client-loop / emit train on base-6 | Root **`user`** enum · **`ai_process_result`** (default false) — **§ base-6.1** |
+| **base-6.2+** | **ADDITIVE / OPTIONAL only** | Further soft inject productization · Workbench UX · pin when green |
+| **Helios wishlist** | **Nice-to-have** (cheap provider first) | Pri-1 report scalars in [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) — **not** Client wishlist bulk |
 
 ```text
 base-5    = last wire/control-plane break before real adoption of this line
@@ -300,14 +313,15 @@ Full plan: **§ Getting skinny**.
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
 | Client injects `hints.*` after rules{} | Soft steer not live until Client | **CR-4** residual · ZC-WISH-040 |
+| Client stamps `user` + `ai_process_result` loop | base-6.1 residual | **ZC-WISH-035 / 044** |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
-**Pack SoT for new work:** **base-5 wire** · **candidate pack base-6** (`v2/base/base-6/`) · prior content **base-5.3**.  
+**Pack SoT for new work:** **base-5 wire** · **candidate pack base-6.1** (`v2/base/base-6.1/`) · prior **base-6** · **base-5.3**.  
 **Production pin:** **base-1**.  
-**Zeus 0.6 vendor:** **base-5.3** as of **ZE-273** / `0.6.15` (base-6 optional later).  
-**Hop:** [migration/base-5.3_to_base-6/](migration/base-5.3_to_base-6/) · [HINTS.md](HINTS.md).  
+**Zeus 0.6 vendor:** **base-5.3** as of **ZE-273** / `0.6.15` (base-6 / 6.1 packs available; not required pin).  
+**Hop:** [migration/base-6_to_base-6.1/](migration/base-6_to_base-6.1/) · prior [base-5.3_to_base-6/](migration/base-5.3_to_base-6/) · [HINTS.md](HINTS.md).  
 **Modes:** [MODE.md](MODE.md) · plan [work/RECREATE_MODE.md](../work/RECREATE_MODE.md).  
-**Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4 · soft hints **ZC-WISH-040**.
+**Client implement order:** [ZEUS_CLIENT_WISHLIST…](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) · **ZC-WISH-035/044** (base-6.1) · soft hints **ZC-WISH-040**.
 
 ---
 

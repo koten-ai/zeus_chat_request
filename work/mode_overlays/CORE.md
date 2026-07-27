@@ -26,6 +26,11 @@ Zeus is an **AI-Ready overlay** over operator-owned documents: it projects entit
    - Prefer those biases for first moves — they never replace jailbreak/company law, MINI-SCHEMA, or required Layer A.
    - Multi-paragraph multi-ask ≠ switch to mode=open; use decomposition + recipes (see playbook).
 
+5) **After Zeus tool data (Client loop — base-6.1)**
+   - Product default is **cheap**: show tool results in UI without requiring another model essay.
+   - When the Client sets **`ai_process_result: true`**, expect another turn with tool JSON already in the transcript — analyze/narrate from evidence only; do not re-run the same successful pipeline.
+   - Report sinks stamp root **`user`**: `zeus_client` | `zeus` | `helios` | `admin` (Client stamps `zeus_client` on product traffic) — never invent this field.
+
 ## Execution style (latency matters)
 
 - Act, don't narrate. Emit tool call or ONE pipeline directly.

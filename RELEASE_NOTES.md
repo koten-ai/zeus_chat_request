@@ -8,7 +8,7 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 | **Format** | `zeus.chat_request.v2` |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
 | **Candidate pack** | **base-5** wire line — `v2/base/base-5/` (last breaking freeze; not pin) |
-| **Content train** | **base-6.1** — `user` emit + `ai_process_result` ([v2/base/base-6.1/](v2/base/base-6.1/)) |
+| **Content train** | **base-6.1** — `user` + `ip_address` emit + `ai_process_result` ([v2/base/base-6.1/](v2/base/base-6.1/)) |
 | **Prior content** | base-6 soft `hints.*` · base-5.3 skinny/world-model · base-5.2 dual gaps · base-5.1 modes |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` |
 | **Roadmap** | [ROADMAP.md](docs/ROADMAP.md) |
@@ -23,8 +23,9 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 
 - **base-6.1 content train:** [`v2/base/base-6.1/`](v2/base/base-6.1/) — parent `base-6`, **additive only**:
   - Root report field **`user`**: `zeus_client` | `zeus` | `helios` | `admin` (product Client stamps `zeus_client`)
+  - Root report field **`ip_address`**: IPv4 or IPv6 string when known (omit when unknown; never invent)
   - Client setting **`ai_process_result`** (bool, **default false**) — optional post-Zeus AI insight turn
-  - Thin CORE note: cheap default after tools; re-call only when Client enables insight; never invent `user`
+  - Thin CORE note: cheap default after tools; re-call only when Client enables insight; never invent `user` / `ip_address`
   - Hop: [docs/migration/base-6_to_base-6.1/](docs/migration/base-6_to_base-6.1/)
   - Client residual: **ZC-WISH-035**, **ZC-WISH-044** · Helios filter: **HEL-WISH-022**
   - Client wishlist: stripped Helios Pri-3 bulk (locale/channel/market…); Helios SoT remains [HELIOS_WISHLIST…](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)

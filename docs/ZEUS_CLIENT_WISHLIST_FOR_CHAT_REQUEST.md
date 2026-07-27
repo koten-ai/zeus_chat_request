@@ -24,7 +24,7 @@
 
 **Process:** each item is a **Request** — not shipped until a Client package version implements it and [COMPAT.md](../COMPAT.md) records the floor. Depth lives in linked SoT docs; this file is the **prioritized Client backlog + acceptance bar**.
 
-**Not this file:** Helios dashboard field catalogues (locale Motions, funnel stages, geo_norm, …). Those live only in [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md). Client implements **stamps and loop law** it owns (e.g. root `user`, `ai_process_result`).
+**Not this file:** Helios dashboard field catalogues (locale Motions, funnel stages, geo_norm, …). Those live only in [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md). Client implements **stamps and loop law** it owns (e.g. root `user`, `ip_address`, `ai_process_result`).
 
 ---
 
@@ -44,7 +44,7 @@
 | --- | --- | --- |
 | **1** | **base-5 floor** — blocks COMPAT “Client supports base-5” and pin promote | Object rules/triggers, policy table |
 | **2** | Strong reliability / safety before broad trial | Soft-require `policy_action`, force-return levers |
-| **3** | base-6.1 Client emit / loop | root **`user`** stamp · **`ai_process_result`** |
+| **3** | base-6.1 Client emit / loop | root **`user`** + **`ip_address`** stamps · **`ai_process_result`** |
 | **4** | base-6+ soft inject productization | Soft hints, ab_arm |
 | **5** | Nice / later languages or Workbench UX | Go/Node parity, advanced cache |
 
@@ -123,7 +123,7 @@ IDs are stable: **`ZC-WISH-NNN`**. Do not renumber; mark **wont** instead.
 
 | ID | Request | SoT | Acceptance |
 | --- | --- | --- | --- |
-| **ZC-WISH-035** | Stamp root **`user`** on every report/session sink | ROADMAP § base-6.1 · pack base-6.1 | Closed enum `zeus_client` \| `zeus` \| `helios` \| `admin`; product Client always **`zeus_client`**; Hub/admin **`admin`**; never AI |
+| **ZC-WISH-035** | Stamp root **`user`** + optional **`ip_address`** on every report/session sink | ROADMAP § base-6.1 · pack base-6.1 | `user` closed enum `zeus_client` \| `zeus` \| `helios` \| `admin` (product Client always **`zeus_client`**); **`ip_address`**: IPv4 or IPv6 string when known, omit when unknown; never AI |
 | **ZC-WISH-044** | **`ai_process_result`** (bool, **default false**) on chat_prompt / settings | ROADMAP § base-6.1 · MULTI_ROUND · PROMPT_SETTINGS | After Zeus tool data: `false` = cheap UI/table path; `true` = extra AI turn to analyze/narrate |
 
 IDs **ZC-WISH-030…034** (locale/channel/market/deployment Helios spine) were **removed from this file** — implement via [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) + product ops, not Client wishlist bulk. Do not renumber; treat 030–034 as **relocated / not tracked here**.
@@ -205,24 +205,26 @@ metrics emit (G2 never UI)
 validate app_output if requested
 ```
 
-### ZC-WISH-035 — root `user` stamp (base-6.1)
+### ZC-WISH-035 — root `user` + `ip_address` stamps (base-6.1)
 
 ```json
 {
   "user": "zeus_client",
+  "ip_address": "203.0.113.42",
   "ts": "2026-07-27T22:10:00.000Z",
   "scope": "yelp-demo/_default"
 }
 ```
 
-| Value | Writer |
-| --- | --- |
-| `zeus_client` | product Client (default for app traffic) |
-| `zeus` | Zeus engine only if engine is the sink author |
-| `helios` | Helios if it writes a row |
-| `admin` | Hub / Workbench / Debug admin surfaces |
+| Field | Value | Writer |
+| --- | --- | --- |
+| `user` | `zeus_client` | product Client (default for app traffic) |
+| `user` | `zeus` | Zeus engine only if engine is the sink author |
+| `user` | `helios` | Helios if it writes a row |
+| `user` | `admin` | Hub / Workbench / Debug admin surfaces |
+| `ip_address` | IPv4 or IPv6 string (e.g. `203.0.113.42`, `2001:db8::1`) | same sink writer when remote addr known; omit / empty when unknown |
 
-Never set by the model. Helios product filters: `user = "zeus_client"` and scope present.
+Never set by the model. Helios product filters: `user = "zeus_client"` and scope present. Privacy: product may redact or drop `ip_address` per policy — do not invent.
 
 ### ZC-WISH-044 — `ai_process_result` (base-6.1)
 
@@ -248,7 +250,7 @@ After tool results land in `messages[]`, honor the flag (see [MULTI_ROUND_CLIENT
 8. ZC-WISH-010/013/014 policy table + hooks dual score
 9. ZC-WISH-015 multi-round smoke
 10. ZC-WISH-020…024 reliability
-11. ZC-WISH-035 user stamp · ZC-WISH-044 ai_process_result (base-6.1)
+11. ZC-WISH-035 user + ip_address stamps · ZC-WISH-044 ai_process_result (base-6.1)
 12. Package bump + COMPAT Client column
 13. ZC-WISH-040…043 base-6 soft inject productization
 ```
@@ -287,5 +289,5 @@ After tool results land in `messages[]`, honor the flag (see [MULTI_ROUND_CLIENT
 
 | Date | Note |
 | --- | --- |
-| 2026-07-27 | **base-6.1:** ZC-WISH-035 (`user`) · ZC-WISH-044 (`ai_process_result`); **removed** Helios Pri-3 bulk ZC-WISH-030…034 from this file |
+| 2026-07-27 | **base-6.1:** ZC-WISH-035 (`user` + `ip_address` IPv4/IPv6) · ZC-WISH-044 (`ai_process_result`); **removed** Helios Pri-3 bulk ZC-WISH-030…034 from this file |
 | 2026-07-26 | Initial Client wishlist floor catalogue |

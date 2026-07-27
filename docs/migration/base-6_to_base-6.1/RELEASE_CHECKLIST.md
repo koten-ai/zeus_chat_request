@@ -12,7 +12,7 @@
 
 ## 0. Pre-flight (Phase A)
 
-- [x] ROADMAP theme: `user` + `ai_process_result` (readable enums)  
+- [x] ROADMAP theme: `user` + `ip_address` + `ai_process_result` (readable enums)  
 - [x] Additive only (no Layer A rename)  
 - [x] Helios bulk stays out of Client wishlist  
 

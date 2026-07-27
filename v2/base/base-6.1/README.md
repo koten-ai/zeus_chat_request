@@ -4,7 +4,7 @@ Thin index for the **base-6.1** snapshot (additive Client-loop train on base-6).
 
 | | |
 | --- | --- |
-| **Theme** | `user` emit enum + `ai_process_result` (default false) |
+| **Theme** | `user` emit enum + `ip_address` (IPv4/IPv6) + `ai_process_result` (default false) |
 | **Parent** | base-6 |
 | **Wire** | base-5 (no break) |
 | **OVERVIEW** | [OVERVIEW.md](OVERVIEW.md) |

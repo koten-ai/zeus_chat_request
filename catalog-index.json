@@ -3,7 +3,7 @@
   "description": "Auto-scanned chat_request*.json under v2/ for the inspector UI",
   "scan_glob": "v2/**/chat_request*.json",
   "count": 100,
-  "updated_at": "2026-07-27T22:44:47Z",
+  "updated_at": "2026-07-27T22:49:16Z",
   "catalogs": [
     {
       "file": "v2/base/base-6.1/min/chat_request_analytics_base-6.1.json",
@@ -29,8 +29,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "7fdc33bb9d97339c4d866406e8f51ba9c022288cb21260c705fa8bf7fd0fab6a",
-      "bytes": 41432
+      "sha256": "2eceae5f9274bf39fff3d0bdb13ded5092b7529b71f35eec7037f15f52201e2e",
+      "bytes": 41497
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_auto_base-6.1.json",
@@ -56,8 +56,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "29c8c079f1a68ed70e245f75d2108e1084ca7c33da1777b2d1352803e60df212",
-      "bytes": 41281
+      "sha256": "45ab71a3ab5185e7e0f06359540fd0373a4a71c8834a8528149588c512e8e656",
+      "bytes": 41346
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_code_base-6.1.json",
@@ -83,8 +83,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "a35a8d3aa3cb7092679d76e67f43ebd36633b9a42ccb1d0bc650912ffa853bb2",
-      "bytes": 41544
+      "sha256": "027b8f5729bbb0c9c3736e44346a36ae6bb4ee2c2deeebffe34b4e8d00ababef",
+      "bytes": 41609
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_custom_base-6.1.json",
@@ -110,8 +110,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "5b5ec7eebd3575008a7d0ef3a107d742f3da77ed0af7c8a61112a9731e6dab4e",
-      "bytes": 40834
+      "sha256": "47a0e529765d307ed47a30cf78ac966806cb197124be893d8cbbf12c81e0e115",
+      "bytes": 40899
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_fraud_base-6.1.json",
@@ -137,8 +137,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "1b1378c09f58564aab38442a288351b9addeb4446e63d6c80843006949e9ca90",
-      "bytes": 41781
+      "sha256": "fab356bcaf7bc4f99cde93980405d26b3c1c4eb8be0f1725921a07b9d1602354",
+      "bytes": 41846
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_open_base-6.1.json",
@@ -164,8 +164,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "27b226c35c774d7dba557baa69271461b5d0922081ce9f1c46b91210a911a23e",
-      "bytes": 40935
+      "sha256": "3b45b2f17313f7ce4c8ea650c26ab7174327ec7cdcac313f238c541121774cea",
+      "bytes": 41000
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_private_base-6.1.json",
@@ -191,8 +191,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "dc887711c53e53a74d47a1ad05fd4edebe016b664e944d33a840532dcb1c4347",
-      "bytes": 40944
+      "sha256": "d25c41746fa6f09646f5fd4ef90003fe4f587dc63ab16dc5b53230c565f9b66f",
+      "bytes": 41009
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_regulated_base-6.1.json",
@@ -218,8 +218,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "23505b8c18a23946c2b845b8aba05162e6ebd1e6cc3fa3b4467eae582a47b5d6",
-      "bytes": 41523
+      "sha256": "c9796161ef268aeb7dc75353689a5805c9a814d1baeb1e32f1c20ec673319dc2",
+      "bytes": 41588
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_research_base-6.1.json",
@@ -245,8 +245,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "bbea7b069a154b1df76ddea6686bad8415c587e7a08c06fa3ffca51f8f9e04fe",
-      "bytes": 41582
+      "sha256": "5f007dbd8997dd4fd97fed98e27a8e7a7702cc1ebe634d7a9a63952008d849c4",
+      "bytes": 41647
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_tenant_base-6.1.json",
@@ -272,8 +272,8 @@
         "parent_base_id": "base-5.1",
         "text_pack_base_id": "base-6.1"
       },
-      "sha256": "64fad5800f054cbfb7e042fbcd4fbbfffa502ced0767ad3209064beb6e7431d4",
-      "bytes": 40965
+      "sha256": "86d1d14e518db13375a89cf4f0a5f50d6cc6ecbabea1b7d627f4ae6bc7f14911",
+      "bytes": 41030
     },
     {
       "file": "v2/base/base-6/min/chat_request_analytics_base-6.json",

@@ -29,7 +29,7 @@ Zeus is an **AI-Ready overlay** over operator-owned documents: it projects entit
 5) **After Zeus tool data (Client loop — base-6.1)**
    - Product default is **cheap**: show tool results in UI without requiring another model essay.
    - When the Client sets **`ai_process_result: true`**, expect another turn with tool JSON already in the transcript — analyze/narrate from evidence only; do not re-run the same successful pipeline.
-   - Report sinks stamp root **`user`**: `zeus_client` | `zeus` | `helios` | `admin` (Client stamps `zeus_client` on product traffic) — never invent this field.
+   - Report sinks stamp root **`user`**: `zeus_client` | `zeus` | `helios` | `admin` (Client stamps `zeus_client` on product traffic) and optional **`ip_address`** (IPv4 or IPv6 string when known) — never invent these fields.
 
 ## Execution style (latency matters)
 

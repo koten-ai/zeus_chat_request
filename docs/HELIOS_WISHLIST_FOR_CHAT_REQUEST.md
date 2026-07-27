@@ -1219,37 +1219,39 @@ Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `t
 
 ---
 
-### HEL-WISH-022 — Emit provenance `user` (who wrote the row)
+### HEL-WISH-022 — Emit provenance `user` + `ip_address` (who wrote the row)
 
 | Attribute | Value |
 | --- | --- |
-| **Business requirement** | Helios Motions must slice **product Client** traffic vs Hub/admin/engine noise without parsing free text. |
-| **Insight sought** | “Only zeus_client product sessions today with a real scope.” |
+| **Business requirement** | Helios Motions must slice **product Client** traffic vs Hub/admin/engine noise without parsing free text; optional caller IP for abuse/geo. |
+| **Insight sought** | “Only zeus_client product sessions today with a real scope.” · “Which IPs hit this scope today?” |
 | **Example** | See JSON + SQL. |
-| **Fields** | Root `user` closed enum. |
-| **Required?** | **recommended** on every new sink; missing = legacy/unknown |
+| **Fields** | Root `user` closed enum · root `ip_address` IPv4/IPv6 string when known. |
+| **Required?** | **`user` recommended** on every new sink (missing = legacy/unknown); **`ip_address` optional** (omit when unknown / redacted) |
 | **Provider** | **Zeus Client** (`zeus_client`) · **admin/Hub** (`admin`) · **Zeus** (`zeus` if engine sinks) · **Helios** (`helios` if Helios writes) |
 | **AI load** | **none** |
 | **Cost class** | **cheap** |
-| **Data kind** | low-card string enum |
-| **Motions** | Funnel / Explore day filters; quality dashboards |
+| **Data kind** | low-card string enum (`user`) · raw network string (`ip_address`) |
+| **Motions** | Funnel / Explore day filters; quality dashboards; optional IP drill-down |
 | **Priority** | **2** (cheap spine; pairs with ZC-WISH-035) |
-| **Related** | [ROADMAP.md § Emit `user` + `ai_process_result`](ROADMAP.md) |
+| **Related** | [ROADMAP.md § Emit `user` + `ip_address` + `ai_process_result`](ROADMAP.md) |
 
 ```json
 {
   "user": "zeus_client",
+  "ip_address": "203.0.113.42",
   "ts": "2026-07-27T22:10:00.000Z",
   "scope": "yelp-demo/_default"
 }
 ```
 
-| `user` | Meaning |
+| Field | Meaning |
 | --- | --- |
-| `zeus_client` | zeus_client (product middleman) |
-| `zeus` | Zeus engine (engine-authored sink only) |
-| `helios` | Helios |
-| `admin` | admin / Hub |
+| `user` = `zeus_client` | zeus_client (product middleman) |
+| `user` = `zeus` | Zeus engine (engine-authored sink only) |
+| `user` = `helios` | Helios |
+| `user` = `admin` | admin / Hub |
+| `ip_address` | Caller IPv4 or IPv6 textual form; never invented by AI |
 
 ```sql
 SELECT META().id
@@ -1282,4 +1284,4 @@ WHERE t.`ts` >= /* today start */
 | 2026-07-24 | **Explicit JSON examples + types**; **raw vs precomputed/both** with turn-time sum pattern; precomputed counts/sums on outcome/path/constraints. |
 | 2026-07-24 | **§0.2 + HEL-WISH-012**: sparse AI semantics; `multi_part` true-only exception; primary QD rule; dump ≠ multi; Helios SCHEMA_AND_SPARSE_DATA cross-link. |
 | 2026-07-24 | **HEL-WISH-013–021** after Helios Motions live train: user_text_preview, funnel stage, deployment_id, context dump, compare scores, refine recovery, chat recovery, tool fingerprint. |
-| 2026-07-27 | **HEL-WISH-022** root **`user`** (`zeus_client`|`zeus`|`helios`|`admin`) for Helios day/scope filters; pairs with Client **ZC-WISH-035** + optional **`ai_process_result`** (ROADMAP). |
+| 2026-07-27 | **HEL-WISH-022** root **`user`** (`zeus_client`|`zeus`|`helios`|`admin`) + optional **`ip_address`** (IPv4/IPv6) for Helios day/scope filters; pairs with Client **ZC-WISH-035** + optional **`ai_process_result`** (ROADMAP). |

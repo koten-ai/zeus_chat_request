@@ -261,7 +261,7 @@ ai_process_result=false  →  AI → Zeus → UI(+ optional terminate)
 ai_process_result=true   →  AI → Zeus → AI (process results) → return
 ```
 
-**Report root:** stamp **`user`** (`zeus_client` for product Client) on every Analytics/session sink so Helios can filter product traffic. See [ROADMAP.md § base-6.1](ROADMAP.md) · pack **base-6.1** · **ZC-WISH-035** · **ZC-WISH-044** · **HEL-WISH-022**.
+**Report root:** stamp **`user`** (`zeus_client` for product Client) and optional **`ip_address`** (IPv4 or IPv6 string when known) on every Analytics/session sink so Helios can filter product traffic. See [ROADMAP.md § base-6.1](ROADMAP.md) · pack **base-6.1** · **ZC-WISH-035** · **ZC-WISH-044** · **HEL-WISH-022**.
 
 ---
 

@@ -6,7 +6,7 @@
 
 ## 1. Readable enums beat short codes
 
-Root field is **`user`**, not `usr`. Values are full names (`zeus_client`, `zeus`, `helios`, `admin`) — not `zc|z|h|a`. Analytics filters and dashboards stay human-readable; document size is not the constraint.
+Root field is **`user`**, not `usr`. Values are full names (`zeus_client`, `zeus`, `helios`, `admin`) — not `zc|z|h|a`. Companion **`ip_address`** is a single string (IPv4 or IPv6 textual form), not separate `ipv4`/`ipv6` fields. Analytics filters and dashboards stay human-readable; document size is not the constraint.
 
 ## 2. Cheap default wins
 
@@ -14,7 +14,7 @@ Root field is **`user`**, not `usr`. Values are full names (`zeus_client`, `zeus
 
 ## 3. Client stamps; model never invents
 
-`user` is set by the **sink writer** (Client / Hub / engine). Never Layer A. Never model free text. Helios product purity = `user = "zeus_client"` **and** scope present.
+`user` and optional `ip_address` are set by the **sink writer** (Client / Hub / engine). Never Layer A. Never model free text. Helios product purity = `user = "zeus_client"` **and** scope present. Missing `ip_address` is fine; inventing one is not.
 
 ## 4. Helios backlog stays in HELIOS_WISHLIST
 

@@ -83,8 +83,9 @@ settings:
 
   # --- emit / analytics provenance (cheap Client stamp on report root) ---
   # Who wrote the Analytics/session row: zeus_client|zeus|helios|admin — product Client always "zeus_client"
+  # Caller IP when known: IPv4 or IPv6 textual string (e.g. "203.0.113.42" / "2001:db8::1"); omit when unknown
   # See ROADMAP.md § base-6.1 · ZC-WISH-035 · HEL-WISH-022
-  # user is set by Client on sink, not by the model
+  # user + ip_address are set by Client on sink, not by the model
 
   # --- safety / ops ---
   redaction: "default" | "strict" | "off_dev_only"
@@ -106,6 +107,7 @@ settings:
 | `output_request` | **S C U** | inject + validate | R | base-5 |
 | `ai_process_result` | **S C** | **C** loop after tools | — | default **false**; **base-6.1** · ZC-WISH-044 |
 | `user` (report stamp) | — | **S C** on sink | — | closed enum; **base-6.1** · ZC-WISH-035 · not model |
+| `ip_address` (report stamp) | — | **S C** on sink | — | IPv4 or IPv6 string when known; omit when unknown; **base-6.1** · ZC-WISH-035 · not model |
 | `redaction` / `debug` / log flags | **S C** | enforce | — | Defaults safe |
 | `zeus_round` | — | **S C** | echo only | Bible §2 |
 

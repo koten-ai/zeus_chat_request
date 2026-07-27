@@ -2,8 +2,8 @@
   "schema_version": 2,
   "base_id": "base-6.1",
   "kind": "base",
-  "status": "candidate",
-  "note": "base-6.1 additive train: user emit enum + ai_process_result (default false). Parent base-6 soft hints. No wire break. Client residual ZC-WISH-035/044.",
+  "status": "scaffold",
+  "note": "base-6.1 scaffolded from (refresh) v2/base/base-6.1. Edit catalogs + Layer A schemas; do not invent production contract hashes. Design docs live under docs/ (see docs/BIBLE.md, docs/CREATE_BASE.md).",
   "paths": {
     "min": "v2/base/base-6.1/min",
     "text": "v2/base/base-6.1/text",
@@ -14,7 +14,7 @@
     "response_output_example": "v2/base/base-6.1/response_output_example.json"
   },
   "parent_source": "(refresh) v2/base/base-6.1",
-  "updated_at": "2026-07-27T22:44:47Z",
+  "updated_at": "2026-07-27T22:49:15Z",
   "generator": "scripts/new_base.py",
   "catalogs": [
     {
@@ -22,70 +22,70 @@
       "mode": "analytics",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 41432
+      "bytes": 41497
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_auto_base-6.1.json",
       "mode": "auto",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 41281
+      "bytes": 41346
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_code_base-6.1.json",
       "mode": "code",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 41544
+      "bytes": 41609
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_custom_base-6.1.json",
       "mode": "custom",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 40834
+      "bytes": 40899
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_fraud_base-6.1.json",
       "mode": "fraud",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 41781
+      "bytes": 41846
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_open_base-6.1.json",
       "mode": "open",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 40935
+      "bytes": 41000
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_private_base-6.1.json",
       "mode": "private",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 40944
+      "bytes": 41009
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_regulated_base-6.1.json",
       "mode": "regulated",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 41523
+      "bytes": 41588
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_research_base-6.1.json",
       "mode": "research",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 41582
+      "bytes": 41647
     },
     {
       "file": "v2/base/base-6.1/min/chat_request_tenant_base-6.1.json",
       "mode": "tenant",
       "base_id": "base-6.1",
       "prototype": false,
-      "bytes": 40965
+      "bytes": 41030
     }
   ]
 }

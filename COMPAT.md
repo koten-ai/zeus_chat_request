@@ -22,7 +22,7 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | **Zeus engine 0.6.x line** | **`0.6.15+`** — **vendors base-5.3** (`PIN.json` + embed `pin.json`; [ZE-273](https://kotenai.atlassian.net/browse/ZE-273)) — **breaking** vs 0.5 |
 | **chat_request production pin (CURRENT)** | **`base-1`** — [`CURRENT.json`](CURRENT.json) · [`v2/min/`](v2/min/) until stamp + Client + Detective green on CURRENT flip |
 | **chat_request Zeus 0.6 vendor pin** | **`base-5.3`** — pack [`v2/base/base-5.3/`](v2/base/base-5.3/) (content train; same base-5 wire as 5.2) |
-| **chat_request candidates** | base-5 … **base-5.3** (Zeus vendor) · **base-6** (soft `hints.*`) · **base-6.1** (`user` + `ai_process_result`; Client residual) |
+| **chat_request candidates** | base-5 … **base-5.3** (Zeus vendor) · **base-6** (soft `hints.*`) · **base-6.1** (`user` + `ip_address` + `ai_process_result`; Client residual) |
 | **zeus_client (Python)** | **`0.1.0`** — object floor TBD until Client ships base-5 wire |
 | **Helios** | **0.6.x** pairs Zeus **0.6.x** (HEL-17); do not run Helios 0.2 Analytics against base-5.2 report shapes |
 | **Envelope** | `_format: "zeus.chat_request.v2"` |
@@ -40,7 +40,7 @@ Zeus operator matrix (surface checklist): Zeus repo [`docs/ops/COMPAT.md`](https
 | `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | 0.2.x | **supported (prior)** | Production CURRENT pin path |
 | `0.5.x` / `0.6.x` trial | base-4 / base-5 / base-5.1 / base-5.2 / **base-5.3** / **base-6** / **base-6.1** packs | *TBD* | — | **candidate / history** | base-6 = soft hints; base-6.1 = `user` + `ai_process_result`; prefer base-5.3 vendor until Client lands residual |
 | `0.6.x` | base-1 | any | any | **unsupported** | Wrong wire for 0.6 Detective/report |
-| *future* | **`base-6+`** live inject + emit | base-5 floor + soft `hints.*` + `user` stamp | matching | **additive only** | No rename/remove of base-5 wire without new major · ZC-WISH-035/040/044 |
+| *future* | **`base-6+`** live inject + emit | base-5 floor + soft `hints.*` + `user`/`ip_address` stamps | matching | **additive only** | No rename/remove of base-5 wire without new major · ZC-WISH-035/040/044 |
 | *future* | promoted pin (`CURRENT` → base-5.2+) | matching Client floor | matching | — | Only after stamp + Client + Detective green |
 
 **Status legend**

@@ -6,14 +6,15 @@
 | **To** | `base-6.1` |
 | **Breaking wire?** | **No** — additive on base-5 wire |
 | **Pack** | [`v2/base/base-6.1/`](../../../v2/base/base-6.1/) |
-| **ROADMAP** | [§ base-6.1](../../ROADMAP.md) · [§ Emit `user` + `ai_process_result`](../../ROADMAP.md) |
+| **ROADMAP** | [§ base-6.1](../../ROADMAP.md) · [§ Emit `user` + `ip_address` + `ai_process_result`](../../ROADMAP.md) |
 
 ## Theme
 
 1. Root report field **`user`**: `zeus_client` | `zeus` | `helios` | `admin` (product Client stamps **`zeus_client`**)  
-2. Client setting **`ai_process_result`** (bool, **default `false`**) — optional post-Zeus AI insight turn  
-3. Thin CORE note so the model expects re-call only when Client enables insight  
-4. Keep base-6 soft **`hints.*`** + base-5.3 world-model / verb clarity  
+2. Root report field **`ip_address`**: IPv4 or IPv6 string when known (omit when unknown) — next to `user`  
+3. Client setting **`ai_process_result`** (bool, **default `false`**) — optional post-Zeus AI insight turn  
+4. Thin CORE note so the model expects re-call only when Client enables insight  
+5. Keep base-6 soft **`hints.*`** + base-5.3 world-model / verb clarity  
 
 ## Commands
 

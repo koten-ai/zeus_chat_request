@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6.1** (`v2/base/base-6.1/`) · last wire break **base-5** · Zeus 0.6 vendor **base-5.3 / base-6 packs available** · next **Client `user` + `ai_process_result` (ZC-WISH-035/044)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6.1** (`v2/base/base-6.1/`) · last wire break **base-5** · Zeus 0.6 vendor **base-5.3 / base-6 packs available** · next **Client `user` + `ip_address` + `ai_process_result` (ZC-WISH-035/044)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4 → **base-5 wire freeze** → **5.1 / 5.2 / 5.3 content** (5.3 pack on main)  
@@ -56,20 +56,20 @@ This is **what we want next and why**, not a commitment calendar.
 14. Modes optimize **join/noise/hop appetite**; multi-paragraph multi-ask is **not** “switch to open”
 15. End-goal: shape the board with **named_query rails** (PREPARED fast-pass) from mined hot paths — **shape the funnel, don’t shrink the box** ([OPTIMIZATION.md](OPTIMIZATION.md))
 16. **Multi-turn:** prefer reusing prior Zeus tool evidence when the user points at it; sharpen under traffic (OPTIMIZATION Option A) — do not unconstrained-rediscover “those / listed” sets
-17. **Emit provenance `user`:** every Analytics / session back-and-forth root stamps **who wrote the row** (`zeus_client`|`zeus`|`helios`|`admin`) so Helios can filter product traffic (`user="zeus_client"`) vs Hub/admin noise — **§ Emit `user` + `ai_process_result`**
+17. **Emit provenance `user` + `ip_address`:** every Analytics / session back-and-forth root stamps **who wrote the row** (`zeus_client`|`zeus`|`helios`|`admin`) and optional **caller IP** (IPv4 or IPv6 string) so Helios can filter product traffic (`user="zeus_client"`) vs Hub/admin noise — **§ Emit `user` + `ip_address` + `ai_process_result`**
 18. **Optional AI insight turn:** Client setting **`ai_process_result`** (default **false**) — after Zeus tool data lands, either surface rows cheaply (one AI plan + tools) **or** spend another AI round to analyze/talk about the data — **not** a Layer A tax
 ```
 
 ---
 
-## base-6.1 — `user` emit + `ai_process_result` (Client loop)
+## base-6.1 — `user` + `ip_address` emit + `ai_process_result` (Client loop)
 
 **Jira residual:** Client **ZC-WISH-035 / 044** · Helios **HEL-WISH-022** (filters only)  
 **Pack:** [`v2/base/base-6.1/`](../v2/base/base-6.1/) · parent **base-6** · hop [migration/base-6_to_base-6.1/](migration/base-6_to_base-6.1/)  
 **Status:** **candidate pack on main** · **not** a base-5 wire break · Client runtime residual  
 **SoT backlog:** [ZEUS_CLIENT_WISHLIST…](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) · multi-round [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · settings [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · Helios filter [HEL-WISH-022](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)
 
-### Emit `user` + `ai_process_result`
+### Emit `user` + `ip_address` + `ai_process_result`
 
 ### Why (lab example)
 
@@ -77,11 +77,11 @@ Hub AI Chat can already: **one model plan → one Zeus `pipeline` → rows in UI
 
 Operators / products sometimes want a **second AI turn** that reads tool JSON and writes a human insight (“what to do in Tampa…”) without making every product path pay that cost.
 
-Helios Motions over `` `zeus_sessions`.`session`.`traces` `` also need a **stable slice**: product Client traffic vs Hub admin vs engine-only — without parsing free-text “I called Zeus.”
+Helios Motions over `` `zeus_sessions`.`session`.`traces` `` also need a **stable slice**: product Client traffic vs Hub admin vs engine-only — without parsing free-text “I called Zeus.” Companion **`ip_address`** (when known) supports abuse / geo / “who hit us” without a second AI tax.
 
-### 1) Root field `user` (emit provenance)
+### 1) Root fields `user` + `ip_address` (emit provenance)
 
-Stamp on the **root of the session / turn / back-and-forth payload** that lands in Analytics (and any parallel report envelope). **Closed enum — do not invent codes.**
+Stamp on the **root of the session / turn / back-and-forth payload** that lands in Analytics (and any parallel report envelope). **Closed enum for `user` — do not invent codes. `ip_address` is a network address string only.**
 
 | `user` | Writer | Typical surface |
 | --- | --- | --- |
@@ -90,9 +90,15 @@ Stamp on the **root of the session / turn / back-and-forth payload** that lands 
 | **`helios`** | **Helios** (if Helios writes/annotates a row) | Motions / ops enrich (rare) |
 | **`admin`** | **admin / Hub** | Workbench, Debug AI Chat, admin tools |
 
+| Field | Type | Rule |
+| --- | --- | --- |
+| **`user`** | closed enum above | Required-recommended on new sinks |
+| **`ip_address`** | **string** — **IPv4 or IPv6** textual form (e.g. `203.0.113.42`, `2001:db8::1`) | Optional when known; omit / empty when unknown; never invent; product may redact per privacy policy |
+
 ```json
 {
   "user": "zeus_client",
+  "ip_address": "203.0.113.42",
   "ts": "2026-07-27T22:10:00.000Z",
   "scope": "yelp-demo/_default",
   "session_id": "…",
@@ -115,10 +121,11 @@ WHERE t.`ts` >= /* start of today UTC or tenant tz */
 
 | Rule | |
 | --- | --- |
-| **Who sets it** | The **component that owns the write** to Analytics/report — Client stamps **`zeus_client`** on product sinks; Hub/admin surfaces stamp **`admin`**; only stamp **`zeus`** if Zeus itself is the sink author |
-| **Never AI** | Model must not invent `user` |
-| **Missing** | Treat as **unknown / legacy** — Helios dashboards that care about product purity **filter `user = "zeus_client"`** (missing ≠ product) |
-| **Not Layer A** | Scalar on report/session root — cheap |
+| **Who sets them** | The **component that owns the write** to Analytics/report — Client stamps **`zeus_client`** + caller **`ip_address`** (when available) on product sinks; Hub/admin surfaces stamp **`admin`**; only stamp **`zeus`** if Zeus itself is the sink author |
+| **Never AI** | Model must not invent `user` or `ip_address` |
+| **Missing `user`** | Treat as **unknown / legacy** — Helios dashboards that care about product purity **filter `user = "zeus_client"`** (missing ≠ product) |
+| **Missing `ip_address`** | OK (server-to-server, privacy redact, no remote addr) — do not invent |
+| **Not Layer A** | Scalars on report/session root — cheap |
 
 ### 2) Client setting `ai_process_result` (optional insight turn)
 
@@ -153,6 +160,7 @@ ai_process_result = true (insight):
 | Piece | BASE / package | Breaking wire? |
 | --- | --- | --- |
 | `user` on report/session root | **Client + Zeus emit** (COMPAT when live) | **No** — additive scalar |
+| `ip_address` on report/session root | **Client + Zeus emit** (IPv4/IPv6 string when known) | **No** — additive scalar |
 | `ai_process_result` | **Client settings** (Pri-4 / base-6 era product) | **No** — loop policy |
 | Catalog prose | Optional one-liner: “when product asks for insight, Client may call you again with tool results” | Content only |
 
@@ -171,7 +179,7 @@ ai_process_result = true (insight):
 - [x] `verify_base_pack.py --base 6.1` OK  
 - [x] COMPAT candidate row · RELEASE_NOTES  
 - [x] Client wishlist stripped of Helios Pri-3 bulk; ZC-035/044 kept  
-- [ ] Client stamps `user` on every report sink (ZC-WISH-035)  
+- [ ] Client stamps `user` (+ `ip_address` when known) on every report sink (ZC-WISH-035)  
 - [ ] Helios Motions filter `user = "zeus_client"` + scope + day (HEL-WISH-022)  
 - [ ] Client implements `ai_process_result` default false (ZC-WISH-044)  
 - [ ] Hub documents Debug default if different from product  
@@ -201,7 +209,7 @@ No production traffic on the **base-4/5 line** yet. Use that:
 | **base-5.2** | **Additive G2 design on base-5 wire** | Keep classic **`wish_i_knew`** + append **`data_gaps`** for Helios acquisition ([WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md)) |
 | **base-5.3** | **Content skinny train on base-5 wire** — **not** a wire break | Prose no-rediscovery · **verb clarity** (desc + params vs V2 API) · schema diet · **usage-driven** skinny packs (stamped A/B) · world-model CORE blurb · **no** runtime strip of hashed verbs · **no** Layer A rename |
 | **base-6** | **ADDITIVE** soft inject | Soft **`hints.*`** after hard `rules{}` ([HINTS.md](HINTS.md)) |
-| **base-6.1** | **ADDITIVE** Client-loop / emit train on base-6 | Root **`user`** enum · **`ai_process_result`** (default false) — **§ base-6.1** |
+| **base-6.1** | **ADDITIVE** Client-loop / emit train on base-6 | Root **`user`** enum · **`ip_address`** (IPv4/IPv6) · **`ai_process_result`** (default false) — **§ base-6.1** |
 | **base-6.2+** | **ADDITIVE / OPTIONAL only** | Further soft inject productization · Workbench UX · pin when green |
 | **Helios wishlist** | **Nice-to-have** (cheap provider first) | Pri-1 report scalars in [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) — **not** Client wishlist bulk |
 
@@ -313,7 +321,7 @@ Full plan: **§ Getting skinny**.
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
 | Client injects `hints.*` after rules{} | Soft steer not live until Client | **CR-4** residual · ZC-WISH-040 |
-| Client stamps `user` + `ai_process_result` loop | base-6.1 residual | **ZC-WISH-035 / 044** |
+| Client stamps `user` + `ip_address` + `ai_process_result` loop | base-6.1 residual | **ZC-WISH-035 / 044** |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
 **Pack SoT for new work:** **base-5 wire** · **candidate pack base-6.1** (`v2/base/base-6.1/`) · prior **base-6** · **base-5.3**.  
@@ -1474,7 +1482,7 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 8. Customs filename smoke in scan + Client.  
 9. **`ab_arm`** on report (cheap Client scalar) — slice by full vs skinny **stamp** and by soft ab_paste arm.  
 10. **A/B stamped skinny packs** (fewer verbs or thinner schemas) promoted only after Hot Path + gold green — not runtime allowlists that unhash production.  
-11. **`user` emit** on session/turn report root (`zeus_client`|`zeus`|`helios`|`admin`) — **ZC-WISH-035** · **§ Emit `user` + `ai_process_result`**.  
+11. **`user` + `ip_address` emit** on session/turn report root (`zeus_client`|`zeus`|`helios`|`admin`; IPv4/IPv6 when known) — **ZC-WISH-035** · **§ Emit `user` + `ip_address` + `ai_process_result`**.  
 12. **`ai_process_result`** Client setting (default **false**) — optional post-Zeus AI insight turn — **ZC-WISH-044**.
 
 ### Helios goals (Pri-2/3 — optional / nice-to-have)
@@ -1507,9 +1515,9 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 - [x] Pack `v2/base/base-6/` + hop + [HINTS.md](HINTS.md)  
 - [x] lessons-learned / migration note  
 - [x] BEST_PRACTICES ↔ hints.path recipe ids aligned in docs  
-- [x] Design: **`user` + `ai_process_result`** on ROADMAP + wishlists (**§ Emit `user` + `ai_process_result`**)  
+- [x] Design: **`user` + `ip_address` + `ai_process_result`** on ROADMAP + wishlists (**§ Emit `user` + `ip_address` + `ai_process_result`**)  
 - [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps (**ZC-WISH-040**)  
-- [ ] Client: stamp **`user`** on report sinks (**ZC-WISH-044**); Helios filters **`user="zeus_client"`** (**HEL-WISH-022**)  
+- [ ] Client: stamp **`user`** + optional **`ip_address`** on report sinks (**ZC-WISH-035**); Helios filters **`user="zeus_client"`** (**HEL-WISH-022**)  
 - [ ] Client: **`ai_process_result`** default false; insight-turn path (**ZC-WISH-044**)  
 - [ ] P0 path + fields + multipart on one integration path  
 - [ ] G2 metrics without UI leak  

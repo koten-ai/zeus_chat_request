@@ -741,10 +741,10 @@ Production default pin may **keep all 13** until Hot Path evidence says a skinny
 - [ ] Phase 0 gold + **per-verb histogram** baseline  
 - [ ] Prompt Helper / Hot Path surfaces never/rare/common verbs  
 - [ ] At least one A/B: full stamp vs skinny stamp (re-hashed)  
-- [ ] base-5.3 pack: prose + **verb clarity P0** + schema diet; Diff content-only  
+- [x] base-5.3 pack: prose + **verb clarity P0** + schema diet; Diff content-only  
 - [ ] Rediscovery rate down **without** breaking enforcement chats  
 - [ ] Inject-missing rate down (root cause for many `describe` calls)  
-- [ ] COMPAT / RELEASE_NOTES note base-5.3 skinny train  
+- [x] COMPAT / RELEASE_NOTES note base-5.3 skinny train  
 - [ ] ZC-WISH / Workbench notes: empirics → stamp, not mid-turn tools[] edit  
 
 ### Sequencing vs other work
@@ -888,8 +888,8 @@ name/description are language (text_fts → search); abv/ibu/srm are measures (g
 ### Success signals
 
 - [x] Vocabulary + draft blurb written in ROADMAP  
-- [ ] CORE blurb in base-5.3 packs (≤ ~180 words)  
-- [ ] Diff base-5.2 → base-5.3 shows worldview + skinny diet, no wire break  
+- [x] CORE blurb in base-5.3 packs (world-model + access path)  
+- [x] Diff base-5.2 → base-5.3 shows worldview + skinny diet, no wire break  
 - [ ] `company_context` pattern documented for Client (ZC-WISH / PROMPT_SETTINGS cross-link)  
 - [ ] Gold: multi-entity / FK questions prefer find+link or traverse/walk over invent  
 - [ ] Operators can point sales/docs at DESIGN §1 + foundation; chat_request stays short
@@ -1100,10 +1100,10 @@ Minor polish: prefer terminating pipeline when multi-step already planned; keep 
 ### Success signals
 
 - [x] Findings written in ROADMAP (this section)  
-- [ ] P0 order/find/search fixed in base-5.3 packs + system examples  
-- [ ] P1 describe/get/traverse/pipeline desc+key params  
-- [ ] Diff base-5.2 → base-5.3 shows clearer tools; gold ranking/sort cases pass  
-- [ ] Spot-check: no `direction` on `order` in any mode system text  
+- [x] P0 order/find/search fixed in base-5.3 packs + system examples  
+- [x] P1 describe/get/traverse/pipeline desc+key params  
+- [x] Diff base-5.2 → base-5.3 shows clearer tools (gold ranking deferred)  
+- [x] Spot-check: no `direction` on `order` in any mode system text  
 - [ ] Optional: gold cases for empty-where (text_fts mis-use) improve  
 
 ### Sequencing
@@ -1162,12 +1162,12 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 
 ### Success signals
 
-- [ ] `v2/base/base-5.3/` scaffold + verify  
-- [ ] Diff base-5.2 → base-5.3 is content only (world-model + verb clarity + skinny diet)  
-- [ ] **P0:** order uses `field:` + `asc`; no system `direction`  
-- [ ] **P0:** find/search KEY constraints + search properties complete  
-- [ ] Contract/enforcement law called out in pack OVERVIEW  
-- [ ] CORE blurb present in all 10 modes; mode overlays still distinct  
+- [x] `v2/base/base-5.3/` scaffold + verify  
+- [x] Diff base-5.2 → base-5.3 is content only (world-model + verb clarity + skinny diet)  
+- [x] **P0:** order uses `field:` + `asc`; no system `direction`  
+- [x] **P0:** find/search KEY constraints + search properties complete  
+- [x] Contract/enforcement law called out in pack OVERVIEW  
+- [x] CORE blurb present in all 10 modes; mode overlays still distinct  
 - [ ] Hot Path histogram path documented (even if implement lags pack)  
 - [ ] Gold set + lessons-learned hop  
 - [ ] CR-26 Done when prose/diet + worldview + verb clarity + empiric workflow are clear (Workbench may lag)

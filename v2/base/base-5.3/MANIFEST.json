@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "base_id": "base-5.3",
+  "kind": "base",
+  "status": "scaffold",
+  "note": "base-5.3 scaffolded from (refresh) v2/base/base-5.3. Edit catalogs + Layer A schemas; do not invent production contract hashes. Design docs live under docs/ (see docs/BIBLE.md, docs/CREATE_BASE.md).",
+  "paths": {
+    "min": "v2/base/base-5.3/min",
+    "text": "v2/base/base-5.3/text",
+    "bible": "docs/BIBLE.md",
+    "roadmap": "docs/ROADMAP.md",
+    "create_base": "docs/CREATE_BASE.md",
+    "response_output_schema": "v2/base/base-5.3/response_output_schema.json",
+    "response_output_example": "v2/base/base-5.3/response_output_example.json"
+  },
+  "parent_source": "(refresh) v2/base/base-5.3",
+  "updated_at": "2026-07-27T00:39:09Z",
+  "generator": "scripts/new_base.py",
+  "catalogs": [
+    {
+      "file": "v2/base/base-5.3/min/chat_request_analytics_base-5.3.json",
+      "mode": "analytics",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40600
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_auto_base-5.3.json",
+      "mode": "auto",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40459
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_code_base-5.3.json",
+      "mode": "code",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40722
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_custom_base-5.3.json",
+      "mode": "custom",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40008
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_fraud_base-5.3.json",
+      "mode": "fraud",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40957
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_open_base-5.3.json",
+      "mode": "open",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40113
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_private_base-5.3.json",
+      "mode": "private",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40116
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_regulated_base-5.3.json",
+      "mode": "regulated",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40691
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_research_base-5.3.json",
+      "mode": "research",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40752
+    },
+    {
+      "file": "v2/base/base-5.3/min/chat_request_tenant_base-5.3.json",
+      "mode": "tenant",
+      "base_id": "base-5.3",
+      "prototype": false,
+      "bytes": 40139
+    }
+  ]
+}

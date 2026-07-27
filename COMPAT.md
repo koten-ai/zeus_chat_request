@@ -21,8 +21,8 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | **Zeus engine 0.5.x line** | e.g. `0.5.107` — still **base-1** runtime for that train |
 | **Zeus engine 0.6.x line** | **`0.6.x`** — **vendors base-5.2** in-engine (`ai/chat_request/PIN.json` + `pinned/min`) — **breaking** vs 0.5 |
 | **chat_request production pin (CURRENT)** | **`base-1`** — [`CURRENT.json`](CURRENT.json) · [`v2/min/`](v2/min/) until stamp + Client + Detective green on CURRENT flip |
-| **chat_request Zeus 0.6 vendor pin** | **`base-5.2`** — pack [`v2/base/base-5.2/`](v2/base/base-5.2/); Zeus may ship this **before** CURRENT flips |
-| **chat_request candidates** | base-5 / base-5.1 / base-5.2 snapshots under `v2/base/` |
+| **chat_request Zeus 0.6 vendor pin** | **`base-5.2`** — pack [`v2/base/base-5.2/`](v2/base/base-5.2/); Zeus may ship this **before** CURRENT flips (base-5.3 is candidate content until engine pin) |
+| **chat_request candidates** | base-5 / base-5.1 / base-5.2 / **base-5.3** snapshots under `v2/base/` |
 | **zeus_client (Python)** | **`0.1.0`** — object floor TBD until Client ships base-5 wire |
 | **Helios** | **0.6.x** pairs Zeus **0.6.x** (HEL-17); do not run Helios 0.2 Analytics against base-5.2 report shapes |
 | **Envelope** | `_format: "zeus.chat_request.v2"` |
@@ -37,7 +37,7 @@ Zeus operator matrix (surface checklist): Zeus repo [`docs/ops/COMPAT.md`](https
 | --- | --- | --- | --- | --- | --- |
 | **`0.6.0` – `0.6.x`** | **`base-5.2`** (vendor) | *TBD* object floor; no dual-read string wish / array triggers | **0.6.x** | **supported (Zeus 0.6 train)** | No dual-compat with base-1 Layer A; report root for Analytics |
 | `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | 0.2.x | **supported (prior)** | Production CURRENT pin path |
-| `0.5.x` | base-4 / base-5 / base-5.1 / base-5.2 packs | *TBD* | — | **candidate / history** | On disk; not 0.5 default pin |
+| `0.5.x` / `0.6.x` trial | base-4 / base-5 / base-5.1 / base-5.2 / **base-5.3** packs | *TBD* | — | **candidate / history** | On disk; base-5.3 = content train (verb clarity + world-model CORE); not CURRENT pin |
 | `0.6.x` | base-1 | any | any | **unsupported** | Wrong wire for 0.6 Detective/report |
 | *future* | **`base-6+`** | base-5 floor + optional soft injects | matching | **additive only** | No rename/remove of base-5 wire without new major |
 | *future* | promoted pin (`CURRENT` → base-5.2+) | matching Client floor | matching | — | Only after stamp + Client + Detective green |

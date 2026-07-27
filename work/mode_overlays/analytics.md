@@ -24,7 +24,7 @@
 ```
 steps: [
   {"as": "cands", "verb": "find", "entity_type": "<Type>", "limit": 100},
-  {"as": "ord", "verb": "order", "ids": "@cands.ids", "by": "<field>", "direction": "desc"},
+  {"as": "ord", "verb": "order", "ids": "@cands.ids", "by": "field:<field>", "asc": false},
   {"as": "top", "verb": "project", "ids": "@ord.ids", "fields": ["name", "<field>"], "limit": 5}
 ]
 ```

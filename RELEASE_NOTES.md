@@ -7,8 +7,9 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 | **Repo** | https://github.com/koten-ai/zeus_chat_request |
 | **Format** | `zeus.chat_request.v2` |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
-| **Candidate pack** | **base-5** — `v2/base/base-5/` (last breaking freeze; not pin) |
-| **Content train** | **base-5.1** — mode overlays in system prompt (same pack path; not a wire break) |
+| **Candidate pack** | **base-5** wire line — `v2/base/base-5/` (last breaking freeze; not pin) |
+| **Content train** | **base-5.3** — skinny + world-model CORE + verb clarity ([v2/base/base-5.3/](v2/base/base-5.3/)) |
+| **Prior content** | base-5.1 modes · base-5.2 dual gaps |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` |
 | **Roadmap** | [ROADMAP.md](docs/ROADMAP.md) |
 | **Modes** | [MODE.md](docs/MODE.md) · [work/RECREATE_MODE.md](work/RECREATE_MODE.md) |
@@ -20,14 +21,21 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 
 ### Highlights
 
+- **base-5.3 content train (CR-26):** [`v2/base/base-5.3/`](v2/base/base-5.3/) — parent `base-5.2`, **not a wire break**:
+  - World-model CORE blurb (AI-Ready overlay · MINI-SCHEMA shape · access path → verb · evidence-only Layer A)
+  - Verb catalog clarity: all 13 tools WHEN/WHEN NOT/KEY aligned to Zeus `docs/API/V2`
+  - **P0:** `order` uses `by: "field:<name>"` + `asc` (system no longer teaches `direction`)
+  - `search` properties include `timeout_ms`, `where`, `seed_node_id`; `describe` gains `include`
+  - Dual gaps from base-5.2 retained
+  - Hop: [docs/migration/base-5.2_to_base-5.3/](docs/migration/base-5.2_to_base-5.3/)
 - **Pack trains = snapshot folders (CR-25):** full trees for pull + JSON Diff — not in-place `content_train`:
   - [`v2/base/base-5/`](v2/base/base-5/) — wire freeze (objects, `app_output`; no mode overlays)
   - [`v2/base/base-5.1/`](v2/base/base-5.1/) — CORE + MODE_OVERLAY system prompts
   - [`v2/base/base-5.2/`](v2/base/base-5.2/) — dual gaps (`data_gaps` + design [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md))
-- **base-5.1 modes:** Author under `work/mode_overlays/`; `assemble_mode_prompts.py --base 5.1`; `diff_modes.py --fail-if-clone`. Diff `base-5` vs `base-5.1` without git archaeology.
-- Pin remains **base-1**.
-- Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/) (GUIDE, lessons, RELEASE_CHECKLIST).
-- **base-4** remains available for Diff/history (`v2/base/base-4/`).
+  - [`v2/base/base-5.3/`](v2/base/base-5.3/) — skinny + world-model + verb clarity
+- **base-5.1 modes:** Author under `work/mode_overlays/`; `assemble_mode_prompts.py --base 5.3` for this train; `diff_modes.py --fail-if-clone`.
+- Pin remains **base-1**. Zeus 0.6 may still **vendor base-5.2** until a separate engine pin.
+- Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/), [base-5.2_to_base-5.3](docs/migration/base-5.2_to_base-5.3/).
 - Docs/process: AI playbook, COMPAT, RELEASE_CHECKLIST, `verify_base_pack.py`, `new_base.py`.
 
 ### Breaking changes (opt-in **base-5**)

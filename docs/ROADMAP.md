@@ -16,13 +16,16 @@
 **Soft HINTS (base-6):** [HINTS.md](HINTS.md) · **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
 **End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **multi-turn CORE (Option A)** · **`named_query` rails** · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)**  
 
-**Best practices vs optimization (pipeline):**
+**Best practices vs optimization (pipeline) — designed stages + citation IDs:**
 
 ```text
-Day one / A/B spit tests     →  BEST_PRACTICES (wide-mouth recipes + short multi-turn)
-Hundreds → 10k+ + Hot Path   →  OPTIMIZATION (sharpen CORE/hints, then rails)
-Per-turn soft bias           →  hints.* (Client ZC-WISH-040) — never hard law alone
+STAGE DAY-ONE   BEST_PRACTICES.md   cite BP:N     spit tests · gold · every new scope
+STAGE TRAFFIC   OPTIMIZATION.md     cite OPT:N    hundreds→10k · Hot Path · rails
+Per-turn soft   hints.*             ZC-WISH-040   never hard law alone
 ```
+
+Prompt Helper / stamps: e.g. `guidance.playbook_refs: ["BP:4","BP:5A"]` · `optimization_refs: ["OPT:4","OPT:14"]`.  
+Indexes live at the top of each doc (**Citation index**).
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
 **Agent procedure:** [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)  

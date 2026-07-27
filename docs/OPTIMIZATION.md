@@ -1,19 +1,26 @@
 # Fine-tuning & end-goal optimization (Pachinko → named rails)
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-6** (content; wire still base-5) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-6** (content; wire still base-5) · version matrix: [COMPAT.md](../COMPAT.md)  
+> **Citation prefix:** `OPT:N` (stable IDs for Prompt Helper / chat_request refs — e.g. `see OPT:4`, `see OPT:14`)
 
-**Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel  
-**Not:** day-one general retrieval playbook (that is [BEST_PRACTICES.md](BEST_PRACTICES.md))  
-**Companion diagram:** [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg) · also business docs `img/` · Zeus `docs/public/img/`  
-**Related:** [ROADMAP.md](ROADMAP.md) (§ HINTS · Hot Path · base-7/8) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) (Funnel / path stage) · Zeus [Funnel motion](https://github.com/koten-ai/Zeus/blob/main/docs/public/motions/FUNNEL.md) · OpenAPI **named queries** (PREPARED N1QL)  
-**Jira (Hub Prompt Helper product):** [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) — Hot Paths → `named_query` rails → **contracted** chat_request (parent [ZE-23](https://kotenai.atlassian.net/browse/ZE-23))
+**Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel, **Prompt Helper**  
+**Not:** day-one general retrieval playbook — that is [BEST_PRACTICES.md](BEST_PRACTICES.md) (`BP:N`)  
+**Companion diagram:** [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg)  
+**Related:** [ROADMAP.md](ROADMAP.md) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) · [HINTS.md](HINTS.md) · [ZE-267](https://kotenai.atlassian.net/browse/ZE-267)
 
-### Optimization vs best practices
+---
+
+## Stage map (how this doc is designed)
+
+```text
+STAGE DAY-ONE     BEST_PRACTICES.md   BP:0…BP:12   spit tests · gold · every new scope
+STAGE TRAFFIC     THIS FILE           OPT:N        hundreds→10k · Hot Path · Funnel · rails
+```
 
 | | [BEST_PRACTICES.md](BEST_PRACTICES.md) | **This doc** |
 | --- | --- | --- |
-| **Traffic** | First A/B spit tests, gold books, day-one | **Hundreds → 10k+ chats**, Hot Path books, Funnel |
-| **Role** | Stable playbook (field→verb, recipes A–H, multi-part, short multi-turn) | **Sharpen** CORE / soft `hints.*` / **rails** from empirics |
+| **Traffic** | First A/B spit tests, gold books | **Hundreds → 10k+ chats**, Hot Path, Funnel |
+| **Role** | Stable playbook floor (`BP:N`) | **Sharpen** CORE / `hints.*` / **rails** (`OPT:N`) |
 | **Mouth** | Keep wide | Keep wide — add **rails**, don’t shrink questions |
 
 ```text
@@ -21,9 +28,49 @@ Best practices  =  how every ball should bounce on day one
 Optimization    =  after rain, angle the pins + bolt rails for the busy paths
 ```
 
+### Citation index (Prompt Helper / chat_request)
+
+Use **`OPT:N`** in stamps, Display Pad, Helper actions, and contracted notes. **Never renumber** existing ids (append only).
+
+| ID | Title | Stage |
+| --- | --- | --- |
+| **OPT:0** | Thesis — wide mouth → rails | traffic |
+| **OPT:1** | Pachinko picture + stages | traffic |
+| **OPT:2** | What is a `named_query` | traffic |
+| **OPT:3** | Relationship to best practices | traffic |
+| **OPT:4** | Multi-turn reuse — CORE Option A | traffic / CORE |
+| **OPT:5** | Lifecycle rain → mine → rail → order | traffic |
+| **OPT:6** | Fast-pass vs multi-turn AI cost | traffic |
+| **OPT:7** | Optimization portfolio ladder | traffic |
+| **OPT:8** | Priority if you only build a few | traffic |
+| **OPT:9** | Rail types (SQL / pipeline / hybrid / …) | traffic |
+| **OPT:10** | Intent → rail router | traffic |
+| **OPT:11** | Board release (contract packaging) | traffic |
+| **OPT:12** | Rail SLOs + demote | traffic |
+| **OPT:13** | Multi-intent compiler | traffic |
+| **OPT:14** | Partial rails / mid-board chutes | traffic |
+| **OPT:15** | Parameter dictionaries / normalization | traffic |
+| **OPT:16** | Seasonal / campaign rail packs | traffic |
+| **OPT:17** | Result + prompt-prefix cache | traffic |
+| **OPT:18** | Mode-specific board density | traffic |
+| **OPT:19** | Confidence-gated ORDER + HITL | traffic |
+| **OPT:20** | Action rails two-phase ORDER | traffic |
+| **OPT:21** | Negative rails | traffic |
+| **OPT:22** | Cross-scope rail patterns | traffic |
+| **OPT:23** | Skinny stamped tool sets | traffic |
+| **OPT:24** | Helios Funnel alignment | traffic |
+| **OPT:25** | What this is *not* | traffic |
+| **OPT:26** | Operator checklist | traffic |
+| **OPT:27** | Implementation horizons / ZE-267 | traffic |
+| **OPT:28** | One-pager for talks | traffic |
+
+**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**.
+
 ---
 
-## 0. One-sentence thesis
+## Stage: Traffic → sharpen → rails
+
+## OPT:0 — One-sentence thesis
 
 Zeus starts as a **wide-mouth** natural-language board (many pins = many tool hops).  
 Over time you **shape the pins into rails**: the top question patterns become **`named_query`** rails — Couchbase **SQL++ PREPARED** statements (and related governed paths) so traffic reaches **order / action** in **1–2 hops**, not 8–12 LLM↔Zeus rounds.
@@ -38,7 +85,7 @@ Seasonal:    new traffic → mine misses → new rails (green in the diagram)
 
 ---
 
-## 1. The Pachinko picture
+## OPT:1 — The Pachinko picture
 
 ![Shaping the Pachinko pins over time](../images/zeus-pachinko-shaping.svg)
 
@@ -63,7 +110,7 @@ That is the opposite of Path B2 (restrict chat so only form-shaped questions rem
 
 ---
 
-## 2. What is a `named_query`?
+## OPT:2 — What is a `named_query`?
 
 **A:** In Zeus, a **named query** is an operator-defined, versioned, **Couchbase SQL++ PREPARED** statement stored per scope (e.g. `zeus_config::named_query:<name>`), invocable as a **governed tool/path** without writing new Go for every pattern.
 
@@ -88,20 +135,20 @@ Mental model: **Candy Land chute / shoots-and-ladders / wormhole / fast-pass lan
 
 ---
 
-## 3. Relationship to general best practices
+## OPT:3 — Relationship to general best practices
 
 | Layer | Doc | Role |
 | --- | --- | --- |
-| **General playbook** | [BEST_PRACTICES.md](BEST_PRACTICES.md) | Every scope, day one: field class → verb, recipes A–H, multi-intent, **short multi-turn** |
-| **Soft steer** | ROADMAP [§ HINTS](ROADMAP.md) · [HINTS.md](HINTS.md) | Per-turn bias without re-stamp |
-| **Sharpen under traffic** | **This doc** § Multi-turn + Hot Path | CORE / hints / books from hundreds–10k chats |
-| **End-goal rails** | **This doc** §§1–6 | Top patterns become **named_query** (and optional action hooks) |
+| **General playbook** | [BEST_PRACTICES.md](BEST_PRACTICES.md) `BP:N` | Day one: field→verb, **BP:5A–H**, multi-intent **BP:6**, multi-turn **BP:4** |
+| **Soft steer** | [HINTS.md](HINTS.md) · ROADMAP § HINTS | Per-turn bias without re-stamp |
+| **Sharpen under traffic** | **This doc** **OPT:4+** | CORE / hints / books from hundreds–10k chats |
+| **End-goal rails** | **OPT:2**, **OPT:5–OPT:23** | Top patterns → **named_query** / pipeline rails |
 
 ```text
-BEST_PRACTICES  →  how to play the pin grid safely (day one + forever floor)
-HINTS / Hot Path →  which paths are getting hot (sharpen)
-named_query      →  turn a hot path into a rail (few hops)
-Funnel motion    →  measure and operate the board (Helios)
+BEST_PRACTICES (BP:*)  →  how to play the pin grid safely (day one + forever floor)
+HINTS / Hot Path       →  which paths are getting hot (sharpen)
+named_query (OPT:2+)   →  turn a hot path into a rail (few hops)
+Funnel motion          →  measure and operate the board (Helios)
 ```
 
 Do **not** replace day-one playbook with “only call named_query.”  
@@ -109,10 +156,12 @@ Do **promote** repeated winning multi-hop shapes into rails over time.
 
 ---
 
-## Multi-turn reuse (prior Zeus evidence) {#multi-turn-reuse-prior-zeus-evidence}
+## OPT:4 — Multi-turn reuse (prior Zeus evidence) {#opt4--multi-turn-reuse-prior-zeus-evidence}
 
-Day-one short law lives in [BEST_PRACTICES §1.3](BEST_PRACTICES.md) (**Option B**).  
+Day-one short law: **[BP:4](BEST_PRACTICES.md)** (Option B).  
 Under real traffic, multi-turn *restrictors* (“those cities,” “from the list above”) show up as **repeat waste** in Detective: global rediscovery, parallel re-find + search without intersection, prose that claims a filter tools never applied.
+
+**Prompt Helper:** when inserting multi-turn CORE under traffic, cite **`OPT:4`** (and still link day-one **`BP:4`**).
 
 ### Why this is an optimization concern
 
@@ -124,7 +173,7 @@ Under real traffic, multi-turn *restrictors* (“those cities,” “from the li
 
 **Mine** these as path fingerprints (e.g. `followup_prior_set+fts_category`) and **sharpen** CORE / soft `hints.multipart` / books — then, if stable, a **rail**.
 
-### CORE candidate (Option A — longer house style)
+### CORE candidate (Option A — longer house style) · cite `OPT:4`
 
 Promote into a **content train** CORE block (or stamped custom) when Hot Path shows multi-turn waste — not as jailbreak law:
 
@@ -151,16 +200,16 @@ Promote into a **content train** CORE block (or stamped custom) when Hot Path sh
 ### Ladder placement
 
 ```text
-Playbook short multi-turn (BP §1.3)  →  CORE Option A (this section)
+BP:4 short multi-turn  →  OPT:4 CORE Option A
   →  soft hints / prior_result inject  →  Hot Path book
-  →  named_query or pipeline template if the pattern dominates
+  →  named_query or pipeline template (OPT:2 / OPT:9) if the pattern dominates
 ```
 
 ---
 
-## 4. Lifecycle: rain → mine → rail → order
+## OPT:5 — Lifecycle: rain → mine → rail → order
 
-### 4.1 Observe (wide mouth stays open)
+### Observe (wide mouth stays open)
 
 - Chat + Detective: rounds, tool sequences, zero-rows, timeouts.  
 - Helios **Funnel** motion: drop-off, stages, conversion (see HEL-WISH-014 path stage).  
@@ -168,7 +217,7 @@ Playbook short multi-turn (BP §1.3)  →  CORE Option A (this section)
 
 Balls still drop across the **whole mouth** — natural language is not reduced to five form fields.
 
-### 4.2 Mine (top 5–10 ideas / question patterns)
+### Mine (top 5–10 ideas / question patterns)
 
 Cluster traffic into **intents / path shapes**, not raw user strings:
 
@@ -181,7 +230,7 @@ Cluster traffic into **intents / path shapes**, not raw user strings:
 
 Target **5–10 rails per mature scope** first — enough coverage without catalog explosion. Seasonal demand adds rails (green path in the diagram), it does not require rewriting CORE every week.
 
-### 4.3 Shape (publish a rail)
+### Shape (publish a rail)
 
 1. Author SQL++ (or promote a proven pipeline shape) as **`named_query:<name>`** with parameters + validation.  
 2. Expose to the agent as a **callable verb/path** (catalog / mode allow-list / Workbench draft rail).  
@@ -190,13 +239,13 @@ Target **5–10 rails per mature scope** first — enough coverage without catal
    - harder product: Client router or tool_choice bias when classifier confidence high  
 4. Keep general verbs for **misses** and novel asks (side bins → next to mine).
 
-### 4.4 Prove (A/B the board)
+### Prove (A/B the board)
 
 - A/B Bench: rounds-to-order, success rate, named_query hit rate, fall-out class.  
 - Promote rails that reduce hops **without** raising wrong-answer rate.  
 - Retire or version rails that go cold.
 
-### 4.5 Act (order is not only “rows”)
+### Act (order is not only “rows”)
 
 Center slot **ORDER** can mean:
 
@@ -210,7 +259,7 @@ Action rails need the same discipline as SQL rails: parameters, authz, audit, id
 
 ---
 
-## 5. Fast-pass vs multi-turn AI (cost picture)
+## OPT:6 — Fast-pass vs multi-turn AI (cost picture)
 
 | Path | Typical cost | When |
 | --- | --- | --- |
@@ -230,31 +279,31 @@ Helios Funnel metrics should eventually show **% traffic on named rails** and **
 
 ---
 
-## 6. Optimization portfolio (ladder)
+## OPT:7 — Optimization portfolio (ladder)
 
-`named_query` rails are the **headline**, but they sit on a **ladder** of optimizations that all “shape the board” without shrinking the mouth. Day-one docs cover **1–2**. [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) is mostly **3→6→contract**. The rest is product/engine portfolio.
+`named_query` rails are the **headline**, but they sit on a **ladder** of optimizations that all “shape the board” without shrinking the mouth. Day-one docs cover **BP:*** + ladder steps 1–2. [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) is mostly **3→6→contract**. The rest is product/engine portfolio.
 
 ```text
 cheapest / always-on
   1  Inject quality (brief, mini-schema, ex: samples)
-  2  Playbook + verb clarity (day-one pins)     ← BEST_PRACTICES / base-5.3+
-  2b Multi-turn reuse (prior Zeus set)         ← BP §1.3 short · this doc Option A
-  3  Soft hints / hot_path (bias, no re-stamp) ← ROADMAP § HINTS · ZC-WISH-040
+  2  Playbook + verb clarity (day-one pins)     ← BP:* / base-5.3+
+  2b Multi-turn reuse (prior Zeus set)         ← BP:4 short · OPT:4 CORE
+  3  Soft hints / hot_path (bias, no re-stamp) ← HINTS · ZC-WISH-040
   4  Contracted catalog delta (custom stamp / mode pack)
-  5  Named pipeline templates (multi-verb rail)
-  6  named_query PREPARED (SQL++ fast-pass)    ← §§1–5 headline
-  7  Intent→rail router (pre-LLM or light classifier)
-  8  Action rails (book / order / dispatch)
+  5  Named pipeline templates (multi-verb rail)  ← OPT:9
+  6  named_query PREPARED (SQL++ fast-pass)      ← OPT:2
+  7  Intent→rail router (pre-LLM or light classifier) ← OPT:10
+  8  Action rails (book / order / dispatch)      ← OPT:20
   9  Materialized edges / walk_path / indexes (engine)
- 10  Cache / prompt-cache / result cache
- 11  Skinny stamped tool sets (empiric A/B)
+ 10  Cache / prompt-cache / result cache         ← OPT:17
+ 11  Skinny stamped tool sets (empiric A/B)      ← OPT:23
 expensive / later
 ```
 
 **Filter for any new idea:** does it **add a rail**, **shorten pins**, or **measure shaping** — while keeping the **wide mouth**?  
 If it only **forbids questions**, it is Path B2, not Zeus optimization.
 
-### 6.1 Priority if you only build a few
+### OPT:8 — Priority if you only build a few
 
 | Pri | Idea | Why |
 | --- | --- | --- |
@@ -272,7 +321,7 @@ If it only **forbids questions**, it is Path B2, not Zeus optimization.
 
 ---
 
-## 6.2 Rail types (not only SQL++)
+## OPT:9 — Rail types (not only SQL++)
 
 Some hot paths are `search→order→project` with no single SQL that feels natural. Treat **rail** as a product type:
 
@@ -288,7 +337,7 @@ Same Pachinko diagram; different **rail material**. ZE-267 should draft SQL rail
 
 ---
 
-## 6.3 Intent → rail router (pre- or co-LLM)
+## OPT:10 — Intent → rail router (pre- or co-LLM)
 
 Before a full 13-verb think, a **cheap** step:
 
@@ -310,7 +359,7 @@ Client or Zeus can own the router; Prompt Helper proposes **when** strings and c
 
 ---
 
-## 6.4 Board release (contract as packaging)
+## OPT:11 — Board release (contract as packaging)
 
 Helper output is eventually **contracted in**. A **board release** is one deployable unit:
 
@@ -326,7 +375,7 @@ Does **not** invent production `contract_hash` inside Helper — stamp/publish s
 
 ---
 
-## 6.5 Rail quality SLOs + demote
+## OPT:12 — Rail quality SLOs + demote
 
 Treat each rail like a product API:
 
@@ -342,7 +391,7 @@ Keeps “fast-pass” from becoming “fast wrong.” Helios / admin should show
 
 ---
 
-## 6.6 Multi-intent compiler
+## OPT:13 — Multi-intent compiler
 
 Paragraph multi-ask is playbook ([BEST_PRACTICES §3](BEST_PRACTICES.md)); **optimization** is a compiler:
 
@@ -360,7 +409,7 @@ Optional soft inject: `hints.multipart` (ROADMAP § HINTS).
 
 ---
 
-## 6.7 Partial rails / mid-board chutes
+## OPT:14 — Partial rails / mid-board chutes
 
 Not every pattern needs mouth→ORDER in one shot:
 
@@ -374,7 +423,7 @@ Reduces average hops without requiring a full funnel win on day two.
 
 ---
 
-## 6.8 Parameter dictionaries / value normalization
+## OPT:15 — Parameter dictionaries / value normalization
 
 `ex:` trailers teach conventions; optimization is **automatic normalize**:
 
@@ -386,7 +435,7 @@ Cuts zero-row loops that look like “bad AI” but are **value shape** problems
 
 ---
 
-## 6.9 Seasonal / campaign rail packs
+## OPT:16 — Seasonal / campaign rail packs
 
 Diagram **green rail** = seasonal demand:
 
@@ -398,7 +447,7 @@ Optimization is not only “more rails forever” — it is **lifecycle** of rai
 
 ---
 
-## 6.10 Result cache + prompt-prefix cache
+## OPT:17 — Result cache + prompt-prefix cache
 
 Even without a new NQ:
 
@@ -413,7 +462,7 @@ Orthogonal to named_query but same goal: less wall time and less AI ms.
 
 ---
 
-## 6.11 Mode-specific board density
+## OPT:18 — Mode-specific board density
 
 Same Pachinko; different **rail density** and fall-out policy (see DESIGN §14.7):
 
@@ -432,7 +481,7 @@ Do **not** switch to `open` only because the user wrote a multi-ask paragraph �
 
 ---
 
-## 6.12 Confidence-gated ORDER + human-in-the-loop
+## OPT:19 — Confidence-gated ORDER + human-in-the-loop
 
 | Gate | Behavior |
 | --- | --- |
@@ -444,7 +493,7 @@ Optimizes **when to stop thinking** and **operator time**, not only fetch latenc
 
 ---
 
-## 6.13 Action rails as two-phase ORDER
+## OPT:20 — Action rails as two-phase ORDER
 
 “Book a car” is rarely one free agent hop:
 
@@ -458,7 +507,7 @@ Authz, audit, idempotency required — same discipline as SQL rails.
 
 ---
 
-## 6.14 Negative rails / “do not go there”
+## OPT:21 — Negative rails / “do not go there”
 
 Mine **fall-out** and **bad paths**:
 
@@ -472,14 +521,14 @@ Side bins feed the **next green rail** *or* a blocked chute (schema/index/produc
 
 ---
 
-## 6.15 Cross-scope rail patterns (careful)
+## OPT:22 — Cross-scope rail patterns (careful)
 
 Tenant-safe **templates**: same NQ shape, different scope binding (portability / D2P spirit).  
 Only where boundary model allows — never one global PREPARE that crosses tenant walls.
 
 ---
 
-## 6.16 Skinny stamped tool sets (empiric)
+## OPT:23 — Skinny stamped tool sets (empiric)
 
 After Hot Path shows 3 of 13 verbs unused:
 
@@ -490,7 +539,7 @@ Complements rails: fewer pins **and** more rails on the product board.
 
 ---
 
-## 7. Helios Funnel alignment
+## OPT:24 — Helios Funnel alignment
 
 | Helios concern | Optimization story |
 | --- | --- |
@@ -505,7 +554,7 @@ Cheap Zeus/Client path metrics beat forcing the model to emit funnel stages ever
 
 ---
 
-## 8. What this is *not*
+## OPT:25 — What this is *not*
 
 | Anti-goal | Why |
 | --- | --- |
@@ -520,7 +569,7 @@ Cheap Zeus/Client path metrics beat forcing the model to emit funnel stages ever
 
 ---
 
-## 9. Operator checklist (close the loop)
+## OPT:26 — Operator checklist (close the loop)
 
 0. **Multi-turn:** gold/book “prior set → follow-up filter”; measure unconstrained rediscovery on “those/listed” asks.
 
@@ -535,7 +584,7 @@ Cheap Zeus/Client path metrics beat forcing the model to emit funnel stages ever
 
 ---
 
-## 10. Implementation horizons (where work lives)
+## OPT:27 — Implementation horizons (where work lives)
 
 | Horizon | Work | Owner |
 | --- | --- | --- |
@@ -561,7 +610,7 @@ ROADMAP home: **named rails + portfolio** under Funnel / Hot Path / base-6 hints
 
 ---
 
-## 11. One-pager for talks
+## OPT:28 — One-pager for talks
 
 > Questions fall into Zeus like balls in a Pachinko machine. Day one, every pin is a tool hop — slow, messy, but the mouth is wide. Watch the traffic, mine the top paths, and bolt on **named_query rails** (SQL++ PREPARED fast lanes) — plus pipeline rails, routers, and seasonal packs as the board matures. Most balls reach **order** in one or two hops — including real actions like booking a car — while rare misses still use the open playbook and become the next rail. **Shape the funnel; don’t shrink the box.**
 

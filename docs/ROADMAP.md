@@ -160,7 +160,7 @@ Full plan: **§ Getting skinny**.
 | --- | --- | --- |
 | zeus_client implements object triggers + settings/policy/`output_request` | Catalogs ready; Client floor TBD | **CR-20** (+ CR-9/10/11) |
 | Zeus loaders / return schema / Detective for base-5+ | Can’t pin CURRENT | **CR-21** |
-| **Zeus vendor pin base-5.2 → base-5.3** | Hub still teaches order.`direction` on live pin | CR-21 residual / ZE pin ticket |
+| ~~**Zeus vendor pin base-5.2 → base-5.3**~~ | ~~Hub taught order.`direction`~~ | **ZE-273** Done on 5TH train (0.6.15) |
 | Hot Path / Prompt Helper: per-verb use over last N runs | Guessing which verbs to diet | Workbench / **ZE-267** (CR-26 residual) |
 | Inject reliability (brief + mini-schema always on product path) | Model rediscovers when inject missing | Client + Zeus CR-20/21 |
 | Helios Pri-1 report emits (cheap spine) | Not catalog tax | **CR-12** |
@@ -171,7 +171,7 @@ Full plan: **§ Getting skinny**.
 
 **Pack SoT for new work:** **base-5 wire** · **candidate pack base-5.3** (`v2/base/base-5.3/`) · next catalog train **base-6 soft `hints.*`** (after Client inject).  
 **Production pin:** **base-1**.  
-**Zeus 0.6 vendor:** still **base-5.2** until re-pin (sibling 5.3 files may already sit in `pinned/min` for A/B).  
+**Zeus 0.6 vendor:** **base-5.3** as of **ZE-273** / `0.6.15` (sibling 5.2 may remain in `pinned/min` for A/B).  
 **Hop:** [migration/base-5.2_to_base-5.3/](migration/base-5.2_to_base-5.3/) · wire hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/).  
 **Modes:** [MODE.md](MODE.md) · plan [work/RECREATE_MODE.md](../work/RECREATE_MODE.md).  
 **Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4.

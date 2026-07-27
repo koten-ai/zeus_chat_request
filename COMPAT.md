@@ -19,10 +19,10 @@ These three versions are **independent**. A BASE bump does not imply a Zeus mino
 | Field | Value |
 | --- | --- |
 | **Zeus engine 0.5.x line** | e.g. `0.5.107` — still **base-1** runtime for that train |
-| **Zeus engine 0.6.x line** | **`0.6.x`** — **vendors base-5.2** today (`PIN.json`); **base-5.3** is candidate pack on central main (re-vendor pending) — **breaking** vs 0.5 |
+| **Zeus engine 0.6.x line** | **`0.6.15+`** — **vendors base-5.3** (`PIN.json` + embed `pin.json`; [ZE-273](https://kotenai.atlassian.net/browse/ZE-273)) — **breaking** vs 0.5 |
 | **chat_request production pin (CURRENT)** | **`base-1`** — [`CURRENT.json`](CURRENT.json) · [`v2/min/`](v2/min/) until stamp + Client + Detective green on CURRENT flip |
-| **chat_request Zeus 0.6 vendor pin** | **`base-5.2`** until engine re-pin — pack [`v2/base/base-5.2/`](v2/base/base-5.2/); target **`base-5.3`** ([`v2/base/base-5.3/`](v2/base/base-5.3/)) |
-| **chat_request candidates** | base-5 / base-5.1 / base-5.2 / **base-5.3** (content train shipped; preferred trial pack) |
+| **chat_request Zeus 0.6 vendor pin** | **`base-5.3`** — pack [`v2/base/base-5.3/`](v2/base/base-5.3/) (content train; same base-5 wire as 5.2) |
+| **chat_request candidates** | base-5 / base-5.1 / base-5.2 / **base-5.3** (preferred trial + Zeus vendor) |
 | **zeus_client (Python)** | **`0.1.0`** — object floor TBD until Client ships base-5 wire |
 | **Helios** | **0.6.x** pairs Zeus **0.6.x** (HEL-17); do not run Helios 0.2 Analytics against base-5.2 report shapes |
 | **Envelope** | `_format: "zeus.chat_request.v2"` |
@@ -35,8 +35,8 @@ Zeus operator matrix (surface checklist): Zeus repo [`docs/ops/COMPAT.md`](https
 
 | Zeus engine | chat_request BASE | zeus_client | Helios | Status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| **`0.6.0` – `0.6.x`** | **`base-5.2`** (vendor today) | *TBD* object floor; no dual-read string wish / array triggers | **0.6.x** | **supported (Zeus 0.6 train)** | No dual-compat with base-1 Layer A; report root for Analytics |
-| `0.6.x` trial / next vendor | **`base-5.3`** (central candidate) | same floor as base-5 wire | **0.6.x** | **candidate** | Content train: world-model CORE + verb clarity; not CURRENT; re-vendor when green |
+| **`0.6.15` – `0.6.x`** | **`base-5.3`** (vendor; ZE-273) | *TBD* object floor; no dual-read string wish / array triggers | **0.6.x** | **supported (Zeus 0.6 train)** | Same base-5 wire as 5.2; world-model CORE + verb clarity; not CURRENT |
+| `0.6.0` – `0.6.14` | **`base-5.2`** (prior vendor) | same | **0.6.x** | **history** | Prefer upgrade to 0.6.15+ for order.asc / CORE fixes |
 | `0.5.0` – `0.5.x` | **`base-1`** | `≥ 0.1.0` | 0.2.x | **supported (prior)** | Production CURRENT pin path |
 | `0.5.x` / `0.6.x` trial | base-4 / base-5 / base-5.1 / base-5.2 packs | *TBD* | — | **candidate / history** | On disk; prefer base-5.3 for new trials |
 | `0.6.x` | base-1 | any | any | **unsupported** | Wrong wire for 0.6 Detective/report |

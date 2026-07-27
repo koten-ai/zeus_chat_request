@@ -246,6 +246,23 @@ Nothing about base-4 Layer A changes that mid-turn.
 
 `control.zeus_round = 2`
 
+#### Branch: `settings.ai_process_result` (default false)
+
+| Setting | What Client does after Zeus tool result is in bag C + D |
+| --- | --- |
+| **`ai_process_result: false`** (default) | **Cheap path.** UI may show Zeus tables / graph / “Zeus results (N)” from bag D **without** another model call. Client may still force a thin `return` later if product needs Layer A; it must not *require* a full insight essay. Lab pattern: one AI plan + one Zeus pipeline. |
+| **`ai_process_result: true`** | **Insight path.** Client **must** call the AI again with tool JSON in `messages[]` so the model can analyze / recommend / narrate (second billable AI turn). Honor `max_rounds`; prefer prune oversized tool bodies (bag D keeps full UI copy). |
+
+```text
+# default — show data without paying for a second LLM turn
+ai_process_result=false  →  AI → Zeus → UI(+ optional terminate)
+
+# opt-in insight
+ai_process_result=true   →  AI → Zeus → AI (process results) → return
+```
+
+**Report root:** stamp **`usr`** (`zc` for product Client) on every Analytics/session sink so Helios can filter product traffic. See [ROADMAP.md § Emit `usr` + `ai_process_result`](ROADMAP.md) · **ZC-WISH-035** (`usr`) · **ZC-WISH-044** (`ai_process_result`) · **HEL-WISH-022**.
+
 ---
 
 ### Round 2 — response from AI API (terminate / Layer A)

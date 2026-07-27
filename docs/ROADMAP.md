@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6** (`v2/base/base-6/`) · last wire break **base-5** · Zeus 0.6 vendor **base-6** · next **Client inject `hints.*` (ZC-WISH-040)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6** (`v2/base/base-6/`) · last wire break **base-5** · Zeus 0.6 vendor **base-6** · next **Client inject `hints.*` (ZC-WISH-040)** · **`usr` + `ai_process_result` (ZC-WISH-035/044 · HEL-WISH-022)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4 → **base-5 wire freeze** → **5.1 / 5.2 / 5.3 content** (5.3 pack on main)  
@@ -56,6 +56,125 @@ This is **what we want next and why**, not a commitment calendar.
 14. Modes optimize **join/noise/hop appetite**; multi-paragraph multi-ask is **not** “switch to open”
 15. End-goal: shape the board with **named_query rails** (PREPARED fast-pass) from mined hot paths — **shape the funnel, don’t shrink the box** ([OPTIMIZATION.md](OPTIMIZATION.md))
 16. **Multi-turn:** prefer reusing prior Zeus tool evidence when the user points at it; sharpen under traffic (OPTIMIZATION Option A) — do not unconstrained-rediscover “those / listed” sets
+17. **Emit provenance `usr`:** every Analytics / session back-and-forth root stamps **who wrote the row** (`zc`|`z`|`h`|`a`) so Helios can filter product traffic (`usr="zc"`) vs Hub/admin noise — **§ Emit `usr` + `ai_process_result`**
+18. **Optional AI insight turn:** Client setting **`ai_process_result`** (default **false**) — after Zeus tool data lands, either surface rows cheaply (one AI plan + tools) **or** spend another AI round to analyze/talk about the data — **not** a Layer A tax
+```
+
+---
+
+## Emit `usr` + `ai_process_result` (Client · Helios · Hub)
+
+**Status:** design / wishlist · **not** a base-5 wire break · land as **cheap Client + report emits** (base-6+ / Client package)  
+**SoT backlog:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) **ZC-WISH-035** (`usr`), **ZC-WISH-044** (`ai_process_result`) · [HELIOS_WISHLIST…](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) **HEL-WISH-022** · multi-round bags [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · settings [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md)
+
+### Why (lab example)
+
+Hub AI Chat can already: **one model plan → one Zeus `pipeline` → rows in UI** (“Zeus results (25)”) with tokens on a single AI call. That is the **cheap default**.
+
+Operators / products sometimes want a **second AI turn** that reads tool JSON and writes a human insight (“what to do in Tampa…”) without making every product path pay that cost.
+
+Helios Motions over `` `zeus_sessions`.`session`.`traces` `` also need a **stable slice**: product Client traffic vs Hub admin vs engine-only — without parsing free-text “I called Zeus.”
+
+### 1) Root field `usr` (emit provenance)
+
+Stamp on the **root of the session / turn / back-and-forth payload** that lands in Analytics (and any parallel report envelope). **Closed enum — do not invent codes.**
+
+| `usr` | Writer | Typical surface |
+| --- | --- | --- |
+| **`zc`** | **zeus_client** (middleman / product SDK) | Apps, product chat |
+| **`z`** | **Zeus engine** (if engine sinks a row without Client) | Internal/engine paths |
+| **`h`** | **Helios** (if Helios writes/annotates a row) | Motions / ops enrich (rare) |
+| **`a`** | **admin / Hub** | Workbench, Debug AI Chat, admin tools |
+
+```json
+{
+  "usr": "zc",
+  "ts": "2026-07-27T22:10:00.000Z",
+  "scope": "yelp-demo/_default",
+  "session_id": "…",
+  "turn": { }
+}
+```
+
+**Helios query shape (example):**
+
+```sql
+-- Product client traffic for "today", with a real scope
+SELECT META().id, t.*
+FROM `zeus_sessions`.`session`.`traces` t
+WHERE t.`ts` >= /* start of today UTC or tenant tz */
+  AND t.`ts` <  /* start of tomorrow */
+  AND t.`scope` IS NOT MISSING
+  AND t.`scope` != ""
+  AND t.`usr` = "zc"
+```
+
+| Rule | |
+| --- | --- |
+| **Who sets it** | The **component that owns the write** to Analytics/report — Client stamps **`zc`** on product sinks; Hub/admin surfaces stamp **`a`**; only stamp **`z`** if Zeus itself is the sink author |
+| **Never AI** | Model must not invent `usr` |
+| **Missing** | Treat as **unknown / legacy** — Helios dashboards that care about product purity **filter `usr = "zc"`** (missing ≠ product) |
+| **Not Layer A** | Scalar on report/session root — cheap |
+
+### 2) Client setting `ai_process_result` (optional insight turn)
+
+**Name (chat_prompt / settings bag):** `ai_process_result`  
+**Type:** boolean · **Default: `false`**
+
+| Value | Client loop after Zeus tool result(s) |
+| --- | --- |
+| **`false` (default)** | Prefer **cheap path**: may surface structured tool data to UI (tables, graph, Zeus-results lightbox) and terminate with a thin summary / Layer A from what is already known — **no extra AI round required** for “show me the rows.” Matches the lab pattern: one plan + one Zeus pipeline. |
+| **`true`** | After tool results are appended to `messages[]`, Client **schedules another AI turn** so the model can **analyze / narrate / recommend** from Zeus evidence (second hop of tokens + latency). Product opt-in for “AI insight on the data.” |
+
+```text
+ai_process_result = false (default, cheap):
+  user → AI (tool_calls) → Zeus → UI/table (+ optional minimal return)
+  # one AI call is enough when the product is "show data"
+
+ai_process_result = true (insight):
+  user → AI (tool_calls) → Zeus → AI (read tool JSON) → return/summary
+  # second AI turn is intentional and billable
+```
+
+| Rule | |
+| --- | --- |
+| **Owner** | App / Client **settings** ([PROMPT_SETTINGS.md](PROMPT_SETTINGS.md)) — **S C**; not hashed catalog body |
+| **Default** | **`false`** — never surprise operators with double AI cost |
+| **Caps** | Still honor `max_rounds` / force-return; insight turn counts as a round |
+| **Payload size** | Client may **prune** huge tool bodies before insight turn (bag D keeps rich copy for UI) |
+| **Hub default** | Product Client default **false**; Hub Debug may default **true** for operator storytelling (document in COMPAT when implemented) |
+
+### 3) BASE / ownership fit
+
+| Piece | BASE / package | Breaking wire? |
+| --- | --- | --- |
+| `usr` on report/session root | **Client + Zeus emit** (COMPAT when live) | **No** — additive scalar |
+| `ai_process_result` | **Client settings** (Pri-4 / base-6 era product) | **No** — loop policy |
+| Catalog prose | Optional one-liner: “when product asks for insight, Client may call you again with tool results” | Content only |
+
+### 4) Open questions (resolve before COMPAT floor)
+
+1. When Hub **admin** chat uses a **product-shaped** catalog pin, is `usr` always **`a`** (surface) or **`zc`** if a real Client session is under the hood? **Proposal:** stamp by **surface** (`a` for Hub/Workbench/Debug).  
+2. Does Zeus ever write Analytics rows **without** Client? If yes, engine must stamp **`z`**; if no, drop `z` from Helios filters.  
+3. `ai_process_result=true` + `max_rounds=1` — refuse config or force `max_rounds ≥ 2`? **Proposal:** Client raises floor to 2 when insight is on, or logs and clamps.  
+4. Should insight turn be **blocked** when tool status ≠ ok / empty rows (avoid paying for “I found nothing” essays)? **Proposal:** product policy flag later; default still call AI if true.  
+5. Exact Analytics path for `usr` (`session.usr` vs per-turn `turn.usr`) — **Proposal:** both session default + per-turn override if multi-writer sessions appear.
+
+### 5) Success signals
+
+- [ ] Spec in ROADMAP + wishlists (**this section**)  
+- [ ] Client stamps `usr` on every report sink · COMPAT row  
+- [ ] Helios Motions / sample queries filter `usr = "zc"` + scope + day  
+- [ ] Client implements `ai_process_result` default false · integration test both arms  
+- [ ] Hub documents Debug default if different from product  
+- [ ] No new **required** Layer A fields for either feature  
+
+### 6) Sequencing
+
+```text
+base-5 Client floor (CR-20) ──► cheap Helios spine (usr = HEL-WISH-022 / ZC-WISH-035)
+                            ──► ai_process_result (ZC-WISH-044) product flag
+base-6 hints (ZC-WISH-040) remains orthogonal (soft steer, not insight-turn law)
 ```
 
 ---
@@ -1340,7 +1459,9 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 7. **De-demo** efficiency prose (residual after base-5.3).  
 8. Customs filename smoke in scan + Client.  
 9. **`ab_arm`** on report (cheap Client scalar) — slice by full vs skinny **stamp** and by soft ab_paste arm.  
-10. **A/B stamped skinny packs** (fewer verbs or thinner schemas) promoted only after Hot Path + gold green — not runtime allowlists that unhash production.
+10. **A/B stamped skinny packs** (fewer verbs or thinner schemas) promoted only after Hot Path + gold green — not runtime allowlists that unhash production.  
+11. **`usr` emit** on session/turn report root (`zc`\|`z`\|`h`\|`a`) — **ZC-WISH-035** · **§ Emit `usr` + `ai_process_result`**.  
+12. **`ai_process_result`** Client setting (default **false**) — optional post-Zeus AI insight turn — **ZC-WISH-044**.
 
 ### Helios goals (Pri-2/3 — optional / nice-to-have)
 
@@ -1354,6 +1475,7 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 | intent_norm map (Zeus first) | **005** | light if AI · optional_when |
 | price_norm (Client slider preferred) | **004** | light if AI · optional_when |
 | Tool fingerprint / chat recovery | **021, 020** | none |
+| **`usr` filter** (product vs Hub/admin) | **022** | none |
 
 ### Explicit non-goals for base-6
 
@@ -1371,7 +1493,10 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 - [x] Pack `v2/base/base-6/` + hop + [HINTS.md](HINTS.md)  
 - [x] lessons-learned / migration note  
 - [x] BEST_PRACTICES ↔ hints.path recipe ids aligned in docs  
+- [x] Design: **`usr` + `ai_process_result`** on ROADMAP + wishlists (**§ Emit `usr` + `ai_process_result`**)  
 - [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps (**ZC-WISH-040**)  
+- [ ] Client: stamp **`usr`** on report sinks (**ZC-WISH-044**); Helios filters **`usr="zc"`** (**HEL-WISH-022**)  
+- [ ] Client: **`ai_process_result`** default false; insight-turn path (**ZC-WISH-045**)  
 - [ ] P0 path + fields + multipart on one integration path  
 - [ ] G2 metrics without UI leak  
 - [ ] At least one `*_norm` path live without new **required** AI fields  

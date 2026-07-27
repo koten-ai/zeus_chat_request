@@ -123,6 +123,7 @@ IDs are stable: **`ZC-WISH-NNN`**. Do not renumber; mark **wont** instead.
 | **ZC-WISH-032** | Market country / geo slice | HEL-WISH-002 | Settings / inject; not AI lat-lon |
 | **ZC-WISH-033** | `deployment_id` / `ruleset_id` on report | HEL-WISH-016 | Align with base pin + rules pack version |
 | **ZC-WISH-034** | Observability: inject-present bools, trigger key rates, zone size estimates | PROMPT_SETTINGS §9 | Cheap metrics only |
+| **ZC-WISH-035** | Stamp root **`usr`** on every report/session sink | ROADMAP § Emit usr · HEL-WISH-022 | Closed enum `zc`\|`z`\|`h`\|`a`; product Client always **`zc`**; Hub/admin **`a`**; never AI |
 
 ### 2.4 Pri-4 — base-6+ additive (after floor)
 
@@ -132,6 +133,7 @@ IDs are stable: **`ZC-WISH-NNN`**. Do not renumber; mark **wont** instead.
 | **ZC-WISH-041** | Formal `ab_arm` product path | PROMPT_SETTINGS | A/B must not thrash contract hash |
 | **ZC-WISH-042** | Assembled-prompt budget / zone metrics productization | ROADMAP base-6 | |
 | **ZC-WISH-043** | G2 hygiene product guarantees (`wish_i_knew` never in summary UI) | ROADMAP base-6 | Client enforce |
+| **ZC-WISH-044** | **`ai_process_result`** (bool, **default false**) on chat_prompt / settings | ROADMAP § Emit usr · MULTI_ROUND · PROMPT_SETTINGS | After Zeus tool data: `false` = cheap UI/table path; `true` = extra AI turn to analyze/narrate |
 
 ### 2.5 Pri-5 — later / multi-language
 
@@ -214,8 +216,9 @@ validate app_output if requested
 8. ZC-WISH-010/013/014 policy table + hooks dual score
 9. ZC-WISH-015 multi-round smoke
 10. ZC-WISH-020…024 reliability
-11. ZC-WISH-030…034 Helios cheap spine
+11. ZC-WISH-030…035 Helios cheap spine (**include `usr` stamp**)
 12. Package bump + COMPAT Client column
+13. ZC-WISH-040…044 base-6 additive (hints · **ai_process_result**)
 ```
 
 ---

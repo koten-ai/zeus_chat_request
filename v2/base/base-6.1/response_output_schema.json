@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/koten-ai/zeus_chat_request/v2/base/base-5/response_output_schema.json",
-  "title": "Zeus Layer A terminate (return tool args) — base-5",
-  "description": "JSON Schema for the model terminate payload on `return` / terminating pipeline. Flat on the wire. Audiences: G1 user, G2 admin (never chat UI), G3 client control-plane. base-5: business_rules_triggers is an object keyed by rule_id (sparse; missing=false); optional app_output when Client sent output_request.app.fields (type+description). Does NOT include Detective Layer B.",
+  "title": "Zeus Layer A terminate (return tool args) \u2014 base-5 (wire shared through base-6.1; stamps separate)",
+  "description": "JSON Schema for the model terminate payload on `return` / terminating pipeline. Flat on the wire. Audiences: G1 user, G2 admin (never chat UI), G3 client control-plane. base-5: business_rules_triggers is an object keyed by rule_id (sparse; missing=false); optional app_output when Client sent output_request.app.fields (type+description). Does NOT include Detective Layer B. base-6.1: report/session sink stamps (user, ip_address) and Client settings (ai_process_result) are NOT Layer A \u2014 see report_sink_schema.json and settings_ai_process_result.example.json in this pack.",
   "type": "object",
   "additionalProperties": true,
   "required": [
@@ -149,7 +149,7 @@
             "string",
             "null"
           ],
-          "description": "Desired shape: rows | count | ids | …"
+          "description": "Desired shape: rows | count | ids | \u2026"
         },
         "context": {
           "type": "object",
@@ -210,13 +210,13 @@
       "type": "number",
       "minimum": 0,
       "maximum": 1,
-      "description": "G2 ADMIN-ONLY. Subjective 0.0–1.0 confidence that the subject/entity was identified correctly. Never chat UI."
+      "description": "G2 ADMIN-ONLY. Subjective 0.0\u20131.0 confidence that the subject/entity was identified correctly. Never chat UI."
     },
     "jail_break_attempt": {
       "type": "number",
       "minimum": 0,
       "maximum": 1,
-      "description": "G2 ADMIN-ONLY. Subjective 0.0–1.0 signal that the user tried to jailbreak / bypass policy (continuous float, not boolean 0|1). Never chat UI."
+      "description": "G2 ADMIN-ONLY. Subjective 0.0\u20131.0 signal that the user tried to jailbreak / bypass policy (continuous float, not boolean 0|1). Never chat UI."
     },
     "wish_i_knew": {
       "type": "array",
@@ -231,7 +231,7 @@
       "additionalProperties": {
         "type": "boolean"
       },
-      "description": "G3 CLIENT control-plane. Map rule_id → whether rule applied this round. Keys match zeus_client business_injection.rules object ids. Missing key = false (sparse OK). base-5 object-only (not boolean[])."
+      "description": "G3 CLIENT control-plane. Map rule_id \u2192 whether rule applied this round. Keys match zeus_client business_injection.rules object ids. Missing key = false (sparse OK). base-5 object-only (not boolean[])."
     },
     "round": {
       "type": "integer",

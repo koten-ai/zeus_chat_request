@@ -207,6 +207,10 @@ validate app_output if requested
 
 ### ZC-WISH-035 — root `user` + `ip_address` stamps (base-6.1)
 
+Machine schema (not Layer A): pack
+[`report_sink_schema.json`](../v2/base/base-6.1/report_sink_schema.json) ·
+[`report_sink_example.json`](../v2/base/base-6.1/report_sink_example.json).
+
 ```json
 {
   "user": "zeus_client",
@@ -227,6 +231,9 @@ validate app_output if requested
 Never set by the model. Helios product filters: `user = "zeus_client"` and scope present. Privacy: product may redact or drop `ip_address` per policy — do not invent.
 
 ### ZC-WISH-044 — `ai_process_result` (base-6.1)
+
+Companion example: pack
+[`settings_ai_process_result.example.json`](../v2/base/base-6.1/settings_ai_process_result.example.json).
 
 ```text
 settings.ai_process_result = false   # default — cheap: AI → Zeus → UI

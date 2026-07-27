@@ -20,9 +20,12 @@
 
 - [x] `v2/base/base-6.1/` from `new_base.py --from v2/base/base-6 --base 6.1`  
 - [x] `_lineage.base_id` = `base-6.1`, parent `base-6`  
-- [x] CORE section 5 (Client loop + `user` stamp) via `assemble_mode_prompts.py --base 6.1`  
+- [x] CORE section 5 (Client loop + `user` / `ip_address` stamp) via `assemble_mode_prompts.py --base 6.1`  
 - [x] text re-export + MANIFEST refresh  
 - [x] OVERVIEW.md + README.md  
+- [x] `report_sink_schema.json` + `report_sink_example.json` (not Layer A)  
+- [x] `settings_ai_process_result.example.json`  
+- [x] Layer A `response_output_*.json` **unchanged** (no stamp fields on model wire)  
 
 ## 2. Verify (Phase D)
 

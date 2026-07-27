@@ -1236,6 +1236,10 @@ Today’s cheap raw scalars already on report: `duration_ms`, `rounds_total`, `t
 | **Priority** | **2** (cheap spine; pairs with ZC-WISH-035) |
 | **Related** | [ROADMAP.md § Emit `user` + `ip_address` + `ai_process_result`](ROADMAP.md) |
 
+Machine schema (not Layer A): pack
+[`report_sink_schema.json`](../v2/base/base-6.1/report_sink_schema.json) ·
+[`report_sink_example.json`](../v2/base/base-6.1/report_sink_example.json).
+
 ```json
 {
   "user": "zeus_client",

@@ -1,0 +1,12 @@
+{
+  "_comment": "Client settings bag keys introduced/documented on base-6.1 \u2014 NOT Layer A; NOT report sink root",
+  "ai_process_result": false,
+  "notes": {
+    "ai_process_result": "bool default false; when true Client schedules a second AI turn after Zeus tools",
+    "see": [
+      "docs/PROMPT_SETTINGS.md",
+      "docs/MULTI_ROUND_CLIENT.md",
+      "ZC-WISH-044"
+    ]
+  }
+}

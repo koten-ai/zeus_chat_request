@@ -179,6 +179,8 @@ ai_process_result = true (insight):
 - [x] `verify_base_pack.py --base 6.1` OK  
 - [x] COMPAT candidate row · RELEASE_NOTES  
 - [x] Client wishlist stripped of Helios Pri-3 bulk; ZC-035/044 kept  
+- [x] Pack `report_sink_schema.json` + `report_sink_example.json` (stamps **not** on Layer A)  
+- [x] Pack `settings_ai_process_result.example.json`  
 - [ ] Client stamps `user` (+ `ip_address` when known) on every report sink (ZC-WISH-035)  
 - [ ] Helios Motions filter `user = "zeus_client"` + scope + day (HEL-WISH-022)  
 - [ ] Client implements `ai_process_result` default false (ZC-WISH-044)  
@@ -321,7 +323,9 @@ Full plan: **§ Getting skinny**.
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
 | Client injects `hints.*` after rules{} | Soft steer not live until Client | **CR-4** residual · ZC-WISH-040 |
-| Client stamps `user` + `ip_address` + `ai_process_result` loop | base-6.1 residual | **ZC-WISH-035 / 044** |
+| **base-6.1 pack** — CORE + report_sink schema + docs | Candidate pack | **CR-27** |
+| Client stamps `user` + `ip_address` + `ai_process_result` loop | base-6.1 residual | **CR-28 / CR-29** · ZC-WISH-035 / 044 |
+| Helios filter `user="zeus_client"` | base-6.1 residual | **CR-30** · HEL-WISH-022 |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
 **Pack SoT for new work:** **base-5 wire** · **candidate pack base-6.1** (`v2/base/base-6.1/`) · prior **base-6** · **base-5.3**.  
@@ -361,6 +365,10 @@ Last status pass: **2026-07-27**.
 | **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
 | **CR-25** | **Snapshot folders** base-5 / 5.1 / 5.2 + process | **Done** | process P0 |
 | **CR-26** | **base-5.3** pack + clarity — **pack Done** (PR #12); residual Hot Path / ZE-267 | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
+| **CR-27** | **base-6.1** pack — `user` + `ip_address` sink stamps + `ai_process_result` docs/CORE | **In Review** (this PR) | § base-6.1 |
+| **CR-28** | Client residual: stamp `user` + `ip_address` (ZC-WISH-035) | To Do | § base-6.1 · Client |
+| **CR-29** | Client residual: `ai_process_result` loop (ZC-WISH-044) | To Do | § base-6.1 · Client |
+| **CR-30** | Helios residual: filter `user="zeus_client"` (HEL-WISH-022) | To Do | § base-6.1 · Helios |
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 

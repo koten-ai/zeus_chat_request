@@ -39,6 +39,15 @@ python3 scripts/verify_base_pack.py --base 6.1
 | [ZEUS_CLIENT_WISHLIST…](../../ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) | **ZC-WISH-035**, **ZC-WISH-044** |
 | [HELIOS_WISHLIST…](../../HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | **HEL-WISH-022** only (not Client wishlist bulk) |
 
+## Machine JSON (pack)
+
+| File | Role |
+| --- | --- |
+| [`response_output_schema.json`](../../../v2/base/base-6.1/response_output_schema.json) | **Layer A only** (model `return`) — does **not** add `user` / `ip_address` |
+| [`report_sink_schema.json`](../../../v2/base/base-6.1/report_sink_schema.json) | Sink root stamps: `user` required-enum · `ip_address` optional IPv4/IPv6 string |
+| [`report_sink_example.json`](../../../v2/base/base-6.1/report_sink_example.json) | One product-shaped sink instance |
+| [`settings_ai_process_result.example.json`](../../../v2/base/base-6.1/settings_ai_process_result.example.json) | Settings bag flag (not Layer A, not sink root) |
+
 ## Pin / Client
 
 - `CURRENT.json` may remain **base-1**.  

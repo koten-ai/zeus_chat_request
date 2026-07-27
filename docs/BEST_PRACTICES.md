@@ -1,12 +1,21 @@
 # Zeus chat_request — retrieval best practices
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-5.3** (on main) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-6** (content; wire still base-5) · version matrix: [COMPAT.md](../COMPAT.md)
 
 **Audience:** catalog authors, zeus_client / Prompt Helper, operators writing `company_context`  
-**Pack surface today:** `v2/base/base-5.3/` CORE + verbs + runtime inject (SCOPE BRIEF / MINI-SCHEMA)  
-**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) (§ World model language · § Verb catalog clarity · **§ HINTS catalog**) · [OPTIMIZATION.md](OPTIMIZATION.md) (**end-goal** Pachinko → `named_query` rails — not this playbook) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · Zeus DESIGN [§14.7 retrieval optimizations](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md#147-retrieval-optimizations-mode-bias--playbook--soft-hints) · [ENTITY foundation](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) · Zeus [docs/API/V2](https://github.com/Fujio-Turner/Zeus/tree/main/docs/API/V2)
+**Pack surface today:** `v2/base/base-6/` (and prior content trains) CORE + verbs + runtime inject (SCOPE BRIEF / MINI-SCHEMA)  
+**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) (§ World model language · § Verb catalog clarity · **§ HINTS catalog**) · [OPTIMIZATION.md](OPTIMIZATION.md) (**end-goal** Pachinko → Hot Path sharpen → `named_query` rails — not day-one playbook) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · Zeus DESIGN [§14.7 retrieval optimizations](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md#147-retrieval-optimizations-mode-bias--playbook--soft-hints) · [ENTITY foundation](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) · Zeus [docs/API/V2](https://github.com/Fujio-Turner/Zeus/tree/main/docs/API/V2)
 
 This doc is the **policy of use** for Zeus verbs + mini-schema: how to plan retrieval for **single-focus** asks and **multi-intent paragraphs**. It is design SoT for a future CORE **Playbook** block — not a second BIBLE and not a pin flip.
+
+### Best practices vs optimization (how we use the two)
+
+| Doc | When traffic is small | When traffic is large |
+| --- | --- | --- |
+| **This file (best practices)** | First A/B “spit tests,” gold books, day-one recipes | Still the **wide-mouth** law — field→verb, A–H, multi-part |
+| **[OPTIMIZATION.md](OPTIMIZATION.md)** | Light touch | **Hundreds → 10k+ chats** + Hot Path: sharpen CORE, soft `hints.*`, rails |
+
+Best practices stay **general and stable**. Optimization is how you **point the funnel** after real traffic — not a replacement for the playbook.
 
 ---
 
@@ -57,8 +66,33 @@ Cost tags (`[cheap]` / `[mod]` / `[exp]`) matter **after** correct class. Wrong 
 | Bind `@step.ids` (not bare `@step`) | Invent counts / field values into `summary` |
 | Empty result OK → adjust path, clarify, or `wish_i_knew` / `data_gaps` | Fake rows to satisfy terminate |
 | `order` with `by: "field:<name>"` and `asc: false` for top-N | `direction: "desc"` on order (not the Zeus API) |
+| Prefer reusing prior Zeus tool evidence when the user points at it (§1.3) | Unconstrained global rediscovery for “those / listed / above” follow-ups |
 
 **Contract note:** under enforcement, **do not strip tools[] mid-session** (e.g. drop `describe` because mini-schema arrived). Teach skip-in-prose; membership changes only via a **new stamped pack** ([ROADMAP § Getting skinny](ROADMAP.md)).
+
+### 1.3 Multi-turn reuse (prior Zeus results) — short law
+
+**Within a pipeline** you already bind prior step ids (`@step.ids`).  
+**Across user turns**, the model often has only chat history + prior tool rows still in `messages` (Client) — not the Hub “Zeus results” lightbox (UI-only).
+
+**House style (Option B — pack CORE candidate / playbook card):**
+
+```text
+Multi-turn: when the user points at a prior Zeus result ("those / listed / above"),
+reuse that evidence (ids, cities, fields) and constrain new tools to it.
+Do not re-run the same broad discovery if prior tool rows already answer the restrictor.
+If prior rows are missing from context, re-query narrowly or clarify — never invent them.
+```
+
+| Prefer | Avoid |
+| --- | --- |
+| Intersect new filter (e.g. pizza / FTS category) with **prior set** when evidence is in context | Global `search "pizza"` while talking as if prior cities were applied |
+| One search/find + **filter to prior set** | N equality `find`s (fan-out / step caps) for large prior sets |
+| Re-fetch **smallest** set if history lost the rows | Invent city/id lists into `summary` |
+| QD / summary that names the **restrictor** | Prose that claims multi-turn while tools ignore it |
+
+**Client / multi-round:** keep prior tool bodies (or a compact city/id bag) in `messages` when product cares about follow-ups — see [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md). Soft long recipes / last-result inject → [HINTS.md](HINTS.md) · ZC-WISH-040.  
+**Sharpening under traffic:** longer multi-turn CORE excerpt + Hot Path → [OPTIMIZATION.md § Multi-turn reuse](OPTIMIZATION.md#multi-turn-reuse-prior-zeus-evidence).
 
 ---
 
@@ -188,6 +222,7 @@ Paragraph
 | **Rank after filter** | “top 5 of those” | candidate bag → TOP_N recipe |
 | **Compare** | “A vs B” | two lookups → project both → summary compares; optional `set` only if shared-id logic needed |
 | **Mixed count + list** | “how many … and show examples” | BRIEF for count when possible; else `find return:count` + limited `project` — do not double full scans |
+| **Follow-up on prior Zeus set** | “out of those cities…”, “which of the ones you listed…” | Reuse prior rows/ids/fields in context (§1.3); new predicate ∩ prior set — not unconstrained rediscovery |
 | **Under-specified paragraph** | many goals, no entities | `policy_action: clarify` or answer partial + `wish_i_knew` — do not invent schema |
 
 ### 3.4 One pipeline vs multi-round
@@ -305,6 +340,8 @@ Suggested next content train: **Playbook in CORE + light verb description diet**
 | Multi-round thrash of the same pipeline | Adjust path or clarify |
 | Summary invents the join | Evidence-only Layer A |
 | Unbounded traverse on open “because exploration” | Sample then expand; hard step caps still apply |
+| “Those cities” follow-up answered with global search only | Multi-turn restrictor ignored (§1.3) |
+| N× `find where city=` for large prior sets | Prefer one new filter + intersect; respect fan-out / step caps |
 
 ---
 
@@ -313,6 +350,7 @@ Suggested next content train: **Playbook in CORE + light verb description diet**
 ```text
 SINGLE:  class field → verb → recipe A–H → terminate
 MULTI:   split parts[] → each part a recipe → set/hop to join → one summary
+FOLLOW:  prior Zeus set ("those/listed") → reuse evidence → constrain new tools
 OPEN:    same recipes, looser HOP / serendipity — not “multi-ask mode”
 JOIN:    FK / walk_path / traverse
 COMBINE: set on id bags
@@ -327,10 +365,11 @@ STOP:    evidence-only Layer A
 
 | Doc | Role |
 | --- | --- |
-| **This file** | Playbook SoT (single + multi-intent + mode bias) |
+| **This file** | Playbook SoT (single + multi-intent + multi-turn short law + mode bias) |
+| [OPTIMIZATION.md](OPTIMIZATION.md) | Traffic → Hot Path → rails; longer multi-turn CORE (Option A) |
 | [MODE.md](MODE.md) | What each mode is for |
-| [ROADMAP.md](ROADMAP.md) | When Playbook enters a BASE pack |
+| [ROADMAP.md](ROADMAP.md) | When Playbook / multi-turn enters a BASE pack |
 | [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Client bags when one pipeline is not enough |
-| Pack CORE (`work/mode_overlays/CORE.md`) | Short LLM-facing excerpt of §§1–2 (+ thin multi-part) |
+| Pack CORE (`work/mode_overlays/CORE.md`) | Short LLM-facing excerpt of §§1–2 (+ thin multi-part + §1.3) |
 
 *When the Playbook is copied into CORE, keep this doc as the long form; do not grow system prompt to full BEST_PRACTICES length.*

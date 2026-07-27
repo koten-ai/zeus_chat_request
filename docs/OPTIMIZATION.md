@@ -1,12 +1,25 @@
 # Fine-tuning & end-goal optimization (Pachinko → named rails)
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-5.3** (on main) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-6** (content; wire still base-5) · version matrix: [COMPAT.md](../COMPAT.md)
 
 **Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel  
 **Not:** day-one general retrieval playbook (that is [BEST_PRACTICES.md](BEST_PRACTICES.md))  
 **Companion diagram:** [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg) · also business docs `img/` · Zeus `docs/public/img/`  
 **Related:** [ROADMAP.md](ROADMAP.md) (§ HINTS · Hot Path · base-7/8) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) (Funnel / path stage) · Zeus [Funnel motion](https://github.com/koten-ai/Zeus/blob/main/docs/public/motions/FUNNEL.md) · OpenAPI **named queries** (PREPARED N1QL)  
 **Jira (Hub Prompt Helper product):** [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) — Hot Paths → `named_query` rails → **contracted** chat_request (parent [ZE-23](https://kotenai.atlassian.net/browse/ZE-23))
+
+### Optimization vs best practices
+
+| | [BEST_PRACTICES.md](BEST_PRACTICES.md) | **This doc** |
+| --- | --- | --- |
+| **Traffic** | First A/B spit tests, gold books, day-one | **Hundreds → 10k+ chats**, Hot Path books, Funnel |
+| **Role** | Stable playbook (field→verb, recipes A–H, multi-part, short multi-turn) | **Sharpen** CORE / soft `hints.*` / **rails** from empirics |
+| **Mouth** | Keep wide | Keep wide — add **rails**, don’t shrink questions |
+
+```text
+Best practices  =  how every ball should bounce on day one
+Optimization    =  after rain, angle the pins + bolt rails for the busy paths
+```
 
 ---
 
@@ -79,19 +92,69 @@ Mental model: **Candy Land chute / shoots-and-ladders / wormhole / fast-pass lan
 
 | Layer | Doc | Role |
 | --- | --- | --- |
-| **General playbook** | [BEST_PRACTICES.md](BEST_PRACTICES.md) | Every scope, day one: field class → verb, recipes A–H, multi-intent |
-| **Soft steer** | ROADMAP [§ HINTS](ROADMAP.md) | Per-turn bias without re-stamp |
-| **End-goal rails** | **This doc** | Top patterns become **named_query** (and optional action hooks) |
+| **General playbook** | [BEST_PRACTICES.md](BEST_PRACTICES.md) | Every scope, day one: field class → verb, recipes A–H, multi-intent, **short multi-turn** |
+| **Soft steer** | ROADMAP [§ HINTS](ROADMAP.md) · [HINTS.md](HINTS.md) | Per-turn bias without re-stamp |
+| **Sharpen under traffic** | **This doc** § Multi-turn + Hot Path | CORE / hints / books from hundreds–10k chats |
+| **End-goal rails** | **This doc** §§1–6 | Top patterns become **named_query** (and optional action hooks) |
 
 ```text
-BEST_PRACTICES  →  how to play the pin grid safely
-HINTS / Hot Path →  which paths are getting hot
+BEST_PRACTICES  →  how to play the pin grid safely (day one + forever floor)
+HINTS / Hot Path →  which paths are getting hot (sharpen)
 named_query      →  turn a hot path into a rail (few hops)
 Funnel motion    →  measure and operate the board (Helios)
 ```
 
 Do **not** replace day-one playbook with “only call named_query.”  
 Do **promote** repeated winning multi-hop shapes into rails over time.
+
+---
+
+## Multi-turn reuse (prior Zeus evidence) {#multi-turn-reuse-prior-zeus-evidence}
+
+Day-one short law lives in [BEST_PRACTICES §1.3](BEST_PRACTICES.md) (**Option B**).  
+Under real traffic, multi-turn *restrictors* (“those cities,” “from the list above”) show up as **repeat waste** in Detective: global rediscovery, parallel re-find + search without intersection, prose that claims a filter tools never applied.
+
+### Why this is an optimization concern
+
+| Signal (Hot Path / Detective) | Cost |
+| --- | --- |
+| Follow-up re-runs full `find Business limit N` after cities already projected | Extra GSI + project; often **wrong set** vs prior turn |
+| Global `search "pizza"` while summary says “among listed cities” | Wrong answer shape; low trust |
+| N× `find where city=` for large prior sets | Fan-out / step caps; slow wall |
+
+**Mine** these as path fingerprints (e.g. `followup_prior_set+fts_category`) and **sharpen** CORE / soft `hints.multipart` / books — then, if stable, a **rail**.
+
+### CORE candidate (Option A — longer house style)
+
+Promote into a **content train** CORE block (or stamped custom) when Hot Path shows multi-turn waste — not as jailbreak law:
+
+```text
+5) Multi-turn reuse (when evidence is in context)
+- If the user refers to prior answers ("those", "the cities listed", "above", "from the last result"),
+  prefer reusing cities / ids / fields already returned by Zeus tools in this conversation
+  over rediscovering the same set with a new broad find/search.
+- Intersect new filters (e.g. pizza / category) with that prior set when possible;
+  do not answer a restricted follow-up with an unconstrained global search.
+- Within a pipeline, keep binding prior step ids as @step.ids.
+- If prior rows are not available in context, re-fetch the smallest set needed or clarify —
+  do not invent the prior list.
+```
+
+| Prefer under traffic | Avoid |
+| --- | --- |
+| Prior set ∩ new predicate (one FTS/find + filter) | Parallel “all businesses” + “global pizza” with no join |
+| Soft `hints.multipart` / last-result inject (ZC-WISH-040) | Hoping the model remembers 50 cities from summary prose alone |
+| Book / gold: “cities then pizza among them” | Gold that only tests single-turn pizza |
+
+**Hub note:** Zeus results lightbox is **operator UI**; the model only reuses what is still in **messages / tool results**. Client multi-round memory or `hints.prior_result` is required for reliable binding — [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [HINTS.md](HINTS.md).
+
+### Ladder placement
+
+```text
+Playbook short multi-turn (BP §1.3)  →  CORE Option A (this section)
+  →  soft hints / prior_result inject  →  Hot Path book
+  →  named_query or pipeline template if the pattern dominates
+```
 
 ---
 
@@ -174,8 +237,9 @@ Helios Funnel metrics should eventually show **% traffic on named rails** and **
 ```text
 cheapest / always-on
   1  Inject quality (brief, mini-schema, ex: samples)
-  2  Playbook + verb clarity (day-one pins)     ← BEST_PRACTICES / base-5.3
-  3  Soft hints / hot_path (bias, no re-stamp) ← ROADMAP § HINTS
+  2  Playbook + verb clarity (day-one pins)     ← BEST_PRACTICES / base-5.3+
+  2b Multi-turn reuse (prior Zeus set)         ← BP §1.3 short · this doc Option A
+  3  Soft hints / hot_path (bias, no re-stamp) ← ROADMAP § HINTS · ZC-WISH-040
   4  Contracted catalog delta (custom stamp / mode pack)
   5  Named pipeline templates (multi-verb rail)
   6  named_query PREPARED (SQL++ fast-pass)    ← §§1–5 headline
@@ -457,6 +521,8 @@ Cheap Zeus/Client path metrics beat forcing the model to emit funnel stages ever
 ---
 
 ## 9. Operator checklist (close the loop)
+
+0. **Multi-turn:** gold/book “prior set → follow-up filter”; measure unconstrained rediscovery on “those/listed” asks.
 
 1. **Observe** Funnel + Hot Paths + Detective slow/error packs.  
 2. **Triage** each fall-out: prompt fix vs new rail vs capability/schema gap.  

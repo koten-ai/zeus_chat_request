@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6** (`v2/base/base-6/`) · last wire break **base-5** · Zeus 0.6 vendor **base-5.3** · next **Client inject `hints.*` (ZC-WISH-040)** · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6** (`v2/base/base-6/`) · last wire break **base-5** · Zeus 0.6 vendor **base-6** · next **Client inject `hints.*` (ZC-WISH-040)** · multi-turn reuse in **BEST_PRACTICES / OPTIMIZATION** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4 → **base-5 wire freeze** → **5.1 / 5.2 / 5.3 content** (5.3 pack on main)  
@@ -12,9 +12,17 @@
 **Latency / skinny plan:** **§ Getting skinny** below — contract-safe tools[] · Hot Path empirics · stamped A/B · schema diet · measure AI floor  
 **World-model language for packs:** **§ World model language for chat_request** — DESIGN vocabulary (AI-Ready overlay · mini-schema shape · access class · modes) · not form-fill  
 **Verb catalog clarity:** **§ Verb catalog clarity** — base-5.2 13-API review vs Zeus `docs/API/V2/*.md` · description/schema gaps · P0 fixes  
-**Retrieval playbook:** [BEST_PRACTICES.md](BEST_PRACTICES.md) — single-focus recipes + multi-intent paragraphs; open ≠ multi-ask  
+**Retrieval playbook:** [BEST_PRACTICES.md](BEST_PRACTICES.md) — single-focus recipes + multi-intent + **multi-turn short law** (§1.3 Option B); open ≠ multi-ask  
 **Soft HINTS (base-6):** [HINTS.md](HINTS.md) · **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
-**End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **`named_query` rails** (SQL++ PREPARED) · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)** (Prompt Helper → contract)  
+**End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **multi-turn CORE (Option A)** · **`named_query` rails** · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)**  
+
+**Best practices vs optimization (pipeline):**
+
+```text
+Day one / A/B spit tests     →  BEST_PRACTICES (wide-mouth recipes + short multi-turn)
+Hundreds → 10k+ + Hot Path   →  OPTIMIZATION (sharpen CORE/hints, then rails)
+Per-turn soft bias           →  hints.* (Client ZC-WISH-040) — never hard law alone
+```
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
 **Agent procedure:** [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)  
@@ -40,9 +48,10 @@ This is **what we want next and why**, not a commitment calendar.
 10. Measure AI floor honestly — catalog/control-plane trains ≠ automatic wall-ms wins; never unhash tools[] mid-chat
 11. Chat_request teaches **world model + verbs** (DESIGN: AI-Ready overlay · mini-schema shape · access class) — not form-fill / slot extraction over raw tables
 12. Each of the 13 tools teaches **when / when-not / KEY constraint** (aligned to Zeus V2 API docs) — not cost-tags alone
-13. **Playbook** (recipes A–H + multi-intent) is policy of use; **hints.*** are per-turn soft bias — never replace hard rules or inject schema
+13. **Playbook** (recipes A–H + multi-intent + multi-turn short law) is policy of use; **hints.*** are per-turn soft bias — never replace hard rules or inject schema
 14. Modes optimize **join/noise/hop appetite**; multi-paragraph multi-ask is **not** “switch to open”
 15. End-goal: shape the board with **named_query rails** (PREPARED fast-pass) from mined hot paths — **shape the funnel, don’t shrink the box** ([OPTIMIZATION.md](OPTIMIZATION.md))
+16. **Multi-turn:** prefer reusing prior Zeus tool evidence when the user points at it; sharpen under traffic (OPTIMIZATION Option A) — do not unconstrained-rediscover “those / listed” sets
 ```
 
 ---
@@ -732,6 +741,9 @@ Production default pin may **keep all 13** until Hot Path evidence says a skinny
 | Scope-aware inject diet (no empty noise; keep zero-row guards) | Zeus | Smaller inject |
 | Multi-round tool body prune | Client | Round N doesn’t explode |
 | Prompt-cache stable zones | Client + provider | Multi-turn savings |
+| **Multi-turn prior-set law** in playbook (Option B) + OPTIMIZATION CORE candidate (Option A) | pack docs → content train | [BEST_PRACTICES §1.3](BEST_PRACTICES.md) · [OPTIMIZATION multi-turn](OPTIMIZATION.md#multi-turn-reuse-prior-zeus-evidence) |
+| Soft `hints.multipart` / prior_result inject when Client ready | Client | ZC-WISH-040; follow-ups constrain to prior Zeus rows |
+| Gold / Hot Path: “list set → filter among those” | Zeus Hub books | Unconstrained rediscovery rate down on “those/listed” asks |
 
 #### Phase 4 — Optional later (base-6 / base-8+)
 

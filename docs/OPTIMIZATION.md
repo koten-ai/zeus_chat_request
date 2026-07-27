@@ -63,8 +63,26 @@ Use **`OPT:N`** in stamps, Display Pad, Helper actions, and contracted notes. **
 | **OPT:26** | Operator checklist | traffic |
 | **OPT:27** | Implementation horizons / ZE-267 | traffic |
 | **OPT:28** | One-pager for talks | traffic |
+| **OPT:29** | Follow-up ∩ prior set (verbose recipe) | traffic · high-value rare |
+| **OPT:30** | Dual-bag without intersect (anti-pattern) | traffic · high-value rare |
+| **OPT:31** | Virtual entity types under traffic | traffic · high-value rare |
+| **OPT:32** | Project fields vs missing stubs | traffic · high-value rare |
+| **OPT:33** | Detective “pass” ≠ multi-turn success | traffic · measure |
+| **OPT:34** | Soft `hints.multipart` pastes (verbose) | traffic · Client inject |
+| **OPT:35** | Why verbose OPT cards are worth tokens | traffic · meta |
 
-**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**.
+**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**; worked multi-turn recipe = **OPT:29**.
+
+### Why OPT cards can be longer than BP cards
+
+Best-practice text is in **every** system prompt / gold path — keep it short.  
+Optimization text is for **Hot Path / Helper / custom stamps** that apply on a **two-digit %** (or less) of turns — but when the user’s ask matches that pattern, the chance the long recipe helps is often **~1 in 3–10**. Paying more tokens on those paths is rational:
+
+| Surface | Length | When loaded |
+| --- | --- | --- |
+| **BP:*** | Short law | Always / day-one CORE |
+| **OPT:0–28** | Medium | Operator + Helper portfolio |
+| **OPT:29+** | **Verbose, specific** | Only when Helper/Hot Path selects the card (or custom stamp for that pattern) |
 
 ---
 
@@ -571,7 +589,8 @@ Cheap Zeus/Client path metrics beat forcing the model to emit funnel stages ever
 
 ## OPT:26 — Operator checklist (close the loop)
 
-0. **Multi-turn:** gold/book “prior set → follow-up filter”; measure unconstrained rediscovery on “those/listed” asks.
+0. **Multi-turn:** gold/book **OPT:29**; measure **OPT:33** metrics (restrictor miss, dual-bag, virtual empty, stub-heavy).  
+0b. **Helper:** attach verbose cards **OPT:29–34** by fingerprint only — not into every CORE (**OPT:35**).
 
 1. **Observe** Funnel + Hot Paths + Detective slow/error packs.  
 2. **Triage** each fall-out: prompt fix vs new rail vs capability/schema gap.  
@@ -616,12 +635,286 @@ ROADMAP home: **named rails + portfolio** under Funnel / Hot Path / base-6 hints
 
 ---
 
+## Stage: High-value rare patterns (verbose cards)
+
+These cards are intentionally **long**. Load them when Hot Path / Helper / books match the fingerprint — not into every BASE CORE.
+
+---
+
+## OPT:29 — Follow-up ∩ prior set (verbose recipe)
+
+**Fingerprint (mine this):**  
+User turn 1 lists a **set** (cities, ids, names) via Zeus tools.  
+User turn 2 uses **restrictor language**: *those / the ones you listed / among them / out of the cities above / from that list* **plus** a new predicate (pizza, open now, top by stars, category FTS).
+
+**Day-one cite:** **BP:4**. **CORE long form under traffic:** **OPT:4**. **This card:** full plan the model should execute.
+
+### Intent translation
+
+| User said | Logical plan |
+| --- | --- |
+| “Which of those cities have pizza?” | `cities_prior ∩ cities(pizza_businesses)` |
+| “Pizza places in the cities you listed” | `pizza_businesses` filtered to `city ∈ cities_prior` |
+| “Top rated among those” | prior bag → order → project (no global rediscovery) |
+
+### Preferred tool plan (one pipeline when possible)
+
+```text
+// 1) PRIOR SET — reuse if still in messages/tool results; else re-fetch SMALL
+//    Prefer prior project rows (city values / ids). Do NOT re-find limit 200 “all businesses”
+//    unless prior evidence is gone from context.
+
+// 2) NEW PREDICATE — class the field (BP:2)
+//    pizza / cuisine language → search Business strategy:fts query_text:"pizza"
+//    (categories is text_fts — never find where categories=…)
+
+// 3) SHAPE
+//    project name, city, state, categories, stars, …
+
+// 4) INTERSECT (model-side or set if you have two id bags of the SAME entity_type)
+//    Keep only rows where city ∈ cities_prior (string normalize: trim, case)
+//    If prior was City ids and Business.city is scalar surface form, match surface strings
+//    from prior project — not invent City entity hosts.
+
+// 5) TERMINATE
+//    summary: which prior cities hit / miss; list pizza places with city
+//    query_decomposition.parts[]: (List prior set) + (Find pizza) + (Intersect)
+//    confidence: med if prior set incomplete or many missing stubs
+//    Do NOT claim “among listed cities” unless step 4 ran.
+```
+
+### Worked sketch (Yelp-style)
+
+```text
+Turn 1: “What cities have listings?”
+  → find/project Business fields [city] (or whatever produced the Zeus results table)
+  → prior_cities = distinct city strings in tool results / history
+
+Turn 2: “Out of the cities listed, which have pizza?”
+  GOOD:
+    search Business fts "pizza" limit 50–100
+    → project city, name, categories, stars
+    → filter rows to city ∈ prior_cities
+    → summary names only cities that appear in both
+
+  BAD (seen in Detective):
+    search pizza global only → pretend multi-turn
+    OR parallel find all Business + search pizza with no join (OPT:30)
+    OR 50× find where city= each city (fan-out / step caps)
+```
+
+### When prior rows are NOT in context
+
+Hub “Zeus results” lightbox is **not** in the model prompt. If history only has a one-line summary:
+
+1. Re-run the **smallest** prior harvest (e.g. project city again with modest limit), **or**  
+2. `policy_action: clarify` / ask which cities, **or**  
+3. Client inject `hints.prior_result` / keep tool JSON in multi-round messages (**OPT:34**, MULTI_ROUND_CLIENT).
+
+Never invent the prior city list into `summary`.
+
+### Success metrics (Hot Path)
+
+| Metric | Goal |
+| --- | --- |
+| Follow-ups with restrictor language that run **global** search/find only | ↓ |
+| Summaries claiming “among listed” without city filter / intersect | ↓ |
+| Avg extra tool calls vs one search+project+filter | ↓ |
+
+**Promote to rail when:** same fingerprint dominates a scope’s Hot Path (e.g. `followup_prior_geo+fts_category`).
+
+---
+
+## OPT:30 — Dual-bag without intersect (anti-pattern)
+
+**Fingerprint:** one pipeline with **two independent harvests** on level 0:
+
+```text
+pizza_biz = search … "pizza"
+all_biz   = find Business limit N   // “re-list cities”
+// projects both bags
+// NO set / NO city filter / NO join
+```
+
+**Why models do it:** QD says “filter cities for pizza” so they fetch **cities** and **pizza** in parallel and hope to reason over both bags. Prose sounds multi-turn; tools never bind the prior set.
+
+**Cost / quality**
+
+| Issue | Effect |
+| --- | --- |
+| `all_biz` ≠ turn-1 city set | Wrong restrictor (limit/order/filter differ) |
+| No intersection | Pizza may be outside “listed” cities; cities bag may have no pizza signal |
+| Double project | Extra ms and tokens; still fails the user ask |
+
+**Fix:** collapse to **OPT:29** (one new predicate + intersect prior set). If you need two bags of the **same** entity_type for boolean logic, use **`set`** (BP:5F) — not narrative join.
+
+**Helper teach string (paste-ready):**
+
+```text
+If you load two bags (e.g. all businesses + pizza hits), you MUST intersect or filter
+explicitly (set on ids, or keep rows whose city/field ∈ prior set). Parallel project
+without intersect is not a multi-turn answer.
+```
+
+---
+
+## OPT:31 — Virtual entity types under traffic
+
+**Day-one:** **BP:14**.  
+**Under traffic:** operators map `Business.city → entity City` with **City fields: 0**. MINI-SCHEMA shows City + `inverse_fks`, so models love `find entity_type:City` and get **0 rows**, then invent or pivot poorly.
+
+### Teach block (verbose — custom stamp / mode book)
+
+```text
+VIRTUAL / PIVOT TYPES (this scope may have them):
+- City, State, (sometimes) category labels exist as scalar_ent on a HOST (Business).
+- Host has the filterable field: Business.city [gsi] scalar_ent → City.
+- City document body may be empty (fields: 0). find City often returns [] even when
+  many Business.city values exist.
+
+TO LIST CITIES WITH LISTINGS:
+  find Business (return ids, broad limit) → project fields [city] (and state if needed)
+  → distinct city strings in summary / next-turn memory
+NOT: find City limit 100 → project name   // empty inventory common
+
+TO FILTER BY CITY:
+  find Business where { city: "<surface form from project/ex:>" }
+  Normalize user "NYC" to stored surface (MINI-SCHEMA ex: samples) before equality.
+
+TO ASK “pizza in those cities”:
+  search pizza → project city → keep city ∈ prior_cities   (OPT:29)
+  Optional: for a SMALL prior set (≤5), equality where.city per city is OK;
+  for large sets prefer one FTS + filter, not N finds.
+```
+
+### Hot Path signals
+
+| Signal | Likely virtual-type miss |
+| --- | --- |
+| `find City` / `find State` result_size 0 then global Business search | Inventory via wrong entity_type |
+| Mini-schema City present + inverse_fks only | Pivot type |
+| project city works; find City fails | Confirm BP:14 / OPT:31 teach |
+
+---
+
+## OPT:32 — Project fields vs missing stubs
+
+**Fingerprint:** `project` with `fields: [name, city, state, …]` returns many rows with only:
+
+```json
+{ "doc_key": "file::…", "id": "file::…", "missing": true, "node_id": "file::…" }
+```
+
+mixed with rich rows that have `city` / `name`.
+
+**Causes (engine / projection):** partial v2 hosts, wrong id kind (`file::` vs `biz:…`), not-yet-reprojected docs after entity_map change.
+
+**Model law (when this appears in tool results):**
+
+```text
+1. Prefer rich rows for summary / next-turn prior set (city, name present).
+2. Do not treat missing:true stubs as equal evidence.
+3. confidence: med/low if a large fraction are stubs.
+4. wish_i_knew / data_gaps when inventory is mostly unresolved hosts
+   (kind: data or schema — “host not fully projected”).
+5. Do not re-project the same missing ids hoping for different data without
+   changing path (get include body only if id is known good).
+```
+
+**Operator path:** re-ingest / DCP zero after entity_map `re_project` (Zeus Lifecycle) — not a chat_request pin flip.
+
+**Helper / stamp:** if Hot Path shows high `missing:true` rate on project, add a **book** case and optional CORE note pointing at re-project; UI may hide stubs (Hub Zeus results) but the **model still sees tool JSON**.
+
+---
+
+## OPT:33 — Detective “pass” ≠ multi-turn success
+
+Detective **output_grade=pass** means Layer A required four + tools OK — **not**:
+
+| Check | Who owns it |
+| --- | --- |
+| Honored “those / listed” restrictor | Plan quality · **OPT:29** |
+| Intersected prior set | Plan · **OPT:30** |
+| Used virtual type correctly | Plan · **OPT:31** |
+| Summary matches tool evidence | Layer A honesty · **BP:9** |
+
+**Measure in Hot Path / books (not only Detective pass rate):**
+
+```text
+multi_turn_restrictor_miss  = follow-up with restrictor language
+                              AND no prior-set filter AND global harvest
+virtual_type_empty_inventory = find pivot type → 0 AND host project would work
+stub_heavy_project           = project rows missing:true > 50%
+```
+
+Gold books should include at least one **OPT:29** scenario per mature scope.
+
+---
+
+## OPT:34 — Soft `hints.multipart` pastes (verbose)
+
+Hash-excluded Client inject ([HINTS.md](HINTS.md) · ZC-WISH-040). Use when CORE is full and this turn needs a **recipe**, not a new stamp.
+
+### Example: prior city set + category FTS
+
+```json
+{
+  "hints": {
+    "multipart": {
+      "when": "user refers to prior Zeus result set (those/listed/above) + new category/language filter",
+      "prefer": "Reuse prior city/id/field values from conversation tool results. Run one search/find for the new predicate; project city (and name); keep only rows in the prior set. Do not re-find all Business just to re-list cities. Do not answer with unconstrained global search while claiming multi-turn.",
+      "recipe": "prior_set → search|find(new_filter) → project → filter to prior_set → terminate with parts[]"
+    },
+    "path": {
+      "avoid": [
+        "parallel all_biz find + pizza search without intersect",
+        "find City for inventory when City is scalar_ent pivot with 0 fields",
+        "N equality finds for large prior city sets"
+      ]
+    }
+  }
+}
+```
+
+### Example: last-fail negative (after Detective)
+
+```json
+{
+  "hints": {
+    "avoid_patterns": [
+      "find where on text_fts categories — use search fts",
+      "order.direction — use asc boolean + by field:name",
+      "repeat same pipeline after empty — change path or clarify"
+    ]
+  }
+}
+```
+
+Keep inject size soft-capped (~1–2 KB). Jailbreak law stays in hard `rules{}`, never only here.
+
+---
+
+## OPT:35 — Why verbose OPT cards are worth tokens
+
+| | BP cards | OPT:29+ cards |
+| --- | --- | --- |
+| **How often loaded** | Most chats / base CORE | Pattern match only |
+| **Length** | Short | Specific + worked examples |
+| **ROI** | Always-on correctness | When the rare ask hits, long recipe prevents a wrong global path |
+
+**Operator rule of thumb:** if Hot Path shows a pattern on **~5–20%** of sessions, and when present the long teach would help **~1/3–1/10** of those, the **expected value** of a verbose Helper insert still beats a one-line “reuse prior results” that models ignore.
+
+**Do not** dump OPT:29–34 into every mode CORE (token tax on the other 80–95%).  
+**Do** wire Prompt Helper to attach **`OPT:N`** by fingerprint (restrictor language, virtual type, stub-heavy project, dual-bag).
+
+---
+
 ## Doc ownership
 
 | Doc | Role |
 | --- | --- |
-| **This file** | End-goal fine-tuning / Pachinko / named rails / **optimization portfolio** |
-| [BEST_PRACTICES.md](BEST_PRACTICES.md) | Day-one playbook (pins) |
+| **This file** | End-goal fine-tuning / Pachinko / named rails / **optimization portfolio** / **verbose rare cards OPT:29+** |
+| [BEST_PRACTICES.md](BEST_PRACTICES.md) | Day-one playbook (pins) · `BP:N` |
 | [ROADMAP.md](ROADMAP.md) § HINTS · sequencing | Soft hot_path inject; when rails enter product trains |
 | [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) | Prompt Helper → rails → contract |
 | Zeus Funnel motion + OpenAPI named queries | Engine rails + admin lifecycle |

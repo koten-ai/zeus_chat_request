@@ -48,8 +48,10 @@ Use **`BP:N`** in stamps, Display Pad, CORE notes, and Helper actions so inserts
 | **BP:10** | What to put in the pack later | day-one → CORE |
 | **BP:11** | Anti-patterns | day-one |
 | **BP:12** | Quick reference card | day-one |
+| **BP:13** | Empty / thin result recovery | day-one |
+| **BP:14** | Virtual entity types (scalar_ent pivots) | day-one |
 
-**ID rules:** never renumber existing `BP:N` (append new ids). Sub-recipes use `BP:5A`…`BP:5H`. Cross-doc: `OPT:4` = multi-turn CORE candidate under traffic.
+**ID rules:** never renumber existing `BP:N` (append new ids). Sub-recipes use `BP:5A`…`BP:5H`. Cross-doc: `OPT:4` = multi-turn CORE candidate under traffic; verbose traffic recipes **OPT:29+**.
 
 ---
 
@@ -394,7 +396,39 @@ COMBINE: set on id bags
 SIMILAR: search hybrid/vector
 RANK:    order by field:X asc:false                               (BP:5C)
 STOP:    evidence-only Layer A                                    (BP:5H, BP:9)
+EMPTY:   adjust class → verb → path; clarify / wish_i_knew        (BP:13)
+VIRTUAL: list via host fields (Business.city) not find City only  (BP:14)
 ```
+
+---
+
+## BP:13 — Empty / thin result recovery
+
+When a step returns **0 rows** (or only `missing: true` stubs):
+
+```text
+1. Re-check field class (BP:2) — was this text_fts in find.where?
+2. One alternate path (search vs find; drop one where key; broaden limit once).
+3. Do not invent rows; summary may say none found; confidence down.
+4. wish_i_knew / data_gaps when schema/data/index is the gap.
+5. Do not thrash the same pipeline (BP:3).
+```
+
+Keep this short in CORE; traffic-specific “missing host projection” mining → **OPT:32**.
+
+---
+
+## BP:14 — Virtual entity types (scalar_ent pivots)
+
+Some MINI-SCHEMA types exist only as **pivots** on a host (e.g. `Business.city → City` with **City fields: 0**).  
+**Day-one rule:** list values via the **host** (`find/project Business` fields `city` / `state`), not only `find entity_type:City` (often empty until entities materialize).
+
+| Prefer | Avoid |
+| --- | --- |
+| `find Business` → `project city` (distinct in summary) | Assume `find City` always inventories cities |
+| Filter `where.city` on Business | Treat City as a full document type with body fields |
+
+Verbose inventory / Hot Path for virtual types → **OPT:31**.
 
 ---
 
@@ -403,7 +437,7 @@ STOP:    evidence-only Layer A                                    (BP:5H, BP:9)
 | Doc | Role |
 | --- | --- |
 | **This file** | Day-one playbook SoT · cite **`BP:N`** |
-| [OPTIMIZATION.md](OPTIMIZATION.md) | Traffic sharpen · cite **`OPT:N`** · multi-turn CORE **OPT:4** |
+| [OPTIMIZATION.md](OPTIMIZATION.md) | Traffic sharpen · cite **`OPT:N`** · multi-turn CORE **OPT:4** · verbose recipes **OPT:29+** |
 | [MODE.md](MODE.md) | What each mode is for |
 | [ROADMAP.md](ROADMAP.md) | When Playbook / multi-turn enters a BASE pack |
 | [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Client bags when one pipeline is not enough |

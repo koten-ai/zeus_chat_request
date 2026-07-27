@@ -24,7 +24,8 @@ STAGE TRAFFIC   OPTIMIZATION.md     cite OPT:N    hundreds→10k · Hot Path · 
 Per-turn soft   hints.*             ZC-WISH-040   never hard law alone
 ```
 
-Prompt Helper / stamps: e.g. `guidance.playbook_refs: ["BP:4","BP:5A"]` · `optimization_refs: ["OPT:4","OPT:14"]`.  
+Prompt Helper / stamps: e.g. `guidance.playbook_refs: ["BP:4","BP:5A"]` · `optimization_refs: ["OPT:4","OPT:29"]`.  
+Verbose traffic cards **OPT:29+** (multi-turn recipe, dual-bag, virtual types, stubs) — load by fingerprint only.  
 Indexes live at the top of each doc (**Citation index**).
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  

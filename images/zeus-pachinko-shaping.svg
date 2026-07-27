@@ -1,0 +1,207 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="860" viewBox="0 0 1240 860" role="img" aria-labelledby="title desc">
+  <title id="title">Shaping the Pachinko pins over time</title>
+  <desc id="desc">Three stages of a Pachinko machine. Stage one: no shaped paths, balls (questions) ping-pong chaotically through a full pin grid and reach the center order slot slowly with many hops. Stage two: observed traffic is mined into the first named queries, shown as angled rails that start channeling balls toward the center. Stage three: a mature, shaped board where rails from the front, middle, and sides guide most balls to the center order in few hops, and new seasonal questions add new rails.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 17px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .stage { font: 700 20px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .cap { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .board { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .pin { fill: #94a3b8; }
+      .pinDim { fill: #e2e8f0; }
+      .ball { stroke: #ffffff; stroke-width: 1.5; }
+      .b1 { fill: #f43f5e; }
+      .b2 { fill: #f59e0b; }
+      .b3 { fill: #0891b2; }
+      .pathBad { stroke: #f43f5e; stroke-width: 2.5; fill: none; opacity: 0.85; }
+      .pathMid { stroke: #f59e0b; stroke-width: 2.5; fill: none; opacity: 0.85; }
+      .pathGood { stroke: #0891b2; stroke-width: 3; fill: none; opacity: 0.9; }
+      .rail { stroke: #0891b2; stroke-width: 7; fill: none; stroke-linecap: round; opacity: 0.9; }
+      .railNew { stroke: #16a34a; stroke-width: 7; fill: none; stroke-linecap: round; stroke-dasharray: 2 11; opacity: 0.95; }
+      .order { fill: #dcfce7; stroke: #16a34a; stroke-width: 2.5; }
+      .bin { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.5; }
+      .orderTxt { font: 700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #166534; }
+      .binTxt { font: 600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .hop { font: 700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .drop { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .nq { fill: #ffffff; stroke: #0891b2; stroke-width: 2.5; }
+      .nqTxt { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0e7490; }
+      .nqNote { font: 700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0e7490; }
+      .nqLead { stroke: #0891b2; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1240" height="860"/>
+  <text class="title" x="620" y="46" text-anchor="middle">The Pachinko machine: shape the pins over time</text>
+  <text class="subtitle" x="620" y="74" text-anchor="middle">Questions are balls dropped across a wide mouth. The goal: get every ball to the center "order" in the fewest hops.</text>
+
+  <!-- ============================================================= -->
+  <!-- STAGE 1 : NO SHAPED PATHS                                     -->
+  <!-- ============================================================= -->
+  <g>
+    <rect class="board" x="40" y="110" width="360" height="640" rx="20"/>
+    <text class="stage" x="220" y="142" text-anchor="middle">1 · Day one</text>
+    <text class="cap" x="220" y="164" text-anchor="middle">no prepared paths — pure ping-pong</text>
+
+    <text class="drop" x="220" y="190" text-anchor="middle">balls dropped across the whole mouth ↓</text>
+
+    <!-- balls at top -->
+    <circle class="ball b1" cx="100" cy="208" r="9"/>
+    <circle class="ball b2" cx="220" cy="208" r="9"/>
+    <circle class="ball b3" cx="340" cy="208" r="9"/>
+
+    <!-- full chaotic pin grid -->
+    <g class="pin">
+      <circle cx="80" cy="250" r="5"/><circle cx="132" cy="250" r="5"/><circle cx="184" cy="250" r="5"/><circle cx="236" cy="250" r="5"/><circle cx="288" cy="250" r="5"/><circle cx="340" cy="250" r="5"/>
+      <circle cx="106" cy="300" r="5"/><circle cx="158" cy="300" r="5"/><circle cx="210" cy="300" r="5"/><circle cx="262" cy="300" r="5"/><circle cx="314" cy="300" r="5"/>
+      <circle cx="80" cy="350" r="5"/><circle cx="132" cy="350" r="5"/><circle cx="184" cy="350" r="5"/><circle cx="236" cy="350" r="5"/><circle cx="288" cy="350" r="5"/><circle cx="340" cy="350" r="5"/>
+      <circle cx="106" cy="400" r="5"/><circle cx="158" cy="400" r="5"/><circle cx="210" cy="400" r="5"/><circle cx="262" cy="400" r="5"/><circle cx="314" cy="400" r="5"/>
+      <circle cx="80" cy="450" r="5"/><circle cx="132" cy="450" r="5"/><circle cx="184" cy="450" r="5"/><circle cx="236" cy="450" r="5"/><circle cx="288" cy="450" r="5"/><circle cx="340" cy="450" r="5"/>
+      <circle cx="106" cy="500" r="5"/><circle cx="158" cy="500" r="5"/><circle cx="210" cy="500" r="5"/><circle cx="262" cy="500" r="5"/><circle cx="314" cy="500" r="5"/>
+      <circle cx="80" cy="550" r="5"/><circle cx="132" cy="550" r="5"/><circle cx="184" cy="550" r="5"/><circle cx="236" cy="550" r="5"/><circle cx="288" cy="550" r="5"/><circle cx="340" cy="550" r="5"/>
+      <circle cx="106" cy="600" r="5"/><circle cx="158" cy="600" r="5"/><circle cx="210" cy="600" r="5"/><circle cx="262" cy="600" r="5"/><circle cx="314" cy="600" r="5"/>
+    </g>
+
+    <!-- chaotic ball paths -->
+    <polyline class="pathBad" points="100,217 130,250 96,300 144,350 100,400 150,450 110,500 96,640"/>
+    <polyline class="pathMid" points="220,217 250,260 200,310 260,360 195,420 255,480 210,540 225,690"/>
+    <polyline class="pathGood" points="340,217 314,260 340,320 300,380 330,440 296,520 330,600 360,640"/>
+
+    <!-- slots -->
+    <rect class="bin" x="60" y="690" width="100" height="46" rx="10"/>
+    <text class="binTxt" x="110" y="712" text-anchor="middle">fell out</text>
+    <text class="binTxt" x="110" y="728" text-anchor="middle">(no answer)</text>
+    <rect class="order" x="170" y="690" width="100" height="46" rx="10"/>
+    <text class="orderTxt" x="220" y="712" text-anchor="middle">ORDER</text>
+    <text class="binTxt" x="220" y="728" text-anchor="middle" fill="#166534">named query</text>
+    <rect class="bin" x="280" y="690" width="100" height="46" rx="10"/>
+    <text class="binTxt" x="330" y="712" text-anchor="middle">fell out</text>
+    <text class="binTxt" x="330" y="728" text-anchor="middle">(no answer)</text>
+
+    <text class="hop" x="220" y="668" text-anchor="middle" fill="#be123c">8–12 hops · most balls miss the center</text>
+  </g>
+
+  <!-- ============================================================= -->
+  <!-- STAGE 2 : MINE THE FIRST PATHS                                -->
+  <!-- ============================================================= -->
+  <g>
+    <rect class="board" x="440" y="110" width="360" height="640" rx="20"/>
+    <text class="stage" x="620" y="142" text-anchor="middle">2 · After watching traffic</text>
+    <text class="cap" x="620" y="164" text-anchor="middle">mine hot paths → first named queries</text>
+
+    <text class="drop" x="620" y="190" text-anchor="middle">same balls, same wide mouth ↓</text>
+
+    <circle class="ball b1" cx="500" cy="208" r="9"/>
+    <circle class="ball b2" cx="620" cy="208" r="9"/>
+    <circle class="ball b3" cx="740" cy="208" r="9"/>
+
+    <!-- some pins dimmed (removed/bypassed), some kept -->
+    <g class="pinDim">
+      <circle cx="480" cy="250" r="5"/><circle cx="532" cy="250" r="5"/><circle cx="688" cy="250" r="5"/><circle cx="740" cy="250" r="5"/>
+      <circle cx="506" cy="300" r="5"/><circle cx="714" cy="300" r="5"/>
+      <circle cx="480" cy="350" r="5"/><circle cx="740" cy="350" r="5"/>
+      <circle cx="506" cy="400" r="5"/><circle cx="714" cy="400" r="5"/>
+      <circle cx="480" cy="450" r="5"/><circle cx="740" cy="450" r="5"/>
+      <circle cx="506" cy="500" r="5"/><circle cx="714" cy="500" r="5"/>
+    </g>
+    <g class="pin">
+      <circle cx="584" cy="250" r="5"/><circle cx="636" cy="250" r="5"/>
+      <circle cx="558" cy="300" r="5"/><circle cx="610" cy="300" r="5"/><circle cx="662" cy="300" r="5"/>
+      <circle cx="584" cy="350" r="5"/><circle cx="636" cy="350" r="5"/>
+    </g>
+
+    <!-- one shaped rail starting to form, funneling toward center -->
+    <path class="rail" d="M520 270 C560 360 600 420 620 470"/>
+    <path class="rail" d="M720 270 C680 360 640 420 620 470"/>
+
+    <!-- callout: the rail IS a named query -->
+    <rect class="nq" x="560" y="402" width="120" height="28" rx="14"/>
+    <text class="nqTxt" x="620" y="421" text-anchor="middle">named_query</text>
+
+    <!-- ball paths: fewer hops, two now find the rail -->
+    <polyline class="pathBad" points="500,217 532,260 506,320 532,380 500,440 506,640"/>
+    <polyline class="pathMid" points="620,217 600,270 636,320 610,370 620,470 620,690"/>
+    <polyline class="pathGood" points="740,217 714,270 700,360 660,430 625,470 620,690"/>
+
+    <rect class="bin" x="460" y="690" width="100" height="46" rx="10"/>
+    <text class="binTxt" x="510" y="712" text-anchor="middle">fell out</text>
+    <text class="binTxt" x="510" y="728" text-anchor="middle">(shrinking)</text>
+    <rect class="order" x="570" y="690" width="100" height="46" rx="10"/>
+    <text class="orderTxt" x="620" y="712" text-anchor="middle">ORDER</text>
+    <text class="binTxt" x="620" y="728" text-anchor="middle" fill="#166534">named query</text>
+    <rect class="bin" x="680" y="690" width="100" height="46" rx="10"/>
+    <text class="binTxt" x="730" y="712" text-anchor="middle">fell out</text>
+    <text class="binTxt" x="730" y="728" text-anchor="middle">(shrinking)</text>
+
+    <text class="hop" x="620" y="668" text-anchor="middle" fill="#b45309">4–6 hops · the busiest paths now land</text>
+  </g>
+
+  <!-- ============================================================= -->
+  <!-- STAGE 3 : SHAPED FUNNEL                                       -->
+  <!-- ============================================================= -->
+  <g>
+    <rect class="board" x="840" y="110" width="360" height="640" rx="20"/>
+    <text class="stage" x="1020" y="142" text-anchor="middle">3 · Shaped funnel</text>
+    <text class="cap" x="1020" y="164" text-anchor="middle">rails from front · middle · sides → center</text>
+
+    <text class="drop" x="1020" y="190" text-anchor="middle">broad questions in across the mouth ↓</text>
+
+    <circle class="ball b1" cx="900" cy="208" r="9"/>
+    <circle class="ball b2" cx="1020" cy="208" r="9"/>
+    <circle class="ball b3" cx="1140" cy="208" r="9"/>
+
+    <!-- mostly rails now, few stray pins -->
+    <g class="pinDim">
+      <circle cx="880" cy="250" r="5"/><circle cx="1160" cy="250" r="5"/>
+    </g>
+
+    <!-- a fan of shaped rails converging on the center order -->
+    <path class="rail" d="M890 240 C930 360 990 440 1020 480"/>
+    <path class="rail" d="M1020 240 C1020 360 1020 440 1020 480"/>
+    <path class="rail" d="M1150 240 C1110 360 1050 440 1020 480"/>
+    <path class="rail" d="M960 250 C980 370 1005 440 1020 480"/>
+    <path class="rail" d="M1080 250 C1060 370 1035 440 1020 480"/>
+    <!-- a NEW seasonal rail being added -->
+    <path class="railNew" d="M1150 300 C1130 400 1070 460 1022 484"/>
+
+    <!-- balls ride the rails straight down -->
+    <polyline class="pathGood" points="900,217 940,330 1000,450 1020,690"/>
+    <polyline class="pathGood" points="1020,217 1020,400 1020,690"/>
+    <polyline class="pathGood" points="1140,217 1100,330 1040,460 1020,690"/>
+
+    <!-- callouts: every rail IS a named query - the reason it is fast -->
+    <rect class="nq" x="888" y="350" width="118" height="28" rx="14"/>
+    <text class="nqTxt" x="947" y="369" text-anchor="middle">named_query</text>
+    <rect class="nq" x="1034" y="350" width="118" height="28" rx="14"/>
+    <text class="nqTxt" x="1093" y="369" text-anchor="middle">named_query</text>
+    <rect class="nq" x="961" y="420" width="118" height="28" rx="14"/>
+    <text class="nqTxt" x="1020" y="439" text-anchor="middle">named_query</text>
+    <path class="nqLead" d="M947 378 L965 415"/>
+    <path class="nqLead" d="M1093 378 L1075 415"/>
+    <text class="nqNote" x="1020" y="475" text-anchor="middle">↑ each rail = a named_query → why it's fast</text>
+
+    <rect class="bin" x="860" y="690" width="100" height="46" rx="10"/>
+    <text class="binTxt" x="910" y="712" text-anchor="middle">rare miss</text>
+    <text class="binTxt" x="910" y="728" text-anchor="middle">→ next to mine</text>
+    <rect class="order" x="970" y="688" width="100" height="50" rx="10"/>
+    <text class="orderTxt" x="1020" y="710" text-anchor="middle">ORDER</text>
+    <text class="binTxt" x="1020" y="728" text-anchor="middle" fill="#166534">many named queries</text>
+    <rect class="bin" x="1080" y="690" width="100" height="46" rx="10"/>
+    <text class="binTxt" x="1130" y="712" text-anchor="middle">rare miss</text>
+    <text class="binTxt" x="1130" y="728" text-anchor="middle">→ next to mine</text>
+
+    <text class="hop" x="1020" y="668" text-anchor="middle" fill="#0e7490">1–2 hops · new seasons add new rails (green)</text>
+  </g>
+
+  <!-- legend -->
+  <g>
+    <circle class="ball b1" cx="430" cy="800" r="8"/>
+    <text class="cap" x="446" y="805">ball = a question / intent</text>
+    <line x1="640" y1="800" x2="678" y2="800" class="rail"/>
+    <text class="cap" x="688" y="805">rail = a named (prepared) query</text>
+    <line x1="930" y1="800" x2="968" y2="800" class="railNew"/>
+    <text class="cap" x="978" y="805">green rail = newly mined seasonal path</text>
+  </g>
+</svg>

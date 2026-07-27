@@ -12,6 +12,9 @@
 **Latency / skinny plan:** **§ Getting skinny** below — contract-safe tools[] · Hot Path empirics · stamped A/B · schema diet · measure AI floor  
 **World-model language for packs:** **§ World model language for chat_request** — DESIGN vocabulary (AI-Ready overlay · mini-schema shape · access class · modes) · not form-fill  
 **Verb catalog clarity:** **§ Verb catalog clarity** — base-5.2 13-API review vs Zeus `docs/API/V2/*.md` · description/schema gaps · P0 fixes  
+**Retrieval playbook:** [BEST_PRACTICES.md](BEST_PRACTICES.md) — single-focus recipes + multi-intent paragraphs; open ≠ multi-ask  
+**Soft HINTS (base-6):** **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
+**End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **`named_query` rails** (SQL++ PREPARED) · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)** (Prompt Helper → contract)  
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
 **Agent procedure:** [BASE_AGENT_PLAYBOOK.md](BASE_AGENT_PLAYBOOK.md) · hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/)  
@@ -37,6 +40,9 @@ This is **what we want next and why**, not a commitment calendar.
 10. Measure AI floor honestly — catalog/control-plane trains ≠ automatic wall-ms wins; never unhash tools[] mid-chat
 11. Chat_request teaches **world model + verbs** (DESIGN: AI-Ready overlay · mini-schema shape · access class) — not form-fill / slot extraction over raw tables
 12. Each of the 13 tools teaches **when / when-not / KEY constraint** (aligned to Zeus V2 API docs) — not cost-tags alone
+13. **Playbook** (recipes A–H + multi-intent) is policy of use; **hints.*** are per-turn soft bias — never replace hard rules or inject schema
+14. Modes optimize **join/noise/hop appetite**; multi-paragraph multi-ask is **not** “switch to open”
+15. End-goal: shape the board with **named_query rails** (PREPARED fast-pass) from mined hot paths — **shape the funnel, don’t shrink the box** ([OPTIMIZATION.md](OPTIMIZATION.md))
 ```
 
 ---
@@ -74,7 +80,9 @@ base-5.3  = SKINNY + WORLD-MODEL + VERB CLARITY on the base-5 wire
             See § Getting skinny · § World model language · § Verb catalog clarity.
 
 base-6+   = additive / optional_when / hash-excluded soft injects / productization
+            hints.* after rules{} (path/recipe, hot_path, multipart, ab_paste, …)
             No rename/remove of base-5 wire keys without a new major BASE + migration hop.
+            See § HINTS catalog · [BEST_PRACTICES.md](BEST_PRACTICES.md).
 
 Helios    = analytics spine on Zeus/Client; optional_when if AI ever needed
             Never block pin on Pri-2/3/4/5 AI fields
@@ -186,7 +194,7 @@ Last status pass: **2026-07-26**.
 | **CR-10** | jailbreak rules{} + hooks | In Progress (spec/pack done) | base-5 · ZC-WISH-002/013 |
 | **CR-11** | object triggers + policy table | In Progress (pack done) | base-5 · ZC-WISH-004/010 |
 | **CR-12** | Helios Pri-1 cheap spine | To Do | Helios Pri-1 · ZC-WISH-030… |
-| **CR-13…14** | base-6 stories | To Do | § base-6 |
+| **CR-13…14** | base-6 stories (hints / hot_path / A-B · G2 budget) | To Do | § base-6 · **§ HINTS catalog** |
 | **CR-15…16** | base-7 stories | To Do | § base-7 |
 | **CR-18** | Pin promote CURRENT | To Do (blocked) | § base-8+ |
 | **CR-19** | Process verify + checklist | In Review (PR #6) | Process / CREATE_BASE |
@@ -1174,25 +1182,144 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 
 ---
 
+## HINTS catalog (soft steer — base-6+)
+
+**Jira:** epic **[CR-4](https://kotenai.atlassian.net/browse/CR-4)** · stories **CR-13**, **CR-14**  
+**SoT playbook (recipes, multi-intent):** [BEST_PRACTICES.md](BEST_PRACTICES.md)  
+**Assembly:** after hard `rules{}` · hash-excluded · must not erase jailbreak / company law  
+**Related:** [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) § assembly zones · § Getting skinny (no runtime tools[] strip)
+
+### Principle
+
+```text
+Rules / CORE     = what is always true (law + house style)
+MINI-SCHEMA      = live map (authoritative shape)
+hints.*          = given this scope / channel / arm / recent evidence,
+                   which playbook bias applies THIS turn?
+```
+
+If a hint is true **every** turn for **every** tenant forever → promote to CORE or `rules{}`, do not leave as soft paste forever.
+
+### Surfaces (do not collapse)
+
+| Surface | Role | Mid-session change? |
+| --- | --- | --- |
+| Hard `rules{}` | Law | Frozen / append-only |
+| CORE + verbs | Stable house style + tool keys | New BASE only |
+| BRIEF / MINI-SCHEMA | Live map | Dirty when scope changes |
+| **`hints.*`** | Soft bias (path, hot_path, multipart, A/B, budget, …) | **Yes** (hash-excluded) |
+
+### Hint families (priority)
+
+| Pri | Family | Example keys | Why |
+| --- | --- | --- | --- |
+| **P0** | **Path / recipe** | `hints.path.default_recipe`, `prefer[]`, `avoid[]` | Steer LOOKUP/TEXT/TOP_N/HOP without re-stamp |
+| **P0** | **Field gotchas** | `hints.fields[]` (3–5 lines) | “description is text_fts → search”; `ex:` conventions |
+| **P0** | **Multi-intent** | `hints.multipart.force_parts`, `max_parts`, `join_default`, `if_underspecified` | Paragraph users — **not** “switch mode to open” |
+| **P1** | **Hot Path paste** | `hints.hot_path[]` named winning pipelines | Empiric per scope from Path Finder / books; **graduates to `named_query` rails** ([OPTIMIZATION.md](OPTIMIZATION.md)) |
+| **P1** | **Negative / last-fail** | `hints.avoid_patterns[]` | Detective: don’t describe when inject green; no `direction` on order |
+| **P2** | **Join bias** | `hints.join.prefer_edges`, `noise_floor`, `super_node_cap` | Soft echo of mode; engine mode remains hard for authz |
+| **P2** | **A/B** | `hints.ab_arm`, `hints.ab_paste` | Experiments without thrashing `contract_hash` |
+| **P2** | **Terminate soft** | `hints.terminate.soft_require`, `summary_style` | Extra G2/G3 nudge; required four stay catalog |
+| **P2** | **Budget / channel** | `hints.budget.max_steps`, `search_timeout_ms`, `channel` | Voice / low-latency SKUs |
+| **P3** | **Product / motion** | `hints.product.motion`, `default_limit` | Explore/compare/refine product chrome |
+| **P3** | **Recovery** | `hints.recovery.last_error`, `try_next` | Session-only after tool fail |
+| **P3** | **Playbook chip** | `hints.playbook_id` + params | Workbench chip → named recipe |
+
+### Sketch shapes (Client inject — not hashed)
+
+```text
+hints:
+  path:
+    default_recipe: TEXT | LOOKUP | TOP_N | HOP | COMPOSE
+    prefer: ["search→project"]
+    avoid: ["describe first", "find where on text_fts"]
+  fields:
+    - "Beer.description is text_fts → search"
+  multipart:
+    force_parts: true
+    max_parts: 4
+    join_default: set_intersect | hop_fk | separate_answers
+    if_underspecified: clarify
+  hot_path:
+    - name: fruit_beers
+      when: "fruit|flavor"
+      steps: [search fts → project]
+  avoid_patterns: ["do not use direction on order"]
+  join:
+    prefer_edges: ["brewery_id"]
+    noise_floor: 0.5
+  ab_arm: "B"
+  ab_paste: "Prefer hybrid over pure fts for description."
+  terminate:
+    soft_require: [policy_action]
+    summary_style: "bullets per part when multi-intent"
+  budget:
+    prefer_one_pipeline: true
+    max_steps: 5
+    search_timeout_ms: 5000
+  product:
+    motion: explore | compare | refine
+    channel: web | voice
+```
+
+Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS security spirit).
+
+### Explicit non-goals for hints
+
+| Temptation | Better home |
+| --- | --- |
+| Jailbreak / never dump prompt | Hard `rules{}` |
+| Required four | Catalog terminate (BASE) |
+| Full mini-schema | Runtime inject |
+| Permanent verb deletion same stamp | New skinny **stamped** pack (Hot Path A/B) |
+| Company manifesto | `company_context` (word caps) |
+| Always-on Helios JTBD/sentiment | Off-path / optional_when |
+| “Long paragraph ⇒ mode=open” | [BEST_PRACTICES § multi-intent](BEST_PRACTICES.md) + `hints.multipart` |
+
+### Multi-intent vs **open** mode (normative)
+
+| Concern | Mechanism |
+| --- | --- |
+| User pastes a **paragraph** with several goals | Decompose → `query_decomposition.parts[]` → recipes → `set`/hop; optional `hints.multipart` |
+| Product wants **serendipity / link maps / low floor** | Scope **mode = open** (+ optional looser `hints.join`) |
+| Scope’s winning pipeline | `hints.hot_path` / `hints.path` from empirics |
+
+**Open is not the multi-ask mode.** Multi-ask is planning; open is join/noise appetite ([BEST_PRACTICES.md](BEST_PRACTICES.md) · DESIGN §14.7).
+
+### Success signals (hints)
+
+- [x] BEST_PRACTICES playbook authored  
+- [x] HINTS catalog written in ROADMAP (this section)  
+- [ ] Client injects `hints.*` after `rules{}` (hash-excluded)  
+- [ ] At least P0: path + fields + multipart live on one product path  
+- [ ] Hot Path can emit `hints.hot_path` without re-stamp  
+- [ ] A/B arm reported as cheap Client scalar  
+- [ ] Jailbreak rules still present when ab_paste is set  
+
+---
+
 ## base-6 — “Additive soft inject + optional Helios norms”
 
 **Jira:** epic **[CR-4](https://kotenai.atlassian.net/browse/CR-4)** · stories **CR-13**, **CR-14** · status To Do (correct until base-5 Client residual prefers green).
 
-**Theme:** **No breaking wire changes vs base-5.** Soft hints/A/B (hash-excluded); optional budget metrics; optional Helios norms as **cheap Zeus/Client** work — same spirit as Helios “nice to have.”  
+**Theme:** **No breaking wire changes vs base-5.** Soft **`hints.*`** / A/B (hash-excluded); optional budget metrics; optional Helios norms as **cheap Zeus/Client** work — same spirit as Helios “nice to have.”  
 **Depends on base-5:** frozen objects + company_context + settings/policy already ship (pack done; Client CR-20).  
-**Prefer after base-5.3 skinny:** soft injects should not re-bloat a surface we just dieted; A/B tool-set experiments stay **stamped arms**, not mid-turn tools[] edits.
+**Prefer after base-5.3:** playbook + verb clarity landed in pack; soft injects should not re-bloat CORE — put steer in `hints.*`. A/B tool-set experiments stay **stamped arms**, not mid-turn tools[] edits.  
+**Detail:** **§ HINTS catalog** above · [BEST_PRACTICES.md](BEST_PRACTICES.md)
 
 ### Catalog / Client goals (all additive or optional)
 
 1. **`wish_i_knew` hygiene** — already optional; shape/docs polish only.  
 2. **G2 metrics hygiene** — never `summary`; dual path docs for `hooks_jailbreak_score` (base-5 already has dual scores).  
 3. **Budget zone metrics (enforced reporting)** — size tags; caps already in base-5 design; **per-verb use rates** from Hot Path.  
-4. **`hints` / Hot-Path / A/B paste** — **after** hard `rules`; hash-excluded; must not strip jailbreak rules.  
-5. **Optional** terminate retry (“required four only”).  
-6. **De-demo** efficiency prose (residual after base-5.3 skinny).  
-7. Customs filename smoke in scan + Client.  
-8. **`ab_arm`** on report (cheap Client scalar) — slice by full vs skinny **stamp**.  
-9. **A/B stamped skinny packs** (fewer verbs or thinner schemas) promoted only after Hot Path + gold green — not runtime allowlists that unhash production.
+4. **`hints.*` catalog (P0–P2)** — path/recipe, field gotchas, multipart, hot_path, avoid_patterns, join bias, ab_paste, terminate soft, budget — **after** hard `rules`; hash-excluded; must not strip jailbreak rules. See **§ HINTS catalog**.  
+5. **Playbook excerpt in CORE (optional thin)** — recipes A–H one-screen; long form stays BEST_PRACTICES (prefer with verb description diet so pack KB does not only grow).  
+6. **Optional** terminate retry (“required four only”).  
+7. **De-demo** efficiency prose (residual after base-5.3).  
+8. Customs filename smoke in scan + Client.  
+9. **`ab_arm`** on report (cheap Client scalar) — slice by full vs skinny **stamp** and by soft ab_paste arm.  
+10. **A/B stamped skinny packs** (fewer verbs or thinner schemas) promoted only after Hot Path + gold green — not runtime allowlists that unhash production.
 
 ### Helios goals (Pri-2/3 — optional / nice-to-have)
 
@@ -1214,13 +1341,18 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 - HEL-WISH-010 on hot path  
 - Auto-ban on jailbreak float  
 - “Must wait for base-6 to have company_context” (already base-5)  
+- Encoding multi-intent as “force mode=open”  
+- Jailbreak-only defense via `ab_paste` / hints  
 
 ### Success signals
 
 - [ ] Diff base-5 → base-6 shows **additive-only** (hints slots, metrics)  
+- [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps  
+- [ ] P0 path + fields + multipart on one integration path  
 - [ ] G2 metrics without UI leak  
 - [ ] At least one `*_norm` path live without new **required** AI fields  
 - [ ] lessons-learned / migration note if any optional fields added  
+- [ ] BEST_PRACTICES ↔ hints.path recipe ids stay aligned  
 
 ---
 
@@ -1237,6 +1369,8 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 | Lint (rule length, dup keys, caps) | Catch bad packs | No |
 | Preview assembled prompt + zone sizes | Debug | No |
 | Prompt Helper A/B UI | Experiments | No |
+| **Hot Paths → draft `named_query` rail** (Pachinko shaping) | End-goal Funnel optimization ([OPTIMIZATION.md](OPTIMIZATION.md)) | No |
+| **Named rail hit rate / rounds-to-order** in Funnel ops | Helios + Hub | No |
 | Stamp/verify for base-N | Real hashes | No |
 | Detective: optional Layer A = **warn** not fail | Soften | No (softer) |
 | COMPAT rows kept current | Versions | No |
@@ -1251,6 +1385,7 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 | Idea | Why | Breaking wire? |
 | --- | --- | --- |
 | Promote base-N to `CURRENT` / `v2/min` | Users get diet | Pin gate only |
+| **Mature named_query coverage** (top patterns = 1–2 hop rails; action rails e.g. book) | Pachinko stage 3 ([OPTIMIZATION.md](OPTIMIZATION.md)) | No (ops + PREPARED catalog) |
 | Provider prompt-cache productization | Cost | No |
 | Structured-output constrained `return` | Reliability | Optional path |
 | Tool-history auto-summarize | Long sessions | No |
@@ -1294,9 +1429,14 @@ base-5.3 SKINNY + WORLD-MODEL + VERB CLARITY on base-5 wire
          ★ company_context = tenant people/places/things + key links
            │
 base-6+ ADDITIVE / OPTIONAL only
-        soft hints/A/B · optional norms · Workbench · pin when green
+        soft hints.* after rules{} (path · hot_path · multipart · ab_paste · …)
+        hot_path hints graduate → named_query rails (PREPARED fast-pass)
+        optional norms · Workbench · pin when green
+        Helios Funnel measures shaping (hops ↓, rail hit rate ↑)
         Helios nice-to-haves stay cheap providers · never re-break base-5 wire
         do not re-bloat Layer A; tool-set A/B stays stamped
+        multi-intent = playbook + hints.multipart — NOT mode=open
+        end-goal: shape funnel (Pachinko rails) — don’t shrink the box (not Path B2)
 ```
 
 ```text
@@ -1406,7 +1546,10 @@ Helios volume is **report/session scalars**.
 25. World-model blurb hard cap: 120 vs 180 words — enough for access-class rules?  
 26. Put access-class cheat on every mode overlay, or only CORE once?  
 27. Verb clarity: hard cap per-description chars vs quality of KEY lines?  
-28. Ship P0 order/find/search in a hotfix on base-5.2 customs before full base-5.3 pack?
+28. Ship P0 order/find/search in a hotfix on base-5.2 customs before full base-5.3 pack?  
+29. Hints soft max KB / hard reject size — 1 KB / 2 KB enough?  
+30. `hints.multipart` Client-default on for analytics product, or opt-in per App?  
+31. Hot Path → `hints.hot_path` automatic inject vs operator paste only?
 
 ---
 
@@ -1416,6 +1559,9 @@ Helios volume is **report/session scalars**.
 | --- | --- |
 | [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) | Structured Helios Requests + priorities |
 | [ROADMAP.md](ROADMAP.md) | BASE sequencing + Helios + **skinny** + **world-model language** + **verb catalog clarity** |
+| [BEST_PRACTICES.md](BEST_PRACTICES.md) | Retrieval playbook (single-focus + multi-intent; mode bias; open ≠ multi-ask) |
+| [OPTIMIZATION.md](OPTIMIZATION.md) | End-goal fine-tuning: Pachinko → `named_query` (SQL++ PREPARED) rails · Funnel |
+| ROADMAP **§ HINTS catalog** | Soft `hints.*` families + assembly law (base-6 / CR-4) |
 | [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules/triggers + Client `output_request` |
 | [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) | Settings · merge · Client policy · cache · security · **verb allow/deny** · company_context |
 | [zeus_design_docs DESIGN.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) | Zeus architecture — overlay · tools · mini-schema §7.8 · modes §14 |

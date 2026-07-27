@@ -1,0 +1,336 @@
+# Zeus chat_request — retrieval best practices
+
+> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate line **base-5.3** · version matrix: [COMPAT.md](../COMPAT.md)
+
+**Audience:** catalog authors, zeus_client / Prompt Helper, operators writing `company_context`  
+**Pack surface today:** `v2/base/base-5.3/` CORE + verbs + runtime inject (SCOPE BRIEF / MINI-SCHEMA)  
+**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) (§ World model language · § Verb catalog clarity · **§ HINTS catalog**) · [OPTIMIZATION.md](OPTIMIZATION.md) (**end-goal** Pachinko → `named_query` rails — not this playbook) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · Zeus DESIGN [§14.7 retrieval optimizations](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md#147-retrieval-optimizations-mode-bias--playbook--soft-hints) · [ENTITY foundation](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) · Zeus [docs/API/V2](https://github.com/Fujio-Turner/Zeus/tree/main/docs/API/V2)
+
+This doc is the **policy of use** for Zeus verbs + mini-schema: how to plan retrieval for **single-focus** asks and **multi-intent paragraphs**. It is design SoT for a future CORE **Playbook** block — not a second BIBLE and not a pin flip.
+
+---
+
+## 0. Three layers (do not collapse)
+
+| Layer | What it is | Where it lives |
+| --- | --- | --- |
+| **World model** | AI-Ready overlay: entities, attributes, relations (map of the world, not a form to invent into) | CORE blurb + inject brief/schema |
+| **Instruments** | 13 verbs, costs, WHEN/KEY on tool schemas | `verbs[]` in pack |
+| **Playbook (this doc)** | Sequences + decision rules for common ask shapes | Here → later short CORE excerpt |
+
+You already ship map + instruments in base-5.3. Playbook turns them into **reliable first moves**.
+
+```text
+Capability (verbs, schema)  +  Policy of use (recipes, multi-part law)  →  good pipelines
+```
+
+---
+
+## 1. Universal loop (every mode, every turn)
+
+```text
+1. Name entity_type(s) from MINI-SCHEMA (do not invent).
+2. Classify field paths: [gsi] equality · text_fts language · display result-only · entity_fk link.
+3. Choose ONE primary access path (or N paths if multi-part — §3).
+4. Prefer one terminating pipeline (or one decisive tool) over rediscovery rounds.
+5. Terminate Layer A from evidence only (summary must not invent tool results).
+```
+
+### 1.1 Field class → first verb (non-negotiable)
+
+| MINI-SCHEMA mark | First move | Never |
+| --- | --- | --- |
+| `[gsi]` / scalar / entity_fk equality | `find` (`where` equality only) | free text in `where` |
+| `text_fts` | `search` (`strategy:fts` / short `query_text`) | `find where` on that path |
+| `display` | only in `project` / result rows | filter on it |
+| exact public id known | `get` (`include:["body"]` if full node needed) | re-find by name when id works |
+| “related / from / of” across entities | seed `find`/`search` → hop (traverse / walk_path / inverse `find`) | invent edge types |
+
+Cost tags (`[cheap]` / `[mod]` / `[exp]`) matter **after** correct class. Wrong class is more expensive than a slightly costlier correct verb.
+
+### 1.2 Always / never (short law)
+
+| Always | Never |
+| --- | --- |
+| Prefer inject BRIEF + MINI-SCHEMA over `describe` when present | Rediscover stats/entity lists when inject is green |
+| One pipeline for multi-step | Same pipeline thrice hoping for different data |
+| Bind `@step.ids` (not bare `@step`) | Invent counts / field values into `summary` |
+| Empty result OK → adjust path, clarify, or `wish_i_knew` / `data_gaps` | Fake rows to satisfy terminate |
+| `order` with `by: "field:<name>"` and `asc: false` for top-N | `direction: "desc"` on order (not the Zeus API) |
+
+**Contract note:** under enforcement, **do not strip tools[] mid-session** (e.g. drop `describe` because mini-schema arrived). Teach skip-in-prose; membership changes only via a **new stamped pack** ([ROADMAP § Getting skinny](ROADMAP.md)).
+
+---
+
+## 2. Single-focus recipes (high coverage)
+
+Most product turns collapse to a few pipelines. Teach these in CORE; mode overlays only bias which recipe is “default.”
+
+| Id | Name | Pattern | Use when |
+| --- | --- | --- | --- |
+| **A** | **LOOKUP** | `find` (`return:ids`, equality `where`) → `project` | “list / filter X where field = value” |
+| **B** | **TEXT** | `search` (`fts`/`hybrid`, short `query_text`) → `project` | language, description, fuzzy name |
+| **C** | **TOP_N** | broad `find`/`search` → `order` `by:"field:X"` `asc:false` → `project` `limit:N` | highest / top / ranked |
+| **D** | **HOP** | seed `find`/`search` → `traverse` \| walk_path \| inverse `find` → `project` | related-to, multi-entity |
+| **E** | **HYDRATE** | …ids → `get` `include:["body"]` | need full node after id bag |
+| **F** | **COMPOSE** | two+ id bags → `set` (intersect/union/…) → `project` | “in A and B”, close/similar sets |
+| **G** | **STATS** | use SCOPE BRIEF; optional cheap `find` limit 1 | “how many / what types” when brief answers |
+| **H** | **STOP** | terminating `pipeline` or `return` | always after evidence |
+
+### 2.1 Minimal examples (copy shape, not domain)
+
+**LOOKUP**
+
+```json
+{
+  "steps": [
+    {"as": "cands", "verb": "find", "entity_type": "Beer", "where": {"brewery_id": "…"}, "return": "ids", "limit": 50},
+    {"as": "out", "verb": "project", "ids": "@cands.ids", "fields": ["name", "abv"], "limit": 20}
+  ]
+}
+```
+
+**TEXT**
+
+```json
+{
+  "steps": [
+    {"as": "hits", "verb": "search", "entity_type": "Beer", "strategy": "fts", "query_text": "fruit", "limit": 30, "timeout_ms": 5000},
+    {"as": "out", "verb": "project", "ids": "@hits.ids", "fields": ["name", "description"], "limit": 10}
+  ]
+}
+```
+
+**TOP_N**
+
+```json
+{
+  "steps": [
+    {"as": "cands", "verb": "find", "entity_type": "Beer", "return": "ids", "limit": 100},
+    {"as": "ord", "verb": "order", "ids": "@cands.ids", "by": "field:abv", "asc": false},
+    {"as": "out", "verb": "project", "ids": "@ord.ids", "fields": ["name", "abv"], "limit": 5}
+  ]
+}
+```
+
+**HOP (inverse FK style — common when edges_total is low)**
+
+```text
+1) find Brewery where name equality / search name
+2) find Beer where brewery_id = <that id>   // inverse_fks on MINI-SCHEMA
+3) project
+```
+
+Or `traverse` / `walk_path` when ## WALK_PATHS / real edges support it.
+
+**COMPOSE (close / similar / both)**
+
+```text
+1) search or find → bag A (@a.ids)
+2) search or find → bag B (@b.ids)
+3) set op:intersect|union inputs:[[@a.ids],[@b.ids]]
+4) project
+```
+
+---
+
+## 3. Multi-intent paragraphs (multiple things in one message)
+
+Users often paste a **paragraph**: several asks, compares, filters, and joins. That is **not** a different Zeus API — it is a different **planning problem**.
+
+### 3.1 Is that “open” mode?
+
+**Mostly no.** Modes and multi-intent are orthogonal:
+
+| Concern | What it is | Mode role |
+| --- | --- | --- |
+| **Multi-intent / multi-part** | User text has **several goals** in one turn | All modes; playbook + `query_decomposition.parts[]` + pipeline/`set` |
+| **`open` mode** | Product bias: **serendipity, liberal joins, low confidence floor (~0.20), link maps** | Explore / crawl / public data — *not* “the multi-part mode” |
+| **`analytics` mode** | Safe default: structural+semantic edges, ~0.50 floor, evidence before claim | Still handles multi-part, but **tighter join noise** |
+| **`fraud` mode** | Weak-signal hops are the product | Multi-hop heavy, not multi-sentence parsing |
+
+So: **paragraph multi-ask** → multi-part playbook (§3.2–3.4).  
+**“Show me the whole linky world / sample then expand”** → `open` mode bias (§4).
+
+Using only `open` for multi-intent would:
+
+- raise noise and false joins on BI-like scopes  
+- not teach `set` / dual find / QD `parts[]`  
+- conflate **exploration policy** with **task decomposition**
+
+### 3.2 Decompose first (Layer A + plan)
+
+Before tools:
+
+1. Split the paragraph into **atomic goals** (list, filter, compare, hop, rank, count).  
+2. Emit structure in terminate (and plan against it):
+   - `query_decomposition`: core intent + entity; optional **`parts[]`** for distinct sub-goals  
+   - `decomposition`: targets / predicates / output grounded in MINI-SCHEMA  
+3. Decide: **one pipeline** (shared scope, joinable) vs **sequential rounds** (Client multi-round — [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md)).
+
+```text
+Paragraph
+  → parts: [P1, P2, P3]
+  → each part → recipe A–G
+  → join parts with set / hop / shared entity_type
+  → one terminating answer (or clarify if under-specified)
+```
+
+### 3.3 Patterns for multi-thing turns
+
+| Pattern | User shape | Tool shape |
+| --- | --- | --- |
+| **Parallel filters (same type)** | “IPAs under 6% and also stouts with fruit in the description” | Two branches → `set` union or two result sections in summary |
+| **Close / similar** | “like this beer / near this set / same style as …” | seed resolve → `search` hybrid/vector or GSI style → optional `set` intersect |
+| **Combine (AND)** | “in California **and** abv > …” | Prefer one `find` with multiple equality `where` when all GSI; else bag ∩ bag via `set` intersect |
+| **Combine (OR)** | “IPA **or** Pale Ale” | two finds/searches → `set` union → project |
+| **Join across types** | “breweries in X and their beers” | HOP / inverse FK / walk_path — not one flat `where` across types |
+| **Rank after filter** | “top 5 of those” | candidate bag → TOP_N recipe |
+| **Compare** | “A vs B” | two lookups → project both → summary compares; optional `set` only if shared-id logic needed |
+| **Mixed count + list** | “how many … and show examples” | BRIEF for count when possible; else `find return:count` + limited `project` — do not double full scans |
+| **Under-specified paragraph** | many goals, no entities | `policy_action: clarify` or answer partial + `wish_i_knew` — do not invent schema |
+
+### 3.4 One pipeline vs multi-round
+
+| Prefer **one pipeline** when | Prefer **multi-round Client** when |
+| --- | --- |
+| All parts share one scope and known entity types | User must pick among ambiguous entities mid-flight |
+| Joins are FK / id-bag (`set`) expressible | Tool result must be shown before next branch (UX) |
+| Budget allows ≤ 8 steps | Plan exceeds step/timeout caps |
+| No clarify needed | `policy_action: clarify` then continue |
+
+Hard cap: **8 steps** per pipeline (CORE). Multi-part does not raise the engine cap — **split or sequence**.
+
+### 3.5 Worked multi-intent sketch
+
+User:
+
+> Find fruit-forward beers, also anything over 8% ABV, and show me which of those come from the same brewery as Pliny if you can.
+
+Plan:
+
+```text
+parts:
+  P1 TEXT fruit  → search Beer fts "fruit" → @fruit.ids
+  P2 LOOKUP high abv → find Beer (if abv GSI) or order field:abv → @strong.ids
+       (if only rank available: broad find → order field:abv asc:false limit …)
+  P3 COMPOSE → set union @fruit @strong → @pool.ids
+  P4 resolve Pliny → find/search name → brewery_id
+  P5 HOP/inverse → find Beer where brewery_id = that (or filter @pool)
+  project names + abv + brewery_id; terminate with parts in query_decomposition
+```
+
+Summary states what was found vs what failed (e.g. Pliny not in scope) — no invented Pliny row.
+
+---
+
+## 4. Mode bias (playbook stays shared)
+
+Modes change **join noise, hop appetite, confidence honesty** — not the existence of recipes A–H.
+
+| Mode | Playbook bias |
+| --- | --- |
+| **analytics** (default) | A–D primary; HOP only on real links; noise floor ~0.50; multi-part OK with tight joins |
+| **open** | Same recipes, but **HOP / sample-then-expand** more often; low floor (~0.20); serendipity; **not** the multi-part parser |
+| **fraud** | HOP-heavy; weak signals kept; multi-hop bags; careful terminate honesty |
+| **code** | HOP on calls/imports; deeper hops; structure before FTS |
+| **research** | citation/backlink-ish HOP + semantic search when present |
+| **tenant / regulated** | same recipes; **scope wall**; higher confidence bar; less speculative join |
+| **private** | local graph + backlinks; no fake corpus stats |
+| **auto** | discover/propose mode; don’t over-commit long traversals |
+| **custom** | follow injects; conservative joins |
+
+### 4.1 When to actually use **open**
+
+Use **open** when the product goal is:
+
+- public / crawl / link-map exploration  
+- “what’s connected / interesting nearby” over BI precision  
+- operator accepts **noise** and lower `confidence`
+
+Do **not** switch to open only because the user wrote a long multi-ask paragraph — stay on analytics (or the scope’s bound mode) and apply **§3 multi-intent**.
+
+---
+
+## 5. Joins, “close”, and “similar” (vocabulary)
+
+| User language | Zeus move |
+| --- | --- |
+| **Join** (relational) | FK `where` / `inverse_fks` / `walk_path` / `traverse` — entity–transaction–entity |
+| **Combine** (boolean) | `set` union / intersect / difference on id bags |
+| **Close / near** (graph) | traverse limited depth from seed; cap fan-out |
+| **Similar** (language/vector) | `search` hybrid/vector/semantic; optional seed |
+| **Same as** (identity) | resolve to id first, then equality / FK — not fuzzy forever |
+
+Never implement “join” by inventing a SQL-shaped `where` across unrelated entity types in one `find`.
+
+---
+
+## 6. Terminate hygiene (multi-part included)
+
+| Field | Single-focus | Multi-intent paragraph |
+| --- | --- | --- |
+| `query_decomposition` | one intent + entity | core + **`parts[]`** for sub-goals when distinct |
+| `decomposition` | one plan | targets/predicates covering parts; honest if partial |
+| `summary` | answer | cover each part or say what was skipped |
+| `confidence` | overall | lower if any part thin or join weak |
+| `policy_action` | usually `answer` | `clarify` if under-specified; not silent invent |
+| `wish_i_knew` / `data_gaps` | optional | use when a part failed for schema/data/index |
+
+---
+
+## 7. What to put in the pack later (implementation note)
+
+| Surface | Content | Size discipline |
+| --- | --- | --- |
+| **CORE Playbook** (~150–250 words) | field→verb + recipes A–D + multi-part 5-line law | Prefer this over longer verb essays |
+| **Mode overlay** | 3–5 prefer/don’t bullets | open: sample-then-expand; analytics: tight joins |
+| **Verb KEY lines** | keep short; recipes live once in Playbook | base-5.3 already heavy — diet when Playbook lands |
+| **company_context** | tenant people/places/things + default recipe | inject, not CORE |
+| **Hot Path / books** | empiric winning pipelines per scope | not contract hash |
+
+Suggested next content train: **Playbook in CORE + light verb description diet** (clarity without another +8 KB surprise).
+
+---
+
+## 8. Anti-patterns
+
+| Anti-pattern | Why it fails |
+| --- | --- |
+| Treat multi-paragraph as “must use open mode” | Conflates exploration bias with task decomposition |
+| One giant `find` with invented cross-type `where` | Not how overlay FKs work |
+| FTS field in `find where` | Empty results; use `search` |
+| Rank with `direction` | Wrong API; use `asc` + `field:` |
+| Rediscover via `describe` when inject green | Waste round; inject is authoritative |
+| Multi-round thrash of the same pipeline | Adjust path or clarify |
+| Summary invents the join | Evidence-only Layer A |
+| Unbounded traverse on open “because exploration” | Sample then expand; hard step caps still apply |
+
+---
+
+## 9. Quick reference card
+
+```text
+SINGLE:  class field → verb → recipe A–H → terminate
+MULTI:   split parts[] → each part a recipe → set/hop to join → one summary
+OPEN:    same recipes, looser HOP / serendipity — not “multi-ask mode”
+JOIN:    FK / walk_path / traverse
+COMBINE: set on id bags
+SIMILAR: search hybrid/vector
+RANK:    order by field:X asc:false
+STOP:    evidence-only Layer A
+```
+
+---
+
+## Doc ownership
+
+| Doc | Role |
+| --- | --- |
+| **This file** | Playbook SoT (single + multi-intent + mode bias) |
+| [MODE.md](MODE.md) | What each mode is for |
+| [ROADMAP.md](ROADMAP.md) | When Playbook enters a BASE pack |
+| [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) | Client bags when one pipeline is not enough |
+| Pack CORE (`work/mode_overlays/CORE.md`) | Short LLM-facing excerpt of §§1–2 (+ thin multi-part) |
+
+*When the Playbook is copied into CORE, keep this doc as the long form; do not grow system prompt to full BEST_PRACTICES length.*

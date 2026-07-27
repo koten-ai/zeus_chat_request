@@ -1,6 +1,6 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-5.3** (`v2/base/base-5.3/`) · last wire break **base-5** · next catalog train **base-6 soft `hints.*`** (after Client inject) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-6** (`v2/base/base-6/`) · last wire break **base-5** · Zeus 0.6 vendor **base-5.3** · next **Client inject `hints.*` (ZC-WISH-040)** · version matrix: [COMPAT.md](../COMPAT.md)
 
 
 **Status:** living plan after base-1 → base-4 → **base-5 wire freeze** → **5.1 / 5.2 / 5.3 content** (5.3 pack on main)  
@@ -13,7 +13,7 @@
 **World-model language for packs:** **§ World model language for chat_request** — DESIGN vocabulary (AI-Ready overlay · mini-schema shape · access class · modes) · not form-fill  
 **Verb catalog clarity:** **§ Verb catalog clarity** — base-5.2 13-API review vs Zeus `docs/API/V2/*.md` · description/schema gaps · P0 fixes  
 **Retrieval playbook:** [BEST_PRACTICES.md](BEST_PRACTICES.md) — single-focus recipes + multi-intent paragraphs; open ≠ multi-ask  
-**Soft HINTS (base-6):** **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
+**Soft HINTS (base-6):** [HINTS.md](HINTS.md) · **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
 **End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **`named_query` rails** (SQL++ PREPARED) · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)** (Prompt Helper → contract)  
 **Ownership (set/unset/change):** [BIBLE.md §2](BIBLE.md)  
 **Production pin:** still **base-1** (`CURRENT.json` / `v2/min`) until an explicit promote  
@@ -155,6 +155,7 @@ Full plan: **§ Getting skinny**.
 | base-5.2 13-verb review vs Zeus `docs/API/V2` in ROADMAP | Findings + P0/P1 clarity backlog | **CR-26** |
 | **base-5.3 pack on main** — world-model CORE + verb clarity P0–P2 + hop docs | Content train closed (PR #12) | **CR-26** Done (pack) |
 | Playbook + HINTS catalog + Pachinko OPTIMIZATION | Day-one recipes + base-6 design + rails end-goal | PR #13 |
+| **base-6 pack on main** — soft `hints.*` contract + CORE note | Additive train (CR-4 pack) | **CR-4** pack |
 
 | Still open | Risk | CR |
 | --- | --- | --- |
@@ -166,15 +167,15 @@ Full plan: **§ Getting skinny**.
 | Helios Pri-1 report emits (cheap spine) | Not catalog tax | **CR-12** |
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
-| base-6 soft injects | After Client floor + soft inject path | **CR-4** |
+| Client injects `hints.*` after rules{} | Soft steer not live until Client | **CR-4** residual · ZC-WISH-040 |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
-**Pack SoT for new work:** **base-5 wire** · **candidate pack base-5.3** (`v2/base/base-5.3/`) · next catalog train **base-6 soft `hints.*`** (after Client inject).  
+**Pack SoT for new work:** **base-5 wire** · **candidate pack base-6** (`v2/base/base-6/`) · prior content **base-5.3**.  
 **Production pin:** **base-1**.  
-**Zeus 0.6 vendor:** **base-5.3** as of **ZE-273** / `0.6.15` (sibling 5.2 may remain in `pinned/min` for A/B).  
-**Hop:** [migration/base-5.2_to_base-5.3/](migration/base-5.2_to_base-5.3/) · wire hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/).  
+**Zeus 0.6 vendor:** **base-5.3** as of **ZE-273** / `0.6.15` (base-6 optional later).  
+**Hop:** [migration/base-5.3_to_base-6/](migration/base-5.3_to_base-6/) · [HINTS.md](HINTS.md).  
 **Modes:** [MODE.md](MODE.md) · plan [work/RECREATE_MODE.md](../work/RECREATE_MODE.md).  
-**Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4.
+**Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4 · soft hints **ZC-WISH-040**.
 
 ---
 
@@ -188,7 +189,7 @@ Last status pass: **2026-07-27**.
 | **CR-1** | Epic — repo SoT / BASE sequence / COMPAT | In Progress | This repo strategy (ongoing) |
 | **CR-2** | Epic — base-4 ship | **Done** | § Where we are (base-4) |
 | **CR-3** | Epic — base-5 pack + residual | In Progress | § base-5 |
-| **CR-4** | Epic — base-6 additive | To Do | § base-6 |
+| **CR-4** | Epic — base-6 additive | In Progress (pack) | § base-6 · [HINTS.md](HINTS.md) |
 | **CR-5** | Epic — base-7 Workbench | To Do | § base-7 |
 | **CR-6…8, CR-17** | base-4 stories | **Done** | base-4 train |
 | **CR-9** | company_context inject (Client) | In Progress (spec/pack done) | base-5 · ZC-WISH-006 |
@@ -1294,7 +1295,8 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 
 - [x] BEST_PRACTICES playbook authored  
 - [x] HINTS catalog written in ROADMAP (this section)  
-- [ ] Client injects `hints.*` after `rules{}` (hash-excluded)  
+- [x] **docs/HINTS.md** SoT + base-6 pack CORE note (pack train)  
+- [ ] Client injects `hints.*` after `rules{}` (hash-excluded) — **ZC-WISH-040**  
 - [ ] At least P0: path + fields + multipart live on one product path  
 - [ ] Hot Path can emit `hints.hot_path` without re-stamp  
 - [ ] A/B arm reported as cheap Client scalar  
@@ -1349,13 +1351,14 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 
 ### Success signals
 
-- [ ] Diff base-5 → base-6 shows **additive-only** (hints slots, metrics)  
-- [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps  
+- [x] Diff base-5.3 → base-6 shows **additive-only** (CORE soft-hints note; no Layer A rename)  
+- [x] Pack `v2/base/base-6/` + hop + [HINTS.md](HINTS.md)  
+- [x] lessons-learned / migration note  
+- [x] BEST_PRACTICES ↔ hints.path recipe ids aligned in docs  
+- [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps (**ZC-WISH-040**)  
 - [ ] P0 path + fields + multipart on one integration path  
 - [ ] G2 metrics without UI leak  
 - [ ] At least one `*_norm` path live without new **required** AI fields  
-- [ ] lessons-learned / migration note if any optional fields added  
-- [ ] BEST_PRACTICES ↔ hints.path recipe ids stay aligned  
 
 ---
 

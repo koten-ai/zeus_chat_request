@@ -1,6 +1,6 @@
 # Migration hops (`base-X` → `base-Y`)
 
-**Last reviewed:** 2026-07-26  
+**Last reviewed:** 2026-07-27  
 **Purpose:** One folder per BASE upgrade. Living design stays in `docs/` root; ship packs stay in `v2/base/base-N/`.
 
 ## Naming (normative)
@@ -31,6 +31,7 @@ See [BASE_AGENT_PLAYBOOK.md](../BASE_AGENT_PLAYBOOK.md) · root [AGENTS.md](../.
 | base-5 → base-5.1 | (folder Diff) | Mode overlays snapshot `v2/base/base-5.1/` |
 | base-5 → base-5.2 | [base-5_to_base-5.2/](base-5_to_base-5.2/) | Dual gaps + **Zeus 0.6 / Helios 0.6 engine pin lessons** · pack `v2/base/base-5.2/` · [WISH_I_KNEW_DUAL.md](../WISH_I_KNEW_DUAL.md) |
 | base-5.2 → base-5.3 | [base-5.2_to_base-5.3/](base-5.2_to_base-5.3/) | Skinny + world-model CORE + verb clarity · pack `v2/base/base-5.3/` · **not a wire break** |
+| base-5.3 → base-6 | [base-5.3_to_base-6/](base-5.3_to_base-6/) | Soft `hints.*` inject contract · pack `v2/base/base-6/` · **additive only** · [HINTS.md](../HINTS.md) |
 
 ## When you finish a new hop
 

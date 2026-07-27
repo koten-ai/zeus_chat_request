@@ -8,8 +8,8 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 | **Format** | `zeus.chat_request.v2` |
 | **Production pin** | **base-1** — `CURRENT.json` · `v2/min/` |
 | **Candidate pack** | **base-5** wire line — `v2/base/base-5/` (last breaking freeze; not pin) |
-| **Content train** | **base-5.3** — skinny + world-model CORE + verb clarity ([v2/base/base-5.3/](v2/base/base-5.3/)) |
-| **Prior content** | base-5.1 modes · base-5.2 dual gaps |
+| **Content train** | **base-6** — soft `hints.*` contract ([v2/base/base-6/](v2/base/base-6/) · [docs/HINTS.md](docs/HINTS.md)) |
+| **Prior content** | base-5.3 skinny/world-model · base-5.2 dual gaps · base-5.1 modes |
 | **Prior candidate** | **base-4** — `v2/base/base-4/` |
 | **Roadmap** | [ROADMAP.md](docs/ROADMAP.md) |
 | **Modes** | [MODE.md](docs/MODE.md) · [work/RECREATE_MODE.md](work/RECREATE_MODE.md) |
@@ -21,6 +21,12 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
 
 ### Highlights
 
+- **base-6 content train (CR-4):** [`v2/base/base-6/`](v2/base/base-6/) — parent `base-5.3`, **additive only** (not a wire break):
+  - Soft **`hints.*`** inject contract — [docs/HINTS.md](docs/HINTS.md) (P0 path/fields/multipart; P1 hot_path; caps; multi-intent ≠ open)
+  - Thin CORE note: hash-excluded hints after hard `rules{}` never replace jailbreak / company / MINI-SCHEMA
+  - Retains base-5.3 world-model + verb clarity + dual gaps
+  - Hop: [docs/migration/base-5.3_to_base-6/](docs/migration/base-5.3_to_base-6/)
+  - Client runtime inject residual: **ZC-WISH-040**
 - **base-5.3 content train (CR-26):** [`v2/base/base-5.3/`](v2/base/base-5.3/) — parent `base-5.2`, **not a wire break**:
   - World-model CORE blurb (AI-Ready overlay · MINI-SCHEMA shape · access path → verb · evidence-only Layer A)
   - Verb catalog clarity: all 13 tools WHEN/WHEN NOT/KEY aligned to Zeus `docs/API/V2`
@@ -33,9 +39,10 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
   - [`v2/base/base-5.1/`](v2/base/base-5.1/) — CORE + MODE_OVERLAY system prompts
   - [`v2/base/base-5.2/`](v2/base/base-5.2/) — dual gaps (`data_gaps` + design [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md))
   - [`v2/base/base-5.3/`](v2/base/base-5.3/) — skinny + world-model + verb clarity
-- **base-5.1 modes:** Author under `work/mode_overlays/`; `assemble_mode_prompts.py --base 5.3` for this train; `diff_modes.py --fail-if-clone`.
-- Pin remains **base-1**. Zeus **0.6.15+** vendors **base-5.3** ([ZE-273](https://kotenai.atlassian.net/browse/ZE-273)); earlier 0.6.x may still be on base-5.2.
-- Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/), [base-5.2_to_base-5.3](docs/migration/base-5.2_to_base-5.3/).
+  - [`v2/base/base-6/`](v2/base/base-6/) — soft hints contract
+- **base-5.1 modes:** Author under `work/mode_overlays/`; `assemble_mode_prompts.py --base 6` for this train; `diff_modes.py --fail-if-clone`.
+- Pin remains **base-1**. Zeus **0.6.15+** vendors **base-5.3** ([ZE-273](https://kotenai.atlassian.net/browse/ZE-273)); base-6 is candidate until Client inject + optional engine pin.
+- Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/), [base-5.2_to_base-5.3](docs/migration/base-5.2_to_base-5.3/), [base-5.3_to_base-6](docs/migration/base-5.3_to_base-6/).
 - Docs/process: AI playbook, COMPAT, RELEASE_CHECKLIST, `verify_base_pack.py`, `new_base.py`.
 
 ### Breaking changes (opt-in **base-5**)

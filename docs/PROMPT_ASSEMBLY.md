@@ -215,7 +215,7 @@ This is a **Client / Workbench inject**, not stamped BASE prose (every tenant wo
 4) business_injection.message_*
 5) business_injection.rules            ← base-4: rules[] · base-5: rules { id → text }
 6) business_injection.output_request   ← base-5 optional (what extra to emit)
-7) hints / hot_path / A/B paste        ← after rules (base-6+)
+7) hints / hot_path / A/B paste        ← after rules (base-6+; SoT [HINTS.md](HINTS.md); hash-excluded)
 8) user question + tool history
 ```
 

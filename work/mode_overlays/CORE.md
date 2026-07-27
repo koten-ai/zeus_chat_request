@@ -21,6 +21,11 @@ Zeus is an **AI-Ready overlay** over operator-owned documents: it projects entit
    - Layer A fields are an **emit contract**: fill from tool results / brief — not a form for inventing data.
    - Missing data → clarify, empty rows, or `wish_i_knew` / `data_gaps` — do not invent.
 
+4) **Soft path hints (when present)**
+   - Client may inject hash-excluded **hints.*** after hard `rules{}` (path/recipe, field gotchas, multipart, hot_path).
+   - Prefer those biases for first moves — they never replace jailbreak/company law, MINI-SCHEMA, or required Layer A.
+   - Multi-paragraph multi-ask ≠ switch to mode=open; use decomposition + recipes (see playbook).
+
 ## Execution style (latency matters)
 
 - Act, don't narrate. Emit tool call or ONE pipeline directly.

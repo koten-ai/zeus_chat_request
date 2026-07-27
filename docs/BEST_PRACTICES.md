@@ -1,7 +1,8 @@
 # Zeus chat_request — retrieval best practices
 
 > **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-6** (content; wire still base-5) · version matrix: [COMPAT.md](../COMPAT.md)  
-> **Citation prefix:** `BP:N` (stable IDs for Prompt Helper / chat_request refs — e.g. `see BP:4`)
+> **Citation prefix:** `BP:N` (stable IDs for Prompt Helper / chat_request refs — e.g. `see BP:4`)  
+> **Consumers:** humans (authors, operators) **and Zeus Hub Prompt Helper** — Helper may load this file, insert playbook cards into drafts/stamps, and cite **`BP:N`** in `chat_request` / Display Pad / CORE notes.
 
 **Audience:** catalog authors, zeus_client / **Prompt Helper**, operators writing `company_context`  
 **Pack surface today:** `v2/base/base-6/` (and prior content trains) CORE + verbs + runtime inject (SCOPE BRIEF / MINI-SCHEMA)  

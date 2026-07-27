@@ -1,7 +1,8 @@
 # Fine-tuning & end-goal optimization (Pachinko → named rails)
 
 > **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-6** (content; wire still base-5) · version matrix: [COMPAT.md](../COMPAT.md)  
-> **Citation prefix:** `OPT:N` (stable IDs for Prompt Helper / chat_request refs — e.g. `see OPT:4`, `see OPT:14`)
+> **Citation prefix:** `OPT:N` (stable IDs for Prompt Helper / chat_request refs — e.g. `see OPT:4`, `see OPT:14`)  
+> **Consumers:** humans (product, Hot Path, Funnel) **and Zeus Hub Prompt Helper** — Helper may load this file, attach verbose cards by fingerprint, insert into drafts/stamps, and cite **`OPT:N`** in `chat_request` / Display Pad / board-release notes. Prefer **OPT:29+** only when the pattern matches (not every turn).
 
 **Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel, **Prompt Helper**  
 **Not:** day-one general retrieval playbook — that is [BEST_PRACTICES.md](BEST_PRACTICES.md) (`BP:N`)  

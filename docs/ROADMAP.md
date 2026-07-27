@@ -1,10 +1,10 @@
 # BASE + Helios roadmap
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · **candidate line base-5.2** (`v2/base/base-5.2/`) · last wire break **base-5** · next content train **base-5.3 skinny + world-model + verb clarity** (planned) · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · **candidate line base-5.3** (`v2/base/base-5.3/`) · last wire break **base-5** · next catalog train **base-6 soft `hints.*`** (after Client inject) · version matrix: [COMPAT.md](../COMPAT.md)
 
 
-**Status:** living plan after base-1 → base-4 → **base-5 / 5.1 / 5.2 candidate line**  
-**Normative (base-4 era docs, base-5 wire freeze):** [BIBLE.md](BIBLE.md) · **Lessons:** [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md) · [migration/base-4_to_base-5/lessons-learned.md](migration/base-4_to_base-5/lessons-learned.md) · [migration/base-5_to_base-5.2/lessons-learned.md](migration/base-5_to_base-5.2/lessons-learned.md)  
+**Status:** living plan after base-1 → base-4 → **base-5 wire freeze** → **5.1 / 5.2 / 5.3 content** (5.3 pack on main)  
+**Normative (base-4 era docs, base-5 wire freeze):** [BIBLE.md](BIBLE.md) · **Lessons:** [migration/base-1_to_base-4/lessons-learned.md](migration/base-1_to_base-4/lessons-learned.md) · [migration/base-4_to_base-5/lessons-learned.md](migration/base-4_to_base-5/lessons-learned.md) · [migration/base-5_to_base-5.2/lessons-learned.md](migration/base-5_to_base-5.2/lessons-learned.md) · [migration/base-5.2_to_base-5.3/lessons-learned.md](migration/base-5.2_to_base-5.3/lessons-learned.md)  
 **Helios requests (analytics emits):** [HELIOS_WISHLIST_FOR_CHAT_REQUEST.md](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)  
 **zeus_client backlog (implement floor):** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) (`ZC-WISH-*`)  
 **base-5 inject / Layer A deltas:** [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) — **rules + triggers as objects**; Client **`output_request` → `app_output`** (each app field = **`type` + `description`**; type-only is not enough)  
@@ -151,36 +151,37 @@ Full plan: **§ Getting skinny**.
 | zeus_client **wishlist** (`ZC-WISH-*`) | Prioritized Client backlog | [ZEUS_CLIENT_WISHLIST…](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) |
 | **base-5.1 mode overlays** pack + CORE/overlay | Stop analytics×rename | **CR-23** |
 | **base-5.2 dual gaps** design + pack path | `wish_i_knew` + `data_gaps` | **CR-24** |
-| Latency diagnosis + skinny plan in ROADMAP | Honest AI-floor + verb surface | **CR-26** (this section) |
-| base-5.2 13-verb review vs Zeus `docs/API/V2` in ROADMAP | Findings + P0/P1 clarity backlog | **CR-26** · § Verb catalog clarity |
+| Latency diagnosis + skinny plan in ROADMAP | Honest AI-floor + verb surface | **CR-26** |
+| base-5.2 13-verb review vs Zeus `docs/API/V2` in ROADMAP | Findings + P0/P1 clarity backlog | **CR-26** |
+| **base-5.3 pack on main** — world-model CORE + verb clarity P0–P2 + hop docs | Content train closed (PR #12) | **CR-26** Done (pack) |
+| Playbook + HINTS catalog + Pachinko OPTIMIZATION | Day-one recipes + base-6 design + rails end-goal | PR #13 |
 
 | Still open | Risk | CR |
 | --- | --- | --- |
 | zeus_client implements object triggers + settings/policy/`output_request` | Catalogs ready; Client floor TBD | **CR-20** (+ CR-9/10/11) |
-| Zeus loaders / return schema / Detective for base-5+ | Can’t pin | **CR-21** |
-| **base-5.3 skinny** — schema diet + prose + **usage empirics → stamped A/B packs** | Catalog always-13 without evidence; AI floor stuck | **CR-26** |
-| **base-5.3 world-model blurb** — DESIGN vocabulary in CORE (overlay / shape / access class) | Packs read as form-fill + tool list; join blindness | **CR-26** · § World model language |
-| **base-5.3 verb clarity** — rewrite 13 tool desc/params; fix order/search schema mismatches | Model taught wrong knobs; empty `where` / wrong sort | **CR-26** · § Verb catalog clarity |
-| Hot Path / Prompt Helper: per-verb use over last N runs | Guessing which verbs to diet | Workbench / Detective (CR-26 Phase 0–1) |
+| Zeus loaders / return schema / Detective for base-5+ | Can’t pin CURRENT | **CR-21** |
+| **Zeus vendor pin base-5.2 → base-5.3** | Hub still teaches order.`direction` on live pin | CR-21 residual / ZE pin ticket |
+| Hot Path / Prompt Helper: per-verb use over last N runs | Guessing which verbs to diet | Workbench / **ZE-267** (CR-26 residual) |
 | Inject reliability (brief + mini-schema always on product path) | Model rediscovers when inject missing | Client + Zeus CR-20/21 |
 | Helios Pri-1 report emits (cheap spine) | Not catalog tax | **CR-12** |
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
-| base-6 soft injects | After Client floor + skinny prefer | **CR-4** |
+| base-6 soft injects | After Client floor + soft inject path | **CR-4** |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
-**Pack SoT for new work:** **base-5 wire** · live candidate packs **base-5.1 / base-5.2** · next content train **base-5.3 skinny** (§ Getting skinny).  
+**Pack SoT for new work:** **base-5 wire** · **candidate pack base-5.3** (`v2/base/base-5.3/`) · next catalog train **base-6 soft `hints.*`** (after Client inject).  
 **Production pin:** **base-1**.  
-**Hop:** [migration/base-4_to_base-5/](migration/base-4_to_base-5/).  
+**Zeus 0.6 vendor:** still **base-5.2** until re-pin (sibling 5.3 files may already sit in `pinned/min` for A/B).  
+**Hop:** [migration/base-5.2_to_base-5.3/](migration/base-5.2_to_base-5.3/) · wire hop [migration/base-4_to_base-5/](migration/base-4_to_base-5/).  
 **Modes:** [MODE.md](MODE.md) · plan [work/RECREATE_MODE.md](../work/RECREATE_MODE.md).  
-**Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4 · add skinny settings to wishlist when CR-26 lands.
+**Client implement order:** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) §4.
 
 ---
 
 ## CR board map (project CR)
 
 Board: https://kotenai.atlassian.net/jira/software/projects/CR/boards/48  
-Last status pass: **2026-07-26**.
+Last status pass: **2026-07-27**.
 
 | Key | Role | Board status (intent) | ROADMAP home |
 | --- | --- | --- | --- |
@@ -197,14 +198,14 @@ Last status pass: **2026-07-26**.
 | **CR-13…14** | base-6 stories (hints / hot_path / A-B · G2 budget) | To Do | § base-6 · **§ HINTS catalog** |
 | **CR-15…16** | base-7 stories | To Do | § base-7 |
 | **CR-18** | Pin promote CURRENT | To Do (blocked) | § base-8+ |
-| **CR-19** | Process verify + checklist | In Review (PR #6) | Process / CREATE_BASE |
+| **CR-19** | Process verify + checklist | Done / In Review | Process / CREATE_BASE |
 | **CR-20** | zeus_client base-5 floor | To Do | § base-5 · full wishlist |
-| **CR-21** | Zeus base-5 loaders/Detective | To Do | § base-5 external |
-| **CR-22** | Pack docs completion tracker | In Review | § base-5 pack |
-| **CR-23** | **base-5.1** mode overlays in system prompt | In Review / merge | § base-5.1 · [MODE.md](MODE.md) |
-| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | In Review / merge | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
-| **CR-25** | **Snapshot folders** base-5 / 5.1 / 5.2 + process | In Progress | This PR · process P0 |
-| **CR-26** | **base-5.3 skinny + world-model + verb clarity** — schema diet · Hot Path empirics · stamped A/B · DESIGN CORE blurb · 13-verb desc/params vs V2 API | To Do (create if missing) | § Getting skinny · § World model language · § Verb catalog clarity · § base-5.3 |
+| **CR-21** | Zeus base-5 loaders/Detective (+ vendor 5.3) | To Do / residual | § base-5 external |
+| **CR-22** | Pack docs completion tracker | Done / In Review | § base-5 pack |
+| **CR-23** | **base-5.1** mode overlays in system prompt | **Done** (pack) | § base-5.1 · [MODE.md](MODE.md) |
+| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
+| **CR-25** | **Snapshot folders** base-5 / 5.1 / 5.2 + process | **Done** | process P0 |
+| **CR-26** | **base-5.3** pack + clarity — **pack Done** (PR #12); residual Hot Path / ZE-267 | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 
@@ -745,7 +746,7 @@ Production default pin may **keep all 13** until Hot Path evidence says a skinny
 - [x] Latency law + skinny plan written in ROADMAP  
 - [x] **Contract law:** no runtime strip of hashed tools under enforcement (documented)  
 - [x] base-5.2 13-verb review vs V2 API findings in ROADMAP (§ Verb catalog clarity)  
-- [ ] CR-26 on board (create if missing)  
+- [x] CR-26 on board · **pack Done** (PR #12); residual product → ZE-267 / Hot Path  
 - [ ] Phase 0 gold + **per-verb histogram** baseline  
 - [ ] Prompt Helper / Hot Path surfaces never/rare/common verbs  
 - [ ] At least one A/B: full stamp vs skinny stamp (re-hashed)  
@@ -1176,9 +1177,11 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 - [x] **P0:** find/search KEY constraints + search properties complete  
 - [x] Contract/enforcement law called out in pack OVERVIEW  
 - [x] CORE blurb present in all 10 modes; mode overlays still distinct  
-- [ ] Hot Path histogram path documented (even if implement lags pack)  
-- [ ] Gold set + lessons-learned hop  
-- [ ] CR-26 Done when prose/diet + worldview + verb clarity + empiric workflow are clear (Workbench may lag)
+- [x] PR #12 merged to main (2026-07-27) · pack train **closed**  
+- [x] Hop `docs/migration/base-5.2_to_base-5.3/` + lessons-learned  
+- [ ] Hot Path histogram path productized (residual → **ZE-267** / Workbench)  
+- [ ] Gold set non-regression on live Zeus pin after vendor → 5.3  
+- [x] CR-26 **pack acceptance Done** (Hot Path residual tracked outside pack Done)
 
 ---
 

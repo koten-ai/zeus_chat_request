@@ -1,6 +1,6 @@
 # Fine-tuning & end-goal optimization (Pachinko → named rails)
 
-> **Doc status** · last reviewed **2026-07-26** · production pin **base-1** · candidate line **base-5.3** · version matrix: [COMPAT.md](../COMPAT.md)
+> **Doc status** · last reviewed **2026-07-27** · production pin **base-1** · candidate pack **base-5.3** (on main) · version matrix: [COMPAT.md](../COMPAT.md)
 
 **Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel  
 **Not:** day-one general retrieval playbook (that is [BEST_PRACTICES.md](BEST_PRACTICES.md))  

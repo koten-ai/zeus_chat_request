@@ -34,7 +34,7 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
   - [`v2/base/base-5.2/`](v2/base/base-5.2/) — dual gaps (`data_gaps` + design [WISH_I_KNEW_DUAL.md](docs/WISH_I_KNEW_DUAL.md))
   - [`v2/base/base-5.3/`](v2/base/base-5.3/) — skinny + world-model + verb clarity
 - **base-5.1 modes:** Author under `work/mode_overlays/`; `assemble_mode_prompts.py --base 5.3` for this train; `diff_modes.py --fail-if-clone`.
-- Pin remains **base-1**. Zeus 0.6 may still **vendor base-5.2** until a separate engine pin.
+- Pin remains **base-1**. Zeus **0.6.15+** vendors **base-5.3** ([ZE-273](https://kotenai.atlassian.net/browse/ZE-273)); earlier 0.6.x may still be on base-5.2.
 - Hop docs: [docs/migration/base-4_to_base-5/](docs/migration/base-4_to_base-5/), [base-5.2_to_base-5.3](docs/migration/base-5.2_to_base-5.3/).
 - Docs/process: AI playbook, COMPAT, RELEASE_CHECKLIST, `verify_base_pack.py`, `new_base.py`.
 

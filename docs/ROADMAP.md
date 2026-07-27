@@ -1496,7 +1496,7 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 - [x] Design: **`usr` + `ai_process_result`** on ROADMAP + wishlists (**§ Emit `usr` + `ai_process_result`**)  
 - [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps (**ZC-WISH-040**)  
 - [ ] Client: stamp **`usr`** on report sinks (**ZC-WISH-044**); Helios filters **`usr="zc"`** (**HEL-WISH-022**)  
-- [ ] Client: **`ai_process_result`** default false; insight-turn path (**ZC-WISH-045**)  
+- [ ] Client: **`ai_process_result`** default false; insight-turn path (**ZC-WISH-044**)  
 - [ ] P0 path + fields + multipart on one integration path  
 - [ ] G2 metrics without UI leak  
 - [ ] At least one `*_norm` path live without new **required** AI fields  

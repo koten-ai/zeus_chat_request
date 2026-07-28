@@ -20,11 +20,4 @@
 - Fan out discovery tools when SCOPE BRIEF already answers counts.
 - Put admin scores in `summary`.
 
-**Example pipeline (ranked list):**
-```
-steps: [
-  {"as": "cands", "verb": "find", "entity_type": "<Type>", "limit": 100},
-  {"as": "ord", "verb": "order", "ids": "@cands.ids", "by": "field:<field>", "asc": false},
-  {"as": "top", "verb": "project", "ids": "@ord.ids", "fields": ["name", "<field>"], "limit": 5}
-]
-```
+**Example:** `find` → `order` (`by: field:<name>`, `asc: false` for top-N) → `project`/`return` (prefer one `pipeline`).

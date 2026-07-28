@@ -179,6 +179,8 @@ ai_process_result = true (insight):
 - [x] `verify_base_pack.py --base 6.1` OK  
 - [x] COMPAT candidate row · RELEASE_NOTES  
 - [x] Client wishlist stripped of Helios Pri-3 bulk; ZC-035/044 kept  
+- [x] Pack `report_sink_schema.json` + `report_sink_example.json` (stamps **not** on Layer A)  
+- [x] Pack `settings_ai_process_result.example.json`  
 - [ ] Client stamps `user` (+ `ip_address` when known) on every report sink (ZC-WISH-035)  
 - [ ] Helios Motions filter `user = "zeus_client"` + scope + day (HEL-WISH-022)  
 - [ ] Client implements `ai_process_result` default false (ZC-WISH-044)  
@@ -321,7 +323,9 @@ Full plan: **§ Getting skinny**.
 | Required four incomplete in the wild | Detective / soft-require levers | CR-21 + Client |
 | CURRENT still base-1 | Expected until green | **CR-18** (blocked by CR-20/21) |
 | Client injects `hints.*` after rules{} | Soft steer not live until Client | **CR-4** residual · ZC-WISH-040 |
-| Client stamps `user` + `ip_address` + `ai_process_result` loop | base-6.1 residual | **ZC-WISH-035 / 044** |
+| **base-6.1 pack** — CORE + report_sink schema + docs | Candidate pack | **CR-27** |
+| Client stamps `user` + `ip_address` + `ai_process_result` loop | base-6.1 residual | **CR-28 / CR-29** · ZC-WISH-035 / 044 |
+| Helios filter `user="zeus_client"` | base-6.1 residual | **CR-30** · HEL-WISH-022 |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
 **Pack SoT for new work:** **base-5 wire** · **candidate pack base-6.1** (`v2/base/base-6.1/`) · prior **base-6** · **base-5.3**.  
@@ -336,31 +340,48 @@ Full plan: **§ Getting skinny**.
 ## CR board map (project CR)
 
 Board: https://kotenai.atlassian.net/jira/software/projects/CR/boards/48  
-Last status pass: **2026-07-27**.
+Last status pass: **2026-07-28** (ROADMAP sync comments on epics + new residual stories).
 
 | Key | Role | Board status (intent) | ROADMAP home |
 | --- | --- | --- | --- |
 | **CR-1** | Epic — repo SoT / BASE sequence / COMPAT | In Progress | This repo strategy (ongoing) |
 | **CR-2** | Epic — base-4 ship | **Done** | § Where we are (base-4) |
 | **CR-3** | Epic — base-5 pack + residual | In Progress | § base-5 |
-| **CR-4** | Epic — base-6 additive | In Progress (pack) | § base-6 · [HINTS.md](HINTS.md) |
+| **CR-4** | Epic — base-6 additive | In Progress / In Review (pack) | § base-6 · [HINTS.md](HINTS.md) |
 | **CR-5** | Epic — base-7 Workbench | To Do | § base-7 |
 | **CR-6…8, CR-17** | base-4 stories | **Done** | base-4 train |
 | **CR-9** | company_context inject (Client) | In Progress (spec/pack done) | base-5 · ZC-WISH-006 |
 | **CR-10** | jailbreak rules{} + hooks | In Progress (spec/pack done) | base-5 · ZC-WISH-002/013 |
 | **CR-11** | object triggers + policy table | In Progress (pack done) | base-5 · ZC-WISH-004/010 |
 | **CR-12** | Helios Pri-1 cheap spine | To Do | Helios Pri-1 · ZC-WISH-030… |
-| **CR-13…14** | base-6 stories (hints / hot_path / A-B · G2 budget) | To Do | § base-6 · **§ HINTS catalog** |
+| **CR-13** | base-6 pack: HINTS / hot_path / ab_paste slots | To Do | § base-6 · **§ HINTS catalog** |
+| **CR-14** | base-6 G2 hygiene + budget + norms | To Do | § base-6 |
 | **CR-15…16** | base-7 stories | To Do | § base-7 |
-| **CR-18** | Pin promote CURRENT | To Do (blocked) | § base-8+ |
-| **CR-19** | Process verify + checklist | Done / In Review | Process / CREATE_BASE |
-| **CR-20** | zeus_client base-5 floor | To Do | § base-5 · full wishlist |
-| **CR-21** | Zeus base-5 loaders/Detective (+ vendor 5.3) | To Do / residual | § base-5 external |
-| **CR-22** | Pack docs completion tracker | Done / In Review | § base-5 pack |
-| **CR-23** | **base-5.1** mode overlays in system prompt | **Done** (pack) | § base-5.1 · [MODE.md](MODE.md) |
-| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
-| **CR-25** | **Snapshot folders** base-5 / 5.1 / 5.2 + process | **Done** | process P0 |
-| **CR-26** | **base-5.3** pack + clarity — **pack Done** (PR #12); residual Hot Path / ZE-267 | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
+| **CR-18** | Pin promote CURRENT | To Do (**blocked** CR-20/21) | § base-8+ |
+| **CR-19** | Process verify + checklist | Done | Process / CREATE_BASE |
+| **CR-20** | zeus_client base-5 floor | In Progress | § base-5 · full wishlist |
+| **CR-21** | Zeus base-5 loaders/Detective (+ vendor) | To Do / residual | § base-5 external · **ZE-286** vendor 6.1 |
+| **CR-22** | Pack docs completion tracker | Done | § base-5 pack |
+| **CR-23** | **base-5.1** mode overlays | **Done** (pack) | § base-5.1 · [MODE.md](MODE.md) |
+| **CR-24** | **base-5.2** dual gaps design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
+| **CR-25** | Snapshot folders process | **Done** | process P0 |
+| **CR-26** | **base-5.3** pack — residual Hot Path **ZE-267** | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
+| **CR-27** | **base-6.1** pack sink stamps + ai_process_result docs | **In Review** | § base-6.1 |
+| **CR-28** | Client residual: stamp `user` + `ip_address` (ZC-WISH-035) | To Do | § base-6.1 · Client |
+| **CR-29** | Client residual: `ai_process_result` loop (ZC-WISH-044) | To Do | § base-6.1 · Client |
+| **CR-30** | Helios residual: filter `user="zeus_client"` (HEL-WISH-022) | To Do | § base-6.1 · Helios |
+| **CR-31** | PROMPT_RULE_PLACEMENT methodology (all modes) | To Do → docs landed | [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) |
+| **CR-32** | Progressive empty → wish_i_knew (assemble CORE → min packs) | To Do | § base-5.2 · BP:13 |
+| **CR-33** | Client residual: inject `hints.*` (ZC-WISH-040) | To Do | § base-6 · Client · pairs CR-13 |
+
+**Zeus project (engine/Hub) companions**
+
+| Key | Role |
+| --- | --- |
+| **ZE-273** | Vendor pin base-5.3 — **Done** |
+| **ZE-267** | Hot Path → named_query rails (base-5.3 residual + base-7) — To Do |
+| **ZE-285** | A/B promotion doctrine visibility (code 0.6.49; Hub banner AC open) |
+| **ZE-286** | Vendor pull base-6.1 when CR-27 green — To Do |
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 
@@ -693,16 +714,19 @@ Prefer **base-5.3 skinny before pin** so production surface is not “always 13 
 | **A classic** | `wish_i_knew[]` (keep) | Detective, Workbench, prompt ops |
 | **B acquisition** | `data_gaps[]` (new) | Helios backlog / Motions (+ precomputed counts) |
 
+**Progressive empty (doctrine add-on):** ≥2 tool-backed empties on the **same topic/facet** (user may broaden constraints) → treat as systemic gap: G1 inventory when possible + **MUST** `wish_i_knew` (still optional on smooth single turns). See [WISH_I_KNEW_DUAL.md §3.3.1](WISH_I_KNEW_DUAL.md) · BP:13.
+
 ### Goals
 
 1. Design doc with A vs B rules and examples.  
 2. Additive wire: keep array `wish_i_knew`; add optional `data_gaps` with machine keys.  
 3. Document Zeus string dual-read for A; Helios cost law for B.  
-4. Implement PR later: schema + terminate table + Client/Zeus parse + report rollups.
+4. Implement PR later: schema + terminate table + Client/Zeus parse + report rollups.  
+5. Progressive same-topic empty → G2 must-fire + G1 facet inventory (docs + CORE blurb).
 
 ### Explicit non-goals
 
-- Require A or B every turn  
+- Require A or B every turn *(except same-topic empty streak ≥2 — still cap max 3 items)*  
 - Nest-break `wish_i_knew` into `{feedback, acquisition}` without dual-read  
 - Soft HINTS/A/B (**base-6**)  
 - Pin promote  
@@ -712,8 +736,10 @@ Prefer **base-5.3 skinny before pin** so production surface is not “always 13 
 - [x] [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) design authored  
 - [x] ROADMAP § base-5.2  
 - [x] CR-24 created  
+- [x] Progressive empty streak doctrine (§3.3.1 + BP:13 + CORE dual-gaps line)  
 - [ ] Design PR merged to main  
 - [ ] Schema + pack terminate table implement (follow-up)  
+- [ ] Rebuild min packs so Dual gaps line ships in stamped catalogs  
 - [ ] Client/Zeus parse + Helios precomputed counters  
 
 ---
@@ -1679,7 +1705,8 @@ Helios volume is **report/session scalars**.
 18. **Drop verbs via Hot Path → A/B stamp → pin** — Prompt Helper and Workbench own the experiment loop; production enforcement stays honest.  
 19. **World model in front of the model** — chat_request teaches overlay + map + access class (DESIGN); Layer A is emit-from-evidence, not form-fill over empty slots.  
 20. **Tenant texture in `company_context`** — durable entities + key links/events; not a second giant system essay.  
-21. **Tool schemas match Zeus V2** — descriptions teach WHEN/KEY; param lists match dispatch (no prompt/`direction` vs API/`asc` drift).
+21. **Tool schemas match Zeus V2** — descriptions teach WHEN/KEY; param lists match dispatch (no prompt/`direction` vs API/`asc` drift).  
+22. **Rule placement is explicit** — CORE / MODE / BP / OPT / hints / Client ([PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md)); looser modes change flavor, not Layer A wire.
 
 ---
 

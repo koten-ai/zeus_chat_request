@@ -25,9 +25,11 @@ Published **Zeus V2 chat_request** catalogs for Zeus Client, Developer Helper MC
   - Root report field **`user`**: `zeus_client` | `zeus` | `helios` | `admin` (product Client stamps `zeus_client`)
   - Root report field **`ip_address`**: IPv4 or IPv6 string when known (omit when unknown; never invent)
   - Client setting **`ai_process_result`** (bool, **default false**) — optional post-Zeus AI insight turn
+  - Machine JSON: [`report_sink_schema.json`](v2/base/base-6.1/report_sink_schema.json) + example (stamps **not** on Layer A `response_output_*`)
+  - Settings companion: [`settings_ai_process_result.example.json`](v2/base/base-6.1/settings_ai_process_result.example.json)
   - Thin CORE note: cheap default after tools; re-call only when Client enables insight; never invent `user` / `ip_address`
   - Hop: [docs/migration/base-6_to_base-6.1/](docs/migration/base-6_to_base-6.1/)
-  - Client residual: **ZC-WISH-035**, **ZC-WISH-044** · Helios filter: **HEL-WISH-022**
+  - Client residual: **ZC-WISH-035**, **ZC-WISH-044** · Helios filter: **HEL-WISH-022** · Jira **CR-27** (pack) / **CR-28…30** (residual)
   - Client wishlist: stripped Helios Pri-3 bulk (locale/channel/market…); Helios SoT remains [HELIOS_WISHLIST…](docs/HELIOS_WISHLIST_FOR_CHAT_REQUEST.md)
 - **base-6 content train (CR-4):** [`v2/base/base-6/`](v2/base/base-6/) — parent `base-5.3`, **additive only** (not a wire break):
   - Soft **`hints.*`** inject contract — [docs/HINTS.md](docs/HINTS.md) (P0 path/fields/multipart; P1 hot_path; caps; multi-intent ≠ open)

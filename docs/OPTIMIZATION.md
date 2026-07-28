@@ -7,7 +7,9 @@
 **Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel, **Prompt Helper**  
 **Not:** day-one general retrieval playbook — that is [BEST_PRACTICES.md](BEST_PRACTICES.md) (`BP:N`)  
 **Companion diagram:** [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg)  
-**Related:** [ROADMAP.md](ROADMAP.md) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) · [HINTS.md](HINTS.md) · [ZE-267](https://kotenai.atlassian.net/browse/ZE-267)
+**Related:** [ROADMAP.md](ROADMAP.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) · [HINTS.md](HINTS.md) · [ZE-267](https://kotenai.atlassian.net/browse/ZE-267)
+
+**Placement:** traffic cards stay `OPT:N` / `hints.*` / custom stamps — do not paste verbose OPT into every mode CORE. See [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md).
 
 ---
 

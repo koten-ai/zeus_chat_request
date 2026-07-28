@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/koten-ai/zeus_chat_request/v2/base/base-6.1/report_sink_schema.json",
+  "title": "Zeus Analytics / session report sink root \u2014 base-6.1",
+  "description": "Client/engine/Helios/admin STAMP fields on the Analytics/session/report ROOT \u2014 NOT Layer A (model return). Never filled by the model. Layer A remains response_output_schema.json. See ROADMAP \u00a7 base-6.1 \u00b7 ZC-WISH-035 \u00b7 HEL-WISH-022.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "user"
+  ],
+  "properties": {
+    "user": {
+      "type": "string",
+      "enum": [
+        "zeus_client",
+        "zeus",
+        "helios",
+        "admin"
+      ],
+      "description": "Who wrote this sink row. Product Client always zeus_client. Hub/admin stamp admin. Never AI."
+    },
+    "ip_address": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Caller IPv4 or IPv6 textual form when known (e.g. 203.0.113.42 or 2001:db8::1). Omit when unknown or redacted. Never invent.",
+      "examples": [
+        "203.0.113.42",
+        "2001:db8::1"
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Sink timestamp (ISO-8601). Client/engine clock \u2014 not model."
+    },
+    "scope": {
+      "type": "string",
+      "description": "Bucket/scope string when known (e.g. yelp-demo/_default)."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Session id for the back-and-forth when applicable."
+    },
+    "turn": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional per-turn payload; may override session defaults later."
+    }
+  },
+  "examples": [
+    {
+      "user": "zeus_client",
+      "ip_address": "203.0.113.42",
+      "ts": "2026-07-27T22:10:00.000Z",
+      "scope": "yelp-demo/_default",
+      "session_id": "sess_example_001"
+    },
+    {
+      "user": "admin",
+      "ts": "2026-07-27T22:11:00.000Z",
+      "scope": "yelp-demo/_default",
+      "session_id": "hub_debug_001"
+    }
+  ]
+}

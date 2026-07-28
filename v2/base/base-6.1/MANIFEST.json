@@ -2,8 +2,8 @@
   "schema_version": 2,
   "base_id": "base-6.1",
   "kind": "base",
-  "status": "scaffold",
-  "note": "base-6.1 scaffolded from (refresh) v2/base/base-6.1. Edit catalogs + Layer A schemas; do not invent production contract hashes. Design docs live under docs/ (see docs/BIBLE.md, docs/CREATE_BASE.md).",
+  "status": "candidate",
+  "note": "base-6.1 additive Client-loop train: report sink stamps (user, ip_address) + settings.ai_process_result. Layer A unchanged (response_output_*). See report_sink_*.json. Do not invent production contract hashes.",
   "paths": {
     "min": "v2/base/base-6.1/min",
     "text": "v2/base/base-6.1/text",
@@ -11,10 +11,13 @@
     "roadmap": "docs/ROADMAP.md",
     "create_base": "docs/CREATE_BASE.md",
     "response_output_schema": "v2/base/base-6.1/response_output_schema.json",
-    "response_output_example": "v2/base/base-6.1/response_output_example.json"
+    "response_output_example": "v2/base/base-6.1/response_output_example.json",
+    "report_sink_schema": "v2/base/base-6.1/report_sink_schema.json",
+    "report_sink_example": "v2/base/base-6.1/report_sink_example.json",
+    "settings_ai_process_result_example": "v2/base/base-6.1/settings_ai_process_result.example.json"
   },
   "parent_source": "(refresh) v2/base/base-6.1",
-  "updated_at": "2026-07-27T22:49:15Z",
+  "updated_at": "2026-07-27T22:53:31Z",
   "generator": "scripts/new_base.py",
   "catalogs": [
     {

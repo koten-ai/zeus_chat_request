@@ -16,6 +16,8 @@ Root field is **`user`**, not `usr`. Values are full names (`zeus_client`, `zeus
 
 `user` and optional `ip_address` are set by the **sink writer** (Client / Hub / engine). Never Layer A. Never model free text. Helios product purity = `user = "zeus_client"` **and** scope present. Missing `ip_address` is fine; inventing one is not.
 
+Machine SoT for the sink (not Layer A): pack `report_sink_schema.json` + `report_sink_example.json`. Layer A remains `response_output_*.json` only.
+
 ## 4. Helios backlog stays in HELIOS_WISHLIST
 
 Locale/channel/market/deployment Helios Pri-1 bulk is **not** the Client wishlist. Client file owns Client floor + base-6.1 emit/loop flags; Helios owns Motions field catalogue.

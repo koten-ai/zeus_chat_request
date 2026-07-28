@@ -6,9 +6,10 @@
 
 **Audience:** catalog authors, zeus_client / **Prompt Helper**, operators writing `company_context`  
 **Pack surface today:** `v2/base/base-6/` (and prior content trains) CORE + verbs + runtime inject (SCOPE BRIEF / MINI-SCHEMA)  
-**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) · [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:N`) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [HINTS.md](HINTS.md)
+**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) · [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:N`) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [HINTS.md](HINTS.md)
 
-This doc is the **policy of use** for Zeus verbs + mini-schema: day-one **wide-mouth** playbook. Design SoT for CORE **Playbook** excerpts — not a second BIBLE and not a pin flip.
+This doc is the **policy of use** for Zeus verbs + mini-schema: day-one **wide-mouth** playbook. Design SoT for CORE **Playbook** excerpts — not a second BIBLE and not a pin flip.  
+**Where a new law belongs (CORE vs BP vs OPT):** [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md).
 
 ---
 
@@ -20,12 +21,16 @@ STAGE DAY-ONE (this file)     First A/B spit tests · gold books · every new sc
 
 STAGE TRAFFIC (OPTIMIZATION)  Hundreds → 10k+ chats · Hot Path · Funnel
   OPT:N                       Sharpen CORE / hints / rails — cite OPT:4 for multi-turn CORE
+
+PLACEMENT METHOD              docs/PROMPT_RULE_PLACEMENT.md
+  CORE / MODE / BP / OPT      Classify every rule (old + new)
 ```
 
 | Doc | Stage | Prompt Helper use |
 | --- | --- | --- |
 | **This file** | **Day-one / always floor** | Insert playbook cards; stamp `guidance` / CORE draft with `BP:N` refs |
 | **[OPTIMIZATION.md](OPTIMIZATION.md)** | **After traffic** | Insert rails / sharpen notes with `OPT:N` refs |
+| **[PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md)** | **Always (meta)** | Decide surface before drafting long text |
 
 Best practices stay **general and stable**. Optimization **points the funnel** after rain — it does not replace this playbook.
 
@@ -103,7 +108,7 @@ Cost tags (`[cheap]` / `[mod]` / `[exp]`) matter **after** correct class. Wrong 
 | Prefer inject BRIEF + MINI-SCHEMA over `describe` when present | Rediscover stats/entity lists when inject is green |
 | One pipeline for multi-step | Same pipeline thrice hoping for different data |
 | Bind `@step.ids` (not bare `@step`) | Invent counts / field values into `summary` |
-| Empty result OK → adjust path, clarify, or `wish_i_knew` / `data_gaps` | Fake rows to satisfy terminate |
+| Empty result OK → adjust path, clarify, or `wish_i_knew` / `data_gaps`; **≥2 same-topic empties → inventory + MUST wish** | Fake rows / title-only terminate on empty streak |
 | `order` with `by: "field:<name>"` and `asc: false` for top-N | `direction: "desc"` on order (not the Zeus API) |
 | Prefer reusing prior Zeus tool evidence when the user points at it (**BP:4**) | Unconstrained global rediscovery for “those / listed / above” follow-ups |
 
@@ -398,6 +403,7 @@ SIMILAR: search hybrid/vector
 RANK:    order by field:X asc:false                               (BP:5C)
 STOP:    evidence-only Layer A                                    (BP:5H, BP:9)
 EMPTY:   adjust class → verb → path; clarify / wish_i_knew        (BP:13)
+STREAK:  ≥2 same-topic empties → inventory facet + MUST wish_i_knew (BP:13)
 VIRTUAL: list via host fields (Business.city) not find City only  (BP:14)
 ```
 
@@ -414,6 +420,23 @@ When a step returns **0 rows** (or only `missing: true` stubs):
 4. wish_i_knew / data_gaps when schema/data/index is the gap.
 5. Do not thrash the same pipeline (BP:3).
 ```
+
+### Progressive same-topic empty (ops signal)
+
+When the **user stays on one theme** (same entity family + facet: amenity, market, …) and you get **≥2 tool-backed empties** — especially if they **relax constraints** (“anyplace”, “any X”) — that is **not** three quiet zeros. Something is missing (vocabulary, path, or data).
+
+```text
+SAME_TOPIC_EMPTY_STREAK (≥2):
+  G1: 0 + keys tried; sample host fields for known facet values when possible
+      (e.g. Listing.amenities[*] — not only empty find on Amenity)
+  G2: MUST emit wish_i_knew (≥1 item, max 3) — inventory/path/samples *I* lacked
+  If inventory truly empty → data_gaps kind:data|schema (+ blocked_answer)
+  NEVER high confidence + title-only summary with empty G2 on streak
+```
+
+Single under-specified clarify stays `kind: message`. Different topic resets the streak. One honest 0 that already returns a full facet list in summary may leave `wish_i_knew: []`.
+
+See [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) §3.3.1.
 
 Keep this short in CORE; traffic-specific “missing host projection” mining → **OPT:32**.
 

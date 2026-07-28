@@ -1,0 +1,10 @@
+{
+  "user": "zeus_client",
+  "ip_address": "203.0.113.42",
+  "ts": "2026-07-27T22:10:00.000Z",
+  "scope": "yelp-demo/_default",
+  "session_id": "sess_example_001",
+  "turn": {
+    "round": 1
+  }
+}

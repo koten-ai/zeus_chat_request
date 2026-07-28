@@ -9,11 +9,12 @@
 **zeus_client backlog (implement floor):** [ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) (`ZC-WISH-*`)  
 **base-5 inject / Layer A deltas:** [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) — **rules + triggers as objects**; Client **`output_request` → `app_output`** (each app field = **`type` + `description`**; type-only is not enough)  
 **base-5 control plane:** [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) — **settings bag** · **rule pack merge/freeze** · **Client policy table** · cache zones · security · observability  
-**Latency / skinny plan:** **§ Getting skinny** below — contract-safe tools[] · Hot Path empirics · stamped A/B · schema diet · measure AI floor  
+**Latency / skinny plan:** **§ Getting skinny** below — contract-safe tools[] · Hot Path empirics · stamped A/B · schema diet · measure AI floor · **end-of-6.x prefix diet → § base-6.2 / [CR-34](https://kotenai.atlassian.net/browse/CR-34)**  
 **World-model language for packs:** **§ World model language for chat_request** — DESIGN vocabulary (AI-Ready overlay · mini-schema shape · access class · modes) · not form-fill  
 **Verb catalog clarity:** **§ Verb catalog clarity** — base-5.2 13-API review vs Zeus `docs/API/V2/*.md` · description/schema gaps · P0 fixes  
 **Retrieval playbook:** [BEST_PRACTICES.md](BEST_PRACTICES.md) — single-focus recipes + multi-intent + **multi-turn short law** (§1.3 Option B); open ≠ multi-ask  
 **Soft HINTS (base-6):** [HINTS.md](HINTS.md) · **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
+**base-6.2 skinny prefix:** **§ base-6.2** · **[CR-34](https://kotenai.atlassian.net/browse/CR-34)** — system + `return`/`pipeline` diet · full 13 verbs · no wire break  
 **End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **multi-turn CORE (Option A)** · **`named_query` rails** · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)**  
 
 **Best practices vs optimization (pipeline) — designed stages + citation IDs:**
@@ -58,6 +59,7 @@ This is **what we want next and why**, not a commitment calendar.
 16. **Multi-turn:** prefer reusing prior Zeus tool evidence when the user points at it; sharpen under traffic (OPTIMIZATION Option A) — do not unconstrained-rediscover “those / listed” sets
 17. **Emit provenance `user` + `ip_address`:** every Analytics / session back-and-forth root stamps **who wrote the row** (`zeus_client`|`zeus`|`helios`|`admin`) and optional **caller IP** (IPv4 or IPv6 string) so Helios can filter product traffic (`user="zeus_client"`) vs Hub/admin noise — **§ Emit `user` + `ip_address` + `ai_process_result`**
 18. **Optional AI insight turn:** Client setting **`ai_process_result`** (default **false**) — after Zeus tool data lands, either surface rows cheaply (one AI plan + tools) **or** spend another AI round to analyze/talk about the data — **not** a Layer A tax
+19. **End base-6.x with a skinny catalog prefix:** same wire + full 13 verbs; diet **system + tool schemas** so hashed prefix is not triple-taught Layer A essays — **§ base-6.2** · **[CR-34](https://kotenai.atlassian.net/browse/CR-34)** · placement: [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md)
 ```
 
 ---
@@ -206,9 +208,16 @@ ZC-WISH-040 hints inject remains orthogonal soft steer
 **Jira:** **[CR-34](https://kotenai.atlassian.net/browse/CR-34)** · parent epic **[CR-4](https://kotenai.atlassian.net/browse/CR-4)**  
 **Pack:** [`v2/base/base-6.2/`](../v2/base/base-6.2/) · parent **base-6.1** · hop [migration/base-6.1_to_base-6.2/](migration/base-6.1_to_base-6.2/)  
 **Status:** **candidate pack** · **not** a wire break · **not** production pin  
-**Related:** § Getting skinny · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · prior diet **CR-26** (base-5.3) · A/B **ZE-285** · verb-membership later **ZE-267**
+**Related:** § Getting skinny · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · prior diet **CR-26** (base-5.3) · A/B **ZE-285** · verb-membership later **ZE-267** · vendor 6.1 first **ZE-286**
 
 **Theme:** End-of-**base-6.x** **content skinny** — reduce hashed **catalog prefix** (system + 13 verb schemas). Full 13 verbs stay. No Layer A rename. No mid-session tools[] strip.
+
+### Catalog prefix (what we dieted)
+
+```text
+Catalog prefix   =  system message  +  verbs[]/tools[] schemas  (hashed when stamped)
+Not in budget    =  BRIEF · MINI-SCHEMA · company_context · rules{} · hints.* · history
+```
 
 ### Measured result (analytics min, 2026-07-28)
 
@@ -219,7 +228,7 @@ Method: chars÷4 ≈ tokens. Scope = system + `verbs[]` only.
 | base-6.1 | ~2,450 | ~3,960 | **~6,410** | — |
 | **base-6.2** | **~1,420** | **~3,400** | **~4,820** | **−25% (~−1.6k/turn)** |
 
-Ship band was conservative ~5.15k / moderate ~4.5k — landed **between** (system overshot moderate; tools still have headroom for later A/B).
+Ship band was conservative ~5.15k / moderate ~4.5k — landed **between** (system beat moderate; tools still have headroom for later A/B).
 
 ### What changed
 
@@ -231,6 +240,15 @@ Ship band was conservative ~5.15k / moderate ~4.5k — landed **between** (syste
 | `pipeline` | Terminating Layer A props **thin-ref** return (no deep `wish_i_knew`/`data_gaps` trees) |
 | Wire | Unchanged — objects, required four, dual gaps, 13 verbs |
 
+### Placement law (while dieting)
+
+```text
+Model prompt  =  retrieve + terminate FROM EVIDENCE
+Client docs   =  user/ip stamps, ai_process_result loop (report_sink / settings)
+hints.*       =  per-turn soft bias — never sole home of jailbreak/contract law
+SCHEMA        =  types/enums + KEY one-liners — not essays duplicated from CORE
+```
+
 ### Success signals
 
 - [x] Spec + ticket **CR-34**  
@@ -239,16 +257,20 @@ Ship band was conservative ~5.15k / moderate ~4.5k — landed **between** (syste
 - [x] `diff_modes.py --fail-if-clone` OK  
 - [x] Prefix ≥20% smaller vs base-6.1 analytics min  
 - [x] Required four + `order.asc` + no-rediscovery + progressive-empty one-liner still explicit  
+- [x] COMPAT/RELEASE_NOTES on this PR  
 - [ ] A/B or books: 6.1 vs 6.2 quality_pass ≥ baseline (**ZE-285**)  
 - [ ] Optional Zeus vendor after books green  
-- [ ] COMPAT/RELEASE_NOTES row on main (this PR)
+
 
 ### Sequencing
 
 ```text
-base-6.1 (CR-27) ──► base-6.2 skinny (CR-34) ──► base-7 product (CR-5)
-        │                      │
-        └── Client residuals CR-28/29/30/33 orthogonal
+base-6.1 pack (CR-27) ──► base-6.2 skinny pack (CR-34) ──► base-7 product (CR-5)
+        │                              │
+        ├── Client CR-28/29/30 / CR-33   (orthogonal residual)
+        ├── CR-32 progressive-empty assemble (keep law in CORE)
+        ├── ZE-286 vendor 6.1 when CR-27 green
+        └── ZE-267 verb-drop A/B remains later (not default 6.2 stamp)
 ```
 
 ---
@@ -292,6 +314,10 @@ base-6+   = additive / optional_when / hash-excluded soft injects / productizati
             hints.* after rules{} (path/recipe, hot_path, multipart, ab_paste, …)
             No rename/remove of base-5 wire keys without a new major BASE + migration hop.
             See § HINTS catalog · [BEST_PRACTICES.md](BEST_PRACTICES.md).
+
+base-6.2  = SKINNY PREFIX (system + verb schemas) on full-13 stamp
+            Collapse triple-teach Terminate × return × pipeline; Client stamp
+            law out of CORE; no verb drop; no wire break. See § base-6.2 · CR-34.
 
 Helios    = analytics spine on Zeus/Client; optional_when if AI ever needed
             Never block pin on Pri-2/3/4/5 AI fields
@@ -380,7 +406,7 @@ Full plan: **§ Getting skinny**.
 | **base-6.1 pack** — CORE + report_sink schema + docs | Candidate pack | **CR-27** |
 | Client stamps `user` + `ip_address` + `ai_process_result` loop | base-6.1 residual | **CR-28 / CR-29** · ZC-WISH-035 / 044 |
 | Helios filter `user="zeus_client"` | base-6.1 residual | **CR-30** · HEL-WISH-022 |
-| ~~**base-6.2 pack** — skinny system + tools~~ | ~~Catalog prefix diet~~ | **CR-34** pack **on branch** · A/B residual |
+| ~~**base-6.2 pack** — skinny system + tools~~ | ~~Catalog prefix diet~~ | **CR-34** pack **landed** · A/B residual |
 | base-7 Workbench / stamp product | Later | **CR-5** |
 
 **Pack SoT for new work:** **base-5 wire** · **candidate pack base-6.2** (`v2/base/base-6.2/`) · prior **base-6.1** · **base-6** · **base-5.3**.  
@@ -395,21 +421,21 @@ Full plan: **§ Getting skinny**.
 ## CR board map (project CR)
 
 Board: https://kotenai.atlassian.net/jira/software/projects/CR/boards/48  
-Last status pass: **2026-07-28** (ROADMAP sync comments on epics + new residual stories).
+Last status pass: **2026-07-28** (CR-34 + full **§ base-6.2** train doc: baseline, targets, goals, placement, success split).
 
 | Key | Role | Board status (intent) | ROADMAP home |
 | --- | --- | --- | --- |
 | **CR-1** | Epic — repo SoT / BASE sequence / COMPAT | In Progress | This repo strategy (ongoing) |
 | **CR-2** | Epic — base-4 ship | **Done** | § Where we are (base-4) |
 | **CR-3** | Epic — base-5 pack + residual | In Progress | § base-5 |
-| **CR-4** | Epic — base-6 additive | In Progress / In Review (pack) | § base-6 · [HINTS.md](HINTS.md) |
-| **CR-5** | Epic — base-7 Workbench | To Do | § base-7 |
+| **CR-4** | Epic — base-6 additive (pack green; Client residual open) | **In Review** | § base-6 · [HINTS.md](HINTS.md) · **§ base-6.2** |
+| **CR-5** | Epic — base-7 Workbench | To Do | § base-7 · **ZE-267** / **ZE-285** |
 | **CR-6…8, CR-17** | base-4 stories | **Done** | base-4 train |
 | **CR-9** | company_context inject (Client) | In Progress (spec/pack done) | base-5 · ZC-WISH-006 |
 | **CR-10** | jailbreak rules{} + hooks | In Progress (spec/pack done) | base-5 · ZC-WISH-002/013 |
 | **CR-11** | object triggers + policy table | In Progress (pack done) | base-5 · ZC-WISH-004/010 |
 | **CR-12** | Helios Pri-1 cheap spine | To Do | Helios Pri-1 · ZC-WISH-030… |
-| **CR-13** | base-6 pack: HINTS / hot_path / ab_paste slots | To Do | § base-6 · **§ HINTS catalog** |
+| **CR-13** | base-6 pack: HINTS / hot_path / ab_paste slots | **Done** (pack) · residual **CR-33** | § base-6 · **§ HINTS catalog** |
 | **CR-14** | base-6 G2 hygiene + budget + norms | To Do | § base-6 |
 | **CR-15…16** | base-7 stories | To Do | § base-7 |
 | **CR-18** | Pin promote CURRENT | To Do (**blocked** CR-20/21) | § base-8+ |
@@ -418,26 +444,28 @@ Last status pass: **2026-07-28** (ROADMAP sync comments on epics + new residual 
 | **CR-21** | Zeus base-5 loaders/Detective (+ vendor) | To Do / residual | § base-5 external · **ZE-286** vendor 6.1 |
 | **CR-22** | Pack docs completion tracker | Done | § base-5 pack |
 | **CR-23** | **base-5.1** mode overlays | **Done** (pack) | § base-5.1 · [MODE.md](MODE.md) |
-| **CR-24** | **base-5.2** dual gaps design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
+| **CR-24** | **base-5.2** dual gaps design | **Done** (pack) · residual **CR-32** | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
 | **CR-25** | Snapshot folders process | **Done** | process P0 |
 | **CR-26** | **base-5.3** pack — residual Hot Path **ZE-267** | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
-| **CR-27** | **base-6.1** pack sink stamps + ai_process_result docs | **In Review** | § base-6.1 |
-| **CR-28** | Client residual: stamp `user` + `ip_address` (ZC-WISH-035) | To Do | § base-6.1 · Client |
-| **CR-29** | Client residual: `ai_process_result` loop (ZC-WISH-044) | To Do | § base-6.1 · Client |
-| **CR-30** | Helios residual: filter `user="zeus_client"` (HEL-WISH-022) | To Do | § base-6.1 · Helios |
-| **CR-31** | PROMPT_RULE_PLACEMENT methodology (all modes) | To Do → docs landed | [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) |
-| **CR-32** | Progressive empty → wish_i_knew (assemble CORE → min packs) | To Do | § base-5.2 · BP:13 |
-| **CR-33** | Client residual: inject `hints.*` (ZC-WISH-040) | To Do | § base-6 · Client · pairs CR-13 |
+| **CR-27** | **base-6.1** pack sink stamps + ai_process_result docs | **In Review** (parent **CR-4**) | § base-6.1 |
+| **CR-28** | Client residual: stamp `user` + `ip_address` (ZC-WISH-035) | To Do (parent **CR-4**) | § base-6.1 · Client |
+| **CR-29** | Client residual: `ai_process_result` loop (ZC-WISH-044) | To Do (parent **CR-4**) | § base-6.1 · Client |
+| **CR-30** | Helios residual: filter `user="zeus_client"` (HEL-WISH-022) | To Do (parent **CR-4**) | § base-6.1 · Helios |
+| **CR-31** | PROMPT_RULE_PLACEMENT methodology (all modes) | **In Review** (docs; parent **CR-1**) | [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) |
+| **CR-32** | Progressive empty → wish_i_knew (assemble CORE → min packs) | To Do (parent **CR-3**) | § base-5.2 · BP:13 |
+| **CR-33** | Client residual: inject `hints.*` (ZC-WISH-040) | To Do (parent **CR-4** · pairs CR-13) | § base-6 · Client |
 | **CR-34** | **base-6.2** skinny chat_prompt (system + tools; full-13) | **In Review** (pack) · A/B residual | **§ base-6.2** · § Getting skinny |
 
 **Zeus project (engine/Hub) companions**
 
-| Key | Role |
-| --- | --- |
-| **ZE-273** | Vendor pin base-5.3 — **Done** |
-| **ZE-267** | Hot Path → named_query rails (base-5.3 residual + base-7) — To Do |
-| **ZE-285** | A/B promotion doctrine visibility (code 0.6.49; Hub banner AC open) |
-| **ZE-286** | Vendor pull base-6.1 when CR-27 green — To Do |
+| Key | Role | Status |
+| --- | --- | --- |
+| **ZE-273** | Vendor pin base-5.3 | **Done** |
+| **ZE-267** | Hot Path → named_query rails (base-5.3 residual + base-7) | To Do · relates CR-26 / CR-5 · **not** default base-6.2 verb drop |
+| **ZE-285** | A/B promotion doctrine visibility (code 0.6.49; Hub banner AC open) | To Do · relates CR-5 · use for **6.1 vs 6.2** A/B |
+| **ZE-286** | Vendor pull base-6.1 when CR-27 green | To Do · **blocked by CR-27** · 6.2 vendor later |
+
+**Jira links:** CR-18 ←blocked-by CR-20/CR-21 · ZE-286 ←blocked-by CR-27 · CR-13↔CR-33 · CR-27↔CR-28/29/30 · CR-24↔CR-32 · CR-26↔ZE-267 · CR-5↔ZE-267/ZE-285 · **CR-34↔CR-26/CR-27/ZE-267**.
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 
@@ -977,6 +1005,7 @@ Production default pin may **keep all 13** until Hot Path evidence says a skinny
 | Action | When |
 | --- | --- |
 | Soft hints that reduce bad paths without growing Layer A | base-6 |
+| **Catalog prefix skinny (system + verb schemas; full-13)** | **base-6.2 · [CR-34](https://kotenai.atlassian.net/browse/CR-34)** · § base-6.2 |
 | Productized prompt-cache | base-8+ |
 | Structured-output constrained `return` | provider-proven |
 | Promote skinny stamp to CURRENT only after gold + Hot Path green | pin gate |
@@ -1545,12 +1574,13 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 
 ## base-6 — “Additive soft inject + optional Helios norms”
 
-**Jira:** epic **[CR-4](https://kotenai.atlassian.net/browse/CR-4)** · stories **CR-13**, **CR-14** · status To Do (correct until base-5 Client residual prefers green).
+**Jira:** epic **[CR-4](https://kotenai.atlassian.net/browse/CR-4)** · stories **CR-13** (pack Done), **CR-14**, **CR-33** (Client inject), **CR-27…30** (base-6.1), **[CR-34](https://kotenai.atlassian.net/browse/CR-34)** (base-6.2 skinny) · epic **In Review** (pack green; residuals open).
 
 **Theme:** **No breaking wire changes vs base-5.** Soft **`hints.*`** / A/B (hash-excluded); optional budget metrics; optional Helios norms as **cheap Zeus/Client** work — same spirit as Helios “nice to have.”  
 **Depends on base-5:** frozen objects + company_context + settings/policy already ship (pack done; Client CR-20).  
 **Prefer after base-5.3:** playbook + verb clarity landed in pack; soft injects should not re-bloat CORE — put steer in `hints.*`. A/B tool-set experiments stay **stamped arms**, not mid-turn tools[] edits.  
-**Detail:** **§ HINTS catalog** above · [BEST_PRACTICES.md](BEST_PRACTICES.md)
+**End of base-6.x:** **§ base-6.2** content skinny (system + verb schemas; full-13) — diet the prefix **after** additive trains, before base-7 productization.  
+**Detail:** **§ HINTS catalog** above · [BEST_PRACTICES.md](BEST_PRACTICES.md) · **§ base-6.1** · **§ base-6.2**
 
 ### Catalog / Client goals (all additive or optional)
 
@@ -1565,7 +1595,8 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 9. **`ab_arm`** on report (cheap Client scalar) — slice by full vs skinny **stamp** and by soft ab_paste arm.  
 10. **A/B stamped skinny packs** (fewer verbs or thinner schemas) promoted only after Hot Path + gold green — not runtime allowlists that unhash production.  
 11. **`user` + `ip_address` emit** on session/turn report root (`zeus_client`|`zeus`|`helios`|`admin`; IPv4/IPv6 when known) — **ZC-WISH-035** · **§ Emit `user` + `ip_address` + `ai_process_result`**.  
-12. **`ai_process_result`** Client setting (default **false**) — optional post-Zeus AI insight turn — **ZC-WISH-044**.
+12. **`ai_process_result`** Client setting (default **false**) — optional post-Zeus AI insight turn — **ZC-WISH-044**.  
+13. **base-6.2 catalog prefix diet** (full-13) — collapse triple-teach Terminate × return × pipeline; Client stamp law out of CORE — **§ base-6.2** · **[CR-34](https://kotenai.atlassian.net/browse/CR-34)**.
 
 ### Helios goals (Pri-2/3 — optional / nice-to-have)
 
@@ -1598,7 +1629,9 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 - [x] lessons-learned / migration note  
 - [x] BEST_PRACTICES ↔ hints.path recipe ids aligned in docs  
 - [x] Design: **`user` + `ip_address` + `ai_process_result`** on ROADMAP + wishlists (**§ Emit `user` + `ip_address` + `ai_process_result`**)  
-- [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps (**ZC-WISH-040**)  
+- [x] Design: **base-6.2 skinny prefix** on ROADMAP + **CR-34** (**§ base-6.2**)  
+- [ ] Pack base-6.2 + verify + A/B (**CR-34** implement)  
+- [ ] Client: `hints.*` after `rules{}`; hash-excluded; size caps (**ZC-WISH-040** · **CR-33**)  
 - [ ] Client: stamp **`user`** + optional **`ip_address`** on report sinks (**ZC-WISH-035**); Helios filters **`user="zeus_client"`** (**HEL-WISH-022**)  
 - [ ] Client: **`ai_process_result`** default false; insight-turn path (**ZC-WISH-044**)  
 - [ ] P0 path + fields + multipart on one integration path  

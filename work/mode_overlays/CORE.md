@@ -129,4 +129,5 @@ Use @step.ids. Lead multi-step with pipeline. Lite schema injected at runtime.
 ### Dual gaps (G2 admin / Helios — optional)
 - wish_i_knew[]: classic ops feedback (rules|message|schema|data|tool|other)
 - data_gaps[]: acquisition only (schema|data|index) with entity_type/field when known — never chat UI
+- Same-topic empty streak (≥2 tool empties on one facet/theme, e.g. Pool→anyplace): G1 list known facet values when tools allow; MUST fill wish_i_knew (not title-only); data_gaps if inventory truly empty — docs/WISH_I_KNEW_DUAL.md §3.3.1 · BP:13
 - See docs/WISH_I_KNEW_DUAL.md

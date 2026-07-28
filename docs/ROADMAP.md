@@ -701,16 +701,19 @@ Prefer **base-5.3 skinny before pin** so production surface is not “always 13 
 | **A classic** | `wish_i_knew[]` (keep) | Detective, Workbench, prompt ops |
 | **B acquisition** | `data_gaps[]` (new) | Helios backlog / Motions (+ precomputed counts) |
 
+**Progressive empty (doctrine add-on):** ≥2 tool-backed empties on the **same topic/facet** (user may broaden constraints) → treat as systemic gap: G1 inventory when possible + **MUST** `wish_i_knew` (still optional on smooth single turns). See [WISH_I_KNEW_DUAL.md §3.3.1](WISH_I_KNEW_DUAL.md) · BP:13.
+
 ### Goals
 
 1. Design doc with A vs B rules and examples.  
 2. Additive wire: keep array `wish_i_knew`; add optional `data_gaps` with machine keys.  
 3. Document Zeus string dual-read for A; Helios cost law for B.  
-4. Implement PR later: schema + terminate table + Client/Zeus parse + report rollups.
+4. Implement PR later: schema + terminate table + Client/Zeus parse + report rollups.  
+5. Progressive same-topic empty → G2 must-fire + G1 facet inventory (docs + CORE blurb).
 
 ### Explicit non-goals
 
-- Require A or B every turn  
+- Require A or B every turn *(except same-topic empty streak ≥2 — still cap max 3 items)*  
 - Nest-break `wish_i_knew` into `{feedback, acquisition}` without dual-read  
 - Soft HINTS/A/B (**base-6**)  
 - Pin promote  
@@ -720,8 +723,10 @@ Prefer **base-5.3 skinny before pin** so production surface is not “always 13 
 - [x] [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) design authored  
 - [x] ROADMAP § base-5.2  
 - [x] CR-24 created  
+- [x] Progressive empty streak doctrine (§3.3.1 + BP:13 + CORE dual-gaps line)  
 - [ ] Design PR merged to main  
 - [ ] Schema + pack terminate table implement (follow-up)  
+- [ ] Rebuild min packs so Dual gaps line ships in stamped catalogs  
 - [ ] Client/Zeus parse + Helios precomputed counters  
 
 ---

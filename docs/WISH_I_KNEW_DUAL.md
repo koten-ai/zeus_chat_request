@@ -163,10 +163,35 @@ emit **structured acquisition gaps** for Helios — not for end users.
 | Type exists, zero matching rows | optional | **`kind: data`** |
 | Need FTS / vector / index capability | optional | **`kind: index`** |
 | Wasted round on wrong tool syntax | `kind: tool` or `schema` | — unless true missing field |
+| **Same-topic empty streak** (≥2 tool-backed empties on one facet/theme; user may have relaxed constraints) | **`kind: data` \| `schema` \| `tool`** — what inventory / path / samples *I* lacked | **`kind: data` \| `schema`** when platform coverage is empty or unusable (`blocked_answer` when true) |
 | Answered fully from tools | `[]` / omit | `[]` / omit |
 
 **Anti-pattern:** listing every field not used this turn. Only gaps that **blocked or forced a weak answer**.
 
+### 3.3.1 Progressive same-topic empty (must-fire G2)
+
+One empty can be a spelling miss. **Two or more** tool-backed empties on the **same intent theme** (same entity family + facet class: amenity, market, category, …) is a **systemic gap** — especially when the user **broadens** (city dropped → “anyplace”).
+
+```text
+SAME_TOPIC_EMPTY_STREAK (≥2 empties, same facet theme):
+  G1 summary:  0 rows + tried keys; when tools allow, list known facet values
+               (sample host entity fields — e.g. Listing.amenities[*])
+  G2 wish_i_knew: MUST emit ≥1 item (cap still max 3) — inventory/path/samples I lacked
+  G2 data_gaps:   if inventory truly empty / unprojected → kind data|schema + blocked_answer
+  NEVER end the streak with high confidence + title-only summary and empty G2
+```
+
+| Streak | Expectation |
+| --- | --- |
+| Miss 1 | Optional weak wish; normalize once |
+| Miss 2 | Start inventory + soft wish |
+| Miss 3+ or “anyplace / any X?” | **Must** inventory (G1) + **must** wish_i_knew; data_gaps if still no vocabulary |
+| Explicit “what values can I filter?” | G1 = list or prove empty; G2 if cannot list |
+
+**Reset streak** when topic changes (different entity family / facet).  
+**Not a streak:** single under-specified clarify (`kind: message` only); one honest 0 that already returned a full facet list in G1 (ops already have vocabulary — G2 may stay `[]`).
+
+This does **not** require A/B every turn (ROADMAP non-goal). It is the exception: **repeated same-theme miss ⇒ ops signal.**
 ### 3.4 Examples
 
 **Blocked by missing field (Helios gold):**
@@ -224,6 +249,50 @@ emit **structured acquisition gaps** for Helios — not for end users.
       "what": "no Inventory rows for requested window",
       "kind": "data",
       "entity_type": "Inventory",
+      "blocked_answer": true,
+      "severity": "high"
+    }
+  ]
+}
+```
+
+**Progressive amenity miss (G1 recovery + G2 ops) — e.g. Pool in NYC → Miami → anyplace:**
+
+```json
+{
+  "summary": "No listings matched amenity \"Pool\" (any market). Amenities that do appear on sampled Listings: Wifi, Kitchen, Heating, …. Markets in sample: … . Pick an exact amenity string to re-filter.",
+  "confidence": "med",
+  "policy_action": "answer",
+  "wish_i_knew": [
+    {
+      "what": "distinct Listing.amenities[*] values (or Amenity labels) for this scope were not in SCOPE BRIEF",
+      "kind": "data",
+      "why": "user asked Pool then broadened to anyplace after city+amenity empties; equality on Pool returned 0 until I sampled Listing",
+      "severity": "high"
+    }
+  ],
+  "data_gaps": []
+}
+```
+
+If sample Listing amenities are also empty:
+
+```json
+{
+  "summary": "I could not find amenity values to filter on in this scope's projection.",
+  "confidence": "low",
+  "wish_i_knew": [
+    {
+      "what": "usable amenity inventory on Listing or Amenity entities",
+      "kind": "data",
+      "severity": "high"
+    }
+  ],
+  "data_gaps": [
+    {
+      "what": "Amenity / Listing.amenities coverage empty or unusable",
+      "kind": "data",
+      "entity_type": "Amenity",
       "blocked_answer": true,
       "severity": "high"
     }

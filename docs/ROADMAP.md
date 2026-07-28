@@ -340,35 +340,48 @@ Full plan: **§ Getting skinny**.
 ## CR board map (project CR)
 
 Board: https://kotenai.atlassian.net/jira/software/projects/CR/boards/48  
-Last status pass: **2026-07-27**.
+Last status pass: **2026-07-28** (ROADMAP sync comments on epics + new residual stories).
 
 | Key | Role | Board status (intent) | ROADMAP home |
 | --- | --- | --- | --- |
 | **CR-1** | Epic — repo SoT / BASE sequence / COMPAT | In Progress | This repo strategy (ongoing) |
 | **CR-2** | Epic — base-4 ship | **Done** | § Where we are (base-4) |
 | **CR-3** | Epic — base-5 pack + residual | In Progress | § base-5 |
-| **CR-4** | Epic — base-6 additive | In Progress (pack) | § base-6 · [HINTS.md](HINTS.md) |
+| **CR-4** | Epic — base-6 additive | In Progress / In Review (pack) | § base-6 · [HINTS.md](HINTS.md) |
 | **CR-5** | Epic — base-7 Workbench | To Do | § base-7 |
 | **CR-6…8, CR-17** | base-4 stories | **Done** | base-4 train |
 | **CR-9** | company_context inject (Client) | In Progress (spec/pack done) | base-5 · ZC-WISH-006 |
 | **CR-10** | jailbreak rules{} + hooks | In Progress (spec/pack done) | base-5 · ZC-WISH-002/013 |
 | **CR-11** | object triggers + policy table | In Progress (pack done) | base-5 · ZC-WISH-004/010 |
 | **CR-12** | Helios Pri-1 cheap spine | To Do | Helios Pri-1 · ZC-WISH-030… |
-| **CR-13…14** | base-6 stories (hints / hot_path / A-B · G2 budget) | To Do | § base-6 · **§ HINTS catalog** |
+| **CR-13** | base-6 pack: HINTS / hot_path / ab_paste slots | To Do | § base-6 · **§ HINTS catalog** |
+| **CR-14** | base-6 G2 hygiene + budget + norms | To Do | § base-6 |
 | **CR-15…16** | base-7 stories | To Do | § base-7 |
-| **CR-18** | Pin promote CURRENT | To Do (blocked) | § base-8+ |
-| **CR-19** | Process verify + checklist | Done / In Review | Process / CREATE_BASE |
-| **CR-20** | zeus_client base-5 floor | To Do | § base-5 · full wishlist |
-| **CR-21** | Zeus base-5 loaders/Detective (+ vendor 5.3) | To Do / residual | § base-5 external |
-| **CR-22** | Pack docs completion tracker | Done / In Review | § base-5 pack |
-| **CR-23** | **base-5.1** mode overlays in system prompt | **Done** (pack) | § base-5.1 · [MODE.md](MODE.md) |
-| **CR-24** | **base-5.2** dual `wish_i_knew` + `data_gaps` design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
-| **CR-25** | **Snapshot folders** base-5 / 5.1 / 5.2 + process | **Done** | process P0 |
-| **CR-26** | **base-5.3** pack + clarity — **pack Done** (PR #12); residual Hot Path / ZE-267 | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
-| **CR-27** | **base-6.1** pack — `user` + `ip_address` sink stamps + `ai_process_result` docs/CORE | **In Review** (this PR) | § base-6.1 |
+| **CR-18** | Pin promote CURRENT | To Do (**blocked** CR-20/21) | § base-8+ |
+| **CR-19** | Process verify + checklist | Done | Process / CREATE_BASE |
+| **CR-20** | zeus_client base-5 floor | In Progress | § base-5 · full wishlist |
+| **CR-21** | Zeus base-5 loaders/Detective (+ vendor) | To Do / residual | § base-5 external · **ZE-286** vendor 6.1 |
+| **CR-22** | Pack docs completion tracker | Done | § base-5 pack |
+| **CR-23** | **base-5.1** mode overlays | **Done** (pack) | § base-5.1 · [MODE.md](MODE.md) |
+| **CR-24** | **base-5.2** dual gaps design | **Done** (pack) | § base-5.2 · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) |
+| **CR-25** | Snapshot folders process | **Done** | process P0 |
+| **CR-26** | **base-5.3** pack — residual Hot Path **ZE-267** | **Done** (pack) · residual product | § Getting skinny · § base-5.3 |
+| **CR-27** | **base-6.1** pack sink stamps + ai_process_result docs | **In Review** | § base-6.1 |
 | **CR-28** | Client residual: stamp `user` + `ip_address` (ZC-WISH-035) | To Do | § base-6.1 · Client |
 | **CR-29** | Client residual: `ai_process_result` loop (ZC-WISH-044) | To Do | § base-6.1 · Client |
 | **CR-30** | Helios residual: filter `user="zeus_client"` (HEL-WISH-022) | To Do | § base-6.1 · Helios |
+| **CR-31** | PROMPT_RULE_PLACEMENT methodology (all modes) | To Do → docs landed | [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) |
+| **CR-32** | Progressive empty → wish_i_knew (assemble CORE → min packs) | To Do | § base-5.2 · BP:13 |
+| **CR-33** | Client residual: inject `hints.*` (ZC-WISH-040) | To Do | § base-6 · Client · pairs CR-13 |
+
+**Zeus project (engine/Hub) companions**
+
+| Key | Role |
+| --- | --- |
+| **ZE-273** | Vendor pin base-5.3 — **Done** |
+| **ZE-267** | Hot Path → named_query rails (base-5.3 residual + base-7) — To Do |
+| **ZE-285** | A/B promotion doctrine visibility (code 0.6.49; Hub banner AC open) |
+| **ZE-286** | Vendor pull base-6.1 when CR-27 green — To Do |
 
 When a train lands: update epic + create residual stories (checklist [§9](migration/RELEASE_CHECKLIST_TEMPLATE.md)).
 

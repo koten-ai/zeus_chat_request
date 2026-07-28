@@ -6,9 +6,10 @@
 
 **Audience:** catalog authors, zeus_client / **Prompt Helper**, operators writing `company_context`  
 **Pack surface today:** `v2/base/base-6/` (and prior content trains) CORE + verbs + runtime inject (SCOPE BRIEF / MINI-SCHEMA)  
-**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) · [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:N`) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [HINTS.md](HINTS.md)
+**Related:** [MODE.md](MODE.md) · [ROADMAP.md](ROADMAP.md) · [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:N`) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [MULTI_ROUND_CLIENT.md](MULTI_ROUND_CLIENT.md) · [HINTS.md](HINTS.md)
 
-This doc is the **policy of use** for Zeus verbs + mini-schema: day-one **wide-mouth** playbook. Design SoT for CORE **Playbook** excerpts — not a second BIBLE and not a pin flip.
+This doc is the **policy of use** for Zeus verbs + mini-schema: day-one **wide-mouth** playbook. Design SoT for CORE **Playbook** excerpts — not a second BIBLE and not a pin flip.  
+**Where a new law belongs (CORE vs BP vs OPT):** [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md).
 
 ---
 
@@ -20,12 +21,16 @@ STAGE DAY-ONE (this file)     First A/B spit tests · gold books · every new sc
 
 STAGE TRAFFIC (OPTIMIZATION)  Hundreds → 10k+ chats · Hot Path · Funnel
   OPT:N                       Sharpen CORE / hints / rails — cite OPT:4 for multi-turn CORE
+
+PLACEMENT METHOD              docs/PROMPT_RULE_PLACEMENT.md
+  CORE / MODE / BP / OPT      Classify every rule (old + new)
 ```
 
 | Doc | Stage | Prompt Helper use |
 | --- | --- | --- |
 | **This file** | **Day-one / always floor** | Insert playbook cards; stamp `guidance` / CORE draft with `BP:N` refs |
 | **[OPTIMIZATION.md](OPTIMIZATION.md)** | **After traffic** | Insert rails / sharpen notes with `OPT:N` refs |
+| **[PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md)** | **Always (meta)** | Decide surface before drafting long text |
 
 Best practices stay **general and stable**. Optimization **points the funnel** after rain — it does not replace this playbook.
 

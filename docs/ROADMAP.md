@@ -1692,7 +1692,8 @@ Helios volume is **report/session scalars**.
 18. **Drop verbs via Hot Path → A/B stamp → pin** — Prompt Helper and Workbench own the experiment loop; production enforcement stays honest.  
 19. **World model in front of the model** — chat_request teaches overlay + map + access class (DESIGN); Layer A is emit-from-evidence, not form-fill over empty slots.  
 20. **Tenant texture in `company_context`** — durable entities + key links/events; not a second giant system essay.  
-21. **Tool schemas match Zeus V2** — descriptions teach WHEN/KEY; param lists match dispatch (no prompt/`direction` vs API/`asc` drift).
+21. **Tool schemas match Zeus V2** — descriptions teach WHEN/KEY; param lists match dispatch (no prompt/`direction` vs API/`asc` drift).  
+22. **Rule placement is explicit** — CORE / MODE / BP / OPT / hints / Client ([PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md)); looser modes change flavor, not Layer A wire.
 
 ---
 

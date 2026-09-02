@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="620" viewBox="0 0 1240 620" role="img" aria-labelledby="title desc">
+  <title id="title">Bind the same id bag versus unbound List fan-out</title>
+  <desc id="desc">Get close then refine means narrow_to / @step.ids on one bag. Sessions List hotel, List airport, List landmark are new global bags. Pathshape today scores pipeline hops as S2 waste — that fights the bound funnel.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 26px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .sub { font: 500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .h { font: 700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .p { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+      .tiny { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .n { font: 700 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    </style>
+    <marker id="g" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#0891b2"/></marker>
+    <marker id="r" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e11d48"/></marker>
+  </defs>
+  <rect class="bg" width="1240" height="620"/>
+  <text class="title" x="620" y="40" text-anchor="middle">“Get close, then refine” = bind, not new Lists</text>
+  <text class="sub" x="620" y="66" text-anchor="middle">Funnel shape vs the Sessions anti-pattern. S2 waste should mean unbound retrievals / extra AI rounds — not pipeline step count.</text>
+
+  <!-- bound -->
+  <rect x="36" y="90" width="1168" height="230" rx="16" fill="#ffffff" stroke="#16a34a" stroke-width="2.5"/>
+  <text class="h" x="56" y="122" fill="#166534">Bound funnel · @step.ids / narrow_to</text>
+  <circle cx="140" cy="200" r="44" fill="#e0f2fe" stroke="#0891b2" stroke-width="2"/>
+  <text class="n" x="140" y="196" text-anchor="middle">400</text>
+  <text class="tiny" x="140" y="214" text-anchor="middle">place</text>
+  <path d="M184 200 L230 200" stroke="#0891b2" stroke-width="3" marker-end="url(#g)"/>
+  <text class="tiny" x="207" y="188" text-anchor="middle">@ids</text>
+  <circle cx="280" cy="200" r="38" fill="#cffafe" stroke="#0891b2" stroke-width="2"/>
+  <text class="n" x="280" y="196" text-anchor="middle">120</text>
+  <text class="tiny" x="280" y="214" text-anchor="middle">vibe</text>
+  <path d="M318 200 L364 200" stroke="#0891b2" stroke-width="3" marker-end="url(#g)"/>
+  <text class="tiny" x="341" y="188" text-anchor="middle">@ids</text>
+  <circle cx="410" cy="200" r="32" fill="#a5f3fc" stroke="#0e7490" stroke-width="2"/>
+  <text class="n" x="410" y="196" text-anchor="middle">40</text>
+  <text class="tiny" x="410" y="214" text-anchor="middle">season</text>
+  <path d="M442 200 L488 200" stroke="#0891b2" stroke-width="3" marker-end="url(#g)"/>
+  <text class="tiny" x="465" y="188" text-anchor="middle">@ids</text>
+  <circle cx="530" cy="200" r="26" fill="#67e8f9" stroke="#0e7490" stroke-width="2"/>
+  <text class="n" x="530" y="204" text-anchor="middle">12</text>
+  <path d="M556 200 L620 200" stroke="#16a34a" stroke-width="3" marker-end="url(#g)"/>
+  <rect x="628" y="176" width="160" height="48" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text class="n" x="708" y="206" text-anchor="middle" fill="#166534">ORDER · 5</text>
+  <text class="p" x="820" y="190">Same id kind the whole way.</text>
+  <text class="tiny" x="820" y="210">Hard $ filter = rail when wired</text>
+  <text class="tiny" x="820" y="228">Staple: fast_pass (plan) or scout (peek once)</text>
+  <text class="tiny" x="56" y="292">Pathshape today: hops&gt;1 and KindPipeline → S2 waste. That punishes this picture. Fix the scorer before trusting hot-path → rail.</text>
+
+  <!-- unbound -->
+  <rect x="36" y="340" width="1168" height="240" rx="16" fill="#ffffff" stroke="#e11d48" stroke-width="2.5"/>
+  <text class="h" x="56" y="372" fill="#9f1239">Unbound fan-out · new global bag each time</text>
+  <rect x="80" y="400" width="150" height="70" rx="10" fill="#ffe4e6" stroke="#e11d48"/>
+  <text class="n" x="155" y="430" text-anchor="middle" fill="#9f1239">List hotel</text>
+  <text class="tiny" x="155" y="450" text-anchor="middle">no prior bag</text>
+  <rect x="280" y="400" width="150" height="70" rx="10" fill="#ffe4e6" stroke="#e11d48"/>
+  <text class="n" x="355" y="430" text-anchor="middle" fill="#9f1239">List airport</text>
+  <text class="tiny" x="355" y="450" text-anchor="middle">no prior bag</text>
+  <rect x="480" y="400" width="170" height="70" rx="10" fill="#ffe4e6" stroke="#e11d48"/>
+  <text class="n" x="565" y="430" text-anchor="middle" fill="#9f1239">List landmark</text>
+  <text class="tiny" x="565" y="450" text-anchor="middle">no prior bag</text>
+  <path d="M155 470 L155 510" stroke="#e11d48" stroke-width="2" marker-end="url(#r)"/>
+  <path d="M355 470 L355 510" stroke="#e11d48" stroke-width="2" marker-end="url(#r)"/>
+  <path d="M565 470 L565 510" stroke="#e11d48" stroke-width="2" marker-end="url(#r)"/>
+  <rect x="80" y="518" width="570" height="40" rx="8" fill="#fff1f2" stroke="#e11d48"/>
+  <text class="n" x="365" y="544" text-anchor="middle" fill="#9f1239">three AI hops · three id kinds · no ORDER bag</text>
+  <text class="p" x="700" y="430">This is what Debug Sessions looked like.</text>
+  <text class="tiny" x="700" y="450">Gold books of only “List X” elect this path.</text>
+  <text class="tiny" x="700" y="470">Fix the book (expected_route) as well as the staple card.</text>
+  <text class="tiny" x="700" y="500">Hygiene: bind_ratio, unbound_retrievals,</text>
+  <text class="tiny" x="700" y="518">extra AI rounds — not len(steps).</text>
+</svg>

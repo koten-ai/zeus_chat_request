@@ -62,6 +62,13 @@ COMPAT.md                      ← Zeus × BASE × zeus_client
 | [../work/RECREATE_MODE.md](../work/RECREATE_MODE.md) | **Plan** — restore mode overlays into system prompt (`messages[].content`) |
 | [../images/assembled_prompt.svg](../images/assembled_prompt.svg) | Assembled prompt diagram |
 | [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg) | Pachinko Funnel shaping (named_query rails) — [OPTIMIZATION.md](OPTIMIZATION.md) |
+| [../images/opt-staples.svg](../images/opt-staples.svg) | **WIP** staples `fast_pass` / `scout` / `thorough` — [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) |
+| [../images/opt-order-vs-waste.svg](../images/opt-order-vs-waste.svg) | Shrink bag → ORDER vs List fan-out |
+| [../images/opt-question-class.svg](../images/opt-question-class.svg) | known_goal vs open_ended vs out-of-corpus |
+| [../images/opt-execution-shapes.svg](../images/opt-execution-shapes.svg) | Terminating pipeline vs scout vs multi-round |
+| [../images/opt-bind-vs-list.svg](../images/opt-bind-vs-list.svg) | Bind `@ids` vs unbound Lists |
+| [../images/opt-pick-and-clocks.svg](../images/opt-pick-and-clocks.svg) | Pick a staple · two clocks |
+| [../images/opt-retrieve-shape.svg](../images/opt-retrieve-shape.svg) | 12 pin verbs · retrieve vs shape |
 
 ## Migration hops
 

@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="720" viewBox="0 0 1240 720" role="img" aria-labelledby="title desc">
+  <title id="title">Optimization staples: fast_pass, scout, thorough</title>
+  <desc id="desc">Three closed staples. fast_pass: one planned pipeline, summary written before results. scout: one probe at live values, then a terminating pipeline. thorough: the same bound plan with a richer project. None of them is more Lists or more sub-agents.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .sub { font: 500 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .card { fill: #ffffff; stroke-width: 2.5; }
+      .h { font: 700 22px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .law { font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+      .tiny { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .chip { font: 700 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .box { font: 700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .ok { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; }
+      .okT { font: 700 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #166534; }
+      .no { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #be123c; }
+    </style>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/></marker>
+  </defs>
+  <rect class="bg" width="1240" height="720"/>
+  <text class="title" x="620" y="42" text-anchor="middle">Optimization theory · three staples</text>
+  <text class="sub" x="620" y="70" text-anchor="middle">Class, SLA, and complexity only pick which staple. Do not invent a fourth until these are insufficient.</text>
+
+  <!-- FAST_PASS -->
+  <g>
+    <rect class="card" x="36" y="96" width="372" height="560" rx="18" fill="#ffffff" stroke="#0891b2"/>
+    <rect x="36" y="96" width="372" height="54" rx="18" fill="#0891b2"/>
+    <rect x="36" y="132" width="372" height="18" fill="#0891b2"/>
+    <text class="h" x="222" y="132" text-anchor="middle" fill="#ecfeff">fast_pass</text>
+    <text class="law" x="54" y="178">Exactly one AI round.</text>
+    <text class="law" x="54" y="198">One terminating pipeline.</text>
+    <text class="law" x="54" y="218">Summary is a bet — written</text>
+    <text class="law" x="54" y="238">before Zeus rows come back.</text>
+
+    <rect x="86" y="262" width="272" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+    <text class="box" x="222" y="285" text-anchor="middle">plan all steps</text>
+    <path d="M222 298 L222 322" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="86" y="326" width="272" height="36" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text class="box" x="222" y="349" text-anchor="middle">pipeline  search→bind→project</text>
+    <path d="M222 362 L222 386" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect class="ok" x="86" y="390" width="272" height="40" rx="8"/>
+    <text class="okT" x="222" y="416" text-anchor="middle">ORDER · compact bag</text>
+
+    <text class="tiny" x="222" y="456" text-anchor="middle">Today: pipeline + transforms</text>
+    <text class="tiny" x="222" y="474" text-anchor="middle">Later: graduate a hot path → rail</text>
+    <text class="tiny" x="222" y="492" text-anchor="middle">named_query is not a pin verb yet</text>
+
+    <text class="no" x="54" y="530">Forbidden</text>
+    <text class="tiny" x="54" y="550">empty terminate “to look fast”</text>
+    <text class="tiny" x="54" y="568">second look “just to see”</text>
+    <text class="tiny" x="54" y="586">N unbound Lists</text>
+    <rect x="248" y="616" width="140" height="22" rx="11" fill="#ecfeff" stroke="#0891b2"/>
+    <text class="chip" x="318" y="631" text-anchor="middle" fill="#0e7490">known_goal default</text>
+  </g>
+
+  <!-- SCOUT -->
+  <g>
+    <rect class="card" x="434" y="96" width="372" height="560" rx="18" fill="#ffffff" stroke="#d97706"/>
+    <rect x="434" y="96" width="372" height="54" rx="18" fill="#d97706"/>
+    <rect x="434" y="132" width="372" height="18" fill="#d97706"/>
+    <text class="h" x="620" y="132" text-anchor="middle" fill="#fffbeb">scout</text>
+    <text class="law" x="452" y="178">One probe at live values.</text>
+    <text class="law" x="452" y="198">Then one terminating pipeline.</text>
+    <text class="law" x="452" y="218">Only staple that sees data</text>
+    <text class="law" x="452" y="238">before the commit plan.</text>
+
+    <rect x="484" y="262" width="272" height="36" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+    <text class="box" x="620" y="285" text-anchor="middle">probe  find limit 1–3 / search 5</text>
+    <path d="M620 298 L620 322" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="484" y="326" width="272" height="36" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+    <text class="box" x="620" y="349" text-anchor="middle">see tokens / ids  (not ORDER)</text>
+    <path d="M620 362 L620 386" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="484" y="390" width="272" height="36" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <text class="box" x="620" y="413" text-anchor="middle">commit pipeline on @ids</text>
+    <path d="M620 426 L620 450" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect class="ok" x="484" y="454" width="272" height="40" rx="8"/>
+    <text class="okT" x="620" y="480" text-anchor="middle">ORDER</text>
+
+    <text class="no" x="452" y="530">Forbidden</text>
+    <text class="tiny" x="452" y="550">probe that never commits</text>
+    <text class="tiny" x="452" y="568">get_stats / list_entity_types</text>
+    <text class="tiny" x="452" y="586">List hotel + List airport + …</text>
+    <rect x="646" y="616" width="140" height="22" rx="11" fill="#fff7ed" stroke="#d97706"/>
+    <text class="chip" x="716" y="631" text-anchor="middle" fill="#9a3412">value-space gaps</text>
+  </g>
+
+  <!-- THOROUGH -->
+  <g>
+    <rect class="card" x="832" y="96" width="372" height="560" rx="18" fill="#ffffff" stroke="#4f46e5"/>
+    <rect x="832" y="96" width="372" height="54" rx="18" fill="#4f46e5"/>
+    <rect x="832" y="132" width="372" height="18" fill="#4f46e5"/>
+    <text class="h" x="1018" y="132" text-anchor="middle" fill="#eef2ff">thorough</text>
+    <text class="law" x="850" y="178">Still one bound pipeline.</text>
+    <text class="law" x="850" y="198">Still @step.ids (cap 8).</text>
+    <text class="law" x="850" y="218">Richer project / hydrate.</text>
+    <text class="law" x="850" y="238">Coverage &gt; wall time.</text>
+
+    <rect x="882" y="262" width="272" height="36" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+    <text class="box" x="1018" y="285" text-anchor="middle">same bound funnel</text>
+    <path d="M1018 298 L1018 322" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="882" y="326" width="272" height="36" rx="8" fill="#e0e7ff" stroke="#4338ca" stroke-width="1.5"/>
+    <text class="box" x="1018" y="349" text-anchor="middle">project rich / get body</text>
+    <path d="M1018 362 L1018 386" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <rect class="ok" x="882" y="390" width="272" height="40" rx="8"/>
+    <text class="okT" x="1018" y="416" text-anchor="middle">ORDER · detailed bag</text>
+
+    <text class="tiny" x="1018" y="456" text-anchor="middle">Open-ended in-graph default</text>
+    <text class="tiny" x="1018" y="474" text-anchor="middle">or known_goal when SLA wants attributes</text>
+    <text class="tiny" x="1018" y="492" text-anchor="middle">Not a bigger encyclopedia search</text>
+
+    <text class="no" x="850" y="530">Forbidden</text>
+    <text class="tiny" x="850" y="550">longer = more independent Lists</text>
+    <text class="tiny" x="850" y="568">out-of-corpus “why Rome fell”</text>
+    <text class="tiny" x="850" y="586">on a hotel overlay</text>
+    <rect x="1044" y="616" width="140" height="22" rx="11" fill="#eef2ff" stroke="#4f46e5"/>
+    <text class="chip" x="1114" y="631" text-anchor="middle" fill="#3730a3">richer, still bound</text>
+  </g>
+</svg>

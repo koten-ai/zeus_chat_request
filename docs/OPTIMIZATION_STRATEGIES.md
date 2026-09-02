@@ -9,6 +9,34 @@
 **Audience:** catalog authors, Hub Workbench / Prompt Helper, zeus_client, operators  
 **Related:** [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:0` Pachinko, `OPT:6`, `OPT:18`) · [BEST_PRACTICES.md](BEST_PRACTICES.md) · [HINTS.md](HINTS.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [MODE.md](MODE.md) · travel funnel (external) `USE_CASE_TRAVEL_BOOKING_STEP_BY_STEP_v2.md`
 
+### Talking-point diagrams (WIP)
+
+Companion to the existing Pachinko board: [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg)
+
+| Diagram | Talking point |
+| --- | --- |
+| [opt-staples.svg](../images/opt-staples.svg) | The theory is three staples: `fast_pass` · `scout` · `thorough` |
+| [opt-order-vs-waste.svg](../images/opt-order-vs-waste.svg) | Optimize = shrink a bag to ORDER, not more Lists / sub-agents |
+| [opt-question-class.svg](../images/opt-question-class.svg) | `known_goal` vs in-graph `open_ended` vs out-of-corpus wish |
+| [opt-execution-shapes.svg](../images/opt-execution-shapes.svg) | Terminating pipeline is a **bet**; scout peeks once; multi-round is a product setting |
+| [opt-bind-vs-list.svg](../images/opt-bind-vs-list.svg) | “Get close then refine” = `@ids` / `narrow_to`, not Sessions List-fan-out |
+| [opt-pick-and-clocks.svg](../images/opt-pick-and-clocks.svg) | SLA × complexity pick a staple; hot-path freezes a win (scorer must change first) |
+| [opt-retrieve-shape.svg](../images/opt-retrieve-shape.svg) | 12 pin verbs: retrieve vs shape; `named_query` is another surface |
+
+![Three staples](../images/opt-staples.svg)
+
+![ORDER vs waste](../images/opt-order-vs-waste.svg)
+
+![Question class](../images/opt-question-class.svg)
+
+![Execution shapes](../images/opt-execution-shapes.svg)
+
+![Bind vs List](../images/opt-bind-vs-list.svg)
+
+![Pick a staple and two clocks](../images/opt-pick-and-clocks.svg)
+
+![Retrieve vs shape](../images/opt-retrieve-shape.svg)
+
 ---
 
 ## 0. One-sentence theory

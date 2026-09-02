@@ -7,6 +7,7 @@
 **Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel, **Prompt Helper**  
 **Not:** day-one general retrieval playbook — that is [BEST_PRACTICES.md](BEST_PRACTICES.md) (`BP:N`)  
 **Companion diagram:** [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg)  
+**WIP staple diagrams:** [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) · [opt-staples.svg](../images/opt-staples.svg) · [opt-order-vs-waste.svg](../images/opt-order-vs-waste.svg) · [opt-question-class.svg](../images/opt-question-class.svg) · [opt-execution-shapes.svg](../images/opt-execution-shapes.svg) · [opt-bind-vs-list.svg](../images/opt-bind-vs-list.svg) · [opt-pick-and-clocks.svg](../images/opt-pick-and-clocks.svg) · [opt-retrieve-shape.svg](../images/opt-retrieve-shape.svg)  
 **Related:** [ROADMAP.md](ROADMAP.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) · [HINTS.md](HINTS.md) · [ZE-267](https://kotenai.atlassian.net/browse/ZE-267)
 
 **Placement:** traffic cards stay `OPT:N` / `hints.*` / custom stamps — do not paste verbose OPT into every mode CORE. See [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md).

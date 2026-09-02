@@ -7,6 +7,7 @@
 **Audience:** product, catalog authors, Workbench / Hot Path operators, Helios Funnel, **Prompt Helper**  
 **Not:** day-one general retrieval playbook — that is [BEST_PRACTICES.md](BEST_PRACTICES.md) (`BP:N`)  
 **Companion diagram:** [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg)  
+**WIP staple diagrams:** [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) · [opt-staples.svg](../images/opt-staples.svg) · [opt-order-vs-waste.svg](../images/opt-order-vs-waste.svg) · [opt-question-class.svg](../images/opt-question-class.svg) · [opt-execution-shapes.svg](../images/opt-execution-shapes.svg) · [opt-bind-vs-list.svg](../images/opt-bind-vs-list.svg) · [opt-pick-and-clocks.svg](../images/opt-pick-and-clocks.svg) · [opt-retrieve-shape.svg](../images/opt-retrieve-shape.svg)  
 **Related:** [ROADMAP.md](ROADMAP.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [HELIOS_WISHLIST](HELIOS_WISHLIST_FOR_CHAT_REQUEST.md) · [HINTS.md](HINTS.md) · [ZE-267](https://kotenai.atlassian.net/browse/ZE-267)
 
 **Placement:** traffic cards stay `OPT:N` / `hints.*` / custom stamps — do not paste verbose OPT into every mode CORE. See [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md).
@@ -73,8 +74,9 @@ Use **`OPT:N`** in stamps, Display Pad, Helper actions, and contracted notes. **
 | **OPT:33** | Detective “pass” ≠ multi-turn success | traffic · measure |
 | **OPT:34** | Soft `hints.multipart` pastes (verbose) | traffic · Client inject |
 | **OPT:35** | Why verbose OPT cards are worth tokens | traffic · meta |
+| **OPT:36** | Staples `fast_pass` / `scout` / `thorough` (+ class `known_goal` / `open_ended`) | **WIP** · [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) |
 
-**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**; worked multi-turn recipe = **OPT:29**.
+**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**; worked multi-turn recipe = **OPT:29**. **WIP theory:** staples **`fast_pass` · `scout` · `thorough`**. Class (`known_goal` sized bag vs `open_ended` in-graph unknown budget) only picks a **default staple**. Named_query is a **graduation**, not a current catalog verb. See [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md); do not hash into CORE yet.
 
 ### Why OPT cards can be longer than BP cards
 
@@ -917,6 +919,7 @@ Keep inject size soft-capped (~1–2 KB). Jailbreak law stays in hard `rules{}`,
 | Doc | Role |
 | --- | --- |
 | **This file** | End-goal fine-tuning / Pachinko / named rails / **optimization portfolio** / **verbose rare cards OPT:29+** |
+| [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) | **WIP** staples `fast_pass` / `scout` / `thorough` (`OPT:36`) |
 | [BEST_PRACTICES.md](BEST_PRACTICES.md) | Day-one playbook (pins) · `BP:N` |
 | [ROADMAP.md](ROADMAP.md) § HINTS · sequencing | Soft hot_path inject; when rails enter product trains |
 | [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) | Prompt Helper → rails → contract |

@@ -16,6 +16,7 @@
 **Soft HINTS (base-6):** [HINTS.md](HINTS.md) · **§ HINTS catalog** below + **§ base-6** — hash-excluded `hints.*` after `rules{}`  
 **base-6.2 skinny prefix:** **§ base-6.2** · **[CR-34](https://kotenai.atlassian.net/browse/CR-34)** — system + `return`/`pipeline` diet · full 13 verbs · no wire break  
 **End-goal optimization:** [OPTIMIZATION.md](OPTIMIZATION.md) — Pachinko funnel · Hot Path mine · **multi-turn CORE (Option A)** · **`named_query` rails** · Helios Funnel · **[ZE-267](https://kotenai.atlassian.net/browse/ZE-267)**  
+**WIP optimization theory:** [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) — staples **`fast_pass` · `scout` · `thorough`** (`OPT:36`). Class `known_goal` / `open_ended` picks a default staple. Not a pack change. Not CORE.  
 
 **Best practices vs optimization (pipeline) — designed stages + citation IDs:**
 
@@ -23,6 +24,8 @@
 STAGE DAY-ONE   BEST_PRACTICES.md   cite BP:N     spit tests · gold · every new scope
 STAGE TRAFFIC   OPTIMIZATION.md     cite OPT:N    hundreds→10k · Hot Path · rails
 Per-turn soft   hints.*             ZC-WISH-040   never hard law alone
+Staples         OPTIMIZATION_STRATEGIES.md  WIP   fast_pass | scout | thorough
+Class default   same doc                    WIP   known_goal | open_ended (not mode)
 ```
 
 Prompt Helper / stamps: e.g. `guidance.playbook_refs: ["BP:4","BP:5A"]` · `optimization_refs: ["OPT:4","OPT:29"]`.  

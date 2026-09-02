@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="560" viewBox="0 0 1240 560" role="img" aria-labelledby="title desc">
+  <title id="title">Pin verbs: retrieve versus shape, and other surfaces</title>
+  <desc id="desc">Current pin verb_order is 12 names, not 8+7. Retrieve/control opens or bounds a bag. Shape verbs work cheaply on ids. named_query and walk_path are other surfaces until wired into the catalog.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 26px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .sub { font: 500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .h { font: 700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .chip { font: 700 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #0f172a; }
+      .tiny { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .p { font: 600 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+    </style>
+  </defs>
+  <rect class="bg" width="1240" height="560"/>
+  <text class="title" x="620" y="40" text-anchor="middle">Step 2 · verbs are a plan language</text>
+  <text class="sub" x="620" y="66" text-anchor="middle">Pin verb_order is 12. MASQ “find cheap” is per call — ten unbound finds are expensive.</text>
+
+  <rect x="36" y="92" width="760" height="280" rx="16" fill="#ffffff" stroke="#0891b2" stroke-width="2.5"/>
+  <text class="h" x="56" y="126">Retrieve / control</text>
+  <text class="tiny" x="56" y="148">Open or bound a bag · plan vs terminate</text>
+  <g>
+    <rect x="56" y="168" width="100" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7"/><text class="chip" x="106" y="191" text-anchor="middle">describe</text>
+    <rect x="168" y="168" width="80" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7"/><text class="chip" x="208" y="191" text-anchor="middle">get</text>
+    <rect x="260" y="168" width="80" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7"/><text class="chip" x="300" y="191" text-anchor="middle">find</text>
+    <rect x="352" y="168" width="96" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7"/><text class="chip" x="400" y="191" text-anchor="middle">search</text>
+    <rect x="460" y="168" width="110" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7"/><text class="chip" x="515" y="191" text-anchor="middle">traverse</text>
+    <rect x="584" y="168" width="110" height="36" rx="8" fill="#cffafe" stroke="#0e7490"/><text class="chip" x="639" y="191" text-anchor="middle">pipeline</text>
+  </g>
+  <g>
+    <rect x="56" y="220" width="100" height="36" rx="8" fill="#e0f2fe" stroke="#0284c7"/><text class="chip" x="106" y="243" text-anchor="middle">analyze</text>
+    <rect x="168" y="220" width="96" height="36" rx="8" fill="#dcfce7" stroke="#16a34a"/><text class="chip" x="216" y="243" text-anchor="middle">return</text>
+  </g>
+  <text class="tiny" x="56" y="286">find = equality [gsi] · search = language / text_fts · pipeline = one AI round of bound steps</text>
+  <text class="tiny" x="56" y="308">describe only if BRIEF missing · return = terminate (Layer A)</text>
+  <text class="p" x="56" y="344">Cheap find is true per call. Unbound List×N is not cheap.</text>
+
+  <rect x="820" y="92" width="384" height="280" rx="16" fill="#ffffff" stroke="#4f46e5" stroke-width="2.5"/>
+  <text class="h" x="840" y="126">Shape (on ids)</text>
+  <text class="tiny" x="840" y="148">Cheap work after a bag exists</text>
+  <rect x="840" y="168" width="80" height="36" rx="8" fill="#eef2ff" stroke="#4f46e5"/><text class="chip" x="880" y="191" text-anchor="middle">set</text>
+  <rect x="932" y="168" width="80" height="36" rx="8" fill="#eef2ff" stroke="#4f46e5"/><text class="chip" x="972" y="191" text-anchor="middle">order</text>
+  <rect x="1024" y="168" width="80" height="36" rx="8" fill="#eef2ff" stroke="#4f46e5"/><text class="chip" x="1064" y="191" text-anchor="middle">enrich</text>
+  <rect x="840" y="220" width="100" height="36" rx="8" fill="#eef2ff" stroke="#4f46e5"/><text class="chip" x="890" y="243" text-anchor="middle">project</text>
+  <text class="tiny" x="840" y="286">Glue inside a pipeline. Hidden from v1 catalog;</text>
+  <text class="tiny" x="840" y="304">callable on the V2 verb layer.</text>
+  <text class="tiny" x="840" y="336">BP:6 parallel parts → set union in one pipeline.</text>
+
+  <rect x="36" y="396" width="1168" height="132" rx="16" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+  <text class="h" x="56" y="430">Other surfaces · not in the 12 until wired</text>
+  <rect x="56" y="450" width="200" height="36" rx="8" fill="#fff7ed" stroke="#d97706"/><text class="chip" x="156" y="473" text-anchor="middle">named_query HTTP</text>
+  <rect x="272" y="450" width="140" height="36" rx="8" fill="#fff7ed" stroke="#d97706"/><text class="chip" x="342" y="473" text-anchor="middle">walk_path</text>
+  <text class="tiny" x="56" y="510">POST /v1/{bucket}/{scope}/named_queries/{name}/execute — operator/public HTTP. Do not tell the model to “prefer named_query” until it is a catalog tool.</text>
+</svg>

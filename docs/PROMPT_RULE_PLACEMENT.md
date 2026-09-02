@@ -4,7 +4,7 @@
 > **Citation:** use this doc when adding or moving any instruction (CORE, mode overlay, `BP:N`, `OPT:N`, `hints.*`, Client law)  
 > **Consumers:** catalog authors, Prompt Helper, zeus_client, Zeus Hub Workbench
 
-**Related:** [BIBLE.md](BIBLE.md) · [MODE.md](MODE.md) · [BEST_PRACTICES.md](BEST_PRACTICES.md) · [OPTIMIZATION.md](OPTIMIZATION.md) · [HINTS.md](HINTS.md) · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) · [ROADMAP.md](ROADMAP.md) · design-docs [DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) (engine modes)
+**Related:** [BIBLE.md](BIBLE.md) · [MODE.md](MODE.md) · [BEST_PRACTICES.md](BEST_PRACTICES.md) · [OPTIMIZATION.md](OPTIMIZATION.md) · [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) (**WIP** pickable postures) · [HINTS.md](HINTS.md) · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) · [ROADMAP.md](ROADMAP.md) · design-docs [DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) (engine modes)
 
 **Why this exists:** Instruction reliability fails when authors put traffic-only polish in every stamp, or leave contract-critical law only in optional essays. This file is the **stable method** for *where* a rule lives — apply it to **old rules** and **new ones**.
 
@@ -32,6 +32,7 @@ Client / engine                       =  enforce security & success; never "hope
 | **SCHEMA** | Tool / return JSON Schema (required four, wish shape) | pack `verbs[]`, `response_output_schema.json` | **Yes** (verbs) | Every turn |
 | **BP** | Short always/never laws `BP:N` | [BEST_PRACTICES.md](BEST_PRACTICES.md); thin lines may mirror CORE | Prefer **cite** in CORE; full card in BP file | Day-one / Helper; not full book in every pack |
 | **OPT** | Traffic sharpen `OPT:N` | [OPTIMIZATION.md](OPTIMIZATION.md) | Only if stamped into custom | Hot Path / Helper / custom when pattern matches |
+| **STRATEGY** | **WIP** staples `fast_pass` \| `scout` \| `thorough`; class `known_goal` \| `open_ended` as default | [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) · `guidance.optimization` / `hints.optimization` | **No** (hash-excluded) | Must be **rendered** into messages; named_query is not a pin verb |
 | **HINTS** | Soft inject `hints.*` | Client runtime (base-6+) | **No** (hash-excluded) | After hard `rules{}`; size-capped |
 | **CLIENT** | Assemble, redact G2, policy table, messages[], injects, validate | zeus_client / Zeus Hub | N/A | Every turn |
 | **ENGINE** | Tenant wall, hop caps, mode confidence floors | Zeus `internal/modes/` | N/A | Always enforce |
@@ -52,6 +53,8 @@ When you write or review a rule, answer in order:
 | Cross-tenant leak / PII dump / unsafe tool | **ENGINE + CLIENT** (+ MODE language) |
 | Wrong verb class / thrash rediscovery on any scope | **CORE** (+ **BP** short law) |
 | Only hurts after hundreds of chats on one path | **OPT** or **HINTS** or custom stamp |
+| How hard this turn may think | **STRATEGY** staple `fast_pass` \| `scout` \| `thorough` (WIP) — not MODE, not CORE |
+| Sized bag vs in-graph unknown budget | **STRATEGY** `question_class` default — mixed traffic OK; don’t mix **gold books** |
 | Only matters for one mode’s personality | **MODE** overlay |
 | Only matters for one tenant brand | **CLIENT inject** (`company_context`, `rules{}`) — not CORE |
 
@@ -88,7 +91,7 @@ If security-critical, **never** leave it only in BP/OPT.
 
 ```text
 Rule: <one line>
-Placement: CORE | MODE | SCHEMA | BP | OPT | HINTS | CLIENT | ENGINE
+Placement: CORE | MODE | SCHEMA | BP | OPT | STRATEGY | HINTS | CLIENT | ENGINE
 Modes: all | list
 Day-one?: yes | no (traffic-only)
 Hashed?: yes | no | n/a

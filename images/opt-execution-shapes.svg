@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="680" viewBox="0 0 1240 680" role="img" aria-labelledby="title desc">
+  <title id="title">Three execution shapes: terminating pipeline, scout then commit, client multi-round</title>
+  <desc id="desc">A terminating pipeline writes summary before results — a bet, not see-then-refine. Scout pays one look then commits. Client multi-round is a product setting (ai_process_result or user pick). Get-close-then-refine as a funnel shape is not the same as adaptive refine after seeing rows.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 26px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .sub { font: 500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #475569; }
+      .h { font: 700 18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .p { font: 600 13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #334155; }
+      .tiny { font: 600 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .lab { font: 700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .step { font: 700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+    </style>
+    <marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/></marker>
+  </defs>
+  <rect class="bg" width="1240" height="680"/>
+  <text class="title" x="620" y="40" text-anchor="middle">Execution shapes · do not collapse these</text>
+  <text class="sub" x="620" y="66" text-anchor="middle">CORE: a terminating pipeline writes summary + query_decomposition before seeing rows.</text>
+
+  <!-- shape 1 -->
+  <rect x="36" y="92" width="1168" height="160" rx="16" fill="#ffffff" stroke="#0891b2" stroke-width="2"/>
+  <rect x="36" y="92" width="12" height="160" rx="6" fill="#0891b2"/>
+  <text class="h" x="64" y="122">1 · One terminating pipeline</text>
+  <text class="lab" x="1080" y="122" fill="#0e7490">staple · fast_pass or thorough</text>
+  <text class="p" x="64" y="148">Sees intermediate data?  NO — summary is a bet.</text>
+  <rect x="64" y="166" width="110" height="52" rx="8" fill="#e0f2fe" stroke="#0284c7"/>
+  <text class="step" x="119" y="188" text-anchor="middle">plan</text>
+  <text class="tiny" x="119" y="206" text-anchor="middle">all steps</text>
+  <path d="M174 192 L198 192" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="206" y="166" width="130" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text class="step" x="271" y="188" text-anchor="middle">search</text>
+  <text class="tiny" x="271" y="206" text-anchor="middle">as: place</text>
+  <path d="M336 192 L360 192" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="368" y="166" width="130" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text class="step" x="433" y="188" text-anchor="middle">search</text>
+  <text class="tiny" x="433" y="206" text-anchor="middle">narrow_to @place</text>
+  <path d="M498 192 L522 192" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="530" y="166" width="130" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text class="step" x="595" y="188" text-anchor="middle">project</text>
+  <text class="tiny" x="595" y="206" text-anchor="middle">compact / rich</text>
+  <path d="M660 192 L684 192" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="692" y="166" width="150" height="52" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text class="step" x="767" y="188" text-anchor="middle" fill="#166534">ORDER</text>
+  <text class="tiny" x="767" y="206" text-anchor="middle">+ pre-written summary</text>
+  <text class="tiny" x="64" y="236">Travel efficient form. One AI round. You do not peek at the 400 ids before authoring step 2.</text>
+
+  <!-- shape 2 -->
+  <rect x="36" y="272" width="1168" height="160" rx="16" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+  <rect x="36" y="272" width="12" height="160" rx="6" fill="#d97706"/>
+  <text class="h" x="64" y="302">2 · Scout, then commit</text>
+  <text class="lab" x="1080" y="302" fill="#9a3412">staple · scout → fast_pass | thorough</text>
+  <text class="p" x="64" y="328">Sees intermediate data?  YES, once.</text>
+  <rect x="64" y="346" width="150" height="52" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+  <text class="step" x="139" y="368" text-anchor="middle">probe</text>
+  <text class="tiny" x="139" y="386" text-anchor="middle">limit 1–3 / search 5</text>
+  <path d="M214 372 L238 372" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="246" y="346" width="150" height="52" rx="8" fill="#fef3c7" stroke="#d97706"/>
+  <text class="step" x="321" y="368" text-anchor="middle">see values</text>
+  <text class="tiny" x="321" y="386" text-anchor="middle">not ORDER</text>
+  <path d="M396 372 L420 372" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="428" y="346" width="200" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text class="step" x="528" y="368" text-anchor="middle">terminating pipeline</text>
+  <text class="tiny" x="528" y="386" text-anchor="middle">uses observed @ids / tokens</text>
+  <path d="M628 372 L652 372" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="660" y="346" width="150" height="52" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text class="step" x="735" y="368" text-anchor="middle" fill="#166534">ORDER</text>
+  <text class="tiny" x="735" y="386" text-anchor="middle">second AI round</text>
+  <text class="tiny" x="64" y="416">This is adaptive refine. It costs an AI round. CORE still says: do not repeat the commit pipeline.</text>
+
+  <!-- shape 3 -->
+  <rect x="36" y="452" width="1168" height="160" rx="16" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+  <rect x="36" y="452" width="12" height="160" rx="6" fill="#64748b"/>
+  <text class="h" x="64" y="482">3 · Client multi-round</text>
+  <text class="lab" x="1000" y="482" fill="#475569">product setting · not a staple</text>
+  <text class="p" x="64" y="508">Sees intermediate data?  YES, by product choice.</text>
+  <rect x="64" y="526" width="170" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text class="step" x="149" y="548" text-anchor="middle">Zeus rows in UI</text>
+  <text class="tiny" x="149" y="566" text-anchor="middle">ai_process_result: false</text>
+  <path d="M234 552 L258 552" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="266" y="526" width="200" height="52" rx="8" fill="#e0e7ff" stroke="#4f46e5"/>
+  <text class="step" x="366" y="548" text-anchor="middle">optional essay turn</text>
+  <text class="tiny" x="366" y="566" text-anchor="middle">ai_process_result: true</text>
+  <path d="M466 552 L490 552" stroke="#64748b" stroke-width="2" marker-end="url(#ar)"/>
+  <rect x="498" y="526" width="200" height="52" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text class="step" x="598" y="548" text-anchor="middle">or user pick / clarify</text>
+  <text class="tiny" x="598" y="566" text-anchor="middle">then another staple</text>
+  <text class="tiny" x="64" y="596">A cheap table can be ORDER. Don’t call that a failed optimization when SLA asked for rows, not an essay.</text>
+</svg>

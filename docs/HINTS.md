@@ -50,6 +50,7 @@ If a hint is true **every** turn for **every** tenant forever → promote to COR
 | **P2** | **A/B** | `hints.ab_arm`, `hints.ab_paste` | Experiments without thrashing `contract_hash` |
 | **P2** | **Terminate soft** | `hints.terminate.soft_require`, `summary_style` | Extra G2/G3 nudge; required four stay catalog |
 | **P2** | **Budget / channel** | `hints.budget.max_steps`, `search_timeout_ms`, `channel` | Voice / low-latency SKUs |
+| **P2** | **Optimization (WIP)** | `hints.optimization.strategy` = `fast_pass` \| `scout` \| `thorough`; optional `question_class` | Staples are the theory. Class is a **default**, not a second product. [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) |
 | **P3** | **Product / motion** | `hints.product.motion`, `default_limit` | Explore/compare/refine product chrome |
 | **P3** | **Recovery** | `hints.recovery.last_error`, `try_next` | Session-only after tool fail |
 | **P3** | **Playbook chip** | `hints.playbook_id` + params | Workbench chip → named recipe |
@@ -86,6 +87,9 @@ hints:
     prefer_one_pipeline: true
     max_steps: 5
     search_timeout_ms: 5000
+  optimization:   # WIP — see OPTIMIZATION_STRATEGIES.md; not live until Client injects
+    strategy: fast_pass | scout | thorough    # staples
+    question_class: known_goal | open_ended   # default; turn may mix on one overlay
   product:
     motion: explore | compare | refine
     channel: web | voice
@@ -104,6 +108,8 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 | Company manifesto | `company_context` (word caps) |
 | Always-on Helios JTBD/sentiment | Off-path / optional_when |
 | “Long paragraph ⇒ mode=open” | [BEST_PRACTICES § multi-intent](BEST_PRACTICES.md) + `hints.multipart` |
+| “Explore because inject is thin ⇒ mode=open” | Staple **`scout`**, then `fast_pass` or `thorough` |
+| “Why Rome fell” on hotel inventory | Out of corpus → wish/clarify, not thorough; in-graph “why Tulum in April” is open_ended on that overlay |
 
 ### Multi-intent vs **open** mode (normative)
 

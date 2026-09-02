@@ -9,6 +9,10 @@
 **Audience:** catalog authors, Hub Workbench / Prompt Helper, zeus_client, operators  
 **Related:** [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:0` Pachinko, `OPT:6`, `OPT:18`) · [BEST_PRACTICES.md](BEST_PRACTICES.md) · [HINTS.md](HINTS.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [MODE.md](MODE.md) · travel funnel (external) `USE_CASE_TRAVEL_BOOKING_STEP_BY_STEP_v2.md`
 
+**TL;DR:** Optimize the *path* from a question to ORDER (the answer this SLA is allowed to cost) by shrinking one evidence bag with `fast_pass`, `scout`, or `thorough` — not by running more agents over more rows.
+
+**Why / what are you optimizing?** Live chats often “answer” by brute-force `List` hops: each entity type is a new global bag, Sessions look busy, and the user still does not have a usable result. Hot-path was meant to find *common styles* of that waste and freeze a better plan. The thing to optimize is **catalog work under an SLA** — how much of the graph you must touch, in how many AI rounds, to be allowed to stop — not wall-clock of a dump, not hop-count as a score, and not a PREPARED statement for a causal essay. A known-goal ask (travel funnel: collect binds / a sized bag) and an in-graph open-ended ask (unknown evidence size) need different *default* staples on the same theory; out-of-corpus “why Rome fell” on a hotel overlay is a gap, not a bigger search.
+
 ### Talking-point diagrams (WIP)
 
 Companion to the existing Pachinko board: [../images/zeus-pachinko-shaping.svg](../images/zeus-pachinko-shaping.svg)

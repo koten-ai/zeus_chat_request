@@ -32,7 +32,7 @@ Client / engine                       =  enforce security & success; never "hope
 | **SCHEMA** | Tool / return JSON Schema (required four, wish shape) | pack `verbs[]`, `response_output_schema.json` | **Yes** (verbs) | Every turn |
 | **BP** | Short always/never laws `BP:N` | [BEST_PRACTICES.md](BEST_PRACTICES.md); thin lines may mirror CORE | Prefer **cite** in CORE; full card in BP file | Day-one / Helper; not full book in every pack |
 | **OPT** | Traffic sharpen `OPT:N` | [OPTIMIZATION.md](OPTIMIZATION.md) | Only if stamped into custom | Hot Path / Helper / custom when pattern matches |
-| **STRATEGY** | **WIP** `question_class` `known_goal` \| `open_ended` (per scope) + think-budget `thorough` \| `fast_pass` \| `scout` | [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) · `guidance.optimization` / `hints.optimization` | **No** (hash-excluded) | Class on the scope; strategy operator/client pick; must be **rendered** into messages |
+| **STRATEGY** | **WIP** staples `fast_pass` \| `scout` \| `thorough`; class `known_goal` \| `open_ended` as default | [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) · `guidance.optimization` / `hints.optimization` | **No** (hash-excluded) | Must be **rendered** into messages; named_query is not a pin verb |
 | **HINTS** | Soft inject `hints.*` | Client runtime (base-6+) | **No** (hash-excluded) | After hard `rules{}`; size-capped |
 | **CLIENT** | Assemble, redact G2, policy table, messages[], injects, validate | zeus_client / Zeus Hub | N/A | Every turn |
 | **ENGINE** | Tenant wall, hop caps, mode confidence floors | Zeus `internal/modes/` | N/A | Always enforce |
@@ -53,8 +53,8 @@ When you write or review a rule, answer in order:
 | Cross-tenant leak / PII dump / unsafe tool | **ENGINE + CLIENT** (+ MODE language) |
 | Wrong verb class / thrash rediscovery on any scope | **CORE** (+ **BP** short law) |
 | Only hurts after hundreds of chats on one path | **OPT** or **HINTS** or custom stamp |
-| How hard this turn may think (detail vs speed vs probe) | **STRATEGY** (WIP) — not MODE, not CORE |
-| Known-goal rail binds vs unknown-size “why” | **STRATEGY** `question_class` — **different `bucket.scope`**, not one catalog |
+| How hard this turn may think | **STRATEGY** staple `fast_pass` \| `scout` \| `thorough` (WIP) — not MODE, not CORE |
+| Sized bag vs in-graph unknown budget | **STRATEGY** `question_class` default — mixed traffic OK; don’t mix **gold books** |
 | Only matters for one mode’s personality | **MODE** overlay |
 | Only matters for one tenant brand | **CLIENT inject** (`company_context`, `rules{}`) — not CORE |
 

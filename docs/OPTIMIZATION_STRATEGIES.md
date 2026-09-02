@@ -1,226 +1,227 @@
-# Optimization methods and pickable strategies
+# Optimization theory — staples `fast_pass` · `scout` · `thorough`
 
 > **Doc status** · **WORK IN PROGRESS** · drafted **2026-09-01** · updated **2026-09-02** · **not** a BASE pack change · **not** hashed CORE · production pin **base-1** · candidate line **base-6.2** · version matrix: [COMPAT.md](../COMPAT.md)
 >
-> Do **not** stamp this into L0 `messages[]`. Do **not** flip `CURRENT.json`. Do **not** treat these enums as wire law until an assembler renders them and a book A/B proves them.
+> Do **not** stamp this into L0 `messages[]`. Do **not** flip `CURRENT.json`. Cards must be **rendered** into `messages` / Workbench suffix or the model never sees them (`guidance` is stripped on the wire).
 >
-> **Citation (reserved):** `OPT:36` — problem class + pickable execution posture. Full card lives here until this graduates into [OPTIMIZATION.md](OPTIMIZATION.md).
+> **Citation (reserved):** `OPT:36` — optimization theory + staples. Verbose card lives here until a short form graduates into [OPTIMIZATION.md](OPTIMIZATION.md).
 
-**Audience:** catalog authors, Hub Workbench / Prompt Helper, zeus_client, operators choosing a `bucket.scope`  
-**Related:** [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:0` Pachinko, `OPT:6` fast-pass vs multi-turn, `OPT:18` mode ≠ strategy) · [BEST_PRACTICES.md](BEST_PRACTICES.md) (`BP:1`–`BP:6`) · [HINTS.md](HINTS.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [MODE.md](MODE.md) · travel funnel (external) `USE_CASE_TRAVEL_BOOKING_STEP_BY_STEP_v2.md`
-
----
-
-## 0. What optimization is (and is not)
-
-Optimization here is **not “go faster.”** It is:
-
-```text
-Reach ORDER — the answer this question is allowed to cost —
-by touching as little of the graph as possible,
-in as few AI rounds as possible.
-```
-
-| Looks like a win | Usually is not |
-| --- | --- |
-| Same ORDER, fewer **AI rounds** | More sub-agents / more parallel Lists |
-| Same ORDER, fewer **unbound** retrievals | Fewer tools that terminate empty |
-| Same ORDER, work on Zeus (pipeline / rail) | Shallow 200 that forces another chat to do the real work |
-| Hot-path rail for a **repeated known-goal** style | Teaching CORE a Mexico if-then, or a named_query for “why Rome fell” |
-
-More processes over more rows is usually **anti-optimization**. A cheap blurry answer that still needs further processing is also anti-optimization unless the **SLA says** progressive disclosure.
-
-**Hot-path** (original thought) is still valid as the *fleet* job: find common **styles** of question that miss SLA and freeze a plan. It does not invent a new meaning of optimize. It **remembers** a plan that already fit.
-
-Two clocks:
-
-| Clock | Job |
-| --- | --- |
-| **Per turn** | Intent (step 1) → verb plan (step 2) under a data budget |
-| **Across traffic** | Cluster by style; if that style misses SLA, freeze the plan (rail or recipe) |
-
-Before picking `thorough` / `fast_pass` / `scout`, name the **problem class**. There are two, and they want **different** optimization methods.
+**Audience:** catalog authors, Hub Workbench / Prompt Helper, zeus_client, operators  
+**Related:** [OPTIMIZATION.md](OPTIMIZATION.md) (`OPT:0` Pachinko, `OPT:6`, `OPT:18`) · [BEST_PRACTICES.md](BEST_PRACTICES.md) · [HINTS.md](HINTS.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) · [MODE.md](MODE.md) · travel funnel (external) `USE_CASE_TRAVEL_BOOKING_STEP_BY_STEP_v2.md`
 
 ---
 
-## 1. Two problem classes (frame this first)
-
-These are not two temperatures of the same knob. They are **different products**.
-
-### `known_goal` — size is designable; ORDER is a bind list
-
-Canonical: travel booking step-by-step v2.
-
-> *Vacation beach spot in Mexico that is fun in April, not more than $300 a night.*
-
-The **goal is known**: collect the **correct inputs** for a prepared statement / `named_query` (ids, dates, guests, `max_nightly_usd`, …), then project a compact bag. You can **design** how much data to process (400 → 120 → 40 → 12 → 5). “Get close, then refine” means **narrow the same id bag** (`narrow_to` / `@step.ids`), then the hard rail.
+## 0. One-sentence theory
 
 ```text
-fuzzy phrase   → search (hybrid)
-exact fact     → find (equality)
-connected      → traverse / walk_path
-hard filter    → named_query PREPARED   ← the actual ORDER machine
-shape          → project
+Optimization = reach ORDER (the answer this turn is allowed to cost)
+               by shrinking the right evidence set,
+               using one of three staples: fast_pass | scout | thorough.
 ```
 
-Success = the rail returns bookable (or otherwise SLA-complete) rows.  
-Failure = List-per-entity fan-out, or `find` faking `nightly_usd <= 300`.
+Not: more sub-agents, more rows, more Lists, or a faster empty 200.  
+Not: hop-count as the reward.  
+Not: “always named_query” on day one (that tool is **not** in the current chat_request verb list).
 
-Hot-path here **shines**: repeated “place + vibe + date + budget” → freeze the shrink-plan into a pipeline template or SQL rail.
+The staples are the **theory**. Problem class, SLA, and complexity only **pick which staple** and how hard it may spend.
 
-### `open_ended` — unknown size; ORDER is a grounded explanation
+```text
+fast_pass   one planned trip to Zeus; summary is a bet
+scout       pay one look at live values, then commit
+thorough    same bound plan, richer evidence / hydrate; still not more Lists
+```
 
-Canonical: *“Why did the Roman empire fall?”*
+---
 
-You do **not** know how much graph, text, or hops are enough. There is no honest PREPARED statement whose binds are “the fall of Rome.” Success is a **grounded narrative** (or structured synthesis) with evidence, confidence, and `wish_i_knew` — not five hotel rows.
+## 1. What ORDER is
 
-Optimization is **budgeted evidence gathering**:
+| Product default | ORDER |
+| --- | --- |
+| Cheap Client (`ai_process_result: false`) | Zeus **rows/ids** in UI — a table can *be* the answer |
+| Essay / insight turn (`ai_process_result: true`) | Grounded **summary** from those rows |
+| Funnel bottom (later) | Compact bag **or** governed action (book / dispatch) |
 
-- Bound first recall (do not ingest the whole corpus).
-- Follow the strongest evidence links, not every entity type.
-- Stop when SLA / confidence says stop, or admit gaps.
-- Refine = *another bounded pass on the same evidence set*, not a new global List.
+A shallow table that the **SLA asked for** is a win. A shallow table that still needs another chat to become the real answer is a miss — unless SLA says progressive disclosure.
 
-A named_query rail is the **wrong** end-state for most of this class. Hot-path here might remember a **recipe** (search primary sources → hop citations → project snippets), not a hotel availability PREPARED.
+---
 
-### Do not mix them on one endpoint / `bucket.scope`
+## 2. The three staples (optimization theory)
 
-| | `known_goal` | `open_ended` |
+These are closed names. Do not invent a fourth until a staple is proven insufficient.
+
+### `fast_pass` — one planned call
+
+**Law:** exactly **one** AI round. Emit **one terminating `pipeline`** (or one rail **when that tool exists**). Write Layer A **before** results (CORE tradeoff). Bind `@step.ids` / `narrow_to`. Compact `project`.
+
+**Use when:** the plan is already known — tokens, entity types, and funnel steps can be authored without peeking.
+
+**Forbidden:** empty terminate “to look fast”; N unbound Lists; a second pipeline “just to see.”
+
+**Today on the pin:** “logic on Zeus” = **pipeline + transforms** (`set` / `order` / `enrich` / `project`).  
+**Later:** graduate a hot fingerprint to a **callable** `named_query` (HTTP `POST /v1/.../named_queries/{name}/execute` exists; it is **not** a catalog verb until Client/Hub wires it). Do not make `fast_pass` mean “call named_query” until that wire exists.
+
+### `scout` — one look, then commit
+
+**Law:** at most **one probe round**, then **one** commit pipeline. Probe is not ORDER.
+
+Probe **may:** `find` `limit:1`–`3` or `return:selectivity` on a MINI-SCHEMA path; tiny `search`; `describe` only if BRIEF/MINI-SCHEMA is missing.  
+Probe **must not:** `get_stats` / `list_entity_types` / recount `nodes_total` (CORE); chain `List hotel`, `List airport`, `List landmark`.
+
+**Use when:** inject names **types**, not **live values** (which city tokens, which FTS phrase hits, which ids exist).
+
+**This is the only staple that sees intermediate data** before the terminating plan. CORE “don’t repeat the pipeline” still applies after commit.
+
+### `thorough` — bound plan, richer ORDER
+
+**Law:** still **one** (maybe two if hydrate) AI round. Still **one** bound pipeline, cap 8, `@step.ids`. Richer `project` / optional `get` `include:["body"]`. Coverage > wall time.
+
+**Use when:** SLA wants attributes, snippets, parts[] coverage — not a faster List dump.
+
+**Forbidden:** longer = more independent Lists. Thorough without bind ratio is the Sessions anti-pattern with extra latency.
+
+### How they compose
+
+```text
+unknown live values?     scout → then fast_pass or thorough
+plan already writable?   fast_pass
+SLA wants a rich bag?    thorough  (or scout → thorough)
+tight SLA + known plan?  fast_pass
+```
+
+Never: scout that never commits. Never: thorough as “try every entity type.” Never: fast_pass as empty-fast when the plan is not known (use scout).
+
+---
+
+## 3. Two clocks (do not mix)
+
+| Clock | Job | Staple role |
 | --- | --- | --- |
-| Typical scope | travel inventory, catalog, booking, BI facts | research KB, papers, investigations, “why / how come” |
-| Typical mode bias | `analytics` / `custom` + rails | `research` / `open` (join/noise), still not “mode=open because paragraph” |
-| Default think-budget | `fast_pass` (or `scout` then rail) | `thorough` (or `scout` then thorough) |
-| ORDER | Compact bag / binds for PREPARED | Grounded explanation + refs |
-| Hot-path output | `named_query` / frozen pipeline | Recipe + maybe partial rails (seed resolve only) |
-| Gold book | Multi-axis funnel questions | Causal / synthesis / coverage questions |
+| **Per turn** | Intent (QD) → pick a staple → verb plan | Model + catalog card |
+| **Across traffic (hot-path)** | Repeated **styles** that miss SLA → freeze the winning staple’s plan | Operator: pipeline template, then rail |
 
-A travel `bucket.scope` should not be asked why Rome fell. A history KB should not be asked to fill `hotels_under_price_with_availability_v3`. **Tune Zeus/Koten per class, per scope.** One catalog, one book, one rail set, one default strategy — not a mushy endpoint that “does both.”
+Hot-path does not invent a fourth meaning of optimize. It **remembers** a staple that already fit.
 
-If a company needs both, that is **two scopes** (or two products), two stamped `chat_request`s, two Helios funnels.
-
-```text
-question_class   = known_goal | open_ended     ← pick per bucket.scope (almost never per turn)
-strategy         = thorough | fast_pass | scout  ← think-budget inside that class
-mode             = analytics | research | …      ← join/noise/hop appetite
-playbook BP:*    = verb class (always-on floor)
-```
+**Honest pin:** pathshape Phase 1 scores `hops > 1` / KindPipeline as **S2 waste**, and `fail_rate` is `nil`. That **punishes** a good `fast_pass` funnel. Until the scorer uses **unbound retrievals** and **AI rounds** (not step count), hot-path cannot implement “optimize slow common styles.” Fix the scorer before trusting backlog → named_query.
 
 ---
 
-## 2. Guiding weights: SLA × complexity
+## 4. Problem class (picks a **default staple**, not a different theory)
 
-| Weight | What it is | What it is not |
+Two classes. Same three staples. Different ORDER tests and default staple.
+
+### `known_goal` — sized bag (travel step-by-step v2)
+
+Goal can be designed: shrink an id bag until SLA is met. Canonical: *beach / Mexico / fun / April / ≤ $300*.
+
+```text
+fuzzy phrase  → search
+exact fact    → find (equality only)
+connected     → traverse
+hard filter   → rail **when wired** (not find.where ranges)
+shape         → project
+```
+
+**Default staple:** `fast_pass` once the funnel is writable; `scout` if binds/tokens are unknown.  
+**Success:** compact rows (and later, binds for a PREPARED).  
+**Not every known-goal is a named_query.** Lookups and “top N hotels in Paris” are `find`/`search`→`project`. Rails are how a **hot** fingerprint **graduates**.
+
+The travel **narrative** is six HTTP looks (model sees each bag). The travel **efficient** form is **one planned pipeline** (`fast_pass` / `thorough`) **or** `scout` + pipeline. Do not document those as the same thing.
+
+### `open_ended` — unknown evidence size, **in this graph**
+
+Canonical *in-graph:* *“Why is Tulum busy in April?”* with season/review evidence on the overlay.  
+Not canonical: *“Why did the Roman empire fall?”* on `travel-sample.inventory` — **out of corpus**. That is `wish_i_knew` / clarify, not `thorough`.
+
+**Default staple:** `thorough` (or `scout` → `thorough`).  
+**Success:** grounded synthesis **from this scope’s data**, refs, confidence, gaps.  
+**`fast_pass` is usually wrong** (empty/shallow). A PREPARED whose binds are “the whole why” is usually wrong. Partial seed rails are OK later.
+
+### Class is a **scope default + optional turn label**
+
+Do **not** treat “one class per `bucket.scope` forever” as a physical law. Real inventory chat mixes “book me X” and “why is X popular.” Split **stamps / rails / books** when that mix is chronic. Don’t A/B Rome-essays against hotel funnels on one gold book.
+
+Open-ended on Zeus = **unbounded evidence budget on this overlay**, not a general encyclopedia.
+
+---
+
+## 5. Weights that pick a staple: SLA × complexity
+
+Neither is a first-class engine input today. Treat them as **operator / profile inputs** (Workbench, Client hints, promotion profile).
+
+| Weight | Meaning | Not |
 | --- | --- | --- |
-| **SLA** | How complete / fresh / timely ORDER must be for **this surface** | p95 of a List dump |
-| **Complexity** | How much data you must **process** to be allowed to stop | Word count, or “use more agents” |
+| **SLA** | How complete / fresh / timely ORDER must be | p95 of a List dump |
+| **Complexity** | How much **catalog work** you must do to be allowed to stop | Word count; “more agents” |
 
-Complexity is **catalog work**, not LLM difficulty:
-
-| Cheap | Expensive |
-| --- | --- |
-| One entity, one equality | Several axes in one paragraph |
-| Candidate set already small | First recall is 400 of 480k |
-| Inject already names the tokens | Live values unknown (`scout`) |
-| Answer is a count from BRIEF | Live price / availability **or** an unbounded “why” |
+Complexity is more than row count: join fan-out, FTS quality, freshness, RBAC, empty index, unknown tokens.
 
 ```text
-data_budget ≈ f(question_class, SLA, complexity)
+data_budget ≈ f(class default, SLA, complexity)  →  staple
 
-known_goal  + tight SLA  + known tokens     → fast_pass (rail)
-known_goal  + unknown tokens                → scout once, then rail / short pipeline
-open_ended  + loose SLA                     → thorough, stop on confidence
-open_ended  + thin map                      → scout once, then thorough
-open_ended  + tight SLA                     → bound evidence + clarify / wish — do not fake a rail
+known_goal  + plan writable + tight SLA     → fast_pass
+known_goal  + unknown tokens                → scout → fast_pass | thorough
+open_ended  + in-graph + loose SLA          → thorough
+open_ended  + thin map                      → scout → thorough
+open_ended  + out of corpus                 → wish / clarify (not a staple spend)
+open_ended  + tight SLA                     → bound thorough + wish — do not fake a rail
 ```
-
-The travel funnel is **high complexity, known goal**. “Why Rome fell” is **unknown size, open-ended**. Same three think-budgets, **different** success tests.
 
 ---
 
-## 3. Per turn: intent then verbs
+## 6. Per turn: intent, then verbs (retrieve vs shape)
 
-**Step 1 — intent (already captured).**  
-`query_decomposition`: intent, entity, parts, geo, price, … That says **what ORDER is**.
+**Step 1 — intent.** `query_decomposition` is the right field. It is **not** “done”: live QD is often `List` + one entity. Weak QD makes every staple look like brute force. Gold books need **expected_route** and expected QD, not only suffix prose.
 
-**Step 2 — compile a plan.**  
-Given class + SLA + data-budget, which of the V2 verbs (and rails) **buy** that ORDER?
+**Step 2 — compile under the chosen staple.**
 
-Treat the catalog as two layers (about **8 retrieve/control** + **the rest shape/rail**):
+Pin `verb_order` is **12** (not “8+7”):  
+`find`, `get`, `pipeline`, `describe`, `set`, `order`, `enrich`, `project`, `traverse`, `search`, `analyze`, `return`.
+
+Useful split:
 
 | Layer | Job | Examples |
 | --- | --- | --- |
-| **Retrieve / control** | Open or bound a bag; plan vs terminate | `describe`, `get`, `find`, `search`, `traverse`, `pipeline`, `analyze`, `return` |
-| **Shape / rail** | Cheap work **on ids**, or skip planning | `set`, `order`, `enrich`, `project`, `named_query`, `walk_path`, … |
+| **Retrieve / control** | Open or bound a bag; terminate | `describe`, `get`, `find`, `search`, `traverse`, `pipeline`, `analyze`, `return` |
+| **Shape** | Cheap work **on ids** | `set`, `order`, `enrich`, `project` |
+| **Other surfaces** | Not in the 12 until wired | `named_query` HTTP, `walk_path`, … |
 
-MASQ “find is cheap” is true **per call**. Ten unbound finds are expensive. One `pipeline` that shrinks an id bag is **one AI round**.
+MASQ “find cheap, search expensive” is **per call**. Ten unbound finds are expensive. One `pipeline` that shrinks a bag is one AI round.
+
+Independent **parts in one pipeline** (`set` union, BP:6) can be the right spend. Ban **unbound rediscovery**, not all parallelism.
 
 Compiler:
 
-1. Decompose (step 1).
-2. **Size the bag** (known_goal: 400→120→12→5; open_ended: hard cap on first recall).
-3. Pick retrieve vs shape — language → `search`; equality → `find`; hop → `traverse`; rank/shape → `order`/`project`; live $ / dates → **rail**.
-4. **Bind** every step after the first to the previous ids / evidence set.
-5. **Stop** when ORDER satisfies SLA, or `wish_i_knew`.
-
-If the fingerprint is already a hot path **and** the class is `known_goal`, skip 2–4 and call the rail.
-
----
-
-## 4. Think-budget strategies (`thorough` / `fast_pass` / `scout`)
-
-These are **how hard this turn may think** *inside* a class. They are not domain policy (`mode`) and not a substitute for `question_class`.
-
-| Strategy | Operator intent |
-| --- | --- |
-| **`thorough`** | Coverage > wall time. Detailed, grounded bag or explanation. |
-| **`fast_pass`** | One AI round. Prefer Zeus (`named_query` / frozen template). Natural **default for `known_goal`**. |
-| **`scout`** | MINI-SCHEMA names types; it does not name live values. One probe, then commit. |
-
-`fast_pass` on `open_ended` is usually **wrong** (empty or shallow terminate).  
-`named_query` as the default first tool on `open_ended` is usually **wrong**.  
-`scout` that never commits is the Sessions `List · hotel` anti-pattern — on **both** classes.
-
-```text
-mode            = domain posture (analytics / open / fraud / …)
-question_class  = known_goal | open_ended          ← per scope
-strategy        = think budget this turn (WIP pick)
-playbook BP:*   = verb class + recipes
-hints.*         = per-turn soft bias
-named_query     = server rail when class is known_goal and fingerprint is hot
-```
-
-### What each strategy changes
-
-| | **thorough** | **fast_pass** | **scout** |
-| --- | --- | --- | --- |
-| Goal | Rich, grounded ORDER | 1–2 hops; Zeus does the work | Learn **value space**, then one pipeline |
-| AI rounds | 1, maybe 2 if hydrate | **1** | **1 probe + 1 commit** (hard cap) |
-| Pipeline steps | Up to 8, bound `@step.ids` | Short; prefer named_query / frozen template | Probe is **not** the answer |
-| Project | Richer fields; optional `get` body | Compact fields | Probe: 1–3 rows / `return:count`; then compact |
-| First move if inject is thin | Still a pipeline; larger candidate limits | Rail or fail-closed `wish_i_knew` | Budgeted sample / `find limit:1` / `describe` **values**, not stats |
-| Failure mode to forbid | N independent `List`s | Empty terminate that “looks fast” | Probe that never commits |
-| Fits `known_goal` | When SLA wants a rich bag after the rail | **Default** once binds are known | When tokens/ids for the rail are unknown |
-| Fits `open_ended` | **Default** | Rare (tight SLA + already-bound evidence) | When the map does not say what to read first |
-
-CORE already says BRIEF is enough for **counts and type names**. Scout is **option discovery**, not recounting `nodes_total`.
+1. Decompose (and don’t trust a bare `List`).
+2. Pick staple (`fast_pass` / `scout` / `thorough`).
+3. Size the bag (known_goal: e.g. 400→120→12→5; open_ended: hard cap first recall).
+4. Retrieve vs shape; hard $ / dates → rail **when it exists**.
+5. Bind after the first step.
+6. Stop when ORDER meets SLA, or `wish_i_knew`.
 
 ---
 
-## 5. Catalog placement (hash boundary)
+## 7. Three execution shapes (do not collapse)
 
-Keep class + strategy **out of the contract hash** so operators can A/B without republishing CORE.
+CORE: a **terminating** pipeline writes `summary` + `query_decomposition` **before** seeing rows.
+
+| Shape | Staple | Sees intermediate data? |
+| --- | --- | --- |
+| One terminating pipeline | `fast_pass` or `thorough` | **No** — summary is a bet |
+| Probe + terminating pipeline | `scout` then `fast_pass` / `thorough` | **Yes**, once |
+| Client multi-round | Product (`ai_process_result`, user pick) | Yes, by setting |
+
+“Get close then refine” is the **funnel shape** (narrow the same ids). Adaptive refine (author step 2 after seeing step 1) **is scout or multi-round**, and costs an AI round. Selling 1-round speed and evidence-adaptive refine as one strategy is false.
+
+---
+
+## 8. Catalog placement (hash boundary)
 
 ```text
-L0 hashed     messages + verbs + masq          ← playbook floor (unchanged)
-L1 excluded   guidance.optimization            ← question_class + strategy (WIP)
-L2 external   named_query rails                ← known_goal fast_pass
-wire          assembler copies L1 into messages[0]
-              (or Workbench system_prompt_suffix)
+L0 hashed     messages + verbs + masq
+L1 excluded   guidance.optimization   ← class default + staple (must be rendered)
+L2 external   named_query docs        ← graduate known_goal hot paths (HTTP today)
+wire          assembler → messages[0]  or Workbench system_prompt_suffix
 ```
-
-**Runtime fact:** the chat path keeps `messages` + tools and **strips** `guidance` before the provider. JSON-only `guidance.optimization` that is never rendered does nothing. Until an assembler exists, Workbench draft **suffix** / Client `hints.optimization` must carry the prose card.
-
-Suggested closed enums (not free text):
 
 ```json
 "guidance": {
@@ -230,7 +231,7 @@ Suggested closed enums (not free text):
     "max_ai_rounds": 1,
     "max_pipeline_steps": 4,
     "probe_budget": 0,
-    "prefer_named_query": true,
+    "prefer_named_query": false,
     "project": "compact",
     "hydrate": "summary",
     "on_empty": "wish_or_rail"
@@ -241,24 +242,11 @@ Suggested closed enums (not free text):
 }
 ```
 
-`known_goal` + `thorough` (rich bag after a funnel):
+`prefer_named_query: true` only when the model **has** that tool. Default **false** on current pin.
+
+Other staple defaults:
 
 ```json
-"question_class": "known_goal",
-"strategy": "thorough",
-"max_ai_rounds": 2,
-"max_pipeline_steps": 8,
-"probe_budget": 0,
-"prefer_named_query": true,
-"project": "rich",
-"hydrate": "body_if_needed",
-"on_empty": "adjust_once_then_wish"
-```
-
-`open_ended` + `thorough`:
-
-```json
-"question_class": "open_ended",
 "strategy": "thorough",
 "max_ai_rounds": 2,
 "max_pipeline_steps": 8,
@@ -267,11 +255,7 @@ Suggested closed enums (not free text):
 "project": "rich",
 "hydrate": "body_if_needed",
 "on_empty": "adjust_once_then_wish"
-```
 
-`scout` (either class; probe then commit):
-
-```json
 "strategy": "scout",
 "max_ai_rounds": 2,
 "max_pipeline_steps": 8,
@@ -282,152 +266,153 @@ Suggested closed enums (not free text):
 "on_empty": "probe_then_pipeline"
 ```
 
-### When to pick
-
-| When | Mechanism (target) |
+| When | Mechanism |
 | --- | --- |
-| **Scope / endpoint** | Set `question_class` once for that `bucket.scope`. Do not A/B Rome vs hotels on the same catalog. |
-| Default think-budget | Stamp customs (`…:c-M_fast` / `_thorough` / `_scout`) **or** one stamp + `strategy` |
-| Per session | Client `hints.optimization` (same keys) — extends [ZC-WISH-040](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md) |
-| Lab | Workbench-2 draft suffix / A/B pane B — **within one class** |
-
-A/B compares **strategy cards on the same class**, not “fast hotel rail vs why-Rome essay.”
+| Scope default class | Operator sets `question_class` on the catalog; turn may override |
+| Default staple | Stamp `…:c-M_fast` / `_scout` / `_thorough` or one stamp + `strategy` |
+| Per session | `hints.optimization.strategy` (extends ZC-WISH-040; not live until Client injects) |
+| Lab | Workbench-2 suffix / A/B **within one book class** |
 
 ---
 
-## 6. Prose cards (insert into `messages` / suffix)
+## 9. Prose cards (suffix / messages)
 
-Helper can paste these as `guidance_markdown` today. Prefix with the class. Later the assembler fills them from `guidance.optimization`.
-
-### Class banners
+Prefix with class default, then **exactly one** staple card.
 
 ```text
 ## Question class: known_goal
-The user wants a compact answer bag (ids/rows) whose fields can bind a named_query or frozen pipeline.
-Shrink one id bag. Hard filters (price, dates, availability) are rails, not find.where ranges.
-Stop when the rail/project satisfies SLA.
+ORDER is a sized bag (ids/rows) for this overlay. Shrink one id bag.
+Hard filters (price, dates) are rails when wired — never find.where ranges.
+Default staple: fast_pass when the funnel is writable; else scout then commit.
 
 ## Question class: open_ended
-The user wants a grounded explanation. Evidence size is unknown. There is no PREPARED whose binds are the whole question.
-Bound first recall. Follow evidence; do not List every entity type. Stop on confidence/SLA or wish_i_knew.
-Do not invent a named_query for a causal essay.
+ORDER is grounded synthesis from THIS scope. Evidence size is unknown.
+Out-of-corpus questions → wish_i_knew / clarify, not a bigger search.
+Default staple: thorough (or scout → thorough). Do not default fast_pass.
 ```
 
-### thorough — detail over speed
-
-```text
-## Optimization: thorough
-Coverage > wall time. One terminating pipeline (cap 8). Bind @step.ids.
-Use search for language, find for [gsi], hops for relations, order+project for top-N.
-Hydrate (get include body / richer project) when the user needs attributes, not just ids.
-Do not spend rounds on List-per-entity. Extra AI round only if the first bag is too thin to project.
-Empty: one bound adjust, then wish_i_knew. Never invent rows.
-```
-
-### fast_pass — speed; logic on Zeus (`known_goal` default)
+### Staple: fast_pass
 
 ```text
 ## Optimization: fast_pass
-Minimize AI rounds (exactly one). Prefer named_query / frozen pipeline template over planning.
-If a rail matches, call it and project compact fields. Do not scout.
-If no rail and the ask is multi-step, emit ONE short pipeline (search/find → bind → project).
-Do not terminate empty to look fast. Missing rail → wish_i_knew (kind:tool|data), not N List calls.
-If question_class is open_ended, do not use this card as the default.
+Exactly one AI round. One terminating pipeline (cap short). Bind @step.ids.
+Plan the funnel up front; summary is written before results.
+Shape with set/order/enrich/project. Compact project.
+Do not terminate empty. Do not scout. Do not List-per-entity.
+If live tokens are unknown, this is the wrong staple — use scout.
+named_query only if that tool is actually on the catalog.
 ```
 
-### scout — inject is not enough; then commit
+### Staple: scout
 
 ```text
 ## Optimization: scout
-MINI-SCHEMA names types/indexes; it does not name live values. If predicates are underspecified
-(unknown tokens, empty where, no id bag), spend AT MOST one probe round:
-  describe (inventory only if brief missing) OR find limit 1–3 OR search limit 5
-  OR find return:count|selectivity on a real [gsi] path.
-Probe is not the answer. Next round: ONE pipeline that uses the observed values (@ids, tokens).
-Never rediscover nodes_total / entity type lists from the brief.
-Never chain List hotel, List airport, List landmark as “exploration.”
+MINI-SCHEMA names types; it does not name live values.
+At most one probe: find limit 1–3 or selectivity on a [gsi] path, or search limit 5,
+or describe if brief is missing.
+Probe is not ORDER. Next round: one terminating pipeline using observed @ids / tokens.
+Never rediscover nodes_total / entity type lists. Never List every entity type.
+```
+
+### Staple: thorough
+
+```text
+## Optimization: thorough
+Coverage > wall time, still one bound pipeline (cap 8), still @step.ids.
+Richer project / get include body when attributes are the SLA.
+Do not spend rounds on List-per-entity. Extra AI round only to hydrate a thin bag.
+Empty: one bound adjust, then wish_i_knew. Never invent rows.
 ```
 
 ---
 
-## 7. CORE conflict (scout vs “never rediscover”)
+## 10. Scoring (do not invent a fourth system)
 
-CORE: *never rediscover stats when BRIEF is present.* Scout must **not** call `get_stats` / `list_entity_types`. It **may**:
+Reuse closed-loop profiles. Add **hygiene**. Books stay **inside one class** as much as possible; mixed product traffic is OK, mixed **gold books** are not.
 
-- `find` `limit:1` or `return:selectivity` on a **schema path**
-- tiny `search` to see if a phrase hits
-- `describe` only when inject is actually missing (already allowed)
-
-Value-space ≠ inventory.
-
-**fast_pass** without L2 rails (on `known_goal`) is just “terminate sooner.” Hard filters stay `named_query`.
-
-**thorough** still needs bind ratio. Longer is not “more Lists.”
-
----
-
-## 8. Scoring / promotion (do not invent a fourth system)
-
-Reuse Zeus closed-loop profiles; add **hygiene** so B cannot win by dumping lists faster. **Books and A/B stay inside one `question_class`.**
-
-| Strategy | Promotion profile | Hygiene extra |
+| Staple | Promotion profile | Hygiene |
 | --- | --- | --- |
-| thorough | `balanced` (quality first; ignore small latency) | parts coverage; hydrate when asked; open_ended: evidence refs, not empty-fast |
-| fast_pass | `latency_first` / `cost_first` | rail hit **or** 1-round pipeline; empty = fail; only default on `known_goal` |
-| scout | `balanced` | `probe_budget` ≤ 1, then bind ratio on the commit turn |
+| fast_pass | `latency_first` / `cost_first` | 1 AI round; bound steps; empty = fail |
+| scout | `balanced` | `probe_budget` ≤ 1, then bind ratio on commit |
+| thorough | `balanced` | parts coverage; hydrate when asked; still bound |
 
-Pathshape **S2 waste** should mean **unbound** retrievals / extra **AI rounds** / find↔search divergence — **not** `len(pipeline steps) > 1`. A bound 5-step funnel is a **known_goal rail candidate**, not waste.
+S2 waste = **unbound** retrievals / extra **AI rounds** / find-on-text_fts — **not** `len(pipeline steps) > 1`.
 
-Gold books: label **class + strategy**. A “List hotel” book will always elect `fast_pass` and hide thorough/scout. A “why Rome” book must not share a catalog with the hotel funnel.
-
-Product reward:
-
-| Class | ORDER (center slot) |
-| --- | --- |
-| `known_goal` | Compact evidence bag, or later book/dispatch (Pachinko) |
-| `open_ended` | Grounded explanation + refs; confidence; gaps named |
-
-Do not RLHF “use pipeline”; the model will wrap a single `find` in a 1-step pipeline.
+Do not RLHF “use pipeline”; models will wrap a single `find`.
 
 ---
 
-## 9. What this is not
+## 11. Assumptions — keep vs change
+
+### Keep
+
+- Optimization ≠ more agents / more unbound Lists.
+- Intent field first; then a verb plan.
+- Bind the same id bag.
+- `find` equality; language → `search`.
+- Cards must be rendered; `guidance` JSON alone is a no-op.
+- MASQ cheap-find steers List today.
+- Pathshape hop-waste fights a good funnel (must change the **scorer**, not the staple names).
+- Travel-sample inventory ≠ OTA funnel catalog.
+
+### Change (this revision)
+
+| Old assumption | Now |
+| --- | --- |
+| known_goal = fill a named_query | ORDER = sized bag; rail is a **graduation** |
+| named_query is how the model puts logic on Zeus | **Pipeline + transforms** on current pin |
+| Terminating pipeline = see-then-refine | Summary is a **bet**; adaptive refine = scout / multi-round |
+| One class per bucket forever | Scope **default** + turn label; mixed inventory chat is normal |
+| “Why Rome fell” is Zeus open-ended | Open-ended = **in-graph** unknown budget; out-of-corpus = wish |
+| SLA × complexity already drive the engine | Operator inputs to **invent**; A/B still HTTP OK − empty |
+| Step 1 intent is done | QD exists; quality is often `List` — fix the **book** |
+| 8 action + 7 other APIs | **12** pin verbs; retrieve vs shape; named_query is another surface |
+| More parallelism never faster | Unbound Lists no; BP:6 parallel **parts in one pipeline** yes |
+| Shallow then another chat always bad | Cheap table can **be** ORDER (`ai_process_result: false`) |
+| Mini-schema never enough | Often enough for lookups; scout is **value-space** gaps |
+| fast_pass default for all known_goal | Only when the plan (or a wired rail) exists; else scout |
+
+---
+
+## 12. What this is not
 
 | Temptation | Better home |
 | --- | --- |
-| Fork `mode=open` for scout or for “why” questions | [MODE.md](MODE.md) · `question_class: open_ended` |
-| One `bucket.scope` / one endpoint for hotels **and** Rome | Two scopes, two stamps, two books |
-| Hash strategy into L0 CORE | This file stays L1 / hints until proven |
-| Free-text “be faster” with no caps | Closed enums + `max_ai_rounds` / `probe_budget` |
-| Per-question auto-pick of class | Operator sets class on the scope |
-| Reward pipeline step count | Reward unbound retrievals + extra LLM rounds |
-| Mexico / Tulum / “Rome” in CORE | Book questions; class is per scope; strategy is motion-shaped |
-| named_query as the optimization for open-ended “why” | Recipe + evidence budget; maybe partial seed rails only |
+| Fourth staple | Prove the three insufficient first |
+| Fork `mode=open` for scout or “why” | Class default + staple; [MODE.md](MODE.md) is join/noise |
+| Hash staples into L0 CORE | L1 / hints until proven |
+| Free-text “be faster” | Closed staple + caps |
+| named_query as the “why” machine | thorough + evidence budget |
+| Mexico / Tulum / Rome in CORE | Books; staples are motion-shaped |
+| Reward pipeline step count | Unbound retrievals + extra LLM rounds |
+| Trust hot-path → rail on current scorer | Fix S2 = unbound / AI rounds first |
 
 ---
 
-## 10. Open work (this is WIP)
+## 13. Open work (WIP)
 
-- [ ] Assembler renders `guidance.optimization` (class + strategy) into `messages[0]` (or Workbench always copies the cards into suffix).
-- [ ] Hub Workbench-2: **class is a scope fact**; strategy picker → suffix + Export.
-- [ ] Client `hints.optimization.question_class` / `strategy` (extend [ZC-WISH-040](ZEUS_CLIENT_WISHLIST_FOR_CHAT_REQUEST.md); do not mint a new wish until this graduates).
-- [ ] A/B hygiene: `expected_route` + bind ratio; stop classifying KindPipeline as S2; **do not A/B across classes**.
-- [ ] Two example books: known_goal funnel (travel-style) vs open_ended synthesis — **different scopes**.
-- [ ] Graduate a short `OPT:36` card into [OPTIMIZATION.md](OPTIMIZATION.md) when the enums are stable; keep this file as the verbose design.
-- [ ] No pack JSON change until the above is proven.
+- [ ] Assembler renders `guidance.optimization` (class default + **staple**) into `messages[0]`.
+- [ ] Workbench-2 staple picker → suffix + Export; class is a default, not a second product unless books diverge.
+- [ ] Client `hints.optimization.strategy` = `fast_pass` \| `scout` \| `thorough` (ZC-WISH-040; not live until inject).
+- [ ] A/B hygiene: `expected_route` + bind ratio; **do not** classify KindPipeline as S2.
+- [ ] Gold books labeled **class + staple** (funnel vs in-graph why vs List-only — List-only books lie).
+- [ ] Wire named_query as a tool **before** `prefer_named_query: true`.
+- [ ] Short `OPT:36` staple card in [OPTIMIZATION.md](OPTIMIZATION.md) when stable.
+- [ ] No pack JSON change until cards are rendered and one book A/B exists.
 
 ---
 
-## Checklist (paste into a later PR)
+## Checklist (later PR)
 
 ```text
-Rule: question_class known_goal|open_ended (per scope) + think-budget thorough|fast_pass|scout
+Rule: staples fast_pass | scout | thorough; class known_goal|open_ended is a default
 Placement: HINTS / guidance (L1) — not CORE, not MODE
-Modes: all (orthogonal to mode overlay; research/open bias often rides open_ended scopes)
-Day-one?: class yes (pick when you create the scope); strategy no (operator pick)
+Modes: all (orthogonal)
+Day-one?: staple pick per product/book; class default on scope
 Hashed?: no
-Enforced by: model (card) until Client/assembler exists
+Enforced by: rendered card until Client/assembler exists
 Citation: OPT:36 (reserved)
-Anti-pattern if misplaced: mix Rome and hotels on one endpoint; scout becomes List fan-out;
-  fast_pass becomes empty terminate; named_query used as the “why” machine; mode=open used as “explore”
+Anti-pattern: mix gold books; scout never commits; fast_pass empty-fast;
+  named_query claimed as a verb on current pin; terminating pipeline sold as see-then-refine;
+  out-of-corpus why treated as thorough; hop-count as waste
 ```

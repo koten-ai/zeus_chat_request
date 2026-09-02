@@ -50,6 +50,7 @@ If a hint is true **every** turn for **every** tenant forever → promote to COR
 | **P2** | **A/B** | `hints.ab_arm`, `hints.ab_paste` | Experiments without thrashing `contract_hash` |
 | **P2** | **Terminate soft** | `hints.terminate.soft_require`, `summary_style` | Extra G2/G3 nudge; required four stay catalog |
 | **P2** | **Budget / channel** | `hints.budget.max_steps`, `search_timeout_ms`, `channel` | Voice / low-latency SKUs |
+| **P2** | **Optimization strategy (WIP)** | `hints.optimization.strategy` = `thorough` \| `fast_pass` \| `scout` | Think-budget this turn; **not** mode. Design: [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) |
 | **P3** | **Product / motion** | `hints.product.motion`, `default_limit` | Explore/compare/refine product chrome |
 | **P3** | **Recovery** | `hints.recovery.last_error`, `try_next` | Session-only after tool fail |
 | **P3** | **Playbook chip** | `hints.playbook_id` + params | Workbench chip → named recipe |
@@ -86,6 +87,8 @@ hints:
     prefer_one_pipeline: true
     max_steps: 5
     search_timeout_ms: 5000
+  optimization:   # WIP — see OPTIMIZATION_STRATEGIES.md; not live until Client injects
+    strategy: thorough | fast_pass | scout
   product:
     motion: explore | compare | refine
     channel: web | voice
@@ -104,6 +107,7 @@ Caps: soft ~1–2 KB inject; hard reject oversized pastes (PROMPT_SETTINGS secur
 | Company manifesto | `company_context` (word caps) |
 | Always-on Helios JTBD/sentiment | Off-path / optional_when |
 | “Long paragraph ⇒ mode=open” | [BEST_PRACTICES § multi-intent](BEST_PRACTICES.md) + `hints.multipart` |
+| “Explore because inject is thin ⇒ mode=open” | [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) `scout` (budgeted probe, then pipeline) |
 
 ### Multi-intent vs **open** mode (normative)
 

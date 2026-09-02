@@ -56,6 +56,7 @@ COMPAT.md                      ← Zeus × BASE × zeus_client
 | [MODE.md](MODE.md) | **Modes** — engine vs catalog; why packs converged; overlay model |
 | [BEST_PRACTICES.md](BEST_PRACTICES.md) | **Retrieval playbook** — single-focus recipes + multi-intent paragraphs; open ≠ multi-ask |
 | [OPTIMIZATION.md](OPTIMIZATION.md) | **End-goal fine-tuning** — Pachinko → `named_query` rails (PREPARED SQL++); Funnel; not day-one playbook |
+| [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) | **WIP** — pickable `thorough` / `fast_pass` / `scout` postures for `chat_request` (not a pack change) |
 | [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) | **Where instructions live** — CORE / MODE / BP / OPT / hints / Client; all modes; new-rule checklist |
 | [WISH_I_KNEW_DUAL.md](WISH_I_KNEW_DUAL.md) | **base-5.2** — classic `wish_i_knew` + `data_gaps` for Helios |
 | [../work/RECREATE_MODE.md](../work/RECREATE_MODE.md) | **Plan** — restore mode overlays into system prompt (`messages[].content`) |

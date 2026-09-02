@@ -73,9 +73,9 @@ Use **`OPT:N`** in stamps, Display Pad, Helper actions, and contracted notes. **
 | **OPT:33** | Detective “pass” ≠ multi-turn success | traffic · measure |
 | **OPT:34** | Soft `hints.multipart` pastes (verbose) | traffic · Client inject |
 | **OPT:35** | Why verbose OPT cards are worth tokens | traffic · meta |
-| **OPT:36** | Pickable execution strategies (`thorough` / `fast_pass` / `scout`) | **WIP** · [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) |
+| **OPT:36** | Problem class (`known_goal` / `open_ended`) + think-budget (`thorough` / `fast_pass` / `scout`) | **WIP** · [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) |
 
-**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**; worked multi-turn recipe = **OPT:29**. Pickable think-budget (`thorough` / `fast_pass` / `scout`) is **WIP** — [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md); do not hash into CORE yet.
+**Cross-doc:** day-one multi-turn short law = **BP:4**; longer CORE under traffic = **OPT:4**; worked multi-turn recipe = **OPT:29**. **WIP:** two optimization methods — `known_goal` (binds for a named_query / travel funnel) vs `open_ended` (unknown size, e.g. “why did Rome fall”) — plus think-budget `thorough` / `fast_pass` / `scout`. Usually **not the same `bucket.scope`**. See [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md); do not hash into CORE yet.
 
 ### Why OPT cards can be longer than BP cards
 
@@ -918,7 +918,7 @@ Keep inject size soft-capped (~1–2 KB). Jailbreak law stays in hard `rules{}`,
 | Doc | Role |
 | --- | --- |
 | **This file** | End-goal fine-tuning / Pachinko / named rails / **optimization portfolio** / **verbose rare cards OPT:29+** |
-| [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) | **WIP** pickable postures `thorough` / `fast_pass` / `scout` (`OPT:36` reserved) |
+| [OPTIMIZATION_STRATEGIES.md](OPTIMIZATION_STRATEGIES.md) | **WIP** `known_goal` vs `open_ended` + postures `thorough` / `fast_pass` / `scout` (`OPT:36`) |
 | [BEST_PRACTICES.md](BEST_PRACTICES.md) | Day-one playbook (pins) · `BP:N` |
 | [ROADMAP.md](ROADMAP.md) § HINTS · sequencing | Soft hot_path inject; when rails enter product trains |
 | [ZE-267](https://kotenai.atlassian.net/browse/ZE-267) | Prompt Helper → rails → contract |

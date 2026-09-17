@@ -5,4 +5,12 @@
 
 __pycache__/
 *.pyc
-.DS_Store
+
+# Local secrets / keys (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+id_rsa
+id_rsa.pub
+secrets/

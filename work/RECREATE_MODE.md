@@ -4,7 +4,7 @@
 > **Roadmap train:** **base-5.1** (content on base-5 wire — not a wire break) · [ROADMAP.md § base-5.1](../docs/ROADMAP.md)  
 > **Jira:** [CR-23](https://kotenai.atlassian.net/browse/CR-23) · parent epic [CR-3](https://kotenai.atlassian.net/browse/CR-3)  
 > **SoT for mode meaning:** [../docs/MODE.md](../docs/MODE.md)  
-> **Engine design:** [zeus_design_docs DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md)  
+> **Engine design:** [zeus_design_docs DESIGN.md §14](https://github.com/koten-ai/zeus_design_docs/blob/main/DESIGN.md)  
 > **Packs:** `v2/base/base-5/min/chat_request_<mode>_base-5.json` (candidate; pin still base-1)
 
 ## Goal

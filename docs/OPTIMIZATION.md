@@ -129,7 +129,7 @@ Seasonal:    new traffic → mine misses → new rails (green in the diagram)
 | **3 · Shaped funnel** | Rails from front/middle/sides | **1–2** · rare miss | Top 5–10 patterns are fast-pass; seasonal green rails for new demand |
 
 **Shape the funnel — don’t shrink the box.**  
-That is the opposite of Path B2 (restrict chat so only form-shaped questions remain). See [ENTITY foundation](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) Path B2 and Zeus Funnel motion docs.
+That is the opposite of Path B2 (restrict chat so only form-shaped questions remain). See [ENTITY foundation](https://github.com/koten-ai/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) Path B2 and Zeus Funnel motion docs.
 
 ---
 

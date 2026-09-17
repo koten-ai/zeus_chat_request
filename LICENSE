@@ -1,0 +1,40 @@
+Zeus Chat Request
+Copyright © 2026 Koten AI. All rights reserved.
+
+------------------------------------------------------------------------------
+
+DEFAULT LICENSE FOR THIS REPOSITORY
+
+Unless an individual file declares a different license in its own header,
+every file in this repository is licensed under the
+
+    Business Source License 1.1 (BUSL-1.1)
+
+with the following parameters:
+
+    Licensor:             Koten AI
+    Licensed Work:        Zeus Chat Request
+    Additional Use Grant: None.  No production use of the Licensed Work
+                          is permitted without a commercial license from
+                          the Licensor.
+    Change Date:          2030-09-16
+    Change License:       Apache License, Version 2.0
+    Contact:              info@koten.ai
+
+The full text of the Business Source License 1.1, with the parameters
+above, lives at:
+
+    licenses/BSL-1.1.txt
+
+------------------------------------------------------------------------------
+
+THIRD-PARTY COMPONENTS
+
+This repository may include third-party software in vendored, packaged,
+or generated form. Such third-party software is licensed by its respective
+copyright holders under its own terms; this file does not re-license it.
+
+------------------------------------------------------------------------------
+
+For commercial licensing of Zeus Chat Request, or any question about this
+license, contact: info@koten.ai

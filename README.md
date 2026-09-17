@@ -206,7 +206,15 @@ python3 scripts/scan_catalogs.py
 
 ## License
 
-Same product family as Zeus / Koten unless otherwise noted.
+Zeus Chat Request is licensed under the **Business Source License 1.1 (BUSL-1.1)**
+with `Additional Use Grant: None` — **no production use is permitted without
+a commercial license** from Koten AI. The license converts to **Apache License
+2.0** on the Change Date (**2030-09-16**).
+
+- Repo-wide default: [`LICENSE`](LICENSE)
+- Full BSL text and parameters: [`licenses/BSL-1.1.txt`](licenses/BSL-1.1.txt)
+
+Commercial licensing: info@koten.ai
 
 ## Release notes
 

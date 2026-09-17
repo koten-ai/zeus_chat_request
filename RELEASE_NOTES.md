@@ -238,4 +238,4 @@ None (initial release).
 
 - No full (non-min) profile published yet — min only.  
 - No use-case-specific catalogs in this tree yet.  
-- Private clones may need `GITHUB_TOKEN` / `ZEUS_CHAT_REQUEST_DIR` for Helper MCP.  
+- Helper MCP can clone this repo; set `ZEUS_CHAT_REQUEST_DIR` to a local checkout if you prefer not to fetch. A `GITHUB_TOKEN` is only needed if the clone is private.  

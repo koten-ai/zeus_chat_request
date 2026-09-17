@@ -730,7 +730,7 @@ Client → type-check values (descriptions not re-emitted)
 
 **Jira:** **[CR-23](https://kotenai.atlassian.net/browse/CR-23)** · parent epic **CR-3** · status To Do  
 **SoT:** [MODE.md](MODE.md) · **Plan:** [work/RECREATE_MODE.md](../work/RECREATE_MODE.md)  
-**Design:** [zeus_design_docs DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) · Zeus `internal/modes/`
+**Design:** [zeus_design_docs DESIGN.md §14](https://github.com/koten-ai/zeus_design_docs/blob/main/DESIGN.md) · Zeus `internal/modes/`
 
 **Theme:** base-5 **froze the wire** but left **10 mode packs nearly identical** (analytics system essay × rename; only `auto` shorter). **base-5.1** restores DESIGN mode intent into the **stamped system prompt** (`messages[].content` = shared CORE + per-mode **MODE_OVERLAY**). **Not** a Layer A / object break.
 
@@ -1055,10 +1055,10 @@ Prefer **verb clarity before aggressive tool-count diet**.
 
 | Doc | Use for |
 | --- | --- |
-| [zeus_design_docs DESIGN.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) §1 | **AI-Ready overlay** — source targets vs Zeus store; never mutate source bodies |
+| [zeus_design_docs DESIGN.md](https://github.com/koten-ai/zeus_design_docs/blob/main/DESIGN.md) §1 | **AI-Ready overlay** — source targets vs Zeus store; never mutate source bodies |
 | DESIGN.md §7 (tool classes) + §7.8 | **Access class** (discovery / kv / lookup / vector / traversal / …) · **MINI-SCHEMA = shape** (legal `where`, FTS vs GSI, FK / inverse_fks, walk_paths) |
 | DESIGN.md §14 | **Modes** — persona + limits (hop caps, confidence floors); analytics = safe default |
-| [ENTITY_TRANSACTION_ENTITY_FOUNDATION.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) | E–T–E ancestry · **schema-as-world-model** vs form · “predicates as verbs for discovery” |
+| [ENTITY_TRANSACTION_ENTITY_FOUNDATION.md](https://github.com/koten-ai/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) | E–T–E ancestry · **schema-as-world-model** vs form · “predicates as verbs for discovery” |
 
 **Gap today (base-5.2):** packs already *have* tools, brief, mini-schema, and mode overlays, but they read like **efficiency + Layer A form**. The DESIGN / foundation thesis — *overlay world map + instruments, not form-fill* — is **implicit**, not taught. Layer A terminate is intentionally form-shaped (emit contract); the **data path** must not be taught the same way.
 
@@ -1164,7 +1164,7 @@ name/description are language (text_fts → search); abv/ibu/srm are measures (g
 - Teaching REA/ER/Kimball names in the hot system prompt (keep in design docs / talks)  
 - Softening required four or growing always-on Helios Layer A fields  
 - Runtime tool strip when inject green (still forbidden under enforcement)  
-- Path B2 “restrict chat to raise hit rate” as the primary product story — modes/contracts bound **verbs and boundaries**, they do not replace a legible map ([ENTITY foundation](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) §7)
+- Path B2 “restrict chat to raise hit rate” as the primary product story — modes/contracts bound **verbs and boundaries**, they do not replace a legible map ([ENTITY foundation](https://github.com/koten-ai/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) §7)
 
 ### Success signals
 
@@ -1190,7 +1190,7 @@ name/description are language (text_fts → search); abv/ibu/srm are measures (g
 
 **Jira:** folds into **[CR-26](https://kotenai.atlassian.net/browse/CR-26)**  
 **Reviewed:** 2026-07-26 · pack `v2/base/base-5.2/min/chat_request_*_base-5.2.json` (analytics representative)  
-**SoT for behaviour:** Zeus [`docs/API/V2/*.md`](https://github.com/Fujio-Turner/Zeus/tree/main/docs/API/V2) (`describe`, `get`, `find`, `traverse`, `search`, `analyze`, `explain`, `pipeline`, `return`, `transforms.md`)  
+**SoT for behaviour:** Zeus [`docs/API/V2/*.md`](https://github.com/koten-ai/Zeus/tree/main/docs/API/V2) (`describe`, `get`, `find`, `traverse`, `search`, `analyze`, `explain`, `pipeline`, `return`, `transforms.md`)  
 **Related:** § Getting skinny (diet / empirics) · § World model language (access path chooser in CORE)
 
 ### Verdict
@@ -1408,8 +1408,8 @@ Prefer **clarity before aggressive tool-count diet**: a wrong `order`/`where` co
 
 **Jira:** **[CR-26](https://kotenai.atlassian.net/browse/CR-26)** · parent epic **CR-3**  
 **SoT:** § Getting skinny · § World model language · § Verb catalog clarity · [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) · Hot Path / Prompt Helper  
-**Upstream words:** [DESIGN.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) §1 · §7.8 · §14 · [ENTITY_TRANSACTION_ENTITY_FOUNDATION.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md)  
-**Upstream API:** Zeus [`docs/API/V2`](https://github.com/Fujio-Turner/Zeus/tree/main/docs/API/V2)  
+**Upstream words:** [DESIGN.md](https://github.com/koten-ai/zeus_design_docs/blob/main/DESIGN.md) §1 · §7.8 · §14 · [ENTITY_TRANSACTION_ENTITY_FOUNDATION.md](https://github.com/koten-ai/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md)  
+**Upstream API:** Zeus [`docs/API/V2`](https://github.com/koten-ai/Zeus/tree/main/docs/API/V2)  
 **Theme:** Cut **token weight** and **bad rediscovery habits**; teach **overlay + map + access class** in short CORE prose; **rewrite 13 verb descriptions/params** so they teach correct use; cut **tool membership** only via **new stamps** from run empirics.
 
 | | |
@@ -1852,9 +1852,9 @@ Helios volume is **report/session scalars**.
 | ROADMAP **§ HINTS catalog** | Soft `hints.*` families + assembly law (base-6 / CR-4) |
 | [RULES_OBJECT_AND_OUTPUT_REQUEST.md](RULES_OBJECT_AND_OUTPUT_REQUEST.md) | Named rules/triggers + Client `output_request` |
 | [PROMPT_SETTINGS.md](PROMPT_SETTINGS.md) | Settings · merge · Client policy · cache · security · **verb allow/deny** · company_context |
-| [zeus_design_docs DESIGN.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) | Zeus architecture — overlay · tools · mini-schema §7.8 · modes §14 |
-| [ENTITY_TRANSACTION_ENTITY_FOUNDATION.md](https://github.com/fujio-turner/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) | E–T–E / schema-as-world-model storytelling SoT |
-| Zeus [`docs/API/V2`](https://github.com/Fujio-Turner/Zeus/tree/main/docs/API/V2) | Per-verb behaviour SoT for catalog descriptions |
+| [zeus_design_docs DESIGN.md](https://github.com/koten-ai/zeus_design_docs/blob/main/DESIGN.md) | Zeus architecture — overlay · tools · mini-schema §7.8 · modes §14 |
+| [ENTITY_TRANSACTION_ENTITY_FOUNDATION.md](https://github.com/koten-ai/zeus_design_docs/blob/main/ENTITY_TRANSACTION_ENTITY_FOUNDATION.md) | E–T–E / schema-as-world-model storytelling SoT |
+| Zeus [`docs/API/V2`](https://github.com/koten-ai/Zeus/tree/main/docs/API/V2) | Per-verb behaviour SoT for catalog descriptions |
 | [CREATE_BASE.md](CREATE_BASE.md) | Scaffold new base-N pack (`scripts/new_base.py`) |
 | [COMPAT.md](../COMPAT.md) | Zeus × chat_request BASE × zeus_client matrix |
 | [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) | Wire order + budgets |

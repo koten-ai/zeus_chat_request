@@ -6,7 +6,7 @@
 **Roadmap train:** **base-5.1** — pack folder **`v2/base/base-5.1/`** · [ROADMAP.md § base-5.1](ROADMAP.md)  
 **Executable restore plan:** [../work/RECREATE_MODE.md](../work/RECREATE_MODE.md)  
 **Jira:** [CR-23](https://kotenai.atlassian.net/browse/CR-23) · snapshot layout [CR-25](https://kotenai.atlassian.net/browse/CR-25)  
-**Normative product design (engine modes):** [zeus_design_docs DESIGN.md §14](https://github.com/fujio-turner/zeus_design_docs/blob/main/DESIGN.md) · runtime hooks `Zeus/internal/modes/`  
+**Normative product design (engine modes):** [zeus_design_docs DESIGN.md §14](https://github.com/koten-ai/zeus_design_docs/blob/main/DESIGN.md) · runtime hooks `Zeus/internal/modes/`  
 **Related:** [CHAT_REQUEST.md](CHAT_REQUEST.md) · [BIBLE.md](BIBLE.md) · [PROMPT_ASSEMBLY.md](PROMPT_ASSEMBLY.md) · [ROADMAP.md](ROADMAP.md) · [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) (CORE vs MODE vs BP vs OPT)
 
 **Placement:** mode overlays hold **posture** only; Layer A wire and evidence law stay universal — [PROMPT_RULE_PLACEMENT.md](PROMPT_RULE_PLACEMENT.md) §3–5.
